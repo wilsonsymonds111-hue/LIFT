@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, User } from 'lucide-react';
 
 export default function TemplateModal({ template, onClose }) {
   if (!template) return null;
@@ -37,8 +37,8 @@ export default function TemplateModal({ template, onClose }) {
           {template.exerciseList?.map((exercise, idx) => (
             <div key={idx} className="flex items-center gap-4">
               {/* Avatar */}
-              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 text-lg font-bold text-gray-500 border border-gray-200">
-                {exercise.name.charAt(0)}
+              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 border border-blue-200">
+                <User className="w-6 h-6 text-blue-600" />
               </div>
 
               {/* Info */}
