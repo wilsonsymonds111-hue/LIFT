@@ -1,11 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Dumbbell, Zap } from 'lucide-react';
+import { Dumbbell, Plus } from 'lucide-react';
 
 export default function BottomNav() {
   const location = useLocation();
 
   const tabs = [
-    { path: '/', label: 'Start Workout', icon: Zap },
+    { path: '/', label: 'Start Workout', icon: Plus },
     { path: '/exercises', label: 'Exercises', icon: Dumbbell },
   ];
 
