@@ -30,13 +30,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Quick Start Section */}
-      <div className="px-4 py-4">
-        <h2 className="text-lg font-semibold text-foreground mb-4">Quick Start</h2>
-        <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition">
-          Start an Empty Workout
-        </button>
-      </div>
+
 
       {/* Templates Section */}
       <div className="px-4 py-6">
