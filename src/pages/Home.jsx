@@ -72,7 +72,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {templates.map((template) => (
-              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer" onClick={() => setSelectedTemplate(template)}>
+              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate(template)}>
                 <div className="flex items-start justify-between mb-3">
                   <h4 className="font-bold text-foreground">{template.name}</h4>
                   <button className="text-muted-foreground hover:text-foreground" onClick={(e) => e.stopPropagation()}>⋯</button>
@@ -94,7 +94,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {exampleTemplates.map((template) => (
-              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer" onClick={() => setSelectedTemplate(template)}>
+              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate(template)}>
                 <h4 className="font-bold text-foreground mb-2">{template.name}</h4>
                 <p className="text-sm text-muted-foreground">{template.exercises}</p>
               </div>
