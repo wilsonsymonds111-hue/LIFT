@@ -40,18 +40,6 @@ export default function Home() {
 
       {/* Templates Section */}
       <div className="px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-foreground">Templates</h2>
-          <div className="flex gap-3">
-            <button className="text-blue-500 font-semibold text-sm">+ Template</button>
-            <button className="p-2 hover:bg-secondary rounded-lg">
-              <span className="text-blue-500">📁</span>
-            </button>
-            <button className="p-2 hover:bg-secondary rounded-lg">
-              <span className="text-muted-foreground">⋯</span>
-            </button>
-          </div>
-        </div>
 
         {/* My Templates */}
         <div className="mb-8">
