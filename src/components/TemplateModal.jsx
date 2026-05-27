@@ -4,45 +4,51 @@ export default function TemplateModal({ template, onClose }) {
   if (!template) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex flex-col justify-end">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
 
-      {/* Modal */}
-      <div
-        className="relative bg-white rounded-t-2xl w-full max-w-lg max-h-[85vh] flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
+      {/* Sheet */}
+      <div className="relative bg-white rounded-t-3xl w-full max-h-[88vh] flex flex-col shadow-2xl">
+
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-gray-300" />
+        </div>
+
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition"
           >
-            <X className="w-4 h-4 text-gray-600" />
+            <X className="w-4 h-4 text-gray-700" />
           </button>
-          <h2 className="font-bold text-lg text-gray-900">{template.name}</h2>
-          <button className="text-blue-500 font-medium text-sm hover:text-blue-600 transition">Edit</button>
+          <h2 className="font-bold text-base tracking-wide text-gray-900">{template.name}</h2>
+          <button className="text-blue-500 font-semibold text-sm hover:text-blue-600 transition">Edit</button>
         </div>
 
         {template.days && (
-          <p className="px-4 pb-3 text-sm text-gray-500">Last Performed: {template.days}</p>
+          <p className="px-5 py-2 text-sm text-gray-500">Last Performed: {template.days}</p>
         )}
 
         {/* Exercise List */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
+        <div className="flex-1 overflow-y-auto px-5 py-2 space-y-4">
           {template.exerciseList?.map((exercise, idx) => (
-            <div key={idx} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold text-gray-500 flex-shrink-0">
-                  {exercise.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900 text-sm">{exercise.sets} × {exercise.name}</p>
-                  <p className="text-xs text-gray-500">{exercise.muscle}</p>
-                </div>
+            <div key={idx} className="flex items-center gap-4">
+              {/* Avatar */}
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 text-lg font-bold text-gray-500 border border-gray-200">
+                {exercise.name.charAt(0)}
               </div>
-              <button className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 text-sm font-bold flex-shrink-0">
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-gray-900 text-sm leading-tight">{exercise.sets} × {exercise.name}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{exercise.muscle}</p>
+              </div>
+
+              {/* Info button */}
+              <button className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 font-bold text-sm flex-shrink-0">
                 ?
               </button>
             </div>
@@ -50,8 +56,8 @@ export default function TemplateModal({ template, onClose }) {
         </div>
 
         {/* Start Workout Button */}
-        <div className="px-4 pb-6 pt-2">
-          <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-xl transition">
+        <div className="px-5 py-5">
+          <button className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-4 rounded-2xl text-base transition">
             Start Workout
           </button>
         </div>
