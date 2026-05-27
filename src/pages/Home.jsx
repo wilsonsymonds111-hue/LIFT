@@ -20,10 +20,7 @@ export default function Home() {
       {/* Header */}
       <div className="px-4 py-6">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <p className="text-sm text-muted-foreground">New in 6.0</p>
-            <h1 className="text-4xl font-bold text-foreground">Start Workout</h1>
-          </div>
+          <h1 className="text-4xl font-bold text-foreground">Start Workout</h1>
           <button className="p-2 hover:bg-secondary rounded-lg transition">
             <Search className="w-6 h-6 text-primary" />
           </button>
