@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Search } from 'lucide-react';
 import TemplateModal from '../components/TemplateModal';
+import WorkoutSheet from '../components/WorkoutSheet';
 
 export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [activeWorkout, setActiveWorkout] = useState(null);
 
   const templates = [
     { id: 1, name: 'CHEST', days: '12 days ago', exercises: 'Incline Bench Press (Barbell), Standing press, Pec Deck (Machine)...', exerciseList: [
@@ -42,7 +44,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <TemplateModal template={selectedTemplate} onClose={() => setSelectedTemplate(null)} />
+      <TemplateModal
+        template={selectedTemplate}
+        onClose={() => setSelectedTemplate(null)}
+        onStartWorkout={(t) => { setActiveWorkout(t); setSelectedTemplate(null); }}
+      />
+      <WorkoutSheet template={activeWorkout} onFinish={() => setActiveWorkout(null)} />
 
       {/* Header */}
       <div className="px-4 py-6">

@@ -1,5 +1,4 @@
 import { X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 const HollowDot = (props) => {
@@ -9,13 +8,11 @@ const HollowDot = (props) => {
   );
 };
 
-export default function TemplateModal({ template, onClose }) {
-  const navigate = useNavigate();
+export default function TemplateModal({ template, onClose, onStartWorkout }) {
   if (!template) return null;
 
   const handleStart = () => {
-    onClose();
-    navigate('/workout', { state: { template } });
+    onStartWorkout?.(template);
   };
 
   return (
