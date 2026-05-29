@@ -1,4 +1,4 @@
-import { X, User, Info } from 'lucide-react';
+import { X, BarChart2 } from 'lucide-react';
 
 export default function TemplateModal({ template, onClose }) {
   if (!template) return null;
@@ -36,20 +36,15 @@ export default function TemplateModal({ template, onClose }) {
         <div className="flex-1 overflow-y-auto px-5 py-2 space-y-4">
           {template.exerciseList?.map((exercise, idx) => (
             <div key={idx} className="flex items-center gap-4">
-              {/* Avatar */}
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 border border-blue-200">
-                <User className="w-6 h-6 text-blue-600" />
-              </div>
-
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-gray-900 text-sm leading-tight">{exercise.sets} × {exercise.name}</p>
                 <p className="text-xs text-gray-400 mt-0.5">{exercise.muscle}</p>
               </div>
 
-              {/* Info button */}
-              <button className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-shrink-0">
-                <Info className="w-4 h-4" />
+              {/* Chart button */}
+              <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 flex-shrink-0">
+                <BarChart2 className="w-4 h-4" />
               </button>
             </div>
           ))}
