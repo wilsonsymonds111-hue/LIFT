@@ -1,6 +1,13 @@
 import { X } from 'lucide-react';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
+const HollowDot = (props) => {
+  const { cx, cy } = props;
+  return (
+    <circle cx={cx} cy={cy} r={3} fill="white" stroke="#3b82f6" strokeWidth={1.5} />
+  );
+};
+
 export default function TemplateModal({ template, onClose }) {
   if (!template) return null;
 
@@ -48,7 +55,7 @@ export default function TemplateModal({ template, onClose }) {
                 <div className="w-16 h-8 flex-shrink-0">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={exercise.history.map(v => ({ v }))}>
-                      <Line type="monotone" dataKey="v" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="v" stroke="#3b82f6" strokeWidth={2} dot={<HollowDot />} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
