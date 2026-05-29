@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { BarChart, Bar, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 export default function TemplateModal({ template, onClose }) {
   if (!template) return null;
@@ -43,13 +43,13 @@ export default function TemplateModal({ template, onClose }) {
                 <p className="text-xs text-gray-400 mt-0.5">{exercise.muscle}</p>
               </div>
 
-              {/* Mini chart */}
+              {/* Mini sparkline */}
               {exercise.history && (
-                <div className="w-14 h-8 flex-shrink-0">
+                <div className="w-16 h-8 flex-shrink-0">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={exercise.history.map(v => ({ v }))} barSize={4}>
-                      <Bar dataKey="v" fill="#3b82f6" radius={[2,2,0,0]} />
-                    </BarChart>
+                    <LineChart data={exercise.history.map(v => ({ v }))}>
+                      <Line type="monotone" dataKey="v" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                    </LineChart>
                   </ResponsiveContainer>
                 </div>
               )}
