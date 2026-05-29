@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 const HollowDot = (props) => {
@@ -9,7 +10,13 @@ const HollowDot = (props) => {
 };
 
 export default function TemplateModal({ template, onClose }) {
+  const navigate = useNavigate();
   if (!template) return null;
+
+  const handleStart = () => {
+    onClose();
+    navigate('/workout', { state: { template } });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
@@ -66,7 +73,7 @@ export default function TemplateModal({ template, onClose }) {
 
         {/* Start Workout Button */}
         <div className="px-5 py-5">
-          <button className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-4 rounded-2xl text-base transition">
+          <button onClick={handleStart} className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-4 rounded-2xl text-base transition">
             Start Workout
           </button>
         </div>

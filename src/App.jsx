@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
 import Exercises from './pages/Exercises';
+import Workout from './pages/Workout';
 import BottomNav from './components/BottomNav';
 
 const AuthenticatedApp = () => {
@@ -38,6 +39,7 @@ const AuthenticatedApp = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/exercises" element={<Exercises />} />
+        <Route path="/workout" element={<Workout />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
       <BottomNav />
