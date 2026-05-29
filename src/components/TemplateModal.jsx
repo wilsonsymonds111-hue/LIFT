@@ -1,4 +1,4 @@
-import { X, User } from 'lucide-react';
+import { X, User, Info } from 'lucide-react';
 
 export default function TemplateModal({ template, onClose }) {
   if (!template) return null;
@@ -48,8 +48,8 @@ export default function TemplateModal({ template, onClose }) {
               </div>
 
               {/* Info button */}
-              <button className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 font-bold text-sm flex-shrink-0">
-                ?
+              <button className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-shrink-0">
+                <Info className="w-4 h-4" />
               </button>
             </div>
           ))}
