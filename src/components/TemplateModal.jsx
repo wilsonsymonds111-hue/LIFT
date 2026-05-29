@@ -48,12 +48,12 @@ export default function TemplateModal({ template, onClose }) {
         )}
 
         {/* Exercise List */}
-        <div className="flex-1 overflow-y-auto px-5 py-2 space-y-4">
+        <div className="px-5 py-3 space-y-3 overflow-hidden">
           {template.exerciseList?.map((exercise, idx) => (
-            <div key={idx} className="flex items-center gap-4">
+            <div key={idx} className="flex items-center gap-3">
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-gray-900 text-sm leading-tight">{exercise.sets} × {exercise.name}</p>
+                <p className="font-bold text-gray-900 text-sm leading-snug">{exercise.sets} × {exercise.name}</p>
                 <p className="text-xs text-gray-400 mt-0.5">{exercise.muscle}</p>
               </div>
 
