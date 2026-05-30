@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Link2, MoreHorizontal, Check, ChevronDown } from 'lucide-react';
+import { X, RotateCcw, Link2, MoreHorizontal, Check, ChevronDown } from 'lucide-react';
 
 function useTimer() {
   const [seconds, setSeconds] = useState(0);
@@ -132,12 +132,20 @@ export default function WorkoutSheet({ template, onFinish }) {
           <>
             {/* Top bar */}
             <div className="flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
-              <button
-                onClick={onFinish}
-                className="w-10 h-10 flex items-center justify-center bg-red-100 hover:bg-red-200 rounded-xl transition"
-              >
-                <X className="w-5 h-5 text-red-600" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onFinish}
+                  className="w-10 h-10 flex items-center justify-center bg-red-100 hover:bg-red-200 rounded-xl transition"
+                >
+                  <X className="w-5 h-5 text-red-600" />
+                </button>
+                <button
+                  onClick={() => {}}
+                  className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition"
+                >
+                  <RotateCcw className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
               <button
                 onClick={onFinish}
                 className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition"
