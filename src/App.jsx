@@ -8,7 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
 import Exercises from './pages/Exercises';
 import Workout from './pages/Workout';
-import BottomNav from './components/BottomNav';
+
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -42,7 +42,6 @@ const AuthenticatedApp = () => {
         <Route path="/workout" element={<Workout />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
-      <BottomNav />
     </>
   );
 };

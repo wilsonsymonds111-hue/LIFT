@@ -43,23 +43,13 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background">
       <TemplateModal
         template={selectedTemplate}
         onClose={() => setSelectedTemplate(null)}
         onStartWorkout={(t) => { setActiveWorkout(t); setSelectedTemplate(null); }}
       />
       <WorkoutSheet template={activeWorkout} onFinish={() => setActiveWorkout(null)} />
-
-      {/* Header */}
-      <div className="px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-4xl font-bold text-foreground">Start Workout</h1>
-          <button className="p-2 hover:bg-secondary rounded-lg transition">
-            <Search className="w-6 h-6 text-primary" />
-          </button>
-        </div>
-      </div>
 
       {/* Quick Start Section */}
       <div className="px-4 py-4">
