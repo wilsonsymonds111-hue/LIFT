@@ -90,7 +90,7 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
         </div>
         {/* Swipeable row */}
         <div
-          className={`grid grid-cols-[40px_1fr_80px_80px_40px] items-center gap-1 py-2 px-1 rounded-lg transition-colors ${done ? 'bg-green-50' : 'bg-white'}`}
+          className={`grid grid-cols-[40px_1fr_80px_80px_40px] items-center gap-1 py-1.5 px-1 rounded-lg transition-colors ${done ? 'bg-green-50' : 'bg-white'}`}
           style={{ transform: `translateX(${swipeX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease' }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -122,7 +122,7 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
         </div>
       </div>
       {done && restSeconds !== null && restSeconds > 0 && (
-        <div className="w-full bg-blue-500 text-white font-bold text-center py-3 rounded-xl mt-2 text-lg tracking-wider">
+        <div className="w-full bg-blue-500 text-white font-bold text-center py-1.5 rounded-xl mt-2 text-base tracking-wider">
           {String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')}
         </div>
       )}
@@ -159,7 +159,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
       ))}
       <button
         onClick={() => setSets(p => [...p, { id: Date.now() }])}
-        className="mt-2 w-full py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
+        className="mt-2 w-full py-1.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
       >
         + Add Set
       </button>
