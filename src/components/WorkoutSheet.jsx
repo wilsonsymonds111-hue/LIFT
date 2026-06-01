@@ -296,6 +296,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [bestSets, setBestSets] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [finishTimer, setFinishTimer] = useState('00:00');
+  const [extraExercises, setExtraExercises] = useState([]);
   const { display: timer } = useTimer();
   const bestSetsRef = useRef({});
 
@@ -360,7 +361,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
+            <div className="relative flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <button onClick={onFinish} className="w-10 h-10 flex items-center justify-center bg-red-100 hover:bg-red-200 rounded-xl transition">
                   <X className="w-5 h-5 text-red-600" />
@@ -369,6 +370,15 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                   <RotateCcw className="w-5 h-5 text-gray-600" />
                 </button>
               </div>
+              <button
+                onClick={() => {
+                  const name = prompt('Exercise name:');
+                  if (name?.trim()) setExtraExercises(prev => [...prev, { name: name.trim(), sets: 1, muscle: '', history: [] }]);
+                }}
+                className="absolute left-1/2 -translate-x-1/2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-xl transition"
+              >
+                + Add Exercise
+              </button>
               <button onClick={handleFinish} className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition">
                 Finish
               </button>
@@ -383,6 +393,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               <input placeholder="Note" className="w-full text-sm text-gray-400 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 pb-1" />
               {template.exerciseList?.map((exercise, idx) => (
                 <ExerciseSection key={idx} exercise={exercise} onBestSet={handleBestSet} />
+              ))}
+              {extraExercises.map((exercise, idx) => (
+                <ExerciseSection key={`extra-${idx}`} exercise={exercise} onBestSet={handleBestSet} />
               ))}
             </div>
           </>
