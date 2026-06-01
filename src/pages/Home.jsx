@@ -66,11 +66,12 @@ export default function Home() {
     return `${diffDays} days ago`;
   };
 
-  const handleSaveHistory = (id, snapshot) => {
+  const handleSaveHistory = (id, snapshot, exerciseList) => {
     setTemplates(prev => {
       const updated = prev.map(t => {
         if (t.id !== id) return t;
-        const newList = t.exerciseList.map(ex => {
+        const sourceList = exerciseList || t.exerciseList;
+        const newList = sourceList.map(ex => {
           const best = snapshot[ex.name];
           if (!best) return ex;
           return { ...ex, history: [...(ex.history || []), best.kg] };

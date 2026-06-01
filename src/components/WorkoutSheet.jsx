@@ -314,7 +314,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
 
   const handleFinish = () => {
     const snapshot = { ...bestSetsRef.current };
-    const computedPrs = (template.exerciseList || []).filter(ex => {
+    const computedPrs = exercises.filter(ex => {
       const best = snapshot[ex.name];
       if (!best || !ex.history || ex.history.length === 0) return false;
       return best.kg >= Math.max(...ex.history);
@@ -322,8 +322,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     setBestSets(snapshot);
     setPrs(computedPrs);
     setFinishTimer(timer);
-    // Save updated history
-    onSaveHistory?.(template.id, snapshot);
+    onSaveHistory?.(template.id, snapshot, exercises);
     setShowSummary(true);
   };
 
