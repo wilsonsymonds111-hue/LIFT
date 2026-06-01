@@ -16,12 +16,12 @@ export default function TemplateModal({ template, onClose, onStartWorkout }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
 
       {/* Sheet */}
-      <div className="relative bg-white rounded-3xl w-[90%] max-h-[85vh] flex flex-col shadow-2xl mx-auto mb-8">
+      <div className="relative bg-white rounded-3xl w-[90%] max-h-[85vh] flex flex-col shadow-2xl mx-auto">
 
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
