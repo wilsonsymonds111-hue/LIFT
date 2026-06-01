@@ -148,10 +148,6 @@ function SummaryScreen({ template, prs, bestSets, durationDisplay, onDone }) {
   useEffect(() => {
     // Victory sound
     playVictorySound();
-    // Confetti burst
-    confetti({ particleCount: 120, spread: 80, origin: { y: 0.55 }, colors: ['#FFD700', '#FFA500', '#fff', '#60a5fa', '#34d399'] });
-    setTimeout(() => confetti({ particleCount: 60, spread: 60, origin: { y: 0.5 }, angle: 60, colors: ['#FFD700', '#FFA500', '#fff'] }), 300);
-    setTimeout(() => confetti({ particleCount: 60, spread: 60, origin: { y: 0.5 }, angle: 120, colors: ['#FFD700', '#FFA500', '#fff'] }), 500);
     // Shimmer
     setTimeout(() => setShimmer(true), 200);
   }, []);
