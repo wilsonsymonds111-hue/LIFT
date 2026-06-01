@@ -7,16 +7,16 @@ import confetti from 'canvas-confetti';
 function playVictorySound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const notes = [523, 659, 784, 1047];
+    const notes = [392, 523, 659, 784, 1047];
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value = freq; osc.type = 'sine';
-      const t = ctx.currentTime + i * 0.18;
-      gain.gain.setValueAtTime(0.25, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
-      osc.start(t); osc.stop(t + 0.5);
+      osc.frequency.value = freq; osc.type = 'triangle';
+      const t = ctx.currentTime + i * 0.12;
+      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+      osc.start(t); osc.stop(t + 0.6);
     });
   } catch (e) { /* ignore */ }
 }
@@ -223,7 +223,7 @@ function SummaryScreen({ template, prs, bestSets, durationDisplay, onDone }) {
 
           {/* Title */}
           <div className="text-center px-4 pb-3 flex-shrink-0">
-            <h1 className="text-2xl font-extrabold text-gray-900">Well Done! 🏆</h1>
+            <h1 className="text-2xl font-extrabold text-gray-900">Well Done!</h1>
             <p className="text-gray-500 text-sm mt-0.5">You crushed your {template.name} workout!</p>
           </div>
 
@@ -239,7 +239,7 @@ function SummaryScreen({ template, prs, bestSets, durationDisplay, onDone }) {
                   <h2 className="font-extrabold text-gray-900 text-lg tracking-wide">{template.name}</h2>
                   <p className="text-gray-500 text-xs mt-0.5">{today}</p>
                 </div>
-                <div className="text-3xl">💪</div>
+                <div className="text-3xl">🏆</div>
               </div>
               <div className="flex items-center gap-4 mt-2">
                 <div className="flex items-center gap-1 text-xs text-gray-600 font-medium">
@@ -289,7 +289,7 @@ function SummaryScreen({ template, prs, bestSets, durationDisplay, onDone }) {
             </button>
             <button
               onClick={onDone}
-              className="w-full flex items-center justify-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-2xl text-sm transition"
+              className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-2xl text-sm transition"
             >
               <Trophy className="w-4 h-4 text-yellow-500" />
               {prs.length > 0 ? `${prs.length} Personal Record${prs.length !== 1 ? 's' : ''} 🎉` : 'Done'}
@@ -327,7 +327,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     const computedPrs = (template.exerciseList || []).filter(ex => {
       const best = snapshot[ex.name];
       if (!best || !ex.history || ex.history.length === 0) return false;
-      return best.kg > Math.max(...ex.history);
+      return best.kg >= Math.max(...ex.history);
     }).map(ex => ({ name: ex.name, kg: snapshot[ex.name].kg }));
     setBestSets(snapshot);
     setPrs(computedPrs);
