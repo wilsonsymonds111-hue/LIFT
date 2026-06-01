@@ -90,7 +90,7 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
         </div>
         {/* Swipeable row */}
         <div
-          className={`grid grid-cols-[40px_1fr_80px_80px_40px] items-center gap-1 py-1.5 px-1 rounded-lg transition-colors ${done ? 'bg-green-50' : 'bg-white'}`}
+          className={`grid grid-cols-[40px_1fr_80px_80px_40px] items-center gap-1 py-1.5 px-1 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
           style={{ transform: `translateX(${swipeX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease' }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -105,17 +105,17 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
             type="number" value={kg}
             onChange={e => { hasEdited.current = true; setKg(e.target.value); }}
             placeholder="—"
-            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
+            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
           />
           <input
             type="number" value={reps}
             onChange={e => { hasEdited.current = true; setReps(e.target.value); }}
             placeholder="—"
-            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
+            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
           />
           <button
             onClick={handleToggle}
-            className={`w-8 h-8 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}
+            className={`w-8 h-8 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-400 text-white' : 'bg-gray-200 text-gray-400'}`}
           >
             <Check className="w-4 h-4" />
           </button>
