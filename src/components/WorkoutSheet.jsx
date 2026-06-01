@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { X, RotateCcw, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
@@ -81,14 +82,14 @@ function SetRow({ setNum, previous, onComplete }) {
 }
 
 /* ─── ExerciseSection ────────────────────────────────────────── */
-function ExerciseSection({ exercise, onBestSet }) {
+function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
   const [sets, setSets] = useState([{ id: 1 }]);
   const prev = exercise.history ? { kg: exercise.history[exercise.history.length - 1], reps: 8 } : null;
 
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-blue-500 font-semibold text-base">{exercise.name}</h3>
+        <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing" {...dragHandleProps}>{exercise.name}</h3>
         <div className="flex items-center gap-3">
           <Link2 className="w-4 h-4 text-blue-400" />
           <MoreHorizontal className="w-4 h-4 text-gray-400" />
@@ -296,7 +297,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [bestSets, setBestSets] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [finishTimer, setFinishTimer] = useState('00:00');
-  const [extraExercises, setExtraExercises] = useState([]);
+  const [exercises, setExercises] = useState(() => [...(template?.exerciseList || [])]);
   const { display: timer } = useTimer();
   const bestSetsRef = useRef({});
 
@@ -373,7 +374,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               <button
                 onClick={() => {
                   const name = prompt('Exercise name:');
-                  if (name?.trim()) setExtraExercises(prev => [...prev, { name: name.trim(), sets: 1, muscle: '', history: [] }]);
+                  if (name?.trim()) setExercises(prev => [...prev, { name: name.trim(), sets: 1, muscle: '', history: [] }]);
                 }}
                 className="absolute left-1/2 -translate-x-1/2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-xl transition"
               >
@@ -391,12 +392,30 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               <p className="text-sm text-gray-500 mb-0.5">📅 {today}</p>
               <p className="text-sm text-gray-500 mb-4">🕐 {timer}</p>
               <input placeholder="Note" className="w-full text-sm text-gray-400 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 pb-1" />
-              {template.exerciseList?.map((exercise, idx) => (
-                <ExerciseSection key={idx} exercise={exercise} onBestSet={handleBestSet} />
-              ))}
-              {extraExercises.map((exercise, idx) => (
-                <ExerciseSection key={`extra-${idx}`} exercise={exercise} onBestSet={handleBestSet} />
-              ))}
+              <DragDropContext onDragEnd={({ source, destination }) => {
+                if (!destination) return;
+                const next = [...exercises];
+                const [moved] = next.splice(source.index, 1);
+                next.splice(destination.index, 0, moved);
+                setExercises(next);
+              }}>
+                <Droppable droppableId="exercises">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {exercises.map((exercise, idx) => (
+                        <Draggable key={exercise.name + idx} draggableId={exercise.name + idx} index={idx}>
+                          {(p) => (
+                            <div ref={p.innerRef} {...p.draggableProps}>
+                              <ExerciseSection exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
             </div>
           </>
         )}
