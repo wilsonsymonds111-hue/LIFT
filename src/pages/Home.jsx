@@ -93,6 +93,11 @@ export default function Home() {
         onSaveHistory={handleSaveHistory}
       />
 
+      {/* Page Title */}
+      <div className="px-4 pt-6 pb-2">
+        <h1 className="text-3xl font-extrabold text-gray-900">Workouts</h1>
+      </div>
+
       {/* Quick Start Section */}
       <div className="px-4 py-4">
         <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition">
