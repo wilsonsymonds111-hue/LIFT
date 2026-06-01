@@ -93,7 +93,7 @@ function ProgressGraph({ history }) {
           {/* Solid line for real data */}
           <Line
             type="monotone" dataKey="reps"
-            stroke="url(#blueGradient)" strokeWidth={2}
+            stroke="#3b82f6" strokeWidth={2}
             dot={<SolidDot />} activeDot={false}
             connectNulls={false}
           />
