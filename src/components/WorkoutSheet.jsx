@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
-import { X, RotateCcw, Link2, MoreHorizontal, Check, ChevronDown, Trophy } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, RotateCcw, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, User } from 'lucide-react';
 
 function useTimer() {
   const [seconds, setSeconds] = useState(0);
+  const ref = useRef(seconds);
+  ref.current = seconds;
   useEffect(() => {
     const id = setInterval(() => setSeconds(s => s + 1), 1000);
     return () => clearInterval(id);
   }, []);
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
   const ss = String(seconds % 60).padStart(2, '0');
-  return `${mm}:${ss}`;
+  return { display: `${mm}:${ss}`, getSeconds: () => ref.current };
 }
 
 function SetRow({ setNum, previous, onComplete }) {
@@ -59,16 +61,14 @@ function SetRow({ setNum, previous, onComplete }) {
 
 function ExerciseSection({ exercise, onBestSet }) {
   const [sets, setSets] = useState([{ id: 1 }]);
-  const [bestKg, setBestKg] = useState(null);
 
   const prev = exercise.history
     ? { kg: exercise.history[exercise.history.length - 1], reps: 8 }
     : null;
 
   const handleSetComplete = (result) => {
-    if (result && (!bestKg || result.kg > bestKg)) {
-      setBestKg(result.kg);
-      onBestSet?.(exercise.name, result.kg, exercise.history);
+    if (result) {
+      onBestSet?.(exercise.name, result.kg, result.reps, exercise.history);
     }
   };
 
@@ -101,51 +101,101 @@ function ExerciseSection({ exercise, onBestSet }) {
   );
 }
 
-function SummaryScreen({ template, prs, onDone }) {
+// Decorative star SVG
+function Star({ size = 24, opacity = 1, className = '' }) {
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-start overflow-y-auto pb-12">
-      {/* Big green checkmark */}
-      <div className="w-full bg-green-500 flex flex-col items-center justify-center pt-16 pb-10">
-        <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center mb-4">
-          <Check className="w-14 h-14 text-white stroke-[3]" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} style={{ opacity }}>
+      <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+    </svg>
+  );
+}
+
+function SummaryScreen({ template, prs, bestSets, totalVolume, durationDisplay, onDone }) {
+  const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+
+  return (
+    <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col overflow-y-auto">
+      {/* Top area with stars */}
+      <div className="relative flex flex-col items-center pt-16 pb-8 overflow-hidden">
+        {/* Scattered bg stars */}
+        {[
+          { top: '8%', left: '5%', size: 18, op: 0.15 },
+          { top: '15%', left: '18%', size: 14, op: 0.2 },
+          { top: '5%', left: '40%', size: 12, op: 0.12 },
+          { top: '20%', left: '62%', size: 20, op: 0.18 },
+          { top: '10%', left: '80%', size: 14, op: 0.15 },
+          { top: '35%', left: '8%', size: 16, op: 0.12 },
+          { top: '38%', left: '88%', size: 12, op: 0.1 },
+          { top: '28%', left: '30%', size: 10, op: 0.1 },
+          { top: '32%', left: '72%', size: 16, op: 0.14 },
+        ].map((s, i) => (
+          <Star key={i} size={s.size} opacity={s.op} className="absolute text-gray-400" style={{ top: s.top, left: s.left }} />
+        ))}
+
+        {/* 3 gold stars */}
+        <div className="flex items-end gap-2 mb-5 relative z-10">
+          <Star size={36} className="text-yellow-400 mb-1" />
+          <Star size={48} className="text-yellow-400" />
+          <Star size={36} className="text-yellow-400 mb-1" />
         </div>
-        <h1 className="text-3xl font-extrabold text-white tracking-tight">Workout Complete!</h1>
-        <p className="text-green-100 mt-2 text-base">Great job finishing {template.name}!</p>
+
+        <h1 className="text-3xl font-extrabold text-gray-900 relative z-10">Well Done!</h1>
+        <p className="text-gray-500 mt-1 text-sm relative z-10">Great job finishing your {template.name} workout!</p>
       </div>
 
-      <div className="w-full max-w-md px-6 pt-8">
-        {prs.length > 0 ? (
-          <>
-            <div className="flex items-center gap-2 mb-4">
-              <Trophy className="w-5 h-5 text-yellow-500" />
-              <h2 className="text-lg font-bold text-gray-900">Personal Records 🎉</h2>
-            </div>
-            <div className="space-y-3">
-              {prs.map((pr, i) => (
-                <div key={i} className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-gray-900 text-sm">{pr.name}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">Previous best: {pr.prev} kg</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-extrabold text-yellow-600">{pr.kg} kg</p>
-                    <p className="text-xs text-green-600 font-semibold">+{(pr.kg - pr.prev).toFixed(1)} kg</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-6">
-            <p className="text-gray-500 text-sm">No new PRs this session — keep pushing!</p>
-          </div>
-        )}
+      {/* Summary card */}
+      <div className="mx-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-5 pt-5 pb-4">
+          <h2 className="font-extrabold text-gray-900 text-base">{template.name}</h2>
+          <p className="text-gray-500 text-sm mt-0.5">{today}</p>
 
+          {/* Stats row */}
+          <div className="flex items-center gap-5 mt-3">
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+              <Clock className="w-4 h-4 text-gray-500" />
+              <span>{durationDisplay}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+              <User className="w-4 h-4 text-gray-500" />
+              <span>{totalVolume.toLocaleString()} kg</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+              <Trophy className="w-4 h-4 text-gray-500" />
+              <span>{prs.length} PRs</span>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-gray-100 mt-4 mb-3" />
+
+          {/* Exercise table */}
+          <div className="grid grid-cols-2 gap-x-4 mb-2">
+            <span className="text-xs font-bold text-gray-700">Exercise</span>
+            <span className="text-xs font-bold text-gray-700">Best Set</span>
+          </div>
+          {template.exerciseList?.map((ex, i) => {
+            const best = bestSets[ex.name];
+            return (
+              <div key={i} className="grid grid-cols-2 gap-x-4 py-1.5">
+                <span className="text-sm text-gray-700 truncate">{ex.sets} × {ex.name}</span>
+                <span className="text-sm text-gray-600">
+                  {best ? `${best.kg} kg × ${best.reps}` : '—'}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Bottom PR button */}
+      <div className="flex-1" />
+      <div className="px-4 py-8 flex justify-center">
         <button
           onClick={onDone}
-          className="mt-10 w-full py-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-2xl text-base transition"
+          className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-8 py-4 rounded-2xl text-base transition"
         >
-          Done
+          <Trophy className="w-5 h-5" />
+          {prs.length} Personal Record{prs.length !== 1 ? 's' : ''}
         </button>
       </div>
     </div>
@@ -155,32 +205,53 @@ function SummaryScreen({ template, prs, onDone }) {
 export default function WorkoutSheet({ template, onFinish }) {
   const [minimized, setMinimized] = useState(false);
   const [prs, setPrs] = useState([]);
+  const [bestSets, setBestSets] = useState({});
+  const [totalVolume, setTotalVolume] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
-  const timer = useTimer();
+  const [finishTimer, setFinishTimer] = useState('00:00');
+  const { display: timer, getSeconds } = useTimer();
+
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
   if (!template) return null;
 
-  const handleBestSet = (name, kg, history) => {
-    if (!history) return;
-    const prevBest = Math.max(...history);
-    if (kg > prevBest) {
-      setPrs(prev => {
-        const existing = prev.find(p => p.name === name);
-        if (existing) {
-          return prev.map(p => p.name === name ? { ...p, kg } : p);
-        }
-        return [...prev, { name, kg, prev: prevBest }];
-      });
+  const handleBestSet = (name, kg, reps, history) => {
+    setBestSets(prev => {
+      const current = prev[name];
+      if (!current || kg > current.kg) {
+        return { ...prev, [name]: { kg, reps } };
+      }
+      return prev;
+    });
+    setTotalVolume(v => v + kg * reps);
+    if (history) {
+      const prevBest = Math.max(...history);
+      if (kg > prevBest) {
+        setPrs(prev => {
+          const existing = prev.find(p => p.name === name);
+          if (existing) return prev.map(p => p.name === name ? { ...p, kg } : p);
+          return [...prev, { name, kg, prev: prevBest }];
+        });
+      }
     }
   };
 
   const handleFinish = () => {
+    setFinishTimer(timer);
     setShowSummary(true);
   };
 
   if (showSummary) {
-    return <SummaryScreen template={template} prs={prs} onDone={onFinish} />;
+    return (
+      <SummaryScreen
+        template={template}
+        prs={prs}
+        bestSets={bestSets}
+        totalVolume={totalVolume}
+        durationDisplay={finishTimer}
+        onDone={onFinish}
+      />
+    );
   }
 
   return (
