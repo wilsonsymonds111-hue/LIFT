@@ -80,44 +80,46 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-lg">
-      {/* Red delete background */}
-      <div className="absolute inset-y-0 right-0 flex items-center justify-end px-4 bg-red-500 rounded-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-        </svg>
-      </div>
-      {/* Swipeable row */}
-      <div
-        className={`grid grid-cols-[40px_1fr_80px_80px_40px] items-center gap-1 py-2 px-1 rounded-lg transition-colors ${done ? 'bg-green-50' : 'bg-white'}`}
-        style={{ transform: `translateX(${swipeX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease' }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerLeave={onPointerUp}
-      >
-        <span className="text-sm font-semibold text-center text-gray-500">{setNum}</span>
-        <span className="text-sm text-gray-400 text-center">
-          {previous ? `${previous.kg} kg × ${previous.reps}` : '—'}
-        </span>
-        <input
-          type="number" value={kg}
-          onChange={e => { hasEdited.current = true; setKg(e.target.value); }}
-          placeholder="—"
-          className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
-        />
-        <input
-          type="number" value={reps}
-          onChange={e => { hasEdited.current = true; setReps(e.target.value); }}
-          placeholder="—"
-          className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
-        />
-        <button
-          onClick={handleToggle}
-          className={`w-8 h-8 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}
+    <div>
+      <div className="relative overflow-hidden rounded-lg">
+        {/* Red delete background */}
+        <div className="absolute inset-y-0 right-0 flex items-center justify-end px-4 bg-red-500 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+        </div>
+        {/* Swipeable row */}
+        <div
+          className={`grid grid-cols-[40px_1fr_80px_80px_40px] items-center gap-1 py-2 px-1 rounded-lg transition-colors ${done ? 'bg-green-50' : 'bg-white'}`}
+          style={{ transform: `translateX(${swipeX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease' }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerLeave={onPointerUp}
         >
-          <Check className="w-4 h-4" />
-        </button>
+          <span className="text-sm font-semibold text-center text-gray-500">{setNum}</span>
+          <span className="text-sm text-gray-400 text-center">
+            {previous ? `${previous.kg} kg × ${previous.reps}` : '—'}
+          </span>
+          <input
+            type="number" value={kg}
+            onChange={e => { hasEdited.current = true; setKg(e.target.value); }}
+            placeholder="—"
+            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
+          />
+          <input
+            type="number" value={reps}
+            onChange={e => { hasEdited.current = true; setReps(e.target.value); }}
+            placeholder="—"
+            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
+          />
+          <button
+            onClick={handleToggle}
+            className={`w-8 h-8 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}
+          >
+            <Check className="w-4 h-4" />
+          </button>
+        </div>
       </div>
       {done && restSeconds !== null && restSeconds > 0 && (
         <div className="w-full bg-blue-500 text-white font-bold text-center py-3 rounded-xl mt-2 text-lg tracking-wider">
