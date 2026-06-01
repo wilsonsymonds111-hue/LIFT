@@ -49,7 +49,7 @@ export default function Home() {
         onClose={() => setSelectedTemplate(null)}
         onStartWorkout={(t) => { setActiveWorkout(t); setSelectedTemplate(null); }}
       />
-      <WorkoutSheet template={activeWorkout} onFinish={() => setActiveWorkout(null)} />
+      <WorkoutSheet key={activeWorkout?.id} template={activeWorkout} onFinish={() => setActiveWorkout(null)} />
 
       {/* Quick Start Section */}
       <div className="px-4 py-4">
