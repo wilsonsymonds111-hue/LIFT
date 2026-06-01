@@ -37,16 +37,19 @@ function useTimer() {
 }
 
 /* ─── SetRow ─────────────────────────────────────────────────── */
-function SetRow({ setNum, previous, onComplete }) {
+function SetRow({ setNum, previous, onComplete, onDelete }) {
   const [kg, setKg] = useState(previous?.kg ?? '');
   const [reps, setReps] = useState(previous?.reps ?? '');
   const [done, setDone] = useState(false);
+  const [swipeX, setSwipeX] = useState(0);
+  const [swiping, setSwiping] = useState(false);
+  const startXRef = useRef(null);
+  const DELETE_THRESHOLD = 80;
 
   const notify = (newKg, newReps) => {
     if (newKg && newReps) onComplete?.({ kg: parseFloat(newKg), reps: parseInt(newReps) });
   };
 
-  // Report pre-populated values on mount so they're captured even if user doesn't change them
   useEffect(() => {
     if (kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -56,32 +59,67 @@ function SetRow({ setNum, previous, onComplete }) {
     if (kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
   };
 
+  const onPointerDown = (e) => {
+    startXRef.current = e.clientX;
+    setSwiping(true);
+  };
+  const onPointerMove = (e) => {
+    if (!swiping || startXRef.current === null) return;
+    const dx = Math.min(0, e.clientX - startXRef.current);
+    setSwipeX(Math.max(dx, -DELETE_THRESHOLD - 20));
+  };
+  const onPointerUp = () => {
+    if (swipeX < -DELETE_THRESHOLD) {
+      onDelete?.();
+    } else {
+      setSwipeX(0);
+    }
+    setSwiping(false);
+    startXRef.current = null;
+  };
+
   return (
-    <div className={`grid grid-cols-[40px_1fr_80px_80px_40px] items-center gap-1 py-2 px-1 rounded-lg transition ${done ? 'bg-green-50' : ''}`}>
-      <span className="text-sm font-semibold text-center text-gray-500">{setNum}</span>
-      <span className="text-sm text-gray-400 text-center">
-        {previous ? `${previous.kg} kg × ${previous.reps}` : '—'}
-      </span>
-      <input
-        type="number" value={kg}
-        onChange={e => { setKg(e.target.value); notify(e.target.value, reps); }}
-        onBlur={e => notify(e.target.value, reps)}
-        placeholder="—"
-        className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
-      <input
-        type="number" value={reps}
-        onChange={e => { setReps(e.target.value); notify(kg, e.target.value); }}
-        onBlur={e => notify(kg, e.target.value)}
-        placeholder="—"
-        className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
-      <button
-        onClick={handleToggle}
-        className={`w-8 h-8 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}
+    <div className="relative overflow-hidden rounded-lg">
+      {/* Red delete background */}
+      <div className="absolute inset-y-0 right-0 flex items-center justify-end px-4 bg-red-500 rounded-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+        </svg>
+      </div>
+      {/* Swipeable row */}
+      <div
+        className={`grid grid-cols-[40px_1fr_80px_80px_40px] items-center gap-1 py-2 px-1 rounded-lg transition-colors ${done ? 'bg-green-50' : 'bg-white'}`}
+        style={{ transform: `translateX(${swipeX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease' }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerLeave={onPointerUp}
       >
-        <Check className="w-4 h-4" />
-      </button>
+        <span className="text-sm font-semibold text-center text-gray-500">{setNum}</span>
+        <span className="text-sm text-gray-400 text-center">
+          {previous ? `${previous.kg} kg × ${previous.reps}` : '—'}
+        </span>
+        <input
+          type="number" value={kg}
+          onChange={e => { setKg(e.target.value); notify(e.target.value, reps); }}
+          onBlur={e => notify(e.target.value, reps)}
+          placeholder="—"
+          className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <input
+          type="number" value={reps}
+          onChange={e => { setReps(e.target.value); notify(kg, e.target.value); }}
+          onBlur={e => notify(kg, e.target.value)}
+          placeholder="—"
+          className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <button
+          onClick={handleToggle}
+          className={`w-8 h-8 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}
+        >
+          <Check className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 }
@@ -108,8 +146,9 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
         <span></span>
       </div>
       {sets.map((s, i) => (
-        <SetRow key={s.id} setNum={i + 1} previous={prev}
-          onComplete={(result) => result && onBestSet?.(exercise.name, result.kg, result.reps)} />
+        <SetRow key={s.id} setNum={i + 1} previous={i === 0 ? prev : null}
+          onComplete={(result) => result && onBestSet?.(exercise.name, result.kg, result.reps)}
+          onDelete={() => setSets(p => p.filter(r => r.id !== s.id))} />
       ))}
       <button
         onClick={() => setSets(p => [...p, { id: Date.now() }])}
