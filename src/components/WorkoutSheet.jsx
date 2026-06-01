@@ -8,26 +8,29 @@ import confetti from 'canvas-confetti';
 function playVictorySound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    // Punchy fanfare: power chord hit + rising arpeggio
-    const hits = [
-      { freq: 261, start: 0,    dur: 0.18, type: 'sawtooth', vol: 0.35 },
-      { freq: 329, start: 0,    dur: 0.18, type: 'sawtooth', vol: 0.30 },
-      { freq: 392, start: 0,    dur: 0.18, type: 'sawtooth', vol: 0.28 },
-      { freq: 523, start: 0.20, dur: 0.15, type: 'square',   vol: 0.25 },
-      { freq: 659, start: 0.34, dur: 0.15, type: 'square',   vol: 0.25 },
-      { freq: 784, start: 0.48, dur: 0.15, type: 'square',   vol: 0.25 },
-      { freq: 1047,start: 0.62, dur: 0.4,  type: 'sine',     vol: 0.30 },
-      { freq: 1319,start: 0.70, dur: 0.5,  type: 'sine',     vol: 0.28 },
-    ];
-    hits.forEach(({ freq, start, dur, type, vol }) => {
+    // Coin-collect shimmer + deep bass thud
+    const now = ctx.currentTime;
+
+    // Bass thud
+    const bass = ctx.createOscillator();
+    const bassGain = ctx.createGain();
+    bass.connect(bassGain); bassGain.connect(ctx.destination);
+    bass.type = 'sine'; bass.frequency.setValueAtTime(120, now);
+    bass.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+    bassGain.gain.setValueAtTime(0.6, now);
+    bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    bass.start(now); bass.stop(now + 0.35);
+
+    // Shimmer arpeggio
+    [880, 1108, 1319, 1760, 2093].forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value = freq; osc.type = type;
-      const t = ctx.currentTime + start;
-      gain.gain.setValueAtTime(vol, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
-      osc.start(t); osc.stop(t + dur + 0.05);
+      osc.type = 'sine'; osc.frequency.value = freq;
+      const t = now + 0.05 + i * 0.07;
+      gain.gain.setValueAtTime(0.22, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      osc.start(t); osc.stop(t + 0.45);
     });
   } catch (e) { /* ignore */ }
 }
