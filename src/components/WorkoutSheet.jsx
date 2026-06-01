@@ -284,8 +284,8 @@ function SummaryScreen({ template, prs, bestSets, durationDisplay, onDone }) {
               onClick={onDone}
               className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-2xl text-sm transition"
             >
-              <Trophy className="w-4 h-4 text-yellow-500" />
-              {prs.length > 0 ? `${prs.length} Personal Record${prs.length !== 1 ? 's' : ''} 🎉` : 'Done'}
+              <Trophy className="w-4 h-4" />
+              Done
             </button>
           </div>
         </div>
