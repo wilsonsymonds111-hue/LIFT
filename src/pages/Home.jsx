@@ -52,11 +52,14 @@ export default function Home() {
 
   const daysAgo = (dateStr) => {
     if (!dateStr) return null;
-    const date = new Date(dateStr);
-    const diffMs = Date.now() - date.getTime();
+    // For date-only strings (no time), compare by calendar day to avoid timezone shifts
+    const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+    const date = isDateOnly ? new Date(dateStr + 'T00:00:00') : new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
     const diffHrs = diffMs / 3600000;
     if (diffHrs < 24) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
     }
     const diffDays = Math.floor(diffMs / 86400000);
     if (diffDays === 1) return 'Yesterday';
