@@ -120,15 +120,8 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
         </button>
       </div>
       {done && restSeconds !== null && restSeconds > 0 && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg mt-1">
-          <svg className="w-4 h-4 text-blue-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span className="text-blue-600 font-semibold text-sm">Rest</span>
-          <span className="text-blue-700 font-bold text-sm ml-auto">{String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')}</span>
-        </div>
-      )}
-      {done && restSeconds === 0 && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg mt-1">
-          <span className="text-green-600 font-semibold text-sm">✓ Rest complete — go!</span>
+        <div className="w-full bg-blue-500 text-white font-bold text-center py-3 rounded-xl mt-2 text-lg tracking-wider">
+          {String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')}
         </div>
       )}
     </div>
