@@ -46,8 +46,10 @@ function ProgressGraph({ history }) {
   });
 
   const SolidDot = (props) => {
-    const { cx, cy } = props;
-    return <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
+    const { cx, cy, payload } = props;
+    // Hide the bridge point — it will be drawn by the ghost line's dot instead
+    if (payload?.projReps !== null && payload?.projReps !== undefined) return <g key={`sd-${cx}`} />;
+    return <circle key={`sd-${cx}-${cy}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
   };
 
   const GhostDot = (props) => {
