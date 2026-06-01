@@ -1,46 +1,67 @@
 import { useState } from 'react';
-import { Search } from 'lucide-react';
 import TemplateModal from '../components/TemplateModal';
 import WorkoutSheet from '../components/WorkoutSheet';
+
+const defaultTemplates = [
+  { id: 1, name: 'CHEST', days: '12 days ago', exercises: 'Incline Bench Press (Barbell), Standing press, Pec Deck (Machine)...', exerciseList: [
+    { name: 'Incline Bench Press (Barbell)', sets: 1, muscle: 'Chest', history: [60,65,65,70,72] },
+    { name: 'Standing press', sets: 1, muscle: 'Chest', history: [40,42,45,45,48] },
+    { name: 'Pec Deck (Machine)', sets: 1, muscle: 'Chest', history: [50,50,55,55,60] },
+    { name: 'Tricep single arm extension', sets: 1, muscle: 'Arms', history: [20,22,22,25,25] },
+    { name: 'Single arm overhead cable extension', sets: 1, muscle: 'Arms', history: [15,17,18,20,20] },
+    { name: 'Lateral Raise (Dumbbell)', sets: 1, muscle: 'Shoulders', history: [12,12,14,14,16] },
+  ]},
+  { id: 2, name: 'BACK', days: '10 days ago', exercises: 'Isolateral dumbbell rows, Pullover (Machine), Iso-Lateral Row (Machine)...', exerciseList: [
+    { name: 'Isolateral Dumbbell Rows', sets: 1, muscle: 'Back', history: [30,32,35,35,38] },
+    { name: 'Pullover (Machine)', sets: 1, muscle: 'Back', history: [45,48,50,52,55] },
+    { name: 'Iso-Lateral Row (Machine)', sets: 1, muscle: 'Back', history: [60,60,65,68,70] },
+    { name: 'Shrug (Barbell)', sets: 1, muscle: 'Shoulders', history: [80,85,85,90,95] },
+  ]},
+  { id: 3, name: 'LEGS', days: '14 days ago', exercises: 'Smith Squat, Romanian Deadlift (Barbell), Standing Calf Raise (Machine)...', exerciseList: [
+    { name: 'Smith Squat', sets: 1, muscle: 'Legs', history: [80,85,90,95,100] },
+    { name: 'Romanian Deadlift (Barbell)', sets: 1, muscle: 'Legs', history: [70,75,75,80,85] },
+    { name: 'Standing Calf Raise (Machine)', sets: 1, muscle: 'Legs', history: [60,60,65,65,70] },
+  ]},
+];
+
+const exampleTemplates = [
+  { id: 4, name: 'Strong 5x5', exercises: 'Squat, Bench Press, Barbell Row...', exerciseList: [
+    { name: 'Squat', sets: 5, muscle: 'Legs', history: [90,95,100,100,105] },
+    { name: 'Bench Press', sets: 5, muscle: 'Chest', history: [70,72,75,77,80] },
+    { name: 'Barbell Row', sets: 5, muscle: 'Back', history: [65,65,70,72,75] },
+  ]},
+  { id: 5, name: 'Legs', exercises: 'Leg Press, Leg Curl, Leg Extension...', exerciseList: [
+    { name: 'Leg Press', sets: 3, muscle: 'Legs', history: [100,110,115,120,125] },
+    { name: 'Leg Curl', sets: 3, muscle: 'Legs', history: [40,42,45,45,48] },
+    { name: 'Leg Extension', sets: 3, muscle: 'Legs', history: [35,38,40,42,45] },
+  ]},
+];
 
 export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [activeWorkout, setActiveWorkout] = useState(null);
+  const [templates, setTemplates] = useState(() => {
+    try {
+      const s = localStorage.getItem('workout_templates');
+      return s ? JSON.parse(s) : defaultTemplates;
+    } catch { return defaultTemplates; }
+  });
 
-  const templates = [
-    { id: 1, name: 'CHEST', days: '12 days ago', exercises: 'Incline Bench Press (Barbell), Standing press, Pec Deck (Machine)...', exerciseList: [
-      { name: 'Incline Bench Press (Barbell)', sets: 1, muscle: 'Chest', history: [60,65,65,70,72] },
-      { name: 'Standing press', sets: 1, muscle: 'Chest', history: [40,42,45,45,48] },
-      { name: 'Pec Deck (Machine)', sets: 1, muscle: 'Chest', history: [50,50,55,55,60] },
-      { name: 'Tricep single arm extension', sets: 1, muscle: 'Arms', history: [20,22,22,25,25] },
-      { name: 'Single arm overhead cable extension', sets: 1, muscle: 'Arms', history: [15,17,18,20,20] },
-      { name: 'Lateral Raise (Dumbbell)', sets: 1, muscle: 'Shoulders', history: [12,12,14,14,16] },
-    ]},
-    { id: 2, name: 'BACK', days: '10 days ago', exercises: 'Isolateral dumbbell rows, Pullover (Machine), Iso-Lateral Row (Machine)...', exerciseList: [
-      { name: 'Isolateral Dumbbell Rows', sets: 1, muscle: 'Back', history: [30,32,35,35,38] },
-      { name: 'Pullover (Machine)', sets: 1, muscle: 'Back', history: [45,48,50,52,55] },
-      { name: 'Iso-Lateral Row (Machine)', sets: 1, muscle: 'Back', history: [60,60,65,68,70] },
-      { name: 'Shrug (Barbell)', sets: 1, muscle: 'Shoulders', history: [80,85,85,90,95] },
-    ]},
-    { id: 3, name: 'LEGS', days: '14 days ago', exercises: 'Smith Squat, Romanian Deadlift (Barbell), Standing Calf Raise (Machine)...', exerciseList: [
-      { name: 'Smith Squat', sets: 1, muscle: 'Legs', history: [80,85,90,95,100] },
-      { name: 'Romanian Deadlift (Barbell)', sets: 1, muscle: 'Legs', history: [70,75,75,80,85] },
-      { name: 'Standing Calf Raise (Machine)', sets: 1, muscle: 'Legs', history: [60,60,65,65,70] },
-    ]},
-  ];
-
-  const exampleTemplates = [
-    { id: 4, name: 'Strong 5x5', exercises: 'Squat, Bench Press, Barbell Row...', exerciseList: [
-      { name: 'Squat', sets: 5, muscle: 'Legs', history: [90,95,100,100,105] },
-      { name: 'Bench Press', sets: 5, muscle: 'Chest', history: [70,72,75,77,80] },
-      { name: 'Barbell Row', sets: 5, muscle: 'Back', history: [65,65,70,72,75] },
-    ]},
-    { id: 5, name: 'Legs', exercises: 'Leg Press, Leg Curl, Leg Extension...', exerciseList: [
-      { name: 'Leg Press', sets: 3, muscle: 'Legs', history: [100,110,115,120,125] },
-      { name: 'Leg Curl', sets: 3, muscle: 'Legs', history: [40,42,45,45,48] },
-      { name: 'Leg Extension', sets: 3, muscle: 'Legs', history: [35,38,40,42,45] },
-    ]},
-  ];
+  const handleSaveHistory = (id, snapshot) => {
+    setTemplates(prev => {
+      const updated = prev.map(t => {
+        if (t.id !== id) return t;
+        const newList = t.exerciseList.map(ex => {
+          const best = snapshot[ex.name];
+          if (!best) return ex;
+          return { ...ex, history: [...(ex.history || []), best.kg] };
+        });
+        return { ...t, exerciseList: newList };
+      });
+      localStorage.setItem('workout_templates', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,7 +70,12 @@ export default function Home() {
         onClose={() => setSelectedTemplate(null)}
         onStartWorkout={(t) => { setActiveWorkout(t); setSelectedTemplate(null); }}
       />
-      <WorkoutSheet key={activeWorkout?.id} template={activeWorkout} onFinish={() => setActiveWorkout(null)} />
+      <WorkoutSheet
+        key={activeWorkout?.id}
+        template={activeWorkout}
+        onFinish={() => setActiveWorkout(null)}
+        onSaveHistory={handleSaveHistory}
+      />
 
       {/* Quick Start Section */}
       <div className="px-4 py-4">
@@ -64,7 +90,7 @@ export default function Home() {
         {/* My Templates */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-foreground">My Templates (3)</h3>
+            <h3 className="font-semibold text-foreground">My Templates ({templates.length})</h3>
             <button className="text-muted-foreground hover:text-foreground">⋯</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -86,7 +112,7 @@ export default function Home() {
         {/* Example Templates */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-foreground">Example Templates (5)</h3>
+            <h3 className="font-semibold text-foreground">Example Templates ({exampleTemplates.length})</h3>
             <button className="text-muted-foreground hover:text-foreground">⋯</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
