@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, RotateCcw, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, User, Share2 } from 'lucide-react';
+import { X, RotateCcw, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
 function useTimer() {
@@ -102,6 +102,25 @@ function ExerciseSection({ exercise, onBestSet }) {
   );
 }
 
+function InstagramIcon({ size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <defs>
+        <linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#f09433" />
+          <stop offset="25%" stopColor="#e6683c" />
+          <stop offset="50%" stopColor="#dc2743" />
+          <stop offset="75%" stopColor="#cc2366" />
+          <stop offset="100%" stopColor="#bc1888" />
+        </linearGradient>
+      </defs>
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="url(#ig)" strokeWidth="2" fill="none"/>
+      <circle cx="12" cy="12" r="4.5" stroke="url(#ig)" strokeWidth="2" fill="none"/>
+      <circle cx="17.5" cy="6.5" r="1" fill="url(#ig)"/>
+    </svg>
+  );
+}
+
 // Decorative star SVG
 function Star({ size = 24, opacity = 1, className = '' }) {
   return (
@@ -138,97 +157,78 @@ function SummaryScreen({ template, prs, bestSets, totalVolume, durationDisplay, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/60" />
 
-      {/* Modal card */}
-      <div className="relative bg-gray-50 rounded-3xl w-[92%] max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="relative bg-gray-50 rounded-3xl w-[92%] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
 
-        {/* Header row: X, title, Share */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
-          <button
-            onClick={onDone}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition"
-          >
+        {/* Header row: X, stars, Share */}
+        <div className="flex items-center justify-between px-4 pt-3 pb-1 flex-shrink-0">
+          <button onClick={onDone} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
             <X className="w-4 h-4 text-gray-700" />
           </button>
-          <div className="flex items-end gap-1.5">
-            <Star size={28} className="text-yellow-400 mb-0.5" />
-            <Star size={36} className="text-yellow-400" />
-            <Star size={28} className="text-yellow-400 mb-0.5" />
+          <div className="flex items-end gap-1">
+            <Star size={22} className="text-yellow-400 mb-0.5" />
+            <Star size={30} className="text-yellow-400" />
+            <Star size={22} className="text-yellow-400 mb-0.5" />
           </div>
-          <button
-            onClick={handleShare}
-            disabled={sharing}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition"
-          >
-            <Share2 className="w-4 h-4 text-gray-700" />
+          <button onClick={handleShare} disabled={sharing} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
+            <Share className="w-4 h-4 text-gray-700" />
           </button>
         </div>
 
         {/* Title */}
-        <div className="text-center px-4 pb-3 flex-shrink-0">
-          <h1 className="text-2xl font-extrabold text-gray-900">Well Done!</h1>
-          <p className="text-gray-500 text-sm mt-0.5">Great job finishing your {template.name} workout!</p>
+        <div className="text-center px-4 pb-2 flex-shrink-0">
+          <h1 className="text-xl font-extrabold text-gray-900">Well Done!</h1>
+          <p className="text-gray-500 text-xs mt-0.5">Great job finishing your {template.name} workout!</p>
         </div>
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
-          {/* Summary card */}
-          <div ref={cardRef} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="px-5 pt-4 pb-4">
-              <h2 className="font-extrabold text-gray-900 text-base">{template.name}</h2>
-              <p className="text-gray-500 text-sm mt-0.5">{today}</p>
-
-              {/* Stats row - time + PRs only */}
-              <div className="flex items-center gap-5 mt-3">
-                <div className="flex items-center gap-1.5 text-sm text-gray-600">
-                  <Clock className="w-4 h-4 text-gray-500" />
-                  <span>{durationDisplay}</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-sm text-gray-600">
-                  <Trophy className="w-4 h-4 text-gray-500" />
-                  <span>{prs.length} PRs</span>
-                </div>
+        {/* Summary card - no inner scroll */}
+        <div ref={cardRef} className="mx-4 bg-white rounded-2xl shadow-sm border border-gray-100 flex-shrink-0">
+          <div className="px-4 pt-3 pb-3">
+            <h2 className="font-extrabold text-gray-900 text-sm">{template.name}</h2>
+            <p className="text-gray-500 text-xs mt-0.5">{today}</p>
+            <div className="flex items-center gap-4 mt-2">
+              <div className="flex items-center gap-1 text-xs text-gray-600">
+                <Clock className="w-3.5 h-3.5 text-gray-500" />
+                <span>{durationDisplay}</span>
               </div>
-
-              <div className="border-t border-gray-100 mt-4 mb-3" />
-
-              {/* Exercise table */}
-              <div className="grid grid-cols-2 gap-x-4 mb-2">
-                <span className="text-xs font-bold text-gray-700">Exercise</span>
-                <span className="text-xs font-bold text-gray-700">Best Set</span>
+              <div className="flex items-center gap-1 text-xs text-gray-600">
+                <Trophy className="w-3.5 h-3.5 text-gray-500" />
+                <span>{prs.length} PRs</span>
               </div>
-              {template.exerciseList?.map((ex, i) => {
-                const best = bestSets[ex.name];
-                return (
-                  <div key={i} className="grid grid-cols-2 gap-x-4 py-1.5">
-                    <span className="text-sm text-gray-700">{ex.sets} × {ex.name}</span>
-                    <span className="text-sm text-gray-600">
-                      {best ? `${best.kg} kg × ${best.reps}` : '—'}
-                    </span>
-                  </div>
-                );
-              })}
             </div>
+            <div className="border-t border-gray-100 mt-2 mb-2" />
+            <div className="grid grid-cols-2 gap-x-3 mb-1">
+              <span className="text-xs font-bold text-gray-700">Exercise</span>
+              <span className="text-xs font-bold text-gray-700">Best Set</span>
+            </div>
+            {template.exerciseList?.map((ex, i) => {
+              const best = bestSets[ex.name];
+              return (
+                <div key={i} className="grid grid-cols-2 gap-x-3 py-0.5">
+                  <span className="text-xs text-gray-700 truncate">{ex.sets} × {ex.name}</span>
+                  <span className="text-xs text-gray-600">{best ? `${best.kg} kg × ${best.reps}` : '—'}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {/* Bottom actions */}
-        <div className="px-4 pb-4 flex-shrink-0 flex flex-col gap-3">
+        <div className="px-4 pt-3 pb-4 flex-shrink-0 flex flex-col gap-2">
           <button
             onClick={handleShare}
             disabled={sharing}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-bold py-4 rounded-2xl text-base transition active:scale-95 shadow-md"
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-bold py-3.5 rounded-2xl text-sm transition active:scale-95 shadow-md"
           >
-            <Share2 className="w-5 h-5" />
+            <InstagramIcon size={20} />
             {sharing ? 'Preparing...' : 'Share to Instagram Story'}
           </button>
           <button
             onClick={onDone}
-            className="w-full flex items-center justify-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-2xl text-base transition"
+            className="w-full flex items-center justify-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-2xl text-sm transition"
           >
-            <Trophy className="w-5 h-5" />
+            <Trophy className="w-4 h-4" />
             {prs.length} Personal Record{prs.length !== 1 ? 's' : ''}
           </button>
         </div>
