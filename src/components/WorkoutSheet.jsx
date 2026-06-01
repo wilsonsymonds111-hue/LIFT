@@ -46,6 +46,11 @@ function SetRow({ setNum, previous, onComplete }) {
     if (newKg && newReps) onComplete?.({ kg: parseFloat(newKg), reps: parseInt(newReps) });
   };
 
+  // Report pre-populated values on mount so they're captured even if user doesn't change them
+  useEffect(() => {
+    if (kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleToggle = () => {
     setDone(d => !d);
     if (kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
