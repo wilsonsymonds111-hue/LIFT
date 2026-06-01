@@ -28,8 +28,26 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
   const [done, setDone] = useState(false);
   const [swipeX, setSwipeX] = useState(0);
   const [swiping, setSwiping] = useState(false);
+  const [restSeconds, setRestSeconds] = useState(null);
   const startXRef = useRef(null);
   const hasEdited = useRef(false);
+  const restRef = useRef(null);
+
+  useEffect(() => {
+    if (done) {
+      setRestSeconds(120);
+      restRef.current = setInterval(() => {
+        setRestSeconds(s => {
+          if (s <= 1) { clearInterval(restRef.current); return 0; }
+          return s - 1;
+        });
+      }, 1000);
+    } else {
+      clearInterval(restRef.current);
+      setRestSeconds(null);
+    }
+    return () => clearInterval(restRef.current);
+  }, [done]);
   const DELETE_THRESHOLD = 80;
 
   useEffect(() => {
@@ -37,8 +55,9 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
   }, [kg, reps]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleToggle = () => {
-    setDone(d => !d);
-    if (kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
+    const next = !done;
+    setDone(next);
+    if (next && kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
   };
 
   const onPointerDown = (e) => {
@@ -85,13 +104,13 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
           type="number" value={kg}
           onChange={e => { hasEdited.current = true; setKg(e.target.value); }}
           placeholder="—"
-          className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
         />
         <input
           type="number" value={reps}
           onChange={e => { hasEdited.current = true; setReps(e.target.value); }}
           placeholder="—"
-          className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
         />
         <button
           onClick={handleToggle}
@@ -100,6 +119,18 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
           <Check className="w-4 h-4" />
         </button>
       </div>
+      {done && restSeconds !== null && restSeconds > 0 && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg mt-1">
+          <svg className="w-4 h-4 text-blue-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span className="text-blue-600 font-semibold text-sm">Rest</span>
+          <span className="text-blue-700 font-bold text-sm ml-auto">{String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')}</span>
+        </div>
+      )}
+      {done && restSeconds === 0 && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg mt-1">
+          <span className="text-green-600 font-semibold text-sm">✓ Rest complete — go!</span>
+        </div>
+      )}
     </div>
   );
 }
