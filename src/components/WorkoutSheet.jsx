@@ -127,7 +127,8 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
 /* ─── ExerciseSection ────────────────────────────────────────── */
 function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
   const [sets, setSets] = useState([{ id: 1 }]);
-  const prev = exercise.history ? { kg: exercise.history[exercise.history.length - 1], reps: 8 } : null;
+  const lastEntry = exercise.history?.[exercise.history.length - 1];
+  const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
 
   return (
     <div className="mb-6">
@@ -350,18 +351,17 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   if (!template) return null;
 
   const handleBestSet = (name, kg, reps) => {
-    const current = bestSetsRef.current[name];
-    if (!current || kg > current.kg) {
-      bestSetsRef.current[name] = { kg, reps };
-    }
+    // Always save the latest reported set so reps are accurate
+    bestSetsRef.current[name] = { kg, reps };
   };
 
   const handleFinish = () => {
     const snapshot = { ...bestSetsRef.current };
+    const toKg = (h) => typeof h === 'object' ? h.kg : h;
     const computedPrs = exercises.filter(ex => {
       const best = snapshot[ex.name];
       if (!best || !ex.history || ex.history.length === 0) return false;
-      return best.kg >= Math.max(...ex.history);
+      return best.kg >= Math.max(...ex.history.map(toKg));
     }).map(ex => ({ name: ex.name, kg: snapshot[ex.name].kg }));
     setBestSets(snapshot);
     setPrs(computedPrs);

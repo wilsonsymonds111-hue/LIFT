@@ -74,7 +74,7 @@ export default function Home() {
         const newList = sourceList.map(ex => {
           const best = snapshot[ex.name];
           if (!best) return ex;
-          return { ...ex, history: [...(ex.history || []), best.kg] };
+          return { ...ex, history: [...(ex.history || []), { kg: best.kg, reps: best.reps }] };
         });
         return { ...t, exerciseList: newList, lastPerformed: new Date().toISOString() };
       });
