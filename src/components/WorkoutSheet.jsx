@@ -31,13 +31,9 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
   const startXRef = useRef(null);
   const DELETE_THRESHOLD = 80;
 
-  const notify = (newKg, newReps) => {
-    if (newKg && newReps) onComplete?.({ kg: parseFloat(newKg), reps: parseInt(newReps) });
-  };
-
   useEffect(() => {
     if (kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [kg, reps]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleToggle = () => {
     setDone(d => !d);
@@ -86,15 +82,13 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
         </span>
         <input
           type="number" value={kg}
-          onChange={e => { setKg(e.target.value); notify(e.target.value, reps); }}
-          onBlur={e => notify(e.target.value, reps)}
+          onChange={e => setKg(e.target.value)}
           placeholder="—"
           className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         <input
           type="number" value={reps}
-          onChange={e => { setReps(e.target.value); notify(kg, e.target.value); }}
-          onBlur={e => notify(kg, e.target.value)}
+          onChange={e => setReps(e.target.value)}
           placeholder="—"
           className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
