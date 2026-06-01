@@ -137,111 +137,101 @@ function SummaryScreen({ template, prs, bestSets, totalVolume, durationDisplay, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col overflow-y-auto">
-      {/* Top area with stars */}
-      <div className="relative flex flex-col items-center pt-16 pb-8 overflow-hidden">
-        {/* Scattered bg stars */}
-        {[
-          { top: '8%', left: '5%', size: 18, op: 0.15 },
-          { top: '15%', left: '18%', size: 14, op: 0.2 },
-          { top: '5%', left: '40%', size: 12, op: 0.12 },
-          { top: '20%', left: '62%', size: 20, op: 0.18 },
-          { top: '10%', left: '80%', size: 14, op: 0.15 },
-          { top: '35%', left: '8%', size: 16, op: 0.12 },
-          { top: '38%', left: '88%', size: 12, op: 0.1 },
-          { top: '28%', left: '30%', size: 10, op: 0.1 },
-          { top: '32%', left: '72%', size: 16, op: 0.14 },
-        ].map((s, i) => (
-          <Star key={i} size={s.size} opacity={s.op} className="absolute text-gray-400" style={{ top: s.top, left: s.left }} />
-        ))}
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60" />
 
-        {/* 3 gold stars */}
-        <div className="flex items-end gap-2 mb-5 relative z-10">
-          <Star size={36} className="text-yellow-400 mb-1" />
-          <Star size={48} className="text-yellow-400" />
-          <Star size={36} className="text-yellow-400 mb-1" />
+      {/* Modal card */}
+      <div className="relative bg-gray-50 rounded-3xl w-[92%] max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+
+        {/* Header row: X, title, Share */}
+        <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
+          <button
+            onClick={onDone}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition"
+          >
+            <X className="w-4 h-4 text-gray-700" />
+          </button>
+          <div className="flex items-end gap-1.5">
+            <Star size={28} className="text-yellow-400 mb-0.5" />
+            <Star size={36} className="text-yellow-400" />
+            <Star size={28} className="text-yellow-400 mb-0.5" />
+          </div>
+          <button
+            onClick={handleShare}
+            disabled={sharing}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition"
+          >
+            <Share2 className="w-4 h-4 text-gray-700" />
+          </button>
         </div>
 
-        <h1 className="text-3xl font-extrabold text-gray-900 relative z-10">Well Done!</h1>
-        <p className="text-gray-500 mt-1 text-sm relative z-10">Great job finishing your {template.name} workout!</p>
+        {/* Title */}
+        <div className="text-center px-4 pb-3 flex-shrink-0">
+          <h1 className="text-2xl font-extrabold text-gray-900">Well Done!</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Great job finishing your {template.name} workout!</p>
+        </div>
 
-        {/* Share button - prominent, centered */}
-        <button
-          onClick={handleShare}
-          disabled={sharing}
-          className="mt-5 relative z-10 flex items-center gap-2 bg-white border border-gray-200 shadow-md hover:shadow-lg active:scale-95 transition-all px-6 py-3 rounded-2xl text-gray-800 font-semibold text-sm"
-        >
-          <Share2 className="w-4 h-4" />
-          {sharing ? 'Preparing...' : 'Share Workout'}
-        </button>
-      </div>
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4">
+          {/* Summary card */}
+          <div ref={cardRef} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="px-5 pt-4 pb-4">
+              <h2 className="font-extrabold text-gray-900 text-base">{template.name}</h2>
+              <p className="text-gray-500 text-sm mt-0.5">{today}</p>
 
-      {/* Summary card */}
-      <div ref={cardRef} className="mx-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-5 pt-5 pb-4">
-          <h2 className="font-extrabold text-gray-900 text-base">{template.name}</h2>
-          <p className="text-gray-500 text-sm mt-0.5">{today}</p>
-
-          {/* Stats row */}
-          <div className="flex items-center gap-5 mt-3">
-            <div className="flex items-center gap-1.5 text-sm text-gray-600">
-              <Clock className="w-4 h-4 text-gray-500" />
-              <span>{durationDisplay}</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-sm text-gray-600">
-              <User className="w-4 h-4 text-gray-500" />
-              <span>{totalVolume.toLocaleString()} kg</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-sm text-gray-600">
-              <Trophy className="w-4 h-4 text-gray-500" />
-              <span>{prs.length} PRs</span>
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-gray-100 mt-4 mb-3" />
-
-          {/* Exercise table */}
-          <div className="grid grid-cols-2 gap-x-4 mb-2">
-            <span className="text-xs font-bold text-gray-700">Exercise</span>
-            <span className="text-xs font-bold text-gray-700">Best Set</span>
-          </div>
-          {template.exerciseList?.map((ex, i) => {
-            const best = bestSets[ex.name];
-            return (
-              <div key={i} className="grid grid-cols-2 gap-x-4 py-1.5">
-                <span className="text-sm text-gray-700 truncate">{ex.sets} × {ex.name}</span>
-                <span className="text-sm text-gray-600">
-                  {best ? `${best.kg} kg × ${best.reps}` : '—'}
-                </span>
+              {/* Stats row - time + PRs only */}
+              <div className="flex items-center gap-5 mt-3">
+                <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                  <Clock className="w-4 h-4 text-gray-500" />
+                  <span>{durationDisplay}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                  <Trophy className="w-4 h-4 text-gray-500" />
+                  <span>{prs.length} PRs</span>
+                </div>
               </div>
-            );
-          })}
+
+              <div className="border-t border-gray-100 mt-4 mb-3" />
+
+              {/* Exercise table */}
+              <div className="grid grid-cols-2 gap-x-4 mb-2">
+                <span className="text-xs font-bold text-gray-700">Exercise</span>
+                <span className="text-xs font-bold text-gray-700">Best Set</span>
+              </div>
+              {template.exerciseList?.map((ex, i) => {
+                const best = bestSets[ex.name];
+                return (
+                  <div key={i} className="grid grid-cols-2 gap-x-4 py-1.5">
+                    <span className="text-sm text-gray-700">{ex.sets} × {ex.name}</span>
+                    <span className="text-sm text-gray-600">
+                      {best ? `${best.kg} kg × ${best.reps}` : '—'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Instagram Story share button */}
-      <div className="mx-4 mt-3">
-        <button
-          onClick={handleShare}
-          disabled={sharing}
-          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-bold py-4 rounded-2xl text-base transition active:scale-95 shadow-md"
-        >
-          <Share2 className="w-5 h-5" />
-          {sharing ? 'Preparing...' : 'Share to Instagram Story'}
-        </button>
-      </div>
-
-      {/* Bottom PR button */}
-      <div className="flex-1" />
-      <div className="px-4 py-8 flex justify-center">
-        <button
-          onClick={onDone}
-          className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-8 py-4 rounded-2xl text-base transition"
-        >
-          <Trophy className="w-5 h-5" />
-          {prs.length} Personal Record{prs.length !== 1 ? 's' : ''}
-        </button>
+        {/* Bottom actions */}
+        <div className="px-4 pb-4 flex-shrink-0 flex flex-col gap-3">
+          <button
+            onClick={handleShare}
+            disabled={sharing}
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-bold py-4 rounded-2xl text-base transition active:scale-95 shadow-md"
+          >
+            <Share2 className="w-5 h-5" />
+            {sharing ? 'Preparing...' : 'Share to Instagram Story'}
+          </button>
+          <button
+            onClick={onDone}
+            className="w-full flex items-center justify-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-2xl text-base transition"
+          >
+            <Trophy className="w-5 h-5" />
+            {prs.length} Personal Record{prs.length !== 1 ? 's' : ''}
+          </button>
+        </div>
       </div>
     </div>
   );
