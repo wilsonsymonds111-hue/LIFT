@@ -5,55 +5,7 @@ import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 
 /* ─── Victory Sound ─────────────────────────────────────────── */
-function playVictorySound() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const now = ctx.currentTime;
 
-    // Heavy kick drum hit
-    const kick = ctx.createOscillator();
-    const kickGain = ctx.createGain();
-    kick.connect(kickGain); kickGain.connect(ctx.destination);
-    kick.type = 'sine';
-    kick.frequency.setValueAtTime(180, now);
-    kick.frequency.exponentialRampToValueAtTime(30, now + 0.25);
-    kickGain.gain.setValueAtTime(1.0, now);
-    kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-    kick.start(now); kick.stop(now + 0.3);
-
-    // Second kick punch
-    const kick2 = ctx.createOscillator();
-    const kick2Gain = ctx.createGain();
-    kick2.connect(kick2Gain); kick2Gain.connect(ctx.destination);
-    kick2.type = 'sine';
-    kick2.frequency.setValueAtTime(160, now + 0.18);
-    kick2.frequency.exponentialRampToValueAtTime(28, now + 0.42);
-    kick2Gain.gain.setValueAtTime(0.9, now + 0.18);
-    kick2Gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
-    kick2.start(now + 0.18); kick2.stop(now + 0.45);
-
-    // Deep power chord growl
-    [82, 110, 165].forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = 'sawtooth'; osc.frequency.value = freq;
-      const t = now + 0.3;
-      gain.gain.setValueAtTime(0.18, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
-      osc.start(t); osc.stop(t + 0.8);
-    });
-
-    // Short metal clang
-    const clang = ctx.createOscillator();
-    const clangGain = ctx.createGain();
-    clang.connect(clangGain); clangGain.connect(ctx.destination);
-    clang.type = 'square'; clang.frequency.value = 440;
-    clangGain.gain.setValueAtTime(0.25, now + 0.32);
-    clangGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-    clang.start(now + 0.32); clang.stop(now + 0.65);
-  } catch (e) { /* ignore */ }
-}
 
 /* ─── Timer ──────────────────────────────────────────────────── */
 function useTimer() {
@@ -225,8 +177,7 @@ function SummaryScreen({ template, prs, bestSets, durationDisplay, onDone }) {
   const prSet = new Set(prs.map(p => p.name));
 
   useEffect(() => {
-    // Victory sound
-    playVictorySound();
+
     // Shimmer
     setTimeout(() => setShimmer(true), 200);
   }, []);
