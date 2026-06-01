@@ -5,7 +5,7 @@ import WorkoutSheet from '../components/WorkoutSheet';
 const defaultTemplates = [
   { id: 1, name: 'CHEST', lastPerformed: '2026-05-20',
     exercises: 'Incline Bench Press (Barbell), Standing press, Pec Deck (Machine)...', exerciseList: [
-    { name: 'Incline Bench Press (Barbell)', sets: 1, muscle: 'Chest', history: [60,65,65,70,72] },
+    { name: 'Incline Bench Press (Barbell)', sets: 1, muscle: 'Chest', history: [{kg:72,reps:5},{kg:72,reps:6},{kg:72,reps:7},{kg:72,reps:8},{kg:72,reps:10}] },
     { name: 'Standing press', sets: 1, muscle: 'Chest', history: [40,42,45,45,48] },
     { name: 'Pec Deck (Machine)', sets: 1, muscle: 'Chest', history: [50,50,55,55,60] },
     { name: 'Tricep single arm extension', sets: 1, muscle: 'Arms', history: [20,22,22,25,25] },

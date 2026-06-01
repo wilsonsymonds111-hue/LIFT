@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceDot, ResponsiveContainer, Dot } from 'recharts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { X, RotateCcw, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share } from 'lucide-react';
 import html2canvas from 'html2canvas';
@@ -19,6 +20,70 @@ function useTimer() {
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
   const ss = String(seconds % 60).padStart(2, '0');
   return { display: `${mm}:${ss}` };
+}
+
+/* ─── ProgressGraph ─────────────────────────────────────────── */
+function ProgressGraph({ history }) {
+  if (!history || history.length === 0) return null;
+
+  const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
+  const last5 = history.slice(-5).map(toPoint);
+  const lastPoint = last5[last5.length - 1];
+  const projected = { kg: lastPoint.kg, reps: lastPoint.reps + 1, projected: true };
+
+  const data = [...last5, projected].map((p, i) => ({
+    session: i + 1,
+    reps: p.reps,
+    kg: p.kg,
+    projected: !!p.projected,
+  }));
+
+  const CustomDot = (props) => {
+    const { cx, cy, payload } = props;
+    if (payload.projected) {
+      return (
+        <g key={`dot-${cx}-${cy}`}>
+          <circle cx={cx} cy={cy} r={5} fill="#a78bfa" stroke="white" strokeWidth={2} strokeDasharray="2 1" />
+          <text x={cx} y={cy - 10} textAnchor="middle" fontSize={9} fill="#a78bfa" fontWeight="bold">+1</text>
+        </g>
+      );
+    }
+    return <circle key={`dot-${cx}-${cy}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
+  };
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (!active || !payload?.length) return null;
+    const d = payload[0].payload;
+    return (
+      <div className={`text-xs px-2 py-1 rounded-lg shadow font-semibold ${d.projected ? 'bg-purple-100 text-purple-700' : 'bg-white text-gray-700 border border-gray-100'}`}>
+        {d.projected ? '🎯 Goal: ' : ''}{d.reps} reps @ {d.kg}kg
+      </div>
+    );
+  };
+
+  return (
+    <div className="mb-2 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
+      <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">Progress</p>
+      <ResponsiveContainer width="100%" height={60}>
+        <LineChart data={data} margin={{ top: 6, right: 16, left: -28, bottom: 0 }}>
+          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 9, fill: '#9ca3af' }} />
+          <Tooltip content={<CustomTooltip />} />
+          <Line
+            type="monotone" dataKey="reps"
+            stroke="url(#blueGradient)" strokeWidth={2}
+            dot={<CustomDot />}
+            activeDot={false}
+          />
+          <defs>
+            <linearGradient id="blueGradient" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="80%" stopColor="#3b82f6" />
+              <stop offset="100%" stopColor="#a78bfa" />
+            </linearGradient>
+          </defs>
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
 
 /* ─── SetRow ─────────────────────────────────────────────────── */
@@ -145,6 +210,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
           <MoreHorizontal className="w-4 h-4 text-gray-400" />
         </div>
       </div>
+      <ProgressGraph history={exercise.history} />
       <div className="grid grid-cols-[40px_1fr_80px_80px_40px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
