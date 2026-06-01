@@ -20,14 +20,13 @@ function SetRow({ setNum, previous, onComplete }) {
   const [reps, setReps] = useState(previous?.reps ?? '');
   const [done, setDone] = useState(false);
 
+  const notify = (newKg, newReps) => {
+    if (newKg && newReps) onComplete?.({ kg: parseFloat(newKg), reps: parseInt(newReps) });
+  };
+
   const handleToggle = () => {
-    const next = !done;
-    setDone(next);
-    if (next && kg && reps) {
-      onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
-    } else {
-      onComplete?.(null);
-    }
+    setDone(d => !d);
+    if (kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
   };
 
   return (
@@ -39,14 +38,16 @@ function SetRow({ setNum, previous, onComplete }) {
       <input
         type="number"
         value={kg}
-        onChange={e => setKg(e.target.value)}
+        onChange={e => { setKg(e.target.value); notify(e.target.value, reps); }}
+        onBlur={e => notify(e.target.value, reps)}
         placeholder="—"
         className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
       <input
         type="number"
         value={reps}
-        onChange={e => setReps(e.target.value)}
+        onChange={e => { setReps(e.target.value); notify(kg, e.target.value); }}
+        onBlur={e => notify(kg, e.target.value)}
         placeholder="—"
         className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
