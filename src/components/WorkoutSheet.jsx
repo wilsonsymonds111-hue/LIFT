@@ -29,10 +29,11 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
   const [swipeX, setSwipeX] = useState(0);
   const [swiping, setSwiping] = useState(false);
   const startXRef = useRef(null);
+  const hasEdited = useRef(false);
   const DELETE_THRESHOLD = 80;
 
   useEffect(() => {
-    if (kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
+    if (hasEdited.current && kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
   }, [kg, reps]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleToggle = () => {
@@ -82,13 +83,13 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
         </span>
         <input
           type="number" value={kg}
-          onChange={e => setKg(e.target.value)}
+          onChange={e => { hasEdited.current = true; setKg(e.target.value); }}
           placeholder="—"
           className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         <input
           type="number" value={reps}
-          onChange={e => setReps(e.target.value)}
+          onChange={e => { hasEdited.current = true; setReps(e.target.value); }}
           placeholder="—"
           className="bg-gray-100 rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
