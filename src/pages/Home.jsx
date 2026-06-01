@@ -52,10 +52,15 @@ export default function Home() {
 
   const daysAgo = (dateStr) => {
     if (!dateStr) return null;
-    const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
-    if (diff === 0) return 'Today';
-    if (diff === 1) return 'Yesterday';
-    return `${diff} days ago`;
+    const date = new Date(dateStr);
+    const diffMs = Date.now() - date.getTime();
+    const diffHrs = diffMs / 3600000;
+    if (diffHrs < 24) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    const diffDays = Math.floor(diffMs / 86400000);
+    if (diffDays === 1) return 'Yesterday';
+    return `${diffDays} days ago`;
   };
 
   const handleSaveHistory = (id, snapshot) => {
@@ -67,7 +72,7 @@ export default function Home() {
           if (!best) return ex;
           return { ...ex, history: [...(ex.history || []), best.kg] };
         });
-        return { ...t, exerciseList: newList, lastPerformed: new Date().toISOString().slice(0, 10) };
+        return { ...t, exerciseList: newList, lastPerformed: new Date().toISOString() };
       });
       localStorage.setItem('workout_templates', JSON.stringify(updated));
       return updated;
