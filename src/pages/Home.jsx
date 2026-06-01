@@ -3,7 +3,8 @@ import TemplateModal from '../components/TemplateModal';
 import WorkoutSheet from '../components/WorkoutSheet';
 
 const defaultTemplates = [
-  { id: 1, name: 'CHEST', days: '12 days ago', exercises: 'Incline Bench Press (Barbell), Standing press, Pec Deck (Machine)...', exerciseList: [
+  { id: 1, name: 'CHEST', lastPerformed: '2026-05-20',
+    exercises: 'Incline Bench Press (Barbell), Standing press, Pec Deck (Machine)...', exerciseList: [
     { name: 'Incline Bench Press (Barbell)', sets: 1, muscle: 'Chest', history: [60,65,65,70,72] },
     { name: 'Standing press', sets: 1, muscle: 'Chest', history: [40,42,45,45,48] },
     { name: 'Pec Deck (Machine)', sets: 1, muscle: 'Chest', history: [50,50,55,55,60] },
@@ -11,13 +12,15 @@ const defaultTemplates = [
     { name: 'Single arm overhead cable extension', sets: 1, muscle: 'Arms', history: [15,17,18,20,20] },
     { name: 'Lateral Raise (Dumbbell)', sets: 1, muscle: 'Shoulders', history: [12,12,14,14,16] },
   ]},
-  { id: 2, name: 'BACK', days: '10 days ago', exercises: 'Isolateral dumbbell rows, Pullover (Machine), Iso-Lateral Row (Machine)...', exerciseList: [
+  { id: 2, name: 'BACK', lastPerformed: '2026-05-22',
+    exercises: 'Isolateral dumbbell rows, Pullover (Machine), Iso-Lateral Row (Machine)...', exerciseList: [
     { name: 'Isolateral Dumbbell Rows', sets: 1, muscle: 'Back', history: [30,32,35,35,38] },
     { name: 'Pullover (Machine)', sets: 1, muscle: 'Back', history: [45,48,50,52,55] },
     { name: 'Iso-Lateral Row (Machine)', sets: 1, muscle: 'Back', history: [60,60,65,68,70] },
     { name: 'Shrug (Barbell)', sets: 1, muscle: 'Shoulders', history: [80,85,85,90,95] },
   ]},
-  { id: 3, name: 'LEGS', days: '14 days ago', exercises: 'Smith Squat, Romanian Deadlift (Barbell), Standing Calf Raise (Machine)...', exerciseList: [
+  { id: 3, name: 'LEGS', lastPerformed: '2026-05-18',
+    exercises: 'Smith Squat, Romanian Deadlift (Barbell), Standing Calf Raise (Machine)...', exerciseList: [
     { name: 'Smith Squat', sets: 1, muscle: 'Legs', history: [80,85,90,95,100] },
     { name: 'Romanian Deadlift (Barbell)', sets: 1, muscle: 'Legs', history: [70,75,75,80,85] },
     { name: 'Standing Calf Raise (Machine)', sets: 1, muscle: 'Legs', history: [60,60,65,65,70] },
@@ -47,6 +50,14 @@ export default function Home() {
     } catch { return defaultTemplates; }
   });
 
+  const daysAgo = (dateStr) => {
+    if (!dateStr) return null;
+    const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return `${diff} days ago`;
+  };
+
   const handleSaveHistory = (id, snapshot) => {
     setTemplates(prev => {
       const updated = prev.map(t => {
@@ -56,7 +67,7 @@ export default function Home() {
           if (!best) return ex;
           return { ...ex, history: [...(ex.history || []), best.kg] };
         });
-        return { ...t, exerciseList: newList };
+        return { ...t, exerciseList: newList, lastPerformed: new Date().toISOString().slice(0, 10) };
       });
       localStorage.setItem('workout_templates', JSON.stringify(updated));
       return updated;
@@ -102,7 +113,7 @@ export default function Home() {
                 </div>
                 <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  ⏱ {template.days}
+                  ⏱ {template.lastPerformed ? daysAgo(template.lastPerformed) : template.days}
                 </p>
               </div>
             ))}
