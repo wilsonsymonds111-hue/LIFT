@@ -29,34 +29,50 @@ function ProgressGraph({ history }) {
   const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
   const last5 = history.slice(-5).map(toPoint);
   const lastPoint = last5[last5.length - 1];
-  const projected = { kg: lastPoint.kg, reps: lastPoint.reps + 1, projected: true };
 
-  const data = [...last5, projected].map((p, i) => ({
+  // Build data: real points use `reps`, projection segment uses `projReps`
+  // The bridge point (last real point) appears in both so the lines connect
+  const data = last5.map((p, i) => ({
     session: i + 1,
     reps: p.reps,
-    kg: p.kg,
-    projected: !!p.projected,
+    projReps: i === last5.length - 1 ? p.reps : null, // bridge
   }));
+  // Add projected point
+  data.push({
+    session: last5.length + 1,
+    reps: null,
+    projReps: lastPoint.reps + 1,
+    projected: true,
+  });
 
-  const CustomDot = (props) => {
+  const SolidDot = (props) => {
+    const { cx, cy } = props;
+    return <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
+  };
+
+  const GhostDot = (props) => {
     const { cx, cy, payload } = props;
-    if (payload.projected) {
-      return (
-        <g key={`dot-${cx}-${cy}`}>
-          <circle cx={cx} cy={cy} r={5} fill="#a78bfa" stroke="white" strokeWidth={2} strokeDasharray="2 1" />
-          <text x={cx} y={cy - 10} textAnchor="middle" fontSize={9} fill="#a78bfa" fontWeight="bold">+1</text>
-        </g>
-      );
+    if (!payload?.projected) {
+      // bridge dot — hide it (drawn by solid line)
+      return <g key={`ghost-bridge-${cx}`} />;
     }
-    return <circle key={`dot-${cx}-${cy}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
+    return (
+      <g key={`ghost-${cx}-${cy}`}>
+        <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.6} stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.7} />
+      </g>
+    );
   };
 
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.length) return null;
-    const d = payload[0].payload;
+    const d = payload[0]?.payload;
+    const reps = d?.projected ? d.projReps : d?.reps;
+    if (!reps) return null;
     return (
-      <div className={`text-xs px-2 py-1 rounded-lg shadow font-semibold ${d.projected ? 'bg-purple-100 text-purple-700' : 'bg-white text-gray-700 border border-gray-100'}`}>
-        {d.projected ? '🎯 Goal: ' : ''}{d.reps} reps @ {d.kg}kg
+      <div className={`text-xs px-2 py-1 rounded-lg shadow font-semibold ${
+        d?.projected ? 'bg-purple-50 text-purple-400 border border-purple-100' : 'bg-white text-gray-700 border border-gray-100'
+      }`}>
+        {d?.projected ? 'Next: ' : ''}{reps} reps @ {d?.kg ?? lastPoint.kg}kg
       </div>
     );
   };
@@ -66,20 +82,28 @@ function ProgressGraph({ history }) {
       <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">Progress</p>
       <ResponsiveContainer width="100%" height={60}>
         <LineChart data={data} margin={{ top: 6, right: 16, left: -28, bottom: 0 }}>
+          <defs>
+            <linearGradient id="blueGradient" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#3b82f6" />
+              <stop offset="100%" stopColor="#60a5fa" />
+            </linearGradient>
+          </defs>
           <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 9, fill: '#9ca3af' }} />
           <Tooltip content={<CustomTooltip />} />
+          {/* Solid line for real data */}
           <Line
             type="monotone" dataKey="reps"
             stroke="url(#blueGradient)" strokeWidth={2}
-            dot={<CustomDot />}
-            activeDot={false}
+            dot={<SolidDot />} activeDot={false}
+            connectNulls={false}
           />
-          <defs>
-            <linearGradient id="blueGradient" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="80%" stopColor="#3b82f6" />
-              <stop offset="100%" stopColor="#a78bfa" />
-            </linearGradient>
-          </defs>
+          {/* Dashed ghost line for projection */}
+          <Line
+            type="monotone" dataKey="projReps"
+            stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6}
+            dot={<GhostDot />} activeDot={false}
+            connectNulls={true}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
