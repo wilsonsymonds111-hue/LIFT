@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, RotateCcw, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, User } from 'lucide-react';
+import { X, RotateCcw, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, User, Share2 } from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 function useTimer() {
   const [seconds, setSeconds] = useState(0);
@@ -112,6 +113,28 @@ function Star({ size = 24, opacity = 1, className = '' }) {
 
 function SummaryScreen({ template, prs, bestSets, totalVolume, durationDisplay, onDone }) {
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  const cardRef = useRef(null);
+  const [sharing, setSharing] = useState(false);
+
+  const handleShare = async () => {
+    if (!cardRef.current) return;
+    setSharing(true);
+    const canvas = await html2canvas(cardRef.current, { scale: 2, useCORS: true, backgroundColor: '#f9fafb' });
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], 'workout.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: `${template.name} Workout`, text: `Just crushed my ${template.name} workout! 💪` });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'workout.png';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      setSharing(false);
+    }, 'image/png');
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col overflow-y-auto">
@@ -141,10 +164,20 @@ function SummaryScreen({ template, prs, bestSets, totalVolume, durationDisplay, 
 
         <h1 className="text-3xl font-extrabold text-gray-900 relative z-10">Well Done!</h1>
         <p className="text-gray-500 mt-1 text-sm relative z-10">Great job finishing your {template.name} workout!</p>
+
+        {/* Share button - prominent, centered */}
+        <button
+          onClick={handleShare}
+          disabled={sharing}
+          className="mt-5 relative z-10 flex items-center gap-2 bg-white border border-gray-200 shadow-md hover:shadow-lg active:scale-95 transition-all px-6 py-3 rounded-2xl text-gray-800 font-semibold text-sm"
+        >
+          <Share2 className="w-4 h-4" />
+          {sharing ? 'Preparing...' : 'Share Workout'}
+        </button>
       </div>
 
       {/* Summary card */}
-      <div className="mx-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div ref={cardRef} className="mx-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-5 pt-5 pb-4">
           <h2 className="font-extrabold text-gray-900 text-base">{template.name}</h2>
           <p className="text-gray-500 text-sm mt-0.5">{today}</p>
@@ -185,6 +218,18 @@ function SummaryScreen({ template, prs, bestSets, totalVolume, durationDisplay, 
             );
           })}
         </div>
+      </div>
+
+      {/* Instagram Story share button */}
+      <div className="mx-4 mt-3">
+        <button
+          onClick={handleShare}
+          disabled={sharing}
+          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-bold py-4 rounded-2xl text-base transition active:scale-95 shadow-md"
+        >
+          <Share2 className="w-5 h-5" />
+          {sharing ? 'Preparing...' : 'Share to Instagram Story'}
+        </button>
       </div>
 
       {/* Bottom PR button */}
