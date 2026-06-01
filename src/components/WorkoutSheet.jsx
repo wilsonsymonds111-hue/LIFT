@@ -8,16 +8,26 @@ import confetti from 'canvas-confetti';
 function playVictorySound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const notes = [392, 523, 659, 784, 1047];
-    notes.forEach((freq, i) => {
+    // Punchy fanfare: power chord hit + rising arpeggio
+    const hits = [
+      { freq: 261, start: 0,    dur: 0.18, type: 'sawtooth', vol: 0.35 },
+      { freq: 329, start: 0,    dur: 0.18, type: 'sawtooth', vol: 0.30 },
+      { freq: 392, start: 0,    dur: 0.18, type: 'sawtooth', vol: 0.28 },
+      { freq: 523, start: 0.20, dur: 0.15, type: 'square',   vol: 0.25 },
+      { freq: 659, start: 0.34, dur: 0.15, type: 'square',   vol: 0.25 },
+      { freq: 784, start: 0.48, dur: 0.15, type: 'square',   vol: 0.25 },
+      { freq: 1047,start: 0.62, dur: 0.4,  type: 'sine',     vol: 0.30 },
+      { freq: 1319,start: 0.70, dur: 0.5,  type: 'sine',     vol: 0.28 },
+    ];
+    hits.forEach(({ freq, start, dur, type, vol }) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value = freq; osc.type = 'triangle';
-      const t = ctx.currentTime + i * 0.12;
-      gain.gain.setValueAtTime(0.3, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
-      osc.start(t); osc.stop(t + 0.6);
+      osc.frequency.value = freq; osc.type = type;
+      const t = ctx.currentTime + start;
+      gain.gain.setValueAtTime(vol, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      osc.start(t); osc.stop(t + dur + 0.05);
     });
   } catch (e) { /* ignore */ }
 }
