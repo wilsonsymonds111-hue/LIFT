@@ -70,7 +70,7 @@ function ExerciseSection({ exercise, onBestSet }) {
 
   const handleSetComplete = (result) => {
     if (result) {
-      onBestSet?.(exercise.name, result.kg, result.reps, exercise.history);
+      onBestSet?.(exercise.name, result.kg, result.reps);
     }
   };
 
@@ -242,37 +242,33 @@ export default function WorkoutSheet({ template, onFinish }) {
   const [minimized, setMinimized] = useState(false);
   const [prs, setPrs] = useState([]);
   const [bestSets, setBestSets] = useState({});
-  const [totalVolume, setTotalVolume] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
   const [finishTimer, setFinishTimer] = useState('00:00');
-  const { display: timer, getSeconds } = useTimer();
+  const { display: timer } = useTimer();
+  // Use a ref so we always have the latest values when Finish is tapped
+  const bestSetsRef = useRef({});
 
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
   if (!template) return null;
 
-  const handleBestSet = (name, kg, reps, history) => {
-    setBestSets(prev => {
-      const current = prev[name];
-      if (!current || kg > current.kg) {
-        return { ...prev, [name]: { kg, reps } };
-      }
-      return prev;
-    });
-    setTotalVolume(v => v + kg * reps);
-    if (history) {
-      const prevBest = Math.max(...history);
-      if (kg > prevBest) {
-        setPrs(prev => {
-          const existing = prev.find(p => p.name === name);
-          if (existing) return prev.map(p => p.name === name ? { ...p, kg } : p);
-          return [...prev, { name, kg, prev: prevBest }];
-        });
-      }
+  const handleBestSet = (name, kg, reps) => {
+    const current = bestSetsRef.current[name];
+    if (!current || kg > current.kg) {
+      bestSetsRef.current[name] = { kg, reps };
     }
   };
 
   const handleFinish = () => {
+    // Snapshot ref into state, then compute PRs
+    const snapshot = { ...bestSetsRef.current };
+    const computedPrs = (template.exerciseList || []).filter(ex => {
+      const best = snapshot[ex.name];
+      if (!best || !ex.history || ex.history.length === 0) return false;
+      return best.kg > Math.max(...ex.history);
+    }).map(ex => ({ name: ex.name, kg: snapshot[ex.name].kg }));
+    setBestSets(snapshot);
+    setPrs(computedPrs);
     setFinishTimer(timer);
     setShowSummary(true);
   };
@@ -283,7 +279,7 @@ export default function WorkoutSheet({ template, onFinish }) {
         template={template}
         prs={prs}
         bestSets={bestSets}
-        totalVolume={totalVolume}
+        totalVolume={0}
         durationDisplay={finishTimer}
         onDone={onFinish}
       />
