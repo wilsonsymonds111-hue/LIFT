@@ -156,7 +156,7 @@ export default function ExercisePicker({ onClose, onAdd }) {
         </div>
 
         {/* Muscle Filter */}
-        <div className="px-4 py-3 flex gap-2 overflow-x-auto" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
+        <div className="px-4 py-3 flex gap-2 overflow-x-auto flex-shrink-0" style={{scrollbarWidth:'none', msOverflowStyle:'none'}}>
           {MUSCLES.map(m => (
             <button
               key={m}
