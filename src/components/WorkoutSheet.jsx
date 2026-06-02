@@ -83,7 +83,7 @@ function ProgressGraph({ history }) {
   };
 
   return (
-    <div className="mb-2 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
+    <div className="mb-2 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px', transition: 'all 0.4s ease' }}>
       <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">Progress</p>
       <ResponsiveContainer width="100%" height={60}>
         <LineChart data={data} margin={{ top: 12, right: 16, left: -28, bottom: 4 }}>
@@ -101,7 +101,7 @@ function ProgressGraph({ history }) {
             stroke="#3b82f6" strokeWidth={2}
             dot={<SolidDot />} activeDot={false}
             connectNulls={false}
-            isAnimationActive={true} animationDuration={500} animationEasing="ease-in-out"
+            isAnimationActive={false}
           />
           {/* Dashed ghost line for projection */}
           <Line
@@ -109,7 +109,7 @@ function ProgressGraph({ history }) {
             stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6}
             dot={<GhostDot />} activeDot={false}
             connectNulls={true}
-            isAnimationActive={true} animationDuration={500} animationEasing="ease-in-out"
+            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>
