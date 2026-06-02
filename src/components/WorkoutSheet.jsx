@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceDot, ResponsiveContainer, Dot } from 'recharts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { X, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share } from 'lucide-react';
+import ExercisePicker from './ExercisePicker';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 
@@ -441,6 +442,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [showSummary, setShowSummary] = useState(false);
   const [finishTimer, setFinishTimer] = useState('00:00');
   const [exercises, setExercises] = useState(() => [...(template?.exerciseList || [])]);
+  const [showExercisePicker, setShowExercisePicker] = useState(false);
   const { display: timer } = useTimer();
   const bestSetsRef = useRef({});
 
@@ -511,14 +513,24 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
 
               </div>
               <button
-                onClick={() => {
-                  const name = prompt('Exercise name:');
-                  if (name?.trim()) setExercises(prev => [...prev, { name: name.trim(), sets: 1, muscle: '', history: [] }]);
-                }}
+                onClick={() => setShowExercisePicker(true)}
                 className="absolute left-1/2 -translate-x-1/2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-xl transition"
-              >
+                >
                 + Add Exercise
-              </button>
+                </button>
+                {showExercisePicker && (
+                <ExercisePicker
+                  onClose={() => setShowExercisePicker(false)}
+                  onAdd={(picked) => {
+                    setExercises(prev => {
+                      const existing = new Set(prev.map(e => e.name));
+                      const newOnes = picked.filter(e => !existing.has(e.name)).map(e => ({ ...e, sets: 1, history: [] }));
+                      return [...prev, ...newOnes];
+                    });
+                    setShowExercisePicker(false);
+                  }}
+                />
+                )}
               <button onClick={handleFinish} className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition">
                 Finish
               </button>
