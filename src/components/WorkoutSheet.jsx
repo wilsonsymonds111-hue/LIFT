@@ -25,22 +25,25 @@ function useTimer() {
 
 /* ─── ProgressGraph ─────────────────────────────────────────── */
 const punchDotStyle = `
-  @keyframes dotPunch {
-    0%   { r: 0; opacity: 0; }
-    55%  { r: 6; opacity: 1; }
-    75%  { r: 3.5; }
-    90%  { r: 4.8; }
-    100% { r: 4; opacity: 1; }
+  @keyframes dotSnapIn {
+    0%   { transform: scale(0); opacity: 0; }
+    65%  { transform: scale(1.25); opacity: 1; }
+    100% { transform: scale(1);    opacity: 1; }
+  }
+  @keyframes dotRipple {
+    0%   { r: 4;  opacity: 0.8; stroke-width: 2; }
+    100% { r: 16; opacity: 0;   stroke-width: 0.5; }
   }
   @keyframes dotRetract {
-    0%   { r: 4; opacity: 1; }
-    20%  { r: 5.5; }
-    100% { r: 0; opacity: 0; }
+    0%   { transform: scale(1); opacity: 1; }
+    30%  { transform: scale(1.2); }
+    100% { transform: scale(0); opacity: 0; }
   }
   @keyframes segmentFadeIn  { from { opacity: 0; } to { opacity: 1; } }
   @keyframes segmentFadeOut { from { opacity: 1; } to { opacity: 0; } }
-  .punch-dot   { animation: dotPunch   0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important; animation-iteration-count: 1 !important; }
-  .retract-dot { animation: dotRetract 0.35s cubic-bezier(0.55, 0, 1, 0.45) forwards !important; animation-iteration-count: 1 !important; }
+  .snap-dot    { transform-box: fill-box; transform-origin: center; animation: dotSnapIn  0.4s cubic-bezier(0.34,1.56,0.64,1) forwards !important; animation-iteration-count: 1 !important; }
+  .ripple-ring { animation: dotRipple  0.65s ease-out forwards !important; animation-iteration-count: 1 !important; fill: none; stroke: #3b82f6; }
+  .retract-dot { transform-box: fill-box; transform-origin: center; animation: dotRetract 0.35s cubic-bezier(0.55,0,1,0.45) forwards !important; animation-iteration-count: 1 !important; }
   .new-seg-in  { animation: segmentFadeIn  0.5s ease forwards; }
   .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
 `;
@@ -95,15 +98,22 @@ function ProgressGraph({ history, animKey, animDir }) {
     if (value == null) return <g />;
     const isNewest = index === lastRealIdx;
     if (isNewest) {
-      const animClass = freshAnim ? (animDir === 'remove' ? 'retract-dot' : 'punch-dot') : '';
-      return (
-        <circle
-          key={`dot-${animKey}`}
-          cx={cx} cy={cy} r={4}
-          fill="#3b82f6" stroke="white" strokeWidth={2}
-          className={animClass}
-        />
-      );
+      if (freshAnim && animDir === 'remove') {
+        return (
+          <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4}
+            fill="#3b82f6" stroke="white" strokeWidth={2}
+            className="retract-dot" />
+        );
+      }
+      if (freshAnim && animDir === 'add') {
+        return (
+          <g key={`dot-${animKey}`}>
+            <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} className="snap-dot" />
+            <circle cx={cx} cy={cy} r={4} className="ripple-ring" />
+          </g>
+        );
+      }
+      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
     }
     // bridge dot — already drawn by static line, hide
     return <g />;
