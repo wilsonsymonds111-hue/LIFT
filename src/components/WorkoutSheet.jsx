@@ -383,7 +383,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
                   onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
                   className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
                 >
-                  Delete Exercise
+                  Remove Exercise
                 </button>
               </div>
             </>
