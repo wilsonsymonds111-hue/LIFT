@@ -262,7 +262,10 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
             setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
             if (result) onBestSet?.(exercise.name, result.kg, result.reps);
           }}
-          onDelete={() => setSets(p => p.filter(r => r.id !== s.id))} />
+          onDelete={() => {
+            setSets(p => p.filter(r => r.id !== s.id));
+            setCompletedSets(prev => { const next = {...prev}; delete next[s.id]; return next; });
+          }} />
         </div>
       ))}
       <button
