@@ -3,7 +3,7 @@ import TemplateModal from '../components/TemplateModal';
 import WorkoutSheet from '../components/WorkoutSheet';
 
 const defaultTemplates = [
-  { id: 1, name: 'CHEST', lastPerformed: '2026-05-20',
+  { id: 1, name: 'CHEST', lastPerformed: '2026-06-01',
     exercises: 'Incline Bench Press (Barbell), Standing press, Pec Deck (Machine)...', exerciseList: [
     { name: 'Incline Bench Press (Barbell)', sets: 1, muscle: 'Chest', history: [{kg:72,reps:5},{kg:72,reps:6},{kg:72,reps:7},{kg:72,reps:8},{kg:72,reps:10}] },
     { name: 'Standing press', sets: 1, muscle: 'Chest', history: [40,42,45,45,48] },
@@ -12,14 +12,14 @@ const defaultTemplates = [
     { name: 'Single arm overhead cable extension', sets: 1, muscle: 'Arms', history: [15,17,18,20,20] },
     { name: 'Lateral Raise (Dumbbell)', sets: 1, muscle: 'Shoulders', history: [12,12,14,14,16] },
   ]},
-  { id: 2, name: 'BACK', lastPerformed: '2026-05-22',
+  { id: 2, name: 'BACK', lastPerformed: '2026-05-30',
     exercises: 'Isolateral dumbbell rows, Pullover (Machine), Iso-Lateral Row (Machine)...', exerciseList: [
     { name: 'Isolateral Dumbbell Rows', sets: 1, muscle: 'Back', history: [30,32,35,35,38] },
     { name: 'Pullover (Machine)', sets: 1, muscle: 'Back', history: [45,48,50,52,55] },
     { name: 'Iso-Lateral Row (Machine)', sets: 1, muscle: 'Back', history: [60,60,65,68,70] },
     { name: 'Shrug (Barbell)', sets: 1, muscle: 'Shoulders', history: [80,85,85,90,95] },
   ]},
-  { id: 3, name: 'LEGS', lastPerformed: '2026-05-18',
+  { id: 3, name: 'LEGS', lastPerformed: '2026-05-28',
     exercises: 'Smith Squat, Romanian Deadlift (Barbell), Standing Calf Raise (Machine)...', exerciseList: [
     { name: 'Smith Squat', sets: 1, muscle: 'Legs', history: [80,85,90,95,100] },
     { name: 'Romanian Deadlift (Barbell)', sets: 1, muscle: 'Legs', history: [70,75,75,80,85] },
@@ -45,6 +45,11 @@ export default function Home() {
   const [activeWorkout, setActiveWorkout] = useState(null);
   const [templates, setTemplates] = useState(() => {
     try {
+      const VERSION = '2';
+      if (localStorage.getItem('workout_templates_version') !== VERSION) {
+        localStorage.removeItem('workout_templates');
+        localStorage.setItem('workout_templates_version', VERSION);
+      }
       const s = localStorage.getItem('workout_templates');
       return s ? JSON.parse(s) : defaultTemplates;
     } catch { return defaultTemplates; }
