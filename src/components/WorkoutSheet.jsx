@@ -143,14 +143,13 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
   }, [done]);
   const DELETE_THRESHOLD = 80;
 
-  useEffect(() => {
-    if (hasEdited.current && kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
-  }, [kg, reps]); // eslint-disable-line react-hooks/exhaustive-deps
+
 
   const handleToggle = () => {
     const next = !done;
     setDone(next);
     if (next && kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
+    else if (!next) onComplete?.(null);
   };
 
   const onPointerDown = (e) => {
