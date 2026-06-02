@@ -234,7 +234,6 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
       <div className="flex items-center justify-between mb-1">
         <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing" {...dragHandleProps}>{exercise.name}</h3>
         <div className="flex items-center gap-3">
-          <Link2 className="w-4 h-4 text-blue-400" />
           <MoreHorizontal className="w-4 h-4 text-gray-400" />
         </div>
       </div>
