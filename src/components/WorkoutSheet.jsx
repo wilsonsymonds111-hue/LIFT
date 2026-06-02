@@ -118,9 +118,9 @@ function ProgressGraph({ history, animKey }) {
 }
 
 /* ─── SetRow ─────────────────────────────────────────────────── */
-function SetRow({ setNum, previous, onComplete, onDelete }) {
-  const [kg, setKg] = useState(previous?.kg ?? '');
-  const [reps, setReps] = useState(previous?.reps ?? '');
+function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete }) {
+  const [kg, setKg] = useState(initialKg ?? previous?.kg ?? '');
+  const [reps, setReps] = useState(initialReps ?? previous?.reps ?? '');
   const [done, setDone] = useState(false);
   const [swipeX, setSwipeX] = useState(0);
   const [swiping, setSwiping] = useState(false);
@@ -262,7 +262,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
       </div>
       {sets.map((s, i) => (
         <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
-        <SetRow setNum={i + 1} previous={i === 0 ? prev : null}
+        <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg} initialReps={s.suggestedReps}
           onComplete={(result) => {
             setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
             if (result) onBestSet?.(exercise.name, result.kg, result.reps);
@@ -274,7 +274,12 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
         </div>
       ))}
       <button
-        onClick={() => setSets(p => [...p, { id: Date.now() }])}
+        onClick={() => {
+          const lastEntry = exercise.history?.[exercise.history.length - 1];
+          const lastKg = lastEntry ? (typeof lastEntry === 'object' ? lastEntry.kg : lastEntry) : null;
+          const lastReps = lastEntry ? (typeof lastEntry === 'object' ? lastEntry.reps : 8) : null;
+          setSets(p => [...p, { id: Date.now(), suggestedKg: lastKg, suggestedReps: lastReps != null ? lastReps + 1 : null }]);
+        }}
         className="mt-2 w-full py-1.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
       >
         + Add Set
