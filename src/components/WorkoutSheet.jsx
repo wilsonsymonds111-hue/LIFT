@@ -46,6 +46,17 @@ const punchDotStyle = `
 `;
 
 function ProgressGraph({ history, animKey, animDir }) {
+  const [freshAnim, setFreshAnim] = useState(false);
+  const prevAnimKeyRef = useRef(animKey);
+  useEffect(() => {
+    if (animKey !== prevAnimKeyRef.current) {
+      prevAnimKeyRef.current = animKey;
+      setFreshAnim(true);
+      const t = setTimeout(() => setFreshAnim(false), 650);
+      return () => clearTimeout(t);
+    }
+  }, [animKey]);
+
   if (!history || history.length === 0) return null;
 
   const TOTAL_SLOTS = 6;
@@ -84,12 +95,13 @@ function ProgressGraph({ history, animKey, animDir }) {
     if (value == null) return <g />;
     const isNewest = index === lastRealIdx;
     if (isNewest) {
+      const animClass = freshAnim ? (animDir === 'remove' ? 'retract-dot' : 'punch-dot') : '';
       return (
         <circle
           key={`dot-${animKey}`}
           cx={cx} cy={cy} r={4}
           fill="#3b82f6" stroke="white" strokeWidth={2}
-          className={animDir === 'remove' ? 'retract-dot' : 'punch-dot'}
+          className={animClass}
         />
       );
     }
