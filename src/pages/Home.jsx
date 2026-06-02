@@ -127,9 +127,10 @@ export default function Home() {
                   setTemplates(prev => { const updated = [...prev, newTemplate]; localStorage.setItem('workout_templates', JSON.stringify(updated)); return updated; });
                 }
               }}
-              className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white transition"
+              className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-3.5 h-3.5" />
+              Template
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
