@@ -275,10 +275,21 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
       ))}
       <button
         onClick={() => {
-          const lastEntry = exercise.history?.[exercise.history.length - 1];
-          const lastKg = lastEntry ? (typeof lastEntry === 'object' ? lastEntry.kg : lastEntry) : null;
-          const lastReps = lastEntry ? (typeof lastEntry === 'object' ? lastEntry.reps : 8) : null;
-          setSets(p => [...p, { id: Date.now(), suggestedKg: lastKg, suggestedReps: lastReps != null ? lastReps + 1 : null }]);
+          // Prefer last completed set in this session, then fall back to history
+          const sessionCompleted = Object.values(completedSets).filter(Boolean);
+          let suggestedKg = null, suggestedReps = null;
+          if (sessionCompleted.length > 0) {
+            const last = sessionCompleted[sessionCompleted.length - 1];
+            suggestedKg = last.kg;
+            suggestedReps = last.reps;
+          } else {
+            const lastEntry = exercise.history?.[exercise.history.length - 1];
+            if (lastEntry) {
+              suggestedKg = typeof lastEntry === 'object' ? lastEntry.kg : lastEntry;
+              suggestedReps = typeof lastEntry === 'object' ? lastEntry.reps : 8;
+            }
+          }
+          setSets(p => [...p, { id: Date.now(), suggestedKg, suggestedReps: suggestedReps != null ? suggestedReps + 1 : null }]);
         }}
         className="mt-2 w-full py-1.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
       >
