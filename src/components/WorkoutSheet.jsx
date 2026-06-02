@@ -85,7 +85,7 @@ function ProgressGraph({ history }) {
     <div className="mb-2 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
       <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">Progress</p>
       <ResponsiveContainer width="100%" height={60}>
-        <LineChart data={data} margin={{ top: 6, right: 16, left: -28, bottom: 0 }}>
+        <LineChart data={data} margin={{ top: 12, right: 16, left: -28, bottom: 4 }}>
           <defs>
             <linearGradient id="blueGradient" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#3b82f6" />
