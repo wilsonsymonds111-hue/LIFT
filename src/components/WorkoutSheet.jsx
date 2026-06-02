@@ -183,7 +183,7 @@ function ProgressGraph({ history, animKey, animDir }) {
 }
 
 /* ─── SetRow ─────────────────────────────────────────────────── */
-function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete }) {
+function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete, restDuration = 120 }) {
   const [kg, setKg] = useState(initialKg ?? previous?.kg ?? '');
   const [reps, setReps] = useState(initialReps ?? previous?.reps ?? '');
   const [done, setDone] = useState(false);
@@ -196,7 +196,7 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
 
   useEffect(() => {
     if (done) {
-      setRestSeconds(120);
+      setRestSeconds(restDuration);
       restRef.current = setInterval(() => {
         setRestSeconds(s => {
           if (s <= 1) { clearInterval(restRef.current); return 0; }
@@ -300,6 +300,12 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
   const [sets, setSets] = useState([{ id: 1 }]);
   const [completedSets, setCompletedSets] = useState({});
   const [showMenu, setShowMenu] = useState(false);
+  const [note, setNote] = useState('');
+  const [showNote, setShowNote] = useState(false);
+  const [restDuration, setRestDuration] = useState(120);
+  const [restEnabled, setRestEnabled] = useState(true);
+  const [showCustomRest, setShowCustomRest] = useState(false);
+  const [customRestInput, setCustomRestInput] = useState('');
   const lastEntry = exercise.history?.[exercise.history.length - 1];
   const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
   const sessionResults = Object.values(completedSets).filter(Boolean);
@@ -324,7 +330,55 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-7 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[160px]">
+              <div className="absolute right-0 top-7 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[190px]">
+                {/* Note toggle */}
+                <button
+                  onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
+                >
+                  {showNote ? 'Remove Note' : 'Add Note'}
+                </button>
+                <div className="border-t border-gray-100 mx-3 my-1" />
+                {/* Rest timer options */}
+                <p className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rest Timer</p>
+                <button
+                  onClick={() => { setRestEnabled(true); setRestDuration(120); setShowCustomRest(false); setShowMenu(false); }}
+                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration === 120 ? 'text-blue-500' : 'text-gray-700'}`}
+                >
+                  Default (2 min)
+                </button>
+                <button
+                  onClick={() => setShowCustomRest(c => !c)}
+                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration !== 120 ? 'text-blue-500' : 'text-gray-700'}`}
+                >
+                  Custom…
+                </button>
+                {showCustomRest && (
+                  <div className="px-4 pb-2 flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={customRestInput}
+                      onChange={e => setCustomRestInput(e.target.value)}
+                      placeholder="sec"
+                      className="w-16 text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                    <button
+                      onClick={() => {
+                        const s = parseInt(customRestInput);
+                        if (s > 0) { setRestDuration(s); setRestEnabled(true); }
+                        setShowCustomRest(false); setShowMenu(false);
+                      }}
+                      className="text-xs bg-blue-500 text-white px-2 py-1 rounded-lg font-semibold"
+                    >Set</button>
+                  </div>
+                )}
+                <button
+                  onClick={() => { setRestEnabled(false); setShowMenu(false); }}
+                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${!restEnabled ? 'text-blue-500' : 'text-gray-700'}`}
+                >
+                  Off
+                </button>
+                <div className="border-t border-gray-100 mx-3 my-1" />
                 <button
                   onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
                   className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
@@ -336,6 +390,15 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
           )}
         </div>
       </div>
+      {showNote && (
+        <textarea
+          value={note}
+          onChange={e => setNote(e.target.value)}
+          placeholder="Add a note…"
+          rows={2}
+          className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
+        />
+      )}
       <ProgressGraph history={graphHistory} animKey={graphAnimKey} animDir={animDir} />
       <div className="grid grid-cols-[40px_1fr_80px_80px_40px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
@@ -346,7 +409,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
       </div>
       {sets.map((s, i) => (
         <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
-        <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg} initialReps={s.suggestedReps}
+        <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg} initialReps={s.suggestedReps} restDuration={restEnabled ? restDuration : 0}
           onComplete={(result) => {
             setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
             if (result) onBestSet?.(exercise.name, result.kg, result.reps);
