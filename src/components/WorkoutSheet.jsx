@@ -226,8 +226,12 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
 /* ─── ExerciseSection ────────────────────────────────────────── */
 function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
   const [sets, setSets] = useState([{ id: 1 }]);
+  const [liveResult, setLiveResult] = useState(null);
   const lastEntry = exercise.history?.[exercise.history.length - 1];
   const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
+  const graphHistory = liveResult
+    ? [...(exercise.history || []), { kg: liveResult.kg, reps: liveResult.reps }]
+    : exercise.history;
 
   return (
     <div className="mb-6">
@@ -237,7 +241,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
           <MoreHorizontal className="w-4 h-4 text-gray-400" />
         </div>
       </div>
-      <ProgressGraph history={exercise.history} />
+      <ProgressGraph history={graphHistory} />
       <div className="grid grid-cols-[40px_1fr_80px_80px_40px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
@@ -247,7 +251,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
       </div>
       {sets.map((s, i) => (
         <SetRow key={s.id} setNum={i + 1} previous={i === 0 ? prev : null}
-          onComplete={(result) => result && onBestSet?.(exercise.name, result.kg, result.reps)}
+          onComplete={(result) => { if (result) { setLiveResult(result); onBestSet?.(exercise.name, result.kg, result.reps); } }}
           onDelete={() => setSets(p => p.filter(r => r.id !== s.id))} />
       ))}
       <button
