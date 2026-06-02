@@ -26,24 +26,27 @@ function useTimer() {
 function ProgressGraph({ history }) {
   if (!history || history.length === 0) return null;
 
+  const TOTAL_SLOTS = 6;
   const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
-  const last5 = history.slice(-5).map(toPoint);
-  const lastPoint = last5[last5.length - 1];
+  const realPoints = history.slice(-5).map(toPoint);
+  const lastPoint = realPoints[realPoints.length - 1];
+  const projectedCount = Math.max(1, TOTAL_SLOTS - realPoints.length);
 
-  // Build data: real points use `reps`, projection segment uses `projReps`
-  // The bridge point (last real point) appears in both so the lines connect
-  const data = last5.map((p, i) => ({
+  // Real points as solid; bridge the last real point into the dashed line
+  const data = realPoints.map((p, i) => ({
     session: i + 1,
     reps: p.reps,
-    projReps: i === last5.length - 1 ? p.reps : null, // bridge
+    projReps: i === realPoints.length - 1 ? p.reps : null,
   }));
-  // Add projected point
-  data.push({
-    session: last5.length + 1,
-    reps: null,
-    projReps: lastPoint.reps + 1,
-    projected: true,
-  });
+  // Add projected hollow points (+1 rep each)
+  for (let i = 1; i <= projectedCount; i++) {
+    data.push({
+      session: realPoints.length + i,
+      reps: null,
+      projReps: lastPoint.reps + i,
+      projected: true,
+    });
+  }
 
   const SolidDot = (props) => {
     const { cx, cy } = props;
