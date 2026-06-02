@@ -24,7 +24,7 @@ function useTimer() {
 }
 
 /* ─── ProgressGraph ─────────────────────────────────────────── */
-function ProgressGraph({ history }) {
+function ProgressGraph({ history, animKey }) {
   if (!history || history.length === 0) return null;
 
   const TOTAL_SLOTS = 6;
@@ -83,7 +83,7 @@ function ProgressGraph({ history }) {
   };
 
   return (
-    <div className="mb-2 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px', transition: 'all 0.4s ease' }}>
+    <div key={animKey} className="mb-2 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px', animation: 'graphFadeIn 0.35s ease' }}>
       <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">Progress</p>
       <ResponsiveContainer width="100%" height={60}>
         <LineChart data={data} margin={{ top: 12, right: 16, left: -28, bottom: 4 }}>
@@ -229,6 +229,8 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
 }
 
 /* ─── ExerciseSection ────────────────────────────────────────── */
+const graphFadeStyle = `@keyframes graphFadeIn { from { opacity: 0.3; transform: scaleY(0.96); } to { opacity: 1; transform: scaleY(1); } }`;
+
 function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
   const [sets, setSets] = useState([{ id: 1 }]);
   const [completedSets, setCompletedSets] = useState({});
@@ -238,16 +240,19 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
   const graphHistory = sessionResults.length > 0
     ? [...(exercise.history || []), ...sessionResults]
     : exercise.history;
+  const graphAnimKey = sessionResults.length;
 
   return (
-    <div className="mb-6">
+    <>
+    <style>{graphFadeStyle}</style>
+    <div className="mb-4 bg-gray-50 border border-gray-200 rounded-2xl p-3 shadow-sm">
       <div className="flex items-center justify-between mb-1">
         <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing" {...dragHandleProps}>{exercise.name}</h3>
         <div className="flex items-center gap-3">
           <MoreHorizontal className="w-4 h-4 text-gray-400" />
         </div>
       </div>
-      <ProgressGraph history={graphHistory} />
+      <ProgressGraph history={graphHistory} animKey={graphAnimKey} />
       <div className="grid grid-cols-[40px_1fr_80px_80px_40px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
@@ -270,11 +275,12 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
       ))}
       <button
         onClick={() => setSets(p => [...p, { id: Date.now() }])}
-        className="mt-2 w-full py-1.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
+        className="mt-2 w-full py-1.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
       >
         + Add Set
       </button>
     </div>
+    </>
   );
 }
 
