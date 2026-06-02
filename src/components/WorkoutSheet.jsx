@@ -296,9 +296,10 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
 /* ─── ExerciseSection ────────────────────────────────────────── */
 const graphFadeStyle = `@keyframes graphFadeIn { from { opacity: 0.3; transform: scaleY(0.96); } to { opacity: 1; transform: scaleY(1); } }`;
 
-function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
+function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise }) {
   const [sets, setSets] = useState([{ id: 1 }]);
   const [completedSets, setCompletedSets] = useState({});
+  const [showMenu, setShowMenu] = useState(false);
   const lastEntry = exercise.history?.[exercise.history.length - 1];
   const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
   const sessionResults = Object.values(completedSets).filter(Boolean);
@@ -314,10 +315,25 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
     <>
     <style>{graphFadeStyle}</style>
     <div className="mb-4">
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-1 relative">
         <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing" {...dragHandleProps}>{exercise.name}</h3>
-        <div className="flex items-center gap-3">
-          <MoreHorizontal className="w-4 h-4 text-gray-400" />
+        <div className="flex items-center gap-3 relative">
+          <button onClick={() => setShowMenu(m => !m)} className="p-1 rounded-lg hover:bg-gray-100 transition">
+            <MoreHorizontal className="w-4 h-4 text-gray-400" />
+          </button>
+          {showMenu && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+              <div className="absolute right-0 top-7 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[160px]">
+                <button
+                  onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
+                >
+                  Delete Exercise
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
       <ProgressGraph history={graphHistory} animKey={graphAnimKey} animDir={animDir} />
@@ -664,7 +680,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                         <Draggable key={exercise.name + idx} draggableId={exercise.name + idx} index={idx}>
                           {(p) => (
                             <div ref={p.innerRef} {...p.draggableProps}>
-                              <ExerciseSection exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} />
+                              <ExerciseSection exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} onDeleteExercise={() => setExercises(prev => prev.filter((_, i) => i !== idx))} />
                             </div>
                           )}
                         </Draggable>
