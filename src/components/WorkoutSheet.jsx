@@ -101,6 +101,7 @@ function ProgressGraph({ history }) {
             stroke="#3b82f6" strokeWidth={2}
             dot={<SolidDot />} activeDot={false}
             connectNulls={false}
+            isAnimationActive={true} animationDuration={500} animationEasing="ease-in-out"
           />
           {/* Dashed ghost line for projection */}
           <Line
@@ -108,6 +109,7 @@ function ProgressGraph({ history }) {
             stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6}
             dot={<GhostDot />} activeDot={false}
             connectNulls={true}
+            isAnimationActive={true} animationDuration={500} animationEasing="ease-in-out"
           />
         </LineChart>
       </ResponsiveContainer>
@@ -254,12 +256,14 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
         <span></span>
       </div>
       {sets.map((s, i) => (
-        <SetRow key={s.id} setNum={i + 1} previous={i === 0 ? prev : null}
+        <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
+        <SetRow setNum={i + 1} previous={i === 0 ? prev : null}
           onComplete={(result) => {
             setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
             if (result) onBestSet?.(exercise.name, result.kg, result.reps);
           }}
           onDelete={() => setSets(p => p.filter(r => r.id !== s.id))} />
+        </div>
       ))}
       <button
         onClick={() => setSets(p => [...p, { id: Date.now() }])}
