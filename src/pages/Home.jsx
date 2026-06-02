@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import TemplateModal from '../components/TemplateModal';
 import WorkoutSheet from '../components/WorkoutSheet';
 
@@ -118,14 +119,25 @@ export default function Home() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-foreground">My Templates ({templates.length})</h3>
-            <button className="text-muted-foreground hover:text-foreground">⋯</button>
+            <button
+              onClick={() => {
+                const name = prompt('Template name:');
+                if (name?.trim()) {
+                  const newTemplate = { id: Date.now(), name: name.trim(), exercises: 'No exercises yet', exerciseList: [], lastPerformed: null };
+                  setTemplates(prev => { const updated = [...prev, newTemplate]; localStorage.setItem('workout_templates', JSON.stringify(updated)); return updated; });
+                }
+              }}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white transition"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {templates.map((template) => (
               <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate(template)}>
                 <div className="flex items-start justify-between mb-3">
                   <h4 className="font-bold text-foreground">{template.name}</h4>
-                  <button className="text-muted-foreground hover:text-foreground" onClick={(e) => e.stopPropagation()}>⋯</button>
+
                 </div>
                 <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
