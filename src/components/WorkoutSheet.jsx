@@ -39,8 +39,8 @@ const punchDotStyle = `
   }
   @keyframes segmentFadeIn  { from { opacity: 0; } to { opacity: 1; } }
   @keyframes segmentFadeOut { from { opacity: 1; } to { opacity: 0; } }
-  .punch-dot   { animation: dotPunch   0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-  .retract-dot { animation: dotRetract 0.35s cubic-bezier(0.55, 0, 1, 0.45) forwards; }
+  .punch-dot   { animation: dotPunch   0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important; animation-iteration-count: 1 !important; }
+  .retract-dot { animation: dotRetract 0.35s cubic-bezier(0.55, 0, 1, 0.45) forwards !important; animation-iteration-count: 1 !important; }
   .new-seg-in  { animation: segmentFadeIn  0.5s ease forwards; }
   .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
 `;
