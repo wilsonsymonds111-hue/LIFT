@@ -215,8 +215,11 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
         </div>
       </div>
       {done && restSeconds !== null && restSeconds > 0 && (
-        <div className="w-full bg-blue-500 text-white font-bold text-center py-1.5 rounded-xl mt-2 text-base tracking-wider">
-          {String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')}
+        <div
+          className="w-full bg-blue-500 text-white font-bold text-center py-1.5 rounded-xl mt-2 text-base tracking-wider cursor-pointer select-none"
+          onClick={() => { clearInterval(restRef.current); setRestSeconds(0); }}
+        >
+          {String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')} ✕
         </div>
       )}
     </div>
@@ -226,11 +229,12 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
 /* ─── ExerciseSection ────────────────────────────────────────── */
 function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
   const [sets, setSets] = useState([{ id: 1 }]);
-  const [liveResult, setLiveResult] = useState(null);
+  const [completedSets, setCompletedSets] = useState({});
   const lastEntry = exercise.history?.[exercise.history.length - 1];
   const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
-  const graphHistory = liveResult
-    ? [...(exercise.history || []), { kg: liveResult.kg, reps: liveResult.reps }]
+  const sessionResults = Object.values(completedSets).filter(Boolean);
+  const graphHistory = sessionResults.length > 0
+    ? [...(exercise.history || []), ...sessionResults]
     : exercise.history;
 
   return (
@@ -251,7 +255,10 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
       </div>
       {sets.map((s, i) => (
         <SetRow key={s.id} setNum={i + 1} previous={i === 0 ? prev : null}
-          onComplete={(result) => { if (result) { setLiveResult(result); onBestSet?.(exercise.name, result.kg, result.reps); } }}
+          onComplete={(result) => {
+            setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
+            if (result) onBestSet?.(exercise.name, result.kg, result.reps);
+          }}
           onDelete={() => setSets(p => p.filter(r => r.id !== s.id))} />
       ))}
       <button
