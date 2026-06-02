@@ -245,7 +245,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
   return (
     <>
     <style>{graphFadeStyle}</style>
-    <div className="mb-4 bg-gray-50 border border-gray-200 rounded-2xl p-3 shadow-sm">
+    <div className="mb-4 bg-white rounded-2xl p-3" style={{ boxShadow: '0 2px 16px rgba(59,130,246,0.08), 0 1px 4px rgba(0,0,0,0.06)', borderTop: '3px solid #3b82f6' }}>
       <div className="flex items-center justify-between mb-1">
         <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing" {...dragHandleProps}>{exercise.name}</h3>
         <div className="flex items-center gap-3">
