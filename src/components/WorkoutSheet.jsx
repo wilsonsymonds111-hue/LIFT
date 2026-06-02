@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceDot, ResponsiveContainer, Dot } from 'recharts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { X, RotateCcw, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share } from 'lucide-react';
+import { X, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 
@@ -505,9 +505,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                 <button onClick={onFinish} className="w-10 h-10 flex items-center justify-center bg-red-100 hover:bg-red-200 rounded-xl transition">
                   <X className="w-5 h-5 text-red-600" />
                 </button>
-                <button onClick={() => {}} className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition">
-                  <RotateCcw className="w-5 h-5 text-gray-600" />
-                </button>
+
               </div>
               <button
                 onClick={() => {
