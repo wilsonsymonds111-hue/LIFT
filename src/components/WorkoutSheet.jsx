@@ -24,6 +24,17 @@ function useTimer() {
 }
 
 /* ─── ProgressGraph ─────────────────────────────────────────── */
+const punchDotStyle = `
+  @keyframes dotPunch {
+    0%   { r: 0; opacity: 0; }
+    55%  { r: 6; opacity: 1; }
+    75%  { r: 3.5; }
+    90%  { r: 4.8; }
+    100% { r: 4; opacity: 1; }
+  }
+  .punch-dot { animation: dotPunch 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+`;
+
 function ProgressGraph({ history, animKey }) {
   if (!history || history.length === 0) return null;
 
@@ -32,46 +43,62 @@ function ProgressGraph({ history, animKey }) {
   const realPoints = history.slice(-5).map(toPoint);
   const lastPoint = realPoints[realPoints.length - 1];
   const projectedCount = Math.max(1, TOTAL_SLOTS - realPoints.length);
+  const lastRealIdx = realPoints.length - 1;
 
-  // Real points as solid; bridge the last real point into the dashed line
+  // repsStatic: all real points except the newest
+  // repsNew: only the last two real points (the new segment)
   const data = realPoints.map((p, i) => ({
     session: i + 1,
-    reps: p.reps,
-    projReps: i === realPoints.length - 1 ? p.reps : null,
+    repsStatic: i < lastRealIdx ? p.reps : null,
+    repsNew: i >= lastRealIdx - 1 ? p.reps : null,
+    projReps: i === lastRealIdx ? p.reps : null,
   }));
-  // Add projected hollow points (+1 rep each)
   for (let i = 1; i <= projectedCount; i++) {
     data.push({
       session: realPoints.length + i,
-      reps: null,
+      repsStatic: null,
+      repsNew: null,
       projReps: lastPoint.reps + i,
       projected: true,
     });
   }
 
-  const SolidDot = (props) => {
+  const StaticDot = (props) => {
     const { cx, cy, value } = props;
     if (value == null) return <g />;
-    return <circle key={`sd-${cx}-${cy}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
+    return <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
+  };
+
+  const NewDot = (props) => {
+    const { cx, cy, index, value } = props;
+    if (value == null) return <g />;
+    const isNewest = index === lastRealIdx;
+    if (isNewest) {
+      return (
+        <circle
+          key={`punch-${animKey}`}
+          cx={cx} cy={cy} r={4}
+          fill="#3b82f6" stroke="white" strokeWidth={2}
+          className="punch-dot"
+        />
+      );
+    }
+    // bridge dot — already drawn by static line, hide
+    return <g />;
   };
 
   const GhostDot = (props) => {
     const { cx, cy, payload } = props;
-    if (!payload?.projected) {
-      // bridge dot — hide it (drawn by solid line)
-      return <g key={`ghost-bridge-${cx}`} />;
-    }
+    if (!payload?.projected) return <g />;
     return (
-      <g key={`ghost-${cx}-${cy}`}>
-        <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.6} stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.7} />
-      </g>
+      <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.6} stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.7} />
     );
   };
 
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload;
-    const reps = d?.projected ? d.projReps : d?.reps;
+    const reps = d?.projected ? d.projReps : (d?.repsNew ?? d?.repsStatic);
     if (!reps) return null;
     return (
       <div className={`text-xs px-2 py-1 rounded-lg shadow font-semibold ${
@@ -83,29 +110,33 @@ function ProgressGraph({ history, animKey }) {
   };
 
   return (
-    <div key={animKey} className="mb-2 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px', animation: 'graphFadeIn 0.35s ease' }}>
+    <div className="mb-2 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
+      <style>{punchDotStyle}</style>
       <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">Progress</p>
-      <ResponsiveContainer key={animKey} width="100%" height={60}>
+      <ResponsiveContainer width="100%" height={60}>
         <LineChart data={data} margin={{ top: 12, right: 16, left: -28, bottom: 4 }}>
-          <defs>
-            <linearGradient id="blueGradient" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#3b82f6" />
-              <stop offset="100%" stopColor="#60a5fa" />
-            </linearGradient>
-          </defs>
           <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 9, fill: '#9ca3af' }} />
           <Tooltip content={<CustomTooltip />} />
-          {/* Solid line for real data */}
+          {/* Static line — all historical segments, no animation */}
           <Line
-            type="monotone" dataKey="reps"
+            type="monotone" dataKey="repsStatic"
             stroke="#3b82f6" strokeWidth={2}
-            dot={<SolidDot />} activeDot={false}
+            dot={<StaticDot />} activeDot={false}
             connectNulls={false}
+            isAnimationActive={false}
+          />
+          {/* Animated new segment — only last two points */}
+          <Line
+            key={animKey}
+            type="monotone" dataKey="repsNew"
+            stroke="#3b82f6" strokeWidth={2}
+            dot={<NewDot />} activeDot={false}
+            connectNulls={true}
             isAnimationActive={true}
-            animationDuration={700}
+            animationDuration={600}
             animationEasing="ease-out"
           />
-          {/* Dashed ghost line for projection */}
+          {/* Dashed ghost projection line */}
           <Line
             type="monotone" dataKey="projReps"
             stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6}
