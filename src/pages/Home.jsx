@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import TemplateModal from '../components/TemplateModal';
 import WorkoutSheet from '../components/WorkoutSheet';
+import NewTemplateModal from '../components/NewTemplateModal';
 
 const defaultTemplates = [
   { id: 1, name: 'CHEST', lastPerformed: '2026-06-01T19:30:00',
@@ -44,6 +45,7 @@ const exampleTemplates = [
 export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [activeWorkout, setActiveWorkout] = useState(null);
+  const [showNewTemplate, setShowNewTemplate] = useState(false);
   const [templates, setTemplates] = useState(() => {
     try {
       const VERSION = '3';
@@ -88,6 +90,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
+      {showNewTemplate && (
+        <NewTemplateModal
+          onClose={() => setShowNewTemplate(false)}
+          onSave={(template) => {
+            setTemplates(prev => { const updated = [...prev, template]; localStorage.setItem('workout_templates', JSON.stringify(updated)); return updated; });
+            setShowNewTemplate(false);
+          }}
+        />
+      )}
       <TemplateModal
         template={selectedTemplate}
         onClose={() => setSelectedTemplate(null)}
@@ -120,13 +131,7 @@ export default function Home() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-foreground">My Templates ({templates.length})</h3>
             <button
-              onClick={() => {
-                const name = prompt('Template name:');
-                if (name?.trim()) {
-                  const newTemplate = { id: Date.now(), name: name.trim(), exercises: 'No exercises yet', exerciseList: [], lastPerformed: null };
-                  setTemplates(prev => { const updated = [...prev, newTemplate]; localStorage.setItem('workout_templates', JSON.stringify(updated)); return updated; });
-                }
-              }}
+              onClick={() => setShowNewTemplate(true)}
               className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition"
             >
               <Plus className="w-3.5 h-3.5" />
