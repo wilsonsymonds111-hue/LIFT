@@ -50,7 +50,8 @@ function ProgressGraph({ history }) {
   }
 
   const SolidDot = (props) => {
-    const { cx, cy } = props;
+    const { cx, cy, value } = props;
+    if (value == null) return <g />;
     return <circle key={`sd-${cx}-${cy}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
   };
 
