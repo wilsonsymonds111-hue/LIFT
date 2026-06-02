@@ -32,10 +32,20 @@ const punchDotStyle = `
     90%  { r: 4.8; }
     100% { r: 4; opacity: 1; }
   }
-  .punch-dot { animation: dotPunch 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+  @keyframes dotRetract {
+    0%   { r: 4; opacity: 1; }
+    20%  { r: 5.5; }
+    100% { r: 0; opacity: 0; }
+  }
+  @keyframes segmentFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes segmentFadeOut { from { opacity: 1; } to { opacity: 0; } }
+  .punch-dot   { animation: dotPunch   0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+  .retract-dot { animation: dotRetract 0.35s cubic-bezier(0.55, 0, 1, 0.45) forwards; }
+  .new-seg-in  { animation: segmentFadeIn  0.5s ease forwards; }
+  .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
 `;
 
-function ProgressGraph({ history, animKey }) {
+function ProgressGraph({ history, animKey, animDir }) {
   if (!history || history.length === 0) return null;
 
   const TOTAL_SLOTS = 6;
@@ -76,10 +86,10 @@ function ProgressGraph({ history, animKey }) {
     if (isNewest) {
       return (
         <circle
-          key={`punch-${animKey}`}
+          key={`dot-${animKey}`}
           cx={cx} cy={cy} r={4}
           fill="#3b82f6" stroke="white" strokeWidth={2}
-          className="punch-dot"
+          className={animDir === 'remove' ? 'retract-dot' : 'punch-dot'}
         />
       );
     }
@@ -110,7 +120,7 @@ function ProgressGraph({ history, animKey }) {
   };
 
   return (
-    <div className="mb-2 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
+    <div className={`mb-2 rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
       <style>{punchDotStyle}</style>
       <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">Progress</p>
       <ResponsiveContainer width="100%" height={60}>
@@ -274,6 +284,9 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
     ? [...(exercise.history || []), ...sessionResults]
     : exercise.history;
   const graphAnimKey = sessionResults.length;
+  const prevCountRef = useRef(0);
+  const animDir = sessionResults.length >= prevCountRef.current ? 'add' : 'remove';
+  useEffect(() => { prevCountRef.current = sessionResults.length; }, [sessionResults.length]);
 
   return (
     <>
@@ -285,7 +298,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps }) {
           <MoreHorizontal className="w-4 h-4 text-gray-400" />
         </div>
       </div>
-      <ProgressGraph history={graphHistory} animKey={graphAnimKey} />
+      <ProgressGraph history={graphHistory} animKey={graphAnimKey} animDir={animDir} />
       <div className="grid grid-cols-[40px_1fr_80px_80px_40px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
