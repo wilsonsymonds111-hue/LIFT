@@ -219,7 +219,7 @@ function SetRow({ setNum, previous, onComplete, onDelete }) {
           className="w-full bg-blue-500 text-white font-bold text-center py-1.5 rounded-xl mt-2 text-base tracking-wider cursor-pointer select-none"
           onClick={() => { clearInterval(restRef.current); setRestSeconds(0); }}
         >
-          {String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')} ✕
+          {String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')}
         </div>
       )}
     </div>
