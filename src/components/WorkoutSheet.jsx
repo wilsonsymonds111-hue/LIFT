@@ -720,7 +720,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               </div>
               <p className="text-sm text-gray-500 mb-0.5">📅 {today}</p>
               <p className="text-sm text-gray-500 mb-4">🕐 {timer}</p>
-              <input placeholder="Note" className="w-full text-sm text-gray-400 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 pb-1" />
+              <input placeholder="Note" className="w-full text-sm text-gray-800 placeholder-gray-400 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 pb-1" />
               {exercises.length === 0 && (
                 <div className="flex flex-col gap-3 mt-4">
                   <button
