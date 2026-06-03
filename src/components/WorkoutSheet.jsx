@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceDot, ResponsiveContainer, Dot } from 'recharts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { X, Link2, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share } from 'lucide-react';
+import { RotateCcw, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
 import ExercisePicker from './ExercisePicker';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
@@ -629,6 +629,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [finishTimer, setFinishTimer] = useState('00:00');
   const [exercises, setExercises] = useState(() => [...(template?.exerciseList || [])]);
   const [showExercisePicker, setShowExercisePicker] = useState(false);
+  const [showRestTimerPicker, setShowRestTimerPicker] = useState(false);
   const { display: timer } = useTimer();
   const bestSetsRef = useRef({});
 
@@ -692,19 +693,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
         ) : (
           <>
             <div className="relative flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <button onClick={onFinish} className="w-10 h-10 flex items-center justify-center bg-red-100 hover:bg-red-200 rounded-xl transition">
-                  <X className="w-5 h-5 text-red-600" />
-                </button>
-
-              </div>
-              <button
-                onClick={() => setShowExercisePicker(true)}
-                className="absolute left-1/2 -translate-x-1/2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-xl transition"
-                >
-                + Add Exercise
-                </button>
-                {showExercisePicker && (
+              <button onClick={() => setShowRestTimerPicker(true)} className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition">
+                <RotateCcw className="w-5 h-5 text-gray-600" />
+              </button>
+              {showExercisePicker && (
                 <ExercisePicker
                   onClose={() => setShowExercisePicker(false)}
                   onAdd={(picked) => {
@@ -716,7 +708,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                     setShowExercisePicker(false);
                   }}
                 />
-                )}
+              )}
               <button onClick={handleFinish} className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition">
                 Finish
               </button>
