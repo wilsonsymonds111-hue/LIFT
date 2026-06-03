@@ -713,7 +713,22 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                 Finish
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-24">
+            {/* Fixed bottom buttons */}
+            <div className="absolute bottom-0 inset-x-0 px-4 pb-6 pt-3 bg-white border-t border-gray-100 flex flex-col gap-2 z-10">
+              <button
+                onClick={() => setShowExercisePicker(true)}
+                className="w-full py-3.5 bg-blue-50 hover:bg-blue-100 text-blue-500 font-semibold rounded-xl text-base transition"
+              >
+                Add Exercises
+              </button>
+              <button
+                onClick={onFinish}
+                className="w-full py-3.5 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition"
+              >
+                Cancel Workout
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-36">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{template.name}</h1>
                 <MoreHorizontal className="w-5 h-5 text-blue-400" />
@@ -721,22 +736,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               <p className="text-sm text-gray-500 mb-0.5">📅 {today}</p>
               <p className="text-sm text-gray-500 mb-4">🕐 {timer}</p>
               <input placeholder="Note" className="w-full text-sm text-gray-800 placeholder-gray-400 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 pb-1" />
-              {exercises.length === 0 && (
-                <div className="flex flex-col gap-3 mt-4">
-                  <button
-                    onClick={() => setShowExercisePicker(true)}
-                    className="w-full py-4 bg-blue-50 hover:bg-blue-100 text-blue-500 font-semibold rounded-xl text-base transition"
-                  >
-                    Add Exercises
-                  </button>
-                  <button
-                    onClick={onFinish}
-                    className="w-full py-4 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition"
-                  >
-                    Cancel Workout
-                  </button>
-                </div>
-              )}
+
               <DragDropContext onDragEnd={({ source, destination }) => {
                 if (!destination) return;
                 const next = [...exercises];
