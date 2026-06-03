@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceDot, ResponsiveContainer, Dot } from 'recharts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { RotateCcw, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
+import { History, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
 import ExercisePicker from './ExercisePicker';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
@@ -694,7 +694,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
           <>
             <div className="relative flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
               <button onClick={() => setShowRestTimerPicker(true)} className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition">
-                <RotateCcw className="w-5 h-5 text-gray-600" />
+                <History className="w-5 h-5 text-gray-600" />
               </button>
               {showExercisePicker && (
                 <ExercisePicker
