@@ -729,6 +729,22 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               <p className="text-sm text-gray-500 mb-0.5">📅 {today}</p>
               <p className="text-sm text-gray-500 mb-4">🕐 {timer}</p>
               <input placeholder="Note" className="w-full text-sm text-gray-400 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 pb-1" />
+              {exercises.length === 0 && (
+                <div className="flex flex-col gap-3 mt-4">
+                  <button
+                    onClick={() => setShowExercisePicker(true)}
+                    className="w-full py-4 bg-blue-50 hover:bg-blue-100 text-blue-500 font-semibold rounded-xl text-base transition"
+                  >
+                    Add Exercises
+                  </button>
+                  <button
+                    onClick={onFinish}
+                    className="w-full py-4 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition"
+                  >
+                    Cancel Workout
+                  </button>
+                </div>
+              )}
               <DragDropContext onDragEnd={({ source, destination }) => {
                 if (!destination) return;
                 const next = [...exercises];

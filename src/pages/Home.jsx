@@ -118,9 +118,12 @@ export default function Home() {
 
       {/* Quick Start Section */}
       <div className="px-4 py-4">
-        <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition">
-          Start an Empty Workout
-        </button>
+      <button
+        onClick={() => setActiveWorkout({ id: 'empty-' + Date.now(), name: 'Evening Workout', exerciseList: [] })}
+        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition"
+      >
+        Start an Empty Workout
+      </button>
       </div>
 
       {/* Templates Section */}
