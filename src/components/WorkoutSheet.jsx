@@ -743,7 +743,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               </div>
               <p className="text-sm text-gray-500 mb-0.5">📅 {today}</p>
               <p className="text-sm text-gray-500 mb-4">🕐 {timer}</p>
-              <textarea placeholder="Note" rows={1} className="w-full text-sm text-gray-800 placeholder-gray-400 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 pb-1 bg-transparent resize-none font-sans" />
+              <textarea placeholder="Note" rows={1} className="w-full text-sm text-gray-800 placeholder-gray-400 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 pb-1 bg-transparent resize-none" style={{fontFamily: 'inherit'}} />
 
               <DragDropContext onDragEnd={({ source, destination }) => {
                 if (!destination) return;
