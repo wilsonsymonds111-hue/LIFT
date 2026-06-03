@@ -645,10 +645,18 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const handleFinish = () => {
     const snapshot = { ...bestSetsRef.current };
     const toKg = (h) => typeof h === 'object' ? h.kg : h;
+    const toReps = (h) => typeof h === 'object' ? (h.reps ?? 8) : 8;
     const computedPrs = exercises.filter(ex => {
       const best = snapshot[ex.name];
       if (!best || !ex.history || ex.history.length === 0) return false;
-      return best.kg >= Math.max(...ex.history.map(toKg));
+      const maxKg = Math.max(...ex.history.map(toKg));
+      if (best.kg > maxKg) return true;
+      // Same weight but more reps = PR
+      if (best.kg === maxKg) {
+        const maxRepsAtMaxKg = Math.max(...ex.history.filter(h => toKg(h) === maxKg).map(toReps));
+        return best.reps > maxRepsAtMaxKg;
+      }
+      return false;
     }).map(ex => ({ name: ex.name, kg: snapshot[ex.name].kg }));
     setBestSets(snapshot);
     setPrs(computedPrs);
