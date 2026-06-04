@@ -714,27 +714,42 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
 
   return (
     <>
-      <div className={`fixed inset-0 z-30 transition-all duration-500 pointer-events-none ${minimized ? 'bg-black/20' : 'bg-black/50'}`} />
-      <div className={`fixed inset-x-0 bottom-0 z-40 bg-white rounded-t-3xl shadow-2xl transition-all duration-500 ease-in-out flex flex-col ${minimized ? 'h-20' : 'h-[95vh]'}`}>
-        <div className="flex justify-center pt-3 pb-1 cursor-pointer flex-shrink-0" onClick={() => setMinimized(m => !m)}>
+      {/* Overlay — only when fully open */}
+      {!minimized && <div className="fixed inset-0 z-30 bg-black/50 pointer-events-none" />}
+
+      {/* Minimized Spotify-style strip */}
+      {minimized && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-40 bg-gray-900 flex items-center justify-between px-4 py-3 shadow-2xl cursor-pointer"
+          onClick={() => setMinimized(false)}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-xs font-bold">{template.name.slice(0, 2)}</span>
+            </div>
+            <div className="min-w-0">
+              <p className="font-bold text-white text-sm truncate">{template.name}</p>
+              <p className="text-xs text-gray-400">{timer}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <button
+              onClick={e => { e.stopPropagation(); handleFinish(); }}
+              className="px-4 py-1.5 bg-green-500 text-white text-sm font-semibold rounded-lg"
+            >
+              Finish
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Full sheet */}
+      <div className={`fixed inset-x-0 bottom-0 z-40 bg-white rounded-t-3xl shadow-2xl transition-all duration-500 ease-in-out flex flex-col ${minimized ? 'h-0 overflow-hidden' : 'h-[95vh]'}`}>
+        <div className="flex justify-center pt-3 pb-1 cursor-pointer flex-shrink-0" onClick={() => setMinimized(true)}>
           <div className="w-10 h-1 rounded-full bg-gray-300" />
         </div>
 
-        {minimized ? (
-          <div className="flex items-center justify-between px-5 flex-1" onClick={() => setMinimized(false)}>
-            <div>
-              <p className="font-bold text-gray-900 text-sm">{template.name}</p>
-              <p className="text-xs text-gray-400">{timer}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <ChevronDown className="w-5 h-5 text-gray-400 rotate-180" />
-              <button onClick={e => { e.stopPropagation(); handleFinish(); }} className="px-4 py-1.5 bg-green-500 text-white text-sm font-semibold rounded-lg">
-                Finish
-              </button>
-            </div>
-          </div>
-        ) : (
-          <>
+        <>
             <div className="relative flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
               {/* Rest timer pill (minimized) or icon button */}
               {restActive && restMinimized ? (
@@ -835,7 +850,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               </div>
             </div>
           </>
-        )}
       </div>
     </>
   );
