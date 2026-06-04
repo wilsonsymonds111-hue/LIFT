@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceDot, ResponsiveContain
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { History, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
 import ExercisePicker from './ExercisePicker';
+import RestTimerPicker from './RestTimerPicker';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 
@@ -630,6 +631,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [exercises, setExercises] = useState(() => [...(template?.exerciseList || [])]);
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [showRestTimerPicker, setShowRestTimerPicker] = useState(false);
+  const [globalRestDuration, setGlobalRestDuration] = useState(120);
   const { display: timer } = useTimer();
   const bestSetsRef = useRef({});
 
@@ -704,6 +706,13 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               <button onClick={() => setShowRestTimerPicker(true)} className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition">
                 <History className="w-5 h-5 text-gray-600" />
               </button>
+              {showRestTimerPicker && (
+                <RestTimerPicker
+                  current={globalRestDuration}
+                  onSelect={(s) => setGlobalRestDuration(s)}
+                  onClose={() => setShowRestTimerPicker(false)}
+                />
+              )}
               {showExercisePicker && (
                 <ExercisePicker
                   onClose={() => setShowExercisePicker(false)}
