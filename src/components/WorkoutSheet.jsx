@@ -471,7 +471,7 @@ function Star({ size = 24, delay = 0 }) {
 }
 
 /* ─── SummaryScreen ──────────────────────────────────────────── */
-function SummaryScreen({ template, prs, bestSets, durationDisplay, onDone }) {
+function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, onDone }) {
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
   const cardRef = useRef(null);
   const [sharing, setSharing] = useState(false);
@@ -579,7 +579,7 @@ function SummaryScreen({ template, prs, bestSets, durationDisplay, onDone }) {
 
             {/* Exercise rows */}
             <div className="px-4 py-3 space-y-2">
-              {template.exerciseList?.map((ex, i) => {
+              {exercises.map((ex, i) => {
                 const best = bestSets[ex.name];
                 const isPR = prSet.has(ex.name);
                 return (
@@ -683,7 +683,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     const toReps = (h) => typeof h === 'object' ? (h.reps ?? 8) : 8;
     const computedPrs = exercises.filter(ex => {
       const best = snapshot[ex.name];
-      if (!best || !ex.history || ex.history.length === 0) return false;
+      if (!best) return false;
+      // Brand new exercise with no history — first recorded set is always a PR
+      if (!ex.history || ex.history.length === 0) return true;
       const maxKg = Math.max(...ex.history.map(toKg));
       if (best.kg > maxKg) return true;
       // Same weight but more reps = PR
@@ -704,6 +706,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     return (
       <SummaryScreen
         template={template}
+        exercises={exercises}
         prs={prs}
         bestSets={bestSets}
         durationDisplay={finishTimer}
