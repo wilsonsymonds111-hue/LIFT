@@ -5,40 +5,40 @@ import WorkoutSheet from '../components/WorkoutSheet';
 import NewTemplateModal from '../components/NewTemplateModal';
 
 const defaultTemplates = [
-  { id: 1, name: 'CHEST', lastPerformed: '2026-06-01T19:30:00',
+  { id: 1, name: 'CHEST', lastPerformed: null,
     exercises: 'Incline Bench Press (Barbell), Standing press, Pec Deck (Machine)...', exerciseList: [
-    { name: 'Incline Bench Press (Barbell)', sets: 1, muscle: 'Chest', history: [{kg:72,reps:5},{kg:72,reps:6},{kg:72,reps:7},{kg:72,reps:8},{kg:72,reps:10}] },
-    { name: 'Standing press', sets: 1, muscle: 'Chest', history: [40,42,45,45,48] },
-    { name: 'Pec Deck (Machine)', sets: 1, muscle: 'Chest', history: [50,50,55,55,60] },
-    { name: 'Tricep single arm extension', sets: 1, muscle: 'Arms', history: [20,22,22,25,25] },
-    { name: 'Single arm overhead cable extension', sets: 1, muscle: 'Arms', history: [15,17,18,20,20] },
-    { name: 'Lateral Raise (Dumbbell)', sets: 1, muscle: 'Shoulders', history: [12,12,14,14,16] },
+    { name: 'Incline Bench Press (Barbell)', sets: 1, muscle: 'Chest', history: [] },
+    { name: 'Standing press', sets: 1, muscle: 'Chest', history: [] },
+    { name: 'Pec Deck (Machine)', sets: 1, muscle: 'Chest', history: [] },
+    { name: 'Tricep single arm extension', sets: 1, muscle: 'Arms', history: [] },
+    { name: 'Single arm overhead cable extension', sets: 1, muscle: 'Arms', history: [] },
+    { name: 'Lateral Raise (Dumbbell)', sets: 1, muscle: 'Shoulders', history: [] },
   ]},
-  { id: 2, name: 'BACK', lastPerformed: '2026-06-01T19:45:00',
+  { id: 2, name: 'BACK', lastPerformed: null,
     exercises: 'Isolateral dumbbell rows, Pullover (Machine), Iso-Lateral Row (Machine)...', exerciseList: [
-    { name: 'Isolateral Dumbbell Rows', sets: 1, muscle: 'Back', history: [30,32,35,35,38] },
-    { name: 'Pullover (Machine)', sets: 1, muscle: 'Back', history: [45,48,50,52,55] },
-    { name: 'Iso-Lateral Row (Machine)', sets: 1, muscle: 'Back', history: [60,60,65,68,70] },
-    { name: 'Shrug (Barbell)', sets: 1, muscle: 'Shoulders', history: [80,85,85,90,95] },
+    { name: 'Isolateral Dumbbell Rows', sets: 1, muscle: 'Back', history: [] },
+    { name: 'Pullover (Machine)', sets: 1, muscle: 'Back', history: [] },
+    { name: 'Iso-Lateral Row (Machine)', sets: 1, muscle: 'Back', history: [] },
+    { name: 'Shrug (Barbell)', sets: 1, muscle: 'Shoulders', history: [] },
   ]},
-  { id: 3, name: 'LEGS', lastPerformed: '2026-06-01T20:15:00',
+  { id: 3, name: 'LEGS', lastPerformed: null,
     exercises: 'Smith Squat, Romanian Deadlift (Barbell), Standing Calf Raise (Machine)...', exerciseList: [
-    { name: 'Smith Squat', sets: 1, muscle: 'Legs', history: [80,85,90,95,100] },
-    { name: 'Romanian Deadlift (Barbell)', sets: 1, muscle: 'Legs', history: [70,75,75,80,85] },
-    { name: 'Standing Calf Raise (Machine)', sets: 1, muscle: 'Legs', history: [60,60,65,65,70] },
+    { name: 'Smith Squat', sets: 1, muscle: 'Legs', history: [] },
+    { name: 'Romanian Deadlift (Barbell)', sets: 1, muscle: 'Legs', history: [] },
+    { name: 'Standing Calf Raise (Machine)', sets: 1, muscle: 'Legs', history: [] },
   ]},
 ];
 
 const exampleTemplates = [
   { id: 4, name: 'Strong 5x5', exercises: 'Squat, Bench Press, Barbell Row...', exerciseList: [
-    { name: 'Squat', sets: 5, muscle: 'Legs', history: [90,95,100,100,105] },
-    { name: 'Bench Press', sets: 5, muscle: 'Chest', history: [70,72,75,77,80] },
-    { name: 'Barbell Row', sets: 5, muscle: 'Back', history: [65,65,70,72,75] },
+    { name: 'Squat', sets: 5, muscle: 'Legs', history: [] },
+    { name: 'Bench Press', sets: 5, muscle: 'Chest', history: [] },
+    { name: 'Barbell Row', sets: 5, muscle: 'Back', history: [] },
   ]},
   { id: 5, name: 'Legs', exercises: 'Leg Press, Leg Curl, Leg Extension...', exerciseList: [
-    { name: 'Leg Press', sets: 3, muscle: 'Legs', history: [100,110,115,120,125] },
-    { name: 'Leg Curl', sets: 3, muscle: 'Legs', history: [40,42,45,45,48] },
-    { name: 'Leg Extension', sets: 3, muscle: 'Legs', history: [35,38,40,42,45] },
+    { name: 'Leg Press', sets: 3, muscle: 'Legs', history: [] },
+    { name: 'Leg Curl', sets: 3, muscle: 'Legs', history: [] },
+    { name: 'Leg Extension', sets: 3, muscle: 'Legs', history: [] },
   ]},
 ];
 
@@ -48,7 +48,7 @@ export default function Home() {
   const [showNewTemplate, setShowNewTemplate] = useState(false);
   const [templates, setTemplates] = useState(() => {
     try {
-      const VERSION = '3';
+      const VERSION = '4';
       if (localStorage.getItem('workout_templates_version') !== VERSION) {
         localStorage.removeItem('workout_templates');
         localStorage.setItem('workout_templates_version', VERSION);

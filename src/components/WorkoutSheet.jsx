@@ -150,17 +150,12 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
     );
   };
 
-  // Each data point gets ~40px min width so the chart scrolls horizontally with many sessions
-  const minChartWidth = Math.max(data.length * 40, 280);
-
   return (
     <div className={`mb-2 rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
       <style>{punchDotStyle}</style>
       <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">
         {isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)'}
       </p>
-      <div style={{ overflowX: 'auto', overflowY: 'hidden' }}>
-      <div style={{ width: minChartWidth, height: 64 }}>
       <ResponsiveContainer width="100%" height={64}>
         <LineChart data={data} margin={{ top: 12, right: 16, left: -28, bottom: 4 }}>
           <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 9, fill: '#9ca3af' }} />
@@ -194,8 +189,6 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
           />
         </LineChart>
       </ResponsiveContainer>
-      </div>
-      </div>
     </div>
   );
 }
