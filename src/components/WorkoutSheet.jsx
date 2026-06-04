@@ -50,7 +50,7 @@ const punchDotStyle = `
   .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
 `;
 
-function ProgressGraph({ history, animKey, animDir }) {
+function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
   const [freshAnim, setFreshAnim] = useState(false);
   const prevAnimKeyRef = useRef(animKey);
   useEffect(() => {
@@ -71,20 +71,22 @@ function ProgressGraph({ history, animKey, animDir }) {
   const projectedCount = Math.max(1, TOTAL_SLOTS - realPoints.length);
   const lastRealIdx = realPoints.length - 1;
 
-  // repsStatic: all real points except the newest
-  // repsNew: only the last two real points (the new segment)
+  // Use kg for weighted exercises, reps for bodyweight
+  const getValue = (p) => isBodyweight ? p.reps : p.kg;
+  const projValue = isBodyweight ? lastPoint.reps + 1 : lastPoint.kg;
+
   const data = realPoints.map((p, i) => ({
     session: i + 1,
-    repsStatic: i < lastRealIdx ? p.reps : null,
-    repsNew: i >= lastRealIdx - 1 ? p.reps : null,
-    projReps: i === lastRealIdx ? p.reps : null,
+    valStatic: i < lastRealIdx ? getValue(p) : null,
+    valNew: i >= lastRealIdx - 1 ? getValue(p) : null,
+    projVal: i === lastRealIdx ? getValue(p) : null,
   }));
   for (let i = 1; i <= projectedCount; i++) {
     data.push({
       session: realPoints.length + i,
-      repsStatic: null,
-      repsNew: null,
-      projReps: lastPoint.reps + i,
+      valStatic: null,
+      valNew: null,
+      projVal: isBodyweight ? lastPoint.reps + i : lastPoint.kg,
       projected: true,
     });
   }
@@ -132,13 +134,13 @@ function ProgressGraph({ history, animKey, animDir }) {
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload;
-    const reps = d?.projected ? d.projReps : (d?.repsNew ?? d?.repsStatic);
-    if (!reps) return null;
+    const val = d?.projected ? d.projVal : (d?.valNew ?? d?.valStatic);
+    if (val == null) return null;
     return (
       <div className={`text-xs px-2 py-1 rounded-lg shadow font-semibold ${
         d?.projected ? 'bg-purple-50 text-purple-400 border border-purple-100' : 'bg-white text-gray-700 border border-gray-100'
       }`}>
-        {d?.projected ? 'Next: ' : ''}{reps} reps @ {d?.kg ?? lastPoint.kg}kg
+        {d?.projected ? 'Next: ' : ''}{isBodyweight ? `${val} reps` : `${val} kg`}
       </div>
     );
   };
@@ -146,14 +148,16 @@ function ProgressGraph({ history, animKey, animDir }) {
   return (
     <div className={`mb-2 rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
       <style>{punchDotStyle}</style>
-      <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">Progress</p>
+      <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">
+        {isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)'}
+      </p>
       <ResponsiveContainer width="100%" height={60}>
         <LineChart data={data} margin={{ top: 12, right: 16, left: -28, bottom: 4 }}>
           <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 9, fill: '#9ca3af' }} />
           <Tooltip content={<CustomTooltip />} />
           {/* Static line — all historical segments, no animation */}
           <Line
-            type="monotone" dataKey="repsStatic"
+            type="monotone" dataKey="valStatic"
             stroke="#3b82f6" strokeWidth={2}
             dot={<StaticDot />} activeDot={false}
             connectNulls={false}
@@ -162,7 +166,7 @@ function ProgressGraph({ history, animKey, animDir }) {
           {/* Animated new segment — only last two points */}
           <Line
             key={animKey}
-            type="monotone" dataKey="repsNew"
+            type="monotone" dataKey="valNew"
             stroke="#3b82f6" strokeWidth={2}
             dot={<NewDot />} activeDot={false}
             connectNulls={true}
@@ -172,7 +176,7 @@ function ProgressGraph({ history, animKey, animDir }) {
           />
           {/* Dashed ghost projection line */}
           <Line
-            type="monotone" dataKey="projReps"
+            type="monotone" dataKey="projVal"
             stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6}
             dot={<GhostDot />} activeDot={false}
             connectNulls={true}
@@ -319,6 +323,15 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
   const animDir = sessionResults.length >= prevCountRef.current ? 'add' : 'remove';
   useEffect(() => { prevCountRef.current = sessionResults.length; }, [sessionResults.length]);
 
+  // Bodyweight: no kg in history AND no kg in current session results
+  const allEntries = [...(exercise.history || []), ...sessionResults];
+  const isBodyweight = allEntries.length === 0
+    ? false
+    : allEntries.every(h => {
+        const kg = typeof h === 'object' ? (h.kg ?? 0) : (h ?? 0);
+        return kg === 0 || kg == null;
+      });
+
   return (
     <>
     <style>{graphFadeStyle}</style>
@@ -401,7 +414,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
           className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
         />
       )}
-      <ProgressGraph history={graphHistory} animKey={graphAnimKey} animDir={animDir} />
+      <ProgressGraph history={graphHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={isBodyweight} />
       <div className="grid grid-cols-[40px_1fr_80px_80px_40px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
