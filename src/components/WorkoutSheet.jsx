@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { History, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
+import { RestTimerModal, RestTimerPill } from './RestTimerModal';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 
@@ -632,8 +633,40 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [showRestTimerPicker, setShowRestTimerPicker] = useState(false);
   const [globalRestDuration, setGlobalRestDuration] = useState(120);
+  // Active rest timer state
+  const [restActive, setRestActive] = useState(false);       // timer running
+  const [restSeconds, setRestSeconds] = useState(0);         // current countdown
+  const [restTotal, setRestTotal] = useState(0);             // original duration
+  const [restMinimized, setRestMinimized] = useState(false); // pill vs modal
+  const restIntervalRef = useRef(null);
   const { display: timer } = useTimer();
   const bestSetsRef = useRef({});
+
+  // Start the rest countdown
+  const startRestTimer = (duration) => {
+    clearInterval(restIntervalRef.current);
+    setRestTotal(duration);
+    setRestSeconds(duration);
+    setRestActive(true);
+    setRestMinimized(false);
+    restIntervalRef.current = setInterval(() => {
+      setRestSeconds(s => {
+        if (s <= 1) { clearInterval(restIntervalRef.current); setRestActive(false); return 0; }
+        return s - 1;
+      });
+    }, 1000);
+  };
+
+  const stopRestTimer = () => {
+    clearInterval(restIntervalRef.current);
+    setRestActive(false);
+    setRestMinimized(false);
+  };
+
+  const adjustRestTimer = (delta) => {
+    setRestSeconds(s => Math.max(0, s + delta));
+    setRestTotal(t => Math.max(0, t + delta));
+  };
 
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -703,13 +736,34 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
         ) : (
           <>
             <div className="relative flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
-              <button onClick={() => setShowRestTimerPicker(true)} className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition">
-                <History className="w-5 h-5 text-gray-600" />
-              </button>
+              {/* Rest timer pill (minimized) or icon button */}
+              {restActive && restMinimized ? (
+                <RestTimerPill
+                  seconds={restSeconds}
+                  total={restTotal}
+                  onClick={() => setRestMinimized(false)}
+                />
+              ) : (
+                <button onClick={() => setShowRestTimerPicker(true)} className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition">
+                  <History className="w-5 h-5 text-gray-600" />
+                </button>
+              )}
+
+              {/* Full rest timer modal */}
+              {restActive && !restMinimized && (
+                <RestTimerModal
+                  seconds={restSeconds}
+                  total={restTotal}
+                  onSkip={stopRestTimer}
+                  onMinimize={() => setRestMinimized(true)}
+                  onAdjust={adjustRestTimer}
+                />
+              )}
+
               {showRestTimerPicker && (
                 <RestTimerPicker
                   current={globalRestDuration}
-                  onSelect={(s) => setGlobalRestDuration(s)}
+                  onSelect={(s) => { setGlobalRestDuration(s); startRestTimer(s); }}
                   onClose={() => setShowRestTimerPicker(false)}
                 />
               )}
