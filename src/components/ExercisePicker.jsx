@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { X, Search } from 'lucide-react';
+import { X, Search, Plus } from 'lucide-react';
 
 const ALL_EXERCISES = [
   { name: 'Ab Wheel', muscle: 'Core' },
@@ -179,7 +179,7 @@ export default function ExercisePicker({ onClose, onAdd }) {
               <div className="px-4 py-1 bg-gray-50 text-xs font-bold text-gray-400 uppercase tracking-widest">
                 {letter}
               </div>
-              {exercises.map((ex, i) => {
+              {exercises.map((ex) => {
                 const isSelected = selected.includes(ex.name);
                 return (
                   <button
@@ -199,6 +199,25 @@ export default function ExercisePicker({ onClose, onAdd }) {
               })}
             </div>
           ))}
+
+          {/* Create custom exercise when no results found */}
+          {search.trim().length > 0 && filtered.length === 0 && (
+            <div className="px-4 pt-4 pb-2">
+              <p className="text-sm text-gray-400 text-center mb-3">No results for "{search}"</p>
+              <button
+                onClick={() => onAdd([{ name: search.trim(), muscle: 'Other' }])}
+                className="w-full flex items-center gap-3 px-4 py-3.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-2xl transition"
+              >
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Plus className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-blue-600">Create "{search.trim()}"</p>
+                  <p className="text-xs text-blue-400">Add as a new exercise</p>
+                </div>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
