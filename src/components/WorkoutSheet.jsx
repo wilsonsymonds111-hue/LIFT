@@ -730,22 +730,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                 Finish
               </button>
             </div>
-            {/* Fixed bottom buttons */}
-            <div className="absolute bottom-0 inset-x-0 px-4 pb-6 pt-3 bg-white border-t border-gray-100 flex flex-col gap-2 z-10">
-              <button
-                onClick={() => setShowExercisePicker(true)}
-                className="w-full py-3.5 bg-blue-50 hover:bg-blue-100 text-blue-500 font-semibold rounded-xl text-base transition"
-              >
-                Add Exercises
-              </button>
-              <button
-                onClick={onFinish}
-                className="w-full py-3.5 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition"
-              >
-                Cancel Workout
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-36">
+            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-6">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{template.name}</h1>
                 <MoreHorizontal className="w-5 h-5 text-blue-400" />
@@ -778,6 +763,22 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                   )}
                 </Droppable>
               </DragDropContext>
+
+              {/* Bottom buttons - scroll to see */}
+              <div className="mt-6 flex flex-col gap-2">
+                <button
+                  onClick={() => setShowExercisePicker(true)}
+                  className="w-full py-3.5 bg-blue-50 hover:bg-blue-100 text-blue-500 font-semibold rounded-xl text-base transition"
+                >
+                  Add Exercises
+                </button>
+                <button
+                  onClick={onFinish}
+                  className="w-full py-3.5 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition"
+                >
+                  Cancel Workout
+                </button>
+              </div>
             </div>
           </>
         )}
