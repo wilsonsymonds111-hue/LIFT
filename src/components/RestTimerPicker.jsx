@@ -56,7 +56,7 @@ export default function RestTimerPicker({ current, onSelect, onClose }) {
               <button
                 key={opt.seconds}
                 onClick={() => handlePreset(opt.seconds)}
-                className={`text-lg font-semibold transition ${current === opt.seconds ? 'text-blue-500' : 'text-gray-800 hover:text-blue-400'}`}
+                className="text-lg font-semibold text-gray-900"
               >
                 {opt.label}
               </button>
