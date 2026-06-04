@@ -64,32 +64,36 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
 
   if (!history || history.length === 0) return null;
 
-  const TOTAL_SLOTS = 6;
   const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
-  const realPoints = history.slice(-5).map(toPoint);
+  const realPoints = history.map(toPoint);
   const lastPoint = realPoints[realPoints.length - 1];
-  const projectedCount = Math.max(1, TOTAL_SLOTS - realPoints.length);
   const lastRealIdx = realPoints.length - 1;
 
   // Use kg for weighted exercises, reps for bodyweight
   const getValue = (p) => isBodyweight ? p.reps : p.kg;
-  const projValue = isBodyweight ? lastPoint.reps + 1 : lastPoint.kg;
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    return isNaN(d) ? null : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  };
 
   const data = realPoints.map((p, i) => ({
     session: i + 1,
+    date: p.date ? formatDate(p.date) : null,
     valStatic: i < lastRealIdx ? getValue(p) : null,
     valNew: i >= lastRealIdx - 1 ? getValue(p) : null,
     projVal: i === lastRealIdx ? getValue(p) : null,
   }));
-  for (let i = 1; i <= projectedCount; i++) {
-    data.push({
-      session: realPoints.length + i,
-      valStatic: null,
-      valNew: null,
-      projVal: isBodyweight ? lastPoint.reps + i : lastPoint.kg,
-      projected: true,
-    });
-  }
+  // One projected point after the last real one
+  data.push({
+    session: realPoints.length + 1,
+    date: null,
+    valStatic: null,
+    valNew: null,
+    projVal: isBodyweight ? lastPoint.reps + 1 : lastPoint.kg,
+    projected: true,
+  });
 
   const StaticDot = (props) => {
     const { cx, cy, value } = props;
@@ -137,13 +141,17 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
     const val = d?.projected ? d.projVal : (d?.valNew ?? d?.valStatic);
     if (val == null) return null;
     return (
-      <div className={`text-xs px-2 py-1 rounded-lg shadow font-semibold ${
+      <div className={`text-xs px-2 py-1.5 rounded-lg shadow font-semibold flex flex-col gap-0.5 ${
         d?.projected ? 'bg-purple-50 text-purple-400 border border-purple-100' : 'bg-white text-gray-700 border border-gray-100'
       }`}>
-        {d?.projected ? 'Next: ' : ''}{isBodyweight ? `${val} reps` : `${val} kg`}
+        <span>{d?.projected ? 'Next: ' : ''}{isBodyweight ? `${val} reps` : `${val} kg`}</span>
+        {d?.date && <span className="text-[10px] font-normal text-gray-400">{d.date}</span>}
       </div>
     );
   };
+
+  // Each data point gets ~40px min width so the chart scrolls horizontally with many sessions
+  const minChartWidth = Math.max(data.length * 40, 280);
 
   return (
     <div className={`mb-2 rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
@@ -151,7 +159,9 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
       <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">
         {isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)'}
       </p>
-      <ResponsiveContainer width="100%" height={60}>
+      <div style={{ overflowX: 'auto', overflowY: 'hidden' }}>
+      <div style={{ width: minChartWidth, height: 64 }}>
+      <ResponsiveContainer width="100%" height={64}>
         <LineChart data={data} margin={{ top: 12, right: 16, left: -28, bottom: 4 }}>
           <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 9, fill: '#9ca3af' }} />
           <Tooltip content={<CustomTooltip />} />
@@ -184,6 +194,8 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
           />
         </LineChart>
       </ResponsiveContainer>
+      </div>
+      </div>
     </div>
   );
 }
@@ -686,8 +698,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   if (!template) return null;
 
   const handleBestSet = (name, kg, reps) => {
-    // Always save the latest reported set so reps are accurate
-    bestSetsRef.current[name] = { kg, reps };
+    const today = new Date().toISOString().slice(0, 10);
+    bestSetsRef.current[name] = { kg, reps, date: today };
   };
 
   const handleFinish = () => {

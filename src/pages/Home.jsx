@@ -76,10 +76,11 @@ export default function Home() {
       const updated = prev.map(t => {
         if (t.id !== id) return t;
         const sourceList = exerciseList || t.exerciseList;
+        const today = new Date().toISOString().slice(0, 10);
         const newList = sourceList.map(ex => {
           const best = snapshot[ex.name];
           if (!best) return ex;
-          return { ...ex, history: [...(ex.history || []), { kg: best.kg, reps: best.reps }] };
+          return { ...ex, history: [...(ex.history || []), { kg: best.kg, reps: best.reps, date: today }] };
         });
         return { ...t, exerciseList: newList, lastPerformed: new Date().toISOString() };
       });
