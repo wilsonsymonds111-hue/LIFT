@@ -704,6 +704,12 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
       if (!best) return false;
       // Brand new exercise with no history — first recorded set is always a PR
       if (!ex.history || ex.history.length === 0) return true;
+      // Bodyweight exercise (kg is 0 or null) — PR is purely reps-based
+      const isBodyweight = ex.history.every(h => { const k = toKg(h); return k === 0 || k == null; }) && (best.kg === 0 || best.kg == null);
+      if (isBodyweight) {
+        const maxReps = Math.max(...ex.history.map(toReps));
+        return best.reps > maxReps;
+      }
       const maxKg = Math.max(...ex.history.map(toKg));
       if (best.kg > maxKg) return true;
       // Same weight but more reps = PR
