@@ -75,9 +75,11 @@ export default function Home() {
     setTemplates(prev => {
       const updated = prev.map(t => {
         if (t.id !== id) return t;
-        const sourceList = exerciseList || t.exerciseList;
         const today = new Date().toISOString().slice(0, 10);
-        const newList = sourceList.map(ex => {
+        // Use the full exerciseList from the workout session (includes newly added exercises)
+        // Fall back to existing template list if not provided
+        const sessionList = exerciseList || t.exerciseList;
+        const newList = sessionList.map(ex => {
           const best = snapshot[ex.name];
           if (!best) return ex;
           return { ...ex, history: [...(ex.history || []), { kg: best.kg, reps: best.reps, date: today }] };
