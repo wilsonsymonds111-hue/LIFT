@@ -48,7 +48,7 @@ export default function Home() {
   const [showNewTemplate, setShowNewTemplate] = useState(false);
   const [templates, setTemplates] = useState(() => {
     try {
-      const VERSION = '4';
+      const VERSION = '5';
       if (localStorage.getItem('workout_templates_version') !== VERSION) {
         localStorage.removeItem('workout_templates');
         localStorage.setItem('workout_templates_version', VERSION);
