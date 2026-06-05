@@ -227,7 +227,8 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
   const handleToggle = () => {
     const next = !done;
     setDone(next);
-    if (next && kg && reps) onComplete?.({ kg: parseFloat(kg), reps: parseInt(reps) });
+    // Allow kg to be empty/0 (bodyweight), only require reps
+    if (next && reps) onComplete?.({ kg: kg !== '' ? parseFloat(kg) : 0, reps: parseInt(reps) });
     else if (!next) onComplete?.(null);
   };
 
@@ -609,7 +610,7 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
                       )}
                     </div>
                     <span className="flex-shrink-0 text-xs text-gray-500 font-semibold">
-                      {best ? `${best.kg} kg × ${best.reps}` : '—'}
+                      {best ? (best.kg ? `${best.kg} kg × ${best.reps}` : `${best.reps} reps`) : '—'}
                     </span>
                   </div>
                 );
