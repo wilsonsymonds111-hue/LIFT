@@ -89,20 +89,40 @@ const ALL_EXERCISES = [
   { name: 'Zottman Curl', muscle: 'Arms' },
 ];
 
-const MUSCLES = ['All', 'Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders'];
+const MUSCLES = ['All', 'Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders', 'Other'];
+
+function loadAllExercises() {
+  try {
+    const custom = JSON.parse(localStorage.getItem('custom_exercises') || '[]');
+    const existing = new Set(ALL_EXERCISES.map(e => e.name.toLowerCase()));
+    const newOnes = custom.filter(e => !existing.has(e.name.toLowerCase()));
+    return [...ALL_EXERCISES, ...newOnes];
+  } catch { return ALL_EXERCISES; }
+}
+
+function saveCustomExercise(exercise) {
+  try {
+    const custom = JSON.parse(localStorage.getItem('custom_exercises') || '[]');
+    if (!custom.find(e => e.name.toLowerCase() === exercise.name.toLowerCase())) {
+      custom.push(exercise);
+      localStorage.setItem('custom_exercises', JSON.stringify(custom));
+    }
+  } catch {}
+}
 
 export default function ExercisePicker({ onClose, onAdd }) {
   const [search, setSearch] = useState('');
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selected, setSelected] = useState([]);
+  const [exercises, setExercises] = useState(() => loadAllExercises());
 
   const filtered = useMemo(() => {
-    return ALL_EXERCISES.filter(ex => {
+    return exercises.filter(ex => {
       const matchesSearch = ex.name.toLowerCase().includes(search.toLowerCase());
       const matchesMuscle = muscleFilter === 'All' || ex.muscle === muscleFilter;
       return matchesSearch && matchesMuscle;
     });
-  }, [search, muscleFilter]);
+  }, [search, muscleFilter, exercises]);
 
   const grouped = useMemo(() => {
     const map = {};
@@ -119,8 +139,8 @@ export default function ExercisePicker({ onClose, onAdd }) {
   };
 
   const handleAdd = () => {
-    const exercises = ALL_EXERCISES.filter(ex => selected.includes(ex.name));
-    onAdd(exercises);
+    const toAdd = exercises.filter(ex => selected.includes(ex.name));
+    onAdd(toAdd);
   };
 
   return (
@@ -205,7 +225,12 @@ export default function ExercisePicker({ onClose, onAdd }) {
             <div className="px-4 pt-4 pb-2">
               <p className="text-sm text-gray-400 text-center mb-3">No results for "{search}"</p>
               <button
-                onClick={() => onAdd([{ name: search.trim(), muscle: 'Other' }])}
+                onClick={() => {
+                  const newEx = { name: search.trim(), muscle: 'Other' };
+                  saveCustomExercise(newEx);
+                  setExercises(loadAllExercises());
+                  onAdd([newEx]);
+                }}
                 className="w-full flex items-center gap-3 px-4 py-3.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-2xl transition"
               >
                 <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
