@@ -30,18 +30,7 @@ const defaultTemplates = [
   ]},
 ];
 
-const exampleTemplates = [
-  { id: 4, name: 'Strong 5x5', exercises: 'Squat, Bench Press, Barbell Row...', exerciseList: [
-    { name: 'Squat', sets: 5, muscle: 'Legs', history: [] },
-    { name: 'Bench Press', sets: 5, muscle: 'Chest', history: [] },
-    { name: 'Barbell Row', sets: 5, muscle: 'Back', history: [] },
-  ]},
-  { id: 5, name: 'Legs', exercises: 'Leg Press, Leg Curl, Leg Extension...', exerciseList: [
-    { name: 'Leg Press', sets: 3, muscle: 'Legs', history: [] },
-    { name: 'Leg Curl', sets: 3, muscle: 'Legs', history: [] },
-    { name: 'Leg Extension', sets: 3, muscle: 'Legs', history: [] },
-  ]},
-];
+const exampleTemplateIds = ['6a27320b7970367d6da1521b', '6a2732c911e6a46fa1192d44'];
 
 export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -153,7 +142,7 @@ export default function Home() {
         {/* My Templates */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-foreground">My Templates ({templates.length})</h3>
+            <h3 className="font-semibold text-foreground">My Current Split ({templates.length})</h3>
             <button
               onClick={() => setShowNewTemplate(true)}
               className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition"
@@ -201,11 +190,10 @@ export default function Home() {
         {/* Example Templates */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-foreground">Example Templates ({exampleTemplates.length})</h3>
-            <button className="text-muted-foreground hover:text-foreground">⋯</button>
+            <h3 className="font-semibold text-foreground">Example Templates ({exampleTemplateIds.length})</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {exampleTemplates.map((template) => (
+            {templates.filter(t => exampleTemplateIds.includes(t.id)).map((template) => (
               <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate(template)}>
                 <h4 className="font-bold text-foreground mb-2">{template.name}</h4>
                 <p className="text-sm text-muted-foreground">{template.exercises}</p>
