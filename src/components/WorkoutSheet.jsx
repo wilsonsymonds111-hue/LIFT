@@ -493,32 +493,33 @@ function Star({ size = 24, delay = 0 }) {
 function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, onDone }) {
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
   const cardRef = useRef(null);
+  const shareCardRef = useRef(null);
   const [sharing, setSharing] = useState(false);
   const [shimmer, setShimmer] = useState(false);
 
   const prSet = new Set(prs.map(p => p.name));
 
   useEffect(() => {
-
-    // Shimmer
     setTimeout(() => setShimmer(true), 200);
   }, []);
 
   const handleShare = async () => {
-    if (!cardRef.current) return;
+    if (!shareCardRef.current) return;
     setSharing(true);
-    const canvas = await html2canvas(cardRef.current, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-    canvas.toBlob(async (blob) => {
-      const file = new File([blob], 'workout.png', { type: 'image/png' });
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: `${template.name} Workout`, text: `Just crushed my ${template.name} workout! 💪` });
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = 'workout.png'; a.click();
-        URL.revokeObjectURL(url);
-      }
-      setSharing(false);
-    }, 'image/png');
+    try {
+      const canvas = await html2canvas(shareCardRef.current, { scale: 3, useCORS: true, backgroundColor: null, logging: false });
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], 'workout.png', { type: 'image/png' });
+        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: `${template.name} Workout` });
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a'); a.href = url; a.download = 'workout.png'; a.click();
+          URL.revokeObjectURL(url);
+        }
+        setSharing(false);
+      }, 'image/png');
+    } catch { setSharing(false); }
   };
 
   return (
@@ -623,10 +624,10 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
             <button
               onClick={handleShare} disabled={sharing}
               className="w-full flex items-center justify-center gap-2 text-white font-bold py-3.5 rounded-2xl text-sm transition active:scale-95 shadow-md"
-              style={{ background: 'linear-gradient(90deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
+              style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
             >
-              <InstagramIcon size={20} />
-              {sharing ? 'Preparing…' : 'Share to Instagram Story'}
+              <Share className="w-4 h-4" />
+              {sharing ? 'Preparing…' : 'Share Workout'}
             </button>
             <button
               onClick={onDone}
@@ -636,6 +637,64 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Hidden share card — rendered off-screen, captured by html2canvas */}
+      <div
+        ref={shareCardRef}
+        style={{
+          position: 'fixed',
+          left: '-9999px',
+          top: 0,
+          width: '340px',
+          background: 'linear-gradient(135deg, #fffbeb 0%, #fef9c3 100%)',
+          borderRadius: '20px',
+          border: '2px solid #FFD700',
+          padding: '20px',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+        }}
+      >
+        {/* Card header */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '6px' }}>
+          <div>
+            <div style={{ fontSize: '22px', fontWeight: '900', color: '#111', letterSpacing: '-0.5px' }}>{template.name}</div>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>{today}</div>
+          </div>
+          <div style={{ fontSize: '28px' }}>🏆</div>
+        </div>
+        <div style={{ display: 'flex', gap: '14px', marginBottom: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#374151', fontWeight: '600' }}>
+            <span>⏱</span><span>{durationDisplay}</span>
+          </div>
+          {prs.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#b45309', fontWeight: '700' }}>
+              <span>🏅</span><span>{prs.length} PR{prs.length !== 1 ? 's' : ''}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: '1px', background: '#FDE68A', marginBottom: '12px' }} />
+
+        {/* Exercise rows */}
+        {exercises.map((ex, i) => {
+          const best = bestSets[ex.name];
+          const isPR = prSet.has(ex.name);
+          return (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '9px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: '12px', color: '#111', fontWeight: '500' }}>{ex.sets} × {ex.name}</span>
+                {isPR && (
+                  <span style={{ fontSize: '9px', fontWeight: '800', background: '#FBBF24', color: '#78350F', padding: '2px 5px', borderRadius: '99px', flexShrink: 0 }}>PR</span>
+                )}
+              </div>
+              <span style={{ fontSize: '12px', color: '#4b5563', fontWeight: '600', flexShrink: 0, marginLeft: '8px' }}>
+                {best ? (best.kg ? `${best.kg} kg × ${best.reps}` : `${best.reps} reps`) : '—'}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </>
   );
