@@ -684,11 +684,11 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
           return (
             <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '9px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, minWidth: 0 }}>
-                <span style={{ fontSize: '12px', color: '#111', fontWeight: '500' }}>{ex.sets} × {ex.name}</span>
+                <span style={{ fontSize: '12px', color: '#111', fontWeight: '500', lineHeight: '18px' }}>{ex.sets} × {ex.name}</span>
                 {isPR && (
-                  <svg width="30" height="16" viewBox="0 0 30 16" style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'text-bottom' }}>
-                    <rect x="0" y="0" width="30" height="16" rx="8" fill="#FBBF24"/>
-                    <text x="15" y="11.5" dominantBaseline="middle" textAnchor="middle" fontSize="9" fontWeight="800" fill="#78350F" fontFamily="system-ui, -apple-system, sans-serif">PR</text>
+                  <svg width="30" height="18" viewBox="0 0 30 18" style={{ flexShrink: 0, display: 'block' }}>
+                    <rect x="0" y="1" width="30" height="16" rx="8" fill="#FBBF24"/>
+                    <text x="15" y="13" textAnchor="middle" fontSize="9" fontWeight="800" fill="#78350F" fontFamily="system-ui, -apple-system, sans-serif">PR</text>
                   </svg>
                 )}
               </div>
