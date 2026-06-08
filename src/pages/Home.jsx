@@ -5,32 +5,39 @@ import WorkoutSheet from '../components/WorkoutSheet';
 import NewTemplateModal from '../components/NewTemplateModal';
 import { base44 } from '@/api/base44Client';
 
-const defaultTemplates = [
-  { id: 1, name: 'CHEST', lastPerformed: null,
-    exercises: 'Incline Bench Press (Barbell), Standing press, Pec Deck (Machine)...', exerciseList: [
-    { name: 'Incline Bench Press (Barbell)', sets: 1, muscle: 'Chest', history: [] },
-    { name: 'Standing press', sets: 1, muscle: 'Chest', history: [] },
-    { name: 'Pec Deck (Machine)', sets: 1, muscle: 'Chest', history: [] },
-    { name: 'Tricep single arm extension', sets: 1, muscle: 'Arms', history: [] },
-    { name: 'Single arm overhead cable extension', sets: 1, muscle: 'Arms', history: [] },
-    { name: 'Lateral Raise (Dumbbell)', sets: 1, muscle: 'Shoulders', history: [] },
-  ]},
-  { id: 2, name: 'BACK', lastPerformed: null,
-    exercises: 'Isolateral dumbbell rows, Pullover (Machine), Iso-Lateral Row (Machine)...', exerciseList: [
-    { name: 'Isolateral Dumbbell Rows', sets: 1, muscle: 'Back', history: [] },
-    { name: 'Pullover (Machine)', sets: 1, muscle: 'Back', history: [] },
-    { name: 'Iso-Lateral Row (Machine)', sets: 1, muscle: 'Back', history: [] },
-    { name: 'Shrug (Barbell)', sets: 1, muscle: 'Shoulders', history: [] },
-  ]},
-  { id: 3, name: 'LEGS', lastPerformed: null,
-    exercises: 'Smith Squat, Romanian Deadlift (Barbell), Standing Calf Raise (Machine)...', exerciseList: [
-    { name: 'Smith Squat', sets: 1, muscle: 'Legs', history: [] },
-    { name: 'Romanian Deadlift (Barbell)', sets: 1, muscle: 'Legs', history: [] },
-    { name: 'Standing Calf Raise (Machine)', sets: 1, muscle: 'Legs', history: [] },
-  ]},
+// Seed templates — written into code so they always exist regardless of DB changes.
+// Each new user gets their own copies created on first open. They can delete them freely.
+const SEED_TEMPLATES = [
+  {
+    name: 'UPPER',
+    is_example: true,
+    sort_order: 0,
+    exercises: 'Incline Smith Press, Standing Chest Press, Dumbell Row, Cable Row, Tricep Pushdown (Cable), Bicep Curl (Dumbbell), Side Lateral Raise...',
+    exerciseList: [
+      { name: 'Incline Smith Press', sets: 1, muscle: 'Chest', history: [] },
+      { name: 'Standing Chest Press', sets: 1, muscle: 'Chest', history: [] },
+      { name: 'Dumbell Row', sets: 1, muscle: 'Back', history: [] },
+      { name: 'Cable Row', sets: 1, muscle: 'Back', history: [] },
+      { name: 'Tricep Pushdown (Cable)', sets: 1, muscle: 'Arms', history: [] },
+      { name: 'Bicep Curl (Dumbbell)', sets: 1, muscle: 'Arms', history: [] },
+      { name: 'Side Lateral Raise', sets: 1, muscle: 'Shoulders', history: [] },
+    ],
+  },
+  {
+    name: 'LEGS & ABS',
+    is_example: true,
+    sort_order: 1,
+    exercises: 'Smith Squat, Romanian Deadlift (Barbell), Leg Extension (Machine), Standing Calf Raise (Machine), Toe to Bar, Cable Crunches...',
+    exerciseList: [
+      { name: 'Smith Squat', sets: 1, muscle: 'Legs', history: [] },
+      { name: 'Romanian Deadlift (Barbell)', sets: 1, muscle: 'Legs', history: [] },
+      { name: 'Leg Extension (Machine)', sets: 1, muscle: 'Legs', history: [] },
+      { name: 'Standing Calf Raise (Machine)', sets: 1, muscle: 'Legs', history: [] },
+      { name: 'Toe to Bar', sets: 1, muscle: 'Other', history: [] },
+      { name: 'Cable Crunches', sets: 1, muscle: 'Other', history: [] },
+    ],
+  },
 ];
-
-const exampleTemplateIds = ['6a27320b7970367d6da1521b', '6a2732c911e6a46fa1192d44'];
 
 export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -40,14 +47,22 @@ export default function Home() {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Load templates from DB on mount
+  // Load templates from DB on mount, seeding example templates for first-time users
   useEffect(() => {
-    base44.entities.WorkoutTemplate.list('sort_order', 100).then(data => {
+    const loadTemplates = async () => {
+      const data = await base44.entities.WorkoutTemplate.list('sort_order', 100);
       if (data && data.length > 0) {
         setTemplates(data);
+      } else {
+        // First time opening — seed example templates into this user's DB
+        const seeded = await Promise.all(
+          SEED_TEMPLATES.map(t => base44.entities.WorkoutTemplate.create(t))
+        );
+        setTemplates(seeded);
       }
       setLoading(false);
-    });
+    };
+    loadTemplates();
   }, []);
 
   const daysAgo = (dateStr) => {
@@ -188,19 +203,21 @@ export default function Home() {
         </div>
 
         {/* Example Templates */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-foreground">Example Templates ({exampleTemplateIds.length})</h3>
+        {templates.some(t => t.is_example) && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-foreground">Example Templates ({templates.filter(t => t.is_example).length})</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {templates.filter(t => t.is_example).map((template) => (
+                <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate(template)}>
+                  <h4 className="font-bold text-foreground mb-2">{template.name}</h4>
+                  <p className="text-sm text-muted-foreground">{template.exercises}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {templates.filter(t => exampleTemplateIds.includes(t.id)).map((template) => (
-              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate(template)}>
-                <h4 className="font-bold text-foreground mb-2">{template.name}</h4>
-                <p className="text-sm text-muted-foreground">{template.exercises}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

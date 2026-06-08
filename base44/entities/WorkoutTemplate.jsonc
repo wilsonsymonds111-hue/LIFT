@@ -36,6 +36,10 @@
     },
     "sort_order": {
       "type": "number"
+    },
+    "is_example": {
+      "type": "boolean",
+      "description": "True if this is a seeded example template shown in the Example Templates section"
     }
   },
   "required": [
