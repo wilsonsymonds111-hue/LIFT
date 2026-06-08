@@ -111,6 +111,14 @@ export default function Home() {
         template={selectedTemplate}
         onClose={() => setSelectedTemplate(null)}
         onStartWorkout={(t) => { setActiveWorkout(t); setSelectedTemplate(null); }}
+        onSaveEdit={(updated) => {
+          setTemplates(prev => {
+            const next = prev.map(t => t.id === updated.id ? updated : t);
+            localStorage.setItem('workout_templates', JSON.stringify(next));
+            return next;
+          });
+          setSelectedTemplate(updated);
+        }}
       />
       <WorkoutSheet
         key={activeWorkout?.id}
