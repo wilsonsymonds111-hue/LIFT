@@ -3,6 +3,7 @@ import { Plus, MoreVertical } from 'lucide-react';
 import TemplateModal from '../components/TemplateModal';
 import WorkoutSheet from '../components/WorkoutSheet';
 import NewTemplateModal from '../components/NewTemplateModal';
+import { base44 } from '@/api/base44Client';
 
 const defaultTemplates = [
   { id: 1, name: 'CHEST', lastPerformed: null,
@@ -47,12 +48,18 @@ export default function Home() {
   const [activeWorkout, setActiveWorkout] = useState(null);
   const [showNewTemplate, setShowNewTemplate] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
-  const [templates, setTemplates] = useState(() => {
-    try {
-      const s = localStorage.getItem('workout_templates');
-      return s ? JSON.parse(s) : defaultTemplates;
-    } catch { return defaultTemplates; }
-  });
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load templates from DB on mount
+  useEffect(() => {
+    base44.entities.WorkoutTemplate.list('sort_order', 100).then(data => {
+      if (data && data.length > 0) {
+        setTemplates(data);
+      }
+      setLoading(false);
+    });
+  }, []);
 
   const daysAgo = (dateStr) => {
     if (!dateStr) return null;
@@ -67,42 +74,43 @@ export default function Home() {
     return `${diffDays} days ago${timeStr}`;
   };
 
-  const handleDeleteTemplate = (id) => {
-    setTemplates(prev => {
-      const updated = prev.filter(t => t.id !== id);
-      localStorage.setItem('workout_templates', JSON.stringify(updated));
-      return updated;
-    });
+  const handleDeleteTemplate = async (id) => {
+    await base44.entities.WorkoutTemplate.delete(id);
+    setTemplates(prev => prev.filter(t => t.id !== id));
     setOpenMenuId(null);
   };
 
-  const handleSaveHistory = (id, snapshot, exerciseList) => {
-    setTemplates(prev => {
-      const updated = prev.map(t => {
-        if (t.id !== id) return t;
-        const today = new Date().toISOString().slice(0, 10);
-        // Use the full exerciseList from the workout session (includes newly added exercises)
-        // Fall back to existing template list if not provided
-        const sessionList = exerciseList || t.exerciseList;
-        const newList = sessionList.map(ex => {
-          const best = snapshot[ex.name];
-          if (!best) return ex;
-          return { ...ex, history: [...(ex.history || []), { kg: best.kg, reps: best.reps, date: today }] };
-        });
-        return { ...t, exerciseList: newList, lastPerformed: new Date().toISOString() };
-      });
-      localStorage.setItem('workout_templates', JSON.stringify(updated));
-      return updated;
+  const handleSaveHistory = async (id, snapshot, exerciseList) => {
+    const template = templates.find(t => t.id === id);
+    if (!template) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const sessionList = exerciseList || template.exerciseList;
+    const newList = sessionList.map(ex => {
+      const best = snapshot[ex.name];
+      if (!best) return ex;
+      return { ...ex, history: [...(ex.history || []), { kg: best.kg, reps: best.reps, date: today }] };
     });
+    const updated = { ...template, exerciseList: newList, lastPerformed: new Date().toISOString() };
+    await base44.entities.WorkoutTemplate.update(id, updated);
+    setTemplates(prev => prev.map(t => t.id === id ? updated : t));
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       {showNewTemplate && (
         <NewTemplateModal
           onClose={() => setShowNewTemplate(false)}
-          onSave={(template) => {
-            setTemplates(prev => { const updated = [...prev, template]; localStorage.setItem('workout_templates', JSON.stringify(updated)); return updated; });
+          onSave={async (template) => {
+            const created = await base44.entities.WorkoutTemplate.create({ ...template, sort_order: templates.length });
+            setTemplates(prev => [...prev, created]);
             setShowNewTemplate(false);
           }}
         />
@@ -111,12 +119,9 @@ export default function Home() {
         template={selectedTemplate}
         onClose={() => setSelectedTemplate(null)}
         onStartWorkout={(t) => { setActiveWorkout(t); setSelectedTemplate(null); }}
-        onSaveEdit={(updated) => {
-          setTemplates(prev => {
-            const next = prev.map(t => t.id === updated.id ? updated : t);
-            localStorage.setItem('workout_templates', JSON.stringify(next));
-            return next;
-          });
+        onSaveEdit={async (updated) => {
+          await base44.entities.WorkoutTemplate.update(updated.id, updated);
+          setTemplates(prev => prev.map(t => t.id === updated.id ? updated : t));
           setSelectedTemplate(updated);
         }}
       />
