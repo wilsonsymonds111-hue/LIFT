@@ -686,7 +686,7 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, minWidth: 0 }}>
                 <span style={{ fontSize: '12px', color: '#111', fontWeight: '500' }}>{ex.sets} × {ex.name}</span>
                 {isPR && (
-                  <span style={{ fontSize: '10px', fontWeight: '800', background: '#FBBF24', color: '#78350F', borderRadius: '99px', flexShrink: 0, display: 'inline-block', width: '28px', height: '18px', lineHeight: '18px', textAlign: 'center', verticalAlign: 'middle' }}>PR</span>
+                  <span style={{ fontSize: '10px', fontWeight: '800', background: '#FBBF24', color: '#78350F', borderRadius: '99px', flexShrink: 0, display: 'inline-block', padding: '2px 7px', letterSpacing: '0.5px' }}>PR</span>
                 )}
               </div>
               <span style={{ fontSize: '12px', color: '#4b5563', fontWeight: '600', flexShrink: 0, marginLeft: '8px' }}>
