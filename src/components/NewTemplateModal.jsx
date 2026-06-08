@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, MoreHorizontal } from 'lucide-react';
+import { X } from 'lucide-react';
 import ExercisePicker from './ExercisePicker';
 
 export default function NewTemplateModal({ onClose, onSave }) {
@@ -50,14 +50,11 @@ export default function NewTemplateModal({ onClose, onSave }) {
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-4 pt-5">
           {/* Title row */}
-          <div className="flex items-center gap-2 mb-6">
-            <input
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="text-2xl font-extrabold text-gray-900 bg-transparent focus:outline-none flex-1 min-w-0"
-            />
-            <MoreHorizontal className="w-5 h-5 text-blue-400 flex-shrink-0" />
-          </div>
+          <input
+            value={name}
+            onChange={e => setName(e.target.value)}
+            className="text-2xl font-extrabold text-gray-900 bg-transparent focus:outline-none w-full mb-6"
+          />
 
           {/* Exercise List */}
           {exerciseList.map((ex, i) => (
