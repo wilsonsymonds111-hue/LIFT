@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Plus, MoreVertical } from 'lucide-react';
 import TemplateModal from '../components/TemplateModal';
 import WorkoutSheet from '../components/WorkoutSheet';
 import NewTemplateModal from '../components/NewTemplateModal';
@@ -46,6 +46,7 @@ export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [activeWorkout, setActiveWorkout] = useState(null);
   const [showNewTemplate, setShowNewTemplate] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState(null);
   const [templates, setTemplates] = useState(() => {
     try {
       const s = localStorage.getItem('workout_templates');
@@ -64,6 +65,15 @@ export default function Home() {
     if (diffDays === 0) return 'Today' + timeStr;
     if (diffDays === 1) return 'Yesterday' + timeStr;
     return `${diffDays} days ago${timeStr}`;
+  };
+
+  const handleDeleteTemplate = (id) => {
+    setTemplates(prev => {
+      const updated = prev.filter(t => t.id !== id);
+      localStorage.setItem('workout_templates', JSON.stringify(updated));
+      return updated;
+    });
+    setOpenMenuId(null);
   };
 
   const handleSaveHistory = (id, snapshot, exerciseList) => {
@@ -141,15 +151,35 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {templates.map((template) => (
-              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate(template)}>
-                <div className="flex items-start justify-between mb-3">
-                  <h4 className="font-bold text-foreground">{template.name}</h4>
-
+              <div key={template.id} className="relative bg-card border border-border rounded-lg p-4 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200">
+                <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
+                  <h4 className="font-bold text-foreground flex-1 cursor-pointer">{template.name}</h4>
+                  <button
+                    onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
+                    className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition flex-shrink-0 -mt-1 -mr-1"
+                  >
+                    <MoreVertical className="w-4 h-4 text-gray-400" />
+                  </button>
                 </div>
-                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  ⏱ {template.lastPerformed ? daysAgo(template.lastPerformed) : template.days}
-                </p>
+                <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    ⏱ {template.lastPerformed ? daysAgo(template.lastPerformed) : template.days}
+                  </p>
+                </div>
+                {openMenuId === template.id && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
+                    <div className="absolute top-10 right-3 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[140px]">
+                      <button
+                        onClick={() => handleDeleteTemplate(template.id)}
+                        className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
+                      >
+                        Delete Template
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
