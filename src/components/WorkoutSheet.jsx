@@ -622,12 +622,12 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
           {/* Action buttons */}
           <div className="px-4 pb-5 flex flex-col gap-2 flex-shrink-0">
             <button
-              onClick={handleShare} disabled={sharing}
+              disabled={sharing}
               className="w-full flex items-center justify-center gap-2 text-white font-bold py-3.5 rounded-2xl text-sm transition active:scale-95 shadow-md"
-              style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+              style={{ background: 'linear-gradient(90deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
             >
-              <Share className="w-4 h-4" />
-              {sharing ? 'Preparing…' : 'Share Workout'}
+              <InstagramIcon size={20} />
+              Share to Instagram Story
             </button>
             <button
               onClick={onDone}
