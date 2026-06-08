@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Trash2, GripVertical } from 'lucide-react';
+import { X, Trash2 } from 'lucide-react';
 import ExercisePicker from './ExercisePicker';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
@@ -113,10 +113,7 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
             <div ref={p.innerRef} {...p.draggableProps} className="mb-7">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <span {...p.dragHandleProps} className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-400 flex-shrink-0">
-                    <GripVertical className="w-4 h-4" />
-                  </span>
-                  <h3 className="text-blue-500 font-semibold text-base truncate">{ex.name}</h3>
+                  <h3 {...p.dragHandleProps} className="text-blue-500 font-semibold text-base truncate cursor-grab active:cursor-grabbing select-none">{ex.name}</h3>
                 </div>
                 <button onClick={() => removeExercise(exIdx)} className="p-1 rounded-lg hover:bg-red-50 transition flex-shrink-0">
                   <Trash2 className="w-4 h-4 text-red-400" />
