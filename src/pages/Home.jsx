@@ -93,7 +93,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ background: '#f2f2f7' }}>
       {showNewTemplate && (
         <NewTemplateModal
           onClose={() => setShowNewTemplate(false)}
@@ -121,58 +121,66 @@ export default function Home() {
         onSaveHistory={handleSaveHistory}
       />
 
-      {/* Page Title */}
-      <div className="px-4 pt-6 pb-2">
-        <h1 className="text-3xl font-extrabold text-gray-900">Workouts</h1>
+      {/* Header */}
+      <div className="px-4 pt-12 pb-2">
+        <h1 className="text-3xl font-bold text-gray-900" style={{ letterSpacing: '-0.5px' }}>Workouts</h1>
       </div>
 
-      {/* Quick Start Section */}
-      <div className="px-4 py-4">
-      <button
-        onClick={() => setActiveWorkout({ id: 'empty-' + Date.now(), name: 'Evening Workout', exerciseList: [] })}
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition"
-      >
-        Start an Empty Workout
-      </button>
-      </div>
+      <div className="px-4 py-3 space-y-8">
 
-      {/* Templates Section */}
-      <div className="px-4 py-6">
+        {/* Quick Start */}
+        <div>
+          <button
+            onClick={() => setActiveWorkout({ id: 'empty-' + Date.now(), name: 'Evening Workout', exerciseList: [] })}
+            className="w-full bg-blue-500 active:bg-blue-600 text-white font-semibold py-3.5 rounded-2xl text-base transition"
+          >
+            Start an Empty Workout
+          </button>
+        </div>
 
-        {/* My Templates */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-foreground">My Current Split ({templates.length})</h3>
+        {/* My Current Split */}
+        <div>
+          <div className="flex items-center justify-between mb-2 px-1">
+            <span className="text-[17px] font-semibold text-gray-900">My Current Split</span>
             <button
               onClick={() => setShowNewTemplate(true)}
-              className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition"
+              className="flex items-center gap-1 text-blue-500 text-sm font-medium"
             >
-              <Plus className="w-3.5 h-3.5" />
-              Template
+              <Plus className="w-4 h-4" />
+              Add
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {templates.map((template) => (
-              <div key={template.id} className="relative bg-card border border-border rounded-lg p-4 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200">
-                <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
-                  <h4 className="font-bold text-foreground flex-1 cursor-pointer">{template.name}</h4>
-                  <button
-                    onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
-                    className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition flex-shrink-0 -mt-1 -mr-1"
-                  >
-                    <MoreVertical className="w-4 h-4 text-gray-400" />
-                  </button>
-                </div>
-                <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    ⏱ {template.lastPerformed ? daysAgo(template.lastPerformed) : template.days}
-                  </p>
+          <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+            {templates.map((template, idx) => (
+              <div key={template.id} className="relative">
+                {idx > 0 && <div className="h-px bg-gray-100 mx-4" />}
+                <div
+                  className="flex items-center justify-between px-4 py-4 active:bg-gray-50 cursor-pointer"
+                  onClick={() => setSelectedTemplate(template)}
+                >
+                  <div className="flex-1 min-w-0 pr-2">
+                    <p className="font-semibold text-gray-900 text-[15px]">{template.name}</p>
+                    <p className="text-sm text-gray-400 mt-0.5 truncate">{template.exercises}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {template.lastPerformed ? `Last performed ${daysAgo(template.lastPerformed)}` : 'Not performed yet'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
+                      className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+                    >
+                      <MoreVertical className="w-4 h-4 text-gray-400" />
+                    </button>
+                    <svg className="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
                 {openMenuId === template.id && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                    <div className="absolute top-10 right-3 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[140px]">
+                    <div className="absolute top-10 right-3 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[160px]">
                       <button
                         onClick={() => handleDeleteTemplate(template.id)}
                         className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
@@ -189,18 +197,30 @@ export default function Home() {
 
         {/* Example Templates */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-foreground">Example Templates ({exampleTemplateIds.length})</h3>
+          <div className="flex items-center justify-between mb-2 px-1">
+            <span className="text-[17px] font-semibold text-gray-900">Example Templates</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {templates.filter(t => exampleTemplateIds.includes(t.id)).map((template) => (
-              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate(template)}>
-                <h4 className="font-bold text-foreground mb-2">{template.name}</h4>
-                <p className="text-sm text-muted-foreground">{template.exercises}</p>
+          <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+            {templates.filter(t => exampleTemplateIds.includes(t.id)).map((template, idx, arr) => (
+              <div key={template.id}>
+                {idx > 0 && <div className="h-px bg-gray-100 mx-4" />}
+                <div
+                  className="flex items-center justify-between px-4 py-4 active:bg-gray-50 cursor-pointer"
+                  onClick={() => setSelectedTemplate(template)}
+                >
+                  <div className="flex-1 min-w-0 pr-2">
+                    <p className="font-semibold text-gray-900 text-[15px]">{template.name}</p>
+                    <p className="text-sm text-gray-400 mt-0.5 truncate">{template.exercises}</p>
+                  </div>
+                  <svg className="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
               </div>
             ))}
           </div>
         </div>
+
       </div>
     </div>
   );
