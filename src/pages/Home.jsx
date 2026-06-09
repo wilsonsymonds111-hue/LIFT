@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { Plus, MoreVertical } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, MoreVertical, Dumbbell, Zap } from 'lucide-react';
 import TemplateModal from '../components/TemplateModal';
 import WorkoutSheet from '../components/WorkoutSheet';
 import NewTemplateModal from '../components/NewTemplateModal';
@@ -92,8 +92,10 @@ export default function Home() {
     );
   }
 
+  const iconColors = ['#30d158', '#0a84ff', '#ff9f0a', '#ff375f', '#bf5af2', '#32ade6'];
+
   return (
-    <div className="min-h-screen" style={{ background: '#f2f2f7' }}>
+    <div className="min-h-screen pb-10" style={{ background: '#f2f2f7', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
       {showNewTemplate && (
         <NewTemplateModal
           onClose={() => setShowNewTemplate(false)}
@@ -121,62 +123,73 @@ export default function Home() {
         onSaveHistory={handleSaveHistory}
       />
 
-      {/* Header */}
-      <div className="px-4 pt-12 pb-2">
-        <h1 className="text-3xl font-bold text-gray-900" style={{ letterSpacing: '-0.5px' }}>Workouts</h1>
+      {/* Large iOS-style header */}
+      <div className="px-5 pt-14 pb-1">
+        <h1 style={{ fontSize: '34px', fontWeight: '700', letterSpacing: '-0.5px', color: '#000', lineHeight: 1.1 }}>
+          Summary
+        </h1>
       </div>
 
-      <div className="px-4 py-3 space-y-8">
+      <div className="px-4 pt-4 space-y-6">
 
-        {/* Quick Start */}
-        <div>
-          <button
-            onClick={() => setActiveWorkout({ id: 'empty-' + Date.now(), name: 'Evening Workout', exerciseList: [] })}
-            className="w-full bg-blue-500 active:bg-blue-600 text-white font-semibold py-3.5 rounded-2xl text-base transition"
-          >
-            Start an Empty Workout
-          </button>
-        </div>
+        {/* Quick Start — styled as a prominent tappable card */}
+        <button
+          onClick={() => setActiveWorkout({ id: 'empty-' + Date.now(), name: 'Evening Workout', exerciseList: [] })}
+          className="w-full text-left bg-white rounded-2xl px-4 py-4 shadow-sm flex items-center gap-3 active:opacity-70 transition"
+        >
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#0a84ff' }}>
+            <Zap className="w-5 h-5 text-white" fill="white" />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 text-[15px]">Quick Start</p>
+            <p className="text-sm text-gray-400 mt-0.5">Start an empty workout now</p>
+          </div>
+          <svg className="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
 
         {/* My Current Split */}
         <div>
-          <div className="flex items-center justify-between mb-2 px-1">
-            <span className="text-[17px] font-semibold text-gray-900">My Current Split</span>
-            <button
-              onClick={() => setShowNewTemplate(true)}
-              className="flex items-center gap-1 text-blue-500 text-sm font-medium"
-            >
-              <Plus className="w-4 h-4" />
-              Add
+          <div className="flex items-end justify-between mb-2 px-1">
+            <span style={{ fontSize: '20px', fontWeight: '600', color: '#000', letterSpacing: '-0.3px' }}>My Current Split</span>
+            <button onClick={() => setShowNewTemplate(true)} className="text-[15px] font-medium" style={{ color: '#0a84ff' }}>
+              Edit
             </button>
           </div>
-          <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+
+          <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
             {templates.map((template, idx) => (
               <div key={template.id} className="relative">
-                {idx > 0 && <div className="h-px bg-gray-100 mx-4" />}
+                {idx > 0 && <div className="h-px mx-4" style={{ background: '#e5e5ea' }} />}
                 <div
-                  className="flex items-center justify-between px-4 py-4 active:bg-gray-50 cursor-pointer"
+                  className="flex items-center px-4 py-3.5 active:bg-gray-50 cursor-pointer"
                   onClick={() => setSelectedTemplate(template)}
                 >
-                  <div className="flex-1 min-w-0 pr-2">
-                    <p className="font-semibold text-gray-900 text-[15px]">{template.name}</p>
-                    <p className="text-sm text-gray-400 mt-0.5 truncate">{template.exercises}</p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {template.lastPerformed ? `Last performed ${daysAgo(template.lastPerformed)}` : 'Not performed yet'}
-                    </p>
+                  {/* Colored icon */}
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mr-3"
+                    style={{ background: iconColors[idx % iconColors.length] }}
+                  >
+                    <Dumbbell className="w-4 h-4 text-white" />
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button
-                      onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
-                      className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
-                    >
-                      <MoreVertical className="w-4 h-4 text-gray-400" />
-                    </button>
-                    <svg className="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
+
+                  {/* Text */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-semibold text-gray-900 text-[15px]">{template.name}</p>
+                      <span className="text-xs flex-shrink-0" style={{ color: '#8e8e93' }}>
+                        {template.lastPerformed ? daysAgo(template.lastPerformed) : ''}
+                      </span>
+                    </div>
+                    <p className="text-sm mt-0.5 truncate" style={{ color: '#8e8e93' }}>{template.exercises}</p>
                   </div>
+
+                  <svg className="w-4 h-4 ml-2 flex-shrink-0" style={{ color: '#c7c7cc' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
+
                 {openMenuId === template.id && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
@@ -193,26 +206,33 @@ export default function Home() {
               </div>
             ))}
           </div>
+          <p className="text-xs px-2 mt-1.5" style={{ color: '#8e8e93' }}>Tap a template to view details or start your workout.</p>
         </div>
 
         {/* Example Templates */}
         <div>
-          <div className="flex items-center justify-between mb-2 px-1">
-            <span className="text-[17px] font-semibold text-gray-900">Example Templates</span>
+          <div className="flex items-end justify-between mb-2 px-1">
+            <span style={{ fontSize: '20px', fontWeight: '600', color: '#000', letterSpacing: '-0.3px' }}>Example Templates</span>
           </div>
-          <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-            {templates.filter(t => exampleTemplateIds.includes(t.id)).map((template, idx, arr) => (
+          <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+            {templates.filter(t => exampleTemplateIds.includes(t.id)).map((template, idx) => (
               <div key={template.id}>
-                {idx > 0 && <div className="h-px bg-gray-100 mx-4" />}
+                {idx > 0 && <div className="h-px mx-4" style={{ background: '#e5e5ea' }} />}
                 <div
-                  className="flex items-center justify-between px-4 py-4 active:bg-gray-50 cursor-pointer"
+                  className="flex items-center px-4 py-3.5 active:bg-gray-50 cursor-pointer"
                   onClick={() => setSelectedTemplate(template)}
                 >
-                  <div className="flex-1 min-w-0 pr-2">
-                    <p className="font-semibold text-gray-900 text-[15px]">{template.name}</p>
-                    <p className="text-sm text-gray-400 mt-0.5 truncate">{template.exercises}</p>
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mr-3"
+                    style={{ background: iconColors[(idx + 3) % iconColors.length] }}
+                  >
+                    <Dumbbell className="w-4 h-4 text-white" />
                   </div>
-                  <svg className="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 text-[15px]">{template.name}</p>
+                    <p className="text-sm mt-0.5 truncate" style={{ color: '#8e8e93' }}>{template.exercises}</p>
+                  </div>
+                  <svg className="w-4 h-4 ml-2 flex-shrink-0" style={{ color: '#c7c7cc' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
