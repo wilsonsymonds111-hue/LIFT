@@ -71,7 +71,7 @@ export default function TemplateDetail() {
     : 'Not performed yet';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" style={{ animation: 'none' }}>
       <div className="relative bg-white rounded-3xl w-[90%] max-h-[85vh] flex flex-col shadow-2xl mx-auto">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
