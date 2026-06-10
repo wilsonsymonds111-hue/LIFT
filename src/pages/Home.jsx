@@ -135,7 +135,7 @@ export default function Home() {
           <h3 className="font-semibold text-foreground mb-4">Example Templates ({exampleTemplates.length})</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {exampleTemplates.map((template) => (
-              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate(template)}>
+              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate({ ...template, exerciseList: template.exerciseList?.map(e => ({ ...e, history: [] })), lastPerformed: null, _isExample: true })}>
                 <h4 className="font-bold text-foreground mb-2">{template.name}</h4>
                 <p className="text-sm text-muted-foreground line-clamp-2">{template.exercises}</p>
               </div>
