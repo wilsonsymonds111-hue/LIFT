@@ -6,8 +6,6 @@ import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 
-const exampleTemplateIds = ['6a27320b7970367d6da1521b', '6a2732c911e6a46fa1192d44'];
-
 const daysAgo = (dateStr) => {
   if (!dateStr) return null;
   const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
@@ -33,8 +31,8 @@ export default function Home() {
     setLoading(false);
   }, []);
 
-  const myTemplates = templates.filter(t => !exampleTemplateIds.includes(t.id));
-  const exampleTemplates = templates.filter(t => exampleTemplateIds.includes(t.id));
+  const myTemplates = templates;
+  const exampleTemplates = templates;
 
   useEffect(() => { loadTemplates(); }, [loadTemplates]);
 
