@@ -9,20 +9,18 @@ import Home from './pages/Home';
 import Exercises from './pages/Exercises';
 import Workout from './pages/Workout';
 import Settings from './pages/Settings';
-import TemplateDetail from './pages/TemplateDetail';
 import NewTemplate from './pages/NewTemplate';
 import ActiveWorkout from './pages/ActiveWorkout';
 
 
 const AnimatedRoutes = () => {
   const location = useLocation();
-  const noAnimation = ['/template/', '/active-workout/'].some(p => location.pathname.startsWith(p));
+  const noAnimation = location.pathname.startsWith('/active-workout/');
   return (
     <div key={location.pathname} className={noAnimation ? '' : 'route-enter'}>
       <Routes location={location}>
         <Route path="/" element={<Home />} />
         <Route path="/template/new" element={<NewTemplate />} />
-        <Route path="/template/:id" element={<TemplateDetail />} />
         <Route path="/active-workout/:id" element={<ActiveWorkout />} />
         <Route path="/exercises" element={<Exercises />} />
         <Route path="/workout" element={<Workout />} />

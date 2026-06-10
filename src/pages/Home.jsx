@@ -5,6 +5,7 @@ import BottomNav from '../components/BottomNav';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
+import TemplateDetailModal from '../components/TemplateDetailModal';
 
 const daysAgo = (dateStr) => {
   if (!dateStr) return null;
@@ -24,6 +25,7 @@ export default function Home() {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   const loadTemplates = useCallback(async () => {
     const data = await base44.entities.WorkoutTemplate.list('sort_order', 100);
@@ -87,7 +89,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {myTemplates.map((template) => (
             <div key={template.id} className="relative bg-card border border-border rounded-lg p-4 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200">
-              <div className="flex items-start justify-between mb-3" onClick={() => navigate(`/template/${template.id}`)}>
+              <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
                 <h4 className="font-bold text-foreground flex-1 cursor-pointer">{template.name}</h4>
                 <button
                   onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
@@ -96,7 +98,7 @@ export default function Home() {
                   <MoreVertical className="w-4 h-4 text-gray-400" />
                 </button>
               </div>
-              <div onClick={() => navigate(`/template/${template.id}`)} className="cursor-pointer">
+              <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
                 <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   ⏱ {template.lastPerformed ? daysAgo(template.lastPerformed) : 'Not yet performed'}
@@ -133,7 +135,7 @@ export default function Home() {
           <h3 className="font-semibold text-foreground mb-4">Example Templates ({exampleTemplates.length})</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {exampleTemplates.map((template) => (
-              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => navigate(`/template/${template.id}`)}>
+              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate(template)}>
                 <h4 className="font-bold text-foreground mb-2">{template.name}</h4>
                 <p className="text-sm text-muted-foreground line-clamp-2">{template.exercises}</p>
               </div>
@@ -142,6 +144,18 @@ export default function Home() {
         </div>
       )}
       <BottomNav />
+
+      {selectedTemplate && (
+        <TemplateDetailModal
+          template={selectedTemplate}
+          onClose={() => setSelectedTemplate(null)}
+          onSave={(updated) => {
+            setTemplates(prev => prev.map(t => t.id === updated.id ? updated : t));
+            setSelectedTemplate(updated);
+          }}
+          onStartWorkout={(id) => navigate(`/active-workout/${id}`)}
+        />
+      )}
     </div>
   );
 }
