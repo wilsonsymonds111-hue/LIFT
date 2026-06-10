@@ -85,6 +85,8 @@
 
   body {
     @apply bg-background text-foreground font-sans;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   textarea, input {
@@ -93,4 +95,20 @@
     font-weight: inherit;
     letter-spacing: inherit;
   }
+}
+
+/* Route slide transitions */
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes slideOutLeft {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(-30%); opacity: 0; }
+}
+.route-enter {
+  animation: slideInRight 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.route-exit {
+  animation: slideOutLeft 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }

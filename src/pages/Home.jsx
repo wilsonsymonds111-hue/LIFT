@@ -64,9 +64,10 @@ export default function Home() {
   };
 
   const handleDeleteTemplate = async (id) => {
-    await base44.entities.WorkoutTemplate.delete(id);
+    // Optimistic update — remove immediately
     setTemplates(prev => prev.filter(t => t.id !== id));
     setOpenMenuId(null);
+    await base44.entities.WorkoutTemplate.delete(id);
   };
 
   const handleSaveHistory = async (id, snapshot, exerciseList) => {
@@ -109,9 +110,10 @@ export default function Home() {
         onClose={() => setSelectedTemplate(null)}
         onStartWorkout={(t) => { setActiveWorkout(t); setSelectedTemplate(null); }}
         onSaveEdit={async (updated) => {
-          await base44.entities.WorkoutTemplate.update(updated.id, updated);
+          // Optimistic update — apply immediately
           setTemplates(prev => prev.map(t => t.id === updated.id ? updated : t));
           setSelectedTemplate(updated);
+          await base44.entities.WorkoutTemplate.update(updated.id, updated);
         }}
       />
       <WorkoutSheet
@@ -122,7 +124,7 @@ export default function Home() {
       />
 
       {/* Page Title */}
-      <div className="px-4 pt-6 pb-2">
+      <div className="px-4 pb-2" style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top))' }}>
         <h1 className="text-3xl font-extrabold text-gray-900">Workouts</h1>
       </div>
 
@@ -158,7 +160,7 @@ export default function Home() {
                   <h4 className="font-bold text-foreground flex-1 cursor-pointer">{template.name}</h4>
                   <button
                     onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
-                    className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition flex-shrink-0 -mt-1 -mr-1"
+                    className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 transition flex-shrink-0 select-none -mt-1 -mr-1"
                   >
                     <MoreVertical className="w-4 h-4 text-gray-400" />
                   </button>
