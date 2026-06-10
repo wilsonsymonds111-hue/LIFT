@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { base44 } from '@/api/base44Client';
@@ -41,7 +42,7 @@ export default function TemplateDetailModal({ template, onClose, onSave, onStart
     ? `Last Performed: ${daysAgo(template.lastPerformed)}`
     : 'Not performed yet';
 
-  return (
+  return createPortal(
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)' }}>
       <div className="relative bg-white rounded-3xl w-[90%] max-h-[85vh] flex flex-col shadow-2xl mx-auto">
         {/* Handle */}
@@ -97,6 +98,7 @@ export default function TemplateDetailModal({ template, onClose, onSave, onStart
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
