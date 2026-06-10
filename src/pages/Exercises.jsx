@@ -1,6 +1,15 @@
+import { useCallback } from 'react';
 import { Search } from 'lucide-react';
+import BottomNav from '../components/BottomNav';
+import usePullToRefresh from '../hooks/usePullToRefresh';
+import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 
 export default function Exercises() {
+  const handleRefresh = useCallback(async () => {
+    await new Promise(r => setTimeout(r, 600));
+  }, []);
+  const { pullY, refreshing } = usePullToRefresh(handleRefresh);
+
   const exercises = [
     { id: 1, name: 'Bench Press', muscle: 'Chest' },
     { id: 2, name: 'Squat', muscle: 'Legs' },
@@ -12,8 +21,9 @@ export default function Exercises() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <PullToRefreshIndicator pullY={pullY} refreshing={refreshing} />
       {/* Header */}
-      <div className="px-4 py-6">
+      <div className="px-4 py-6" style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top))' }}>
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-4xl font-bold text-foreground">Exercises</h1>
@@ -38,6 +48,7 @@ export default function Exercises() {
           </div>
         ))}
       </div>
+      <BottomNav />
     </div>
   );
 }
