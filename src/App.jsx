@@ -16,8 +16,9 @@ import ActiveWorkout from './pages/ActiveWorkout';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const noAnimation = ['/template/', '/active-workout/'].some(p => location.pathname.startsWith(p));
   return (
-    <div key={location.pathname} className="route-enter">
+    <div key={location.pathname} className={noAnimation ? '' : 'route-enter'}>
       <Routes location={location}>
         <Route path="/" element={<Home />} />
         <Route path="/template/new" element={<NewTemplate />} />
