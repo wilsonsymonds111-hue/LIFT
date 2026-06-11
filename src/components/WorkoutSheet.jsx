@@ -430,7 +430,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
       </div>
       {sets.map((s, i) => (
         <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
-        <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg} initialReps={s.suggestedReps} restDuration={restEnabled ? restDuration : 0}
+        <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg ?? (i === 0 && prev ? prev.kg : null)} initialReps={s.suggestedReps ?? (i === 0 && prev ? prev.reps + 1 : null)} restDuration={restEnabled ? restDuration : 0}
           onComplete={(result) => {
             setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
             if (result) onBestSet?.(exercise.name, result.kg, result.reps);
