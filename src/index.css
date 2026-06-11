@@ -94,6 +94,11 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  button, a, nav, [role="button"] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
   textarea, input {
     font-family: inherit;
     font-size: inherit;

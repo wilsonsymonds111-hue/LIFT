@@ -1,9 +1,24 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Dumbbell, Plus, Settings } from 'lucide-react';
 
+const TAB_ROOTS = ['/', '/exercises', '/settings'];
+
+function getTabRoot(pathname) {
+  if (pathname === '/' || pathname.startsWith('/template') || pathname.startsWith('/active-workout')) return '/';
+  if (pathname.startsWith('/exercises')) return '/exercises';
+  if (pathname.startsWith('/settings')) return '/settings';
+  return '/';
+}
+
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Persist last visited path per tab root
+  const currentRoot = getTabRoot(location.pathname);
+  if (location.pathname !== currentRoot) {
+    sessionStorage.setItem(`tab_stack_${currentRoot}`, location.pathname + location.search);
+  }
 
   const tabs = [
     { path: '/', label: 'Workouts', icon: Plus },
@@ -12,11 +27,13 @@ export default function BottomNav() {
   ];
 
   const handleTabPress = (tab) => {
-    // If already on this tab's root, reset to it (forces re-mount / scroll-to-top)
-    if (location.pathname === tab.path) {
+    if (getTabRoot(location.pathname) === tab.path) {
+      // Already on this tab — reset to root
       navigate(tab.path, { replace: true });
     } else {
-      navigate(tab.path);
+      // Restore last visited sub-page for this tab, or go to root
+      const saved = sessionStorage.getItem(`tab_stack_${tab.path}`);
+      navigate(saved || tab.path);
     }
   };
 
