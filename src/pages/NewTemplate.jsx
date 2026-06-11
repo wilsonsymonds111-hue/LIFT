@@ -91,22 +91,17 @@ const ALL_EXERCISES = [
   { name: 'Zottman Curl', muscle: 'Arms' },
 ];
 
-const MUSCLES = ['All', 'Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders'];
 
 export default function NewTemplate() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState('');
-  const [muscleFilter, setMuscleFilter] = useState('All');
 
   const filtered = useMemo(() => {
-    return ALL_EXERCISES.filter(ex => {
-      const matchesSearch = ex.name.toLowerCase().includes(search.toLowerCase());
-      const matchesMuscle = muscleFilter === 'All' || ex.muscle === muscleFilter;
-      return matchesSearch && matchesMuscle;
-    });
-  }, [search, muscleFilter]);
+    if (!search.trim()) return ALL_EXERCISES;
+    return ALL_EXERCISES.filter(ex => ex.name.toLowerCase().includes(search.toLowerCase()));
+  }, [search]);
 
   const grouped = useMemo(() => {
     const map = {};
@@ -178,21 +173,6 @@ export default function NewTemplate() {
             className="bg-transparent text-sm flex-1 focus:outline-none text-gray-700"
           />
         </div>
-      </div>
-
-      {/* Muscle filter */}
-      <div className="px-4 pb-2 flex gap-2 overflow-x-auto flex-shrink-0">
-        {MUSCLES.map(m => (
-          <button
-            key={m}
-            onClick={() => setMuscleFilter(m)}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
-              muscleFilter === m ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-300'
-            }`}
-          >
-            {m}
-          </button>
-        ))}
       </div>
 
       {/* Exercise list */}
