@@ -82,7 +82,7 @@ export default function NewTemplate() {
       </div>
 
       {showPicker && (
-        <ExercisePicker onClose={() => setShowPicker(false)} onAdd={handleAddExercises} />
+        <ExercisePicker onClose={() => exerciseList.length === 0 ? navigate(-1) : setShowPicker(false)} onAdd={handleAddExercises} />
       )}
     </>
   );
