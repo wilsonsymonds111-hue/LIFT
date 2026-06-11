@@ -141,7 +141,7 @@ export default function NewTemplate() {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-white" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <div className="fixed inset-0 flex flex-col bg-white overflow-hidden" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100 flex-shrink-0">
@@ -202,7 +202,7 @@ export default function NewTemplate() {
       </div>
 
       {/* Exercise list */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto min-h-0">
         {grouped.map(([letter, exs]) => (
           <div key={letter}>
             <div className="px-4 py-1 bg-gray-50 text-xs font-bold text-gray-400 uppercase tracking-widest sticky top-0">
