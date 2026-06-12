@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, MoreVertical, UserCircle } from 'lucide-react';
+import { Plus, MoreVertical, UserCircle, Zap, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
@@ -43,7 +43,6 @@ export default function Home() {
   }, []);
 
   const myTemplates = templates;
-  const exampleTemplates = templates;
 
   useEffect(() => { loadTemplates(); }, [loadTemplates]);
 
@@ -58,7 +57,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-muted border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -67,68 +66,81 @@ export default function Home() {
     <div className="min-h-screen bg-background pb-10">
       <PullToRefreshIndicator pullY={pullY} refreshing={refreshing} />
 
-      {/* Page Title */}
-      <div className="px-4 pb-3 flex items-center justify-between" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
-        <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-0.5">My App</p>
-          <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
-        </div>
+      {/* Header */}
+      <div className="px-5 flex items-center justify-between" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))', paddingBottom: '0.75rem' }}>
+        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Workouts</h1>
         <button
           onClick={() => setShowProfile(true)}
-          className="w-10 h-10 flex items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm active:scale-95 transition-transform"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-foreground text-background active:scale-90 transition-transform"
         >
           <UserCircle className="w-5 h-5" />
         </button>
       </div>
 
       {/* Quick Start */}
-      <div className="px-4 py-4">
+      <div className="px-5 pt-2 pb-5">
         <button
           onClick={() => navigate('/active-workout/empty-' + Date.now())}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition"
+          className="w-full flex items-center justify-between bg-blue-500 active:bg-blue-600 text-white font-bold py-4 px-5 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-blue-500/30"
         >
-          Start an Empty Workout
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+              <Zap className="w-4 h-4" />
+            </div>
+            <span className="text-base">Start Empty Workout</span>
+          </div>
+          <ChevronRight className="w-5 h-5 opacity-70" />
         </button>
       </div>
 
-      {/* Templates Section */}
-      <div className="px-4 py-2">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-foreground">My Current Split ({myTemplates.length})</h3>
+      {/* My Templates */}
+      <div className="px-5">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-base font-bold text-foreground">My Split</h2>
+            <p className="text-xs text-muted-foreground">{myTemplates.length} workout{myTemplates.length !== 1 ? 's' : ''}</p>
+          </div>
           <button
             onClick={() => navigate('/template/new')}
-            className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-foreground text-background text-xs font-bold transition active:scale-95"
           >
-            <Plus className="w-3.5 h-3.5" />
-            Template
+            <Plus className="w-3 h-3" />
+            New
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-3">
           {myTemplates.map((template) => (
-            <div key={template.id} className="relative bg-card border border-border rounded-lg p-4 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200">
-              <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
-                <h4 className="font-bold text-foreground flex-1 cursor-pointer">{template.name}</h4>
-                <button
-                  onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
-                  className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 transition flex-shrink-0 select-none -mt-1 -mr-1"
-                >
-                  <MoreVertical className="w-4 h-4 text-gray-400" />
-                </button>
+            <div
+              key={template.id}
+              className="relative bg-card border border-border rounded-2xl overflow-hidden active:scale-[0.99] transition-transform"
+              onClick={() => setSelectedTemplate(template)}
+            >
+              <div className="px-4 pt-4 pb-3">
+                <div className="flex items-start justify-between">
+                  <h4 className="font-bold text-foreground text-base leading-snug flex-1 pr-2">{template.name}</h4>
+                  <button
+                    onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
+                    className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-muted transition flex-shrink-0 -mt-0.5 -mr-1"
+                  >
+                    <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{template.exercises}</p>
               </div>
-              <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
-                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  ⏱ {template.lastPerformed ? daysAgo(template.lastPerformed) : 'Not yet performed'}
-                </p>
+              <div className="px-4 pb-3 flex items-center gap-1.5">
+                <span className="text-[11px] text-muted-foreground">
+                  {template.lastPerformed ? `Last: ${daysAgo(template.lastPerformed)}` : 'Not yet performed'}
+                </span>
               </div>
+
               {openMenuId === template.id && (
                 <>
-                  <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                  <div className="absolute top-10 right-3 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[140px]">
+                  <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); }} />
+                  <div className="absolute top-10 right-3 z-20 bg-card rounded-xl shadow-xl border border-border py-1 min-w-[150px]">
                     <button
-                      onClick={() => handleDeleteTemplate(template.id)}
-                      className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
+                      onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(template.id); }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 dark:hover:bg-red-950/30 transition"
                     >
                       Delete Template
                     </button>
@@ -140,27 +152,14 @@ export default function Home() {
         </div>
 
         {myTemplates.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <p className="text-lg font-medium mb-1">No templates yet</p>
-            <p className="text-sm">Create your first workout template to get started.</p>
+          <div className="text-center py-16 text-muted-foreground">
+            <div className="text-4xl mb-3">🏋️</div>
+            <p className="text-base font-semibold mb-1">No templates yet</p>
+            <p className="text-sm">Tap "New" to create your first split.</p>
           </div>
         )}
       </div>
 
-      {/* Example Templates */}
-      {exampleTemplates.length > 0 && (
-        <div className="px-4 py-2 mb-4">
-          <h3 className="font-semibold text-foreground mb-4">Example Templates ({exampleTemplates.length})</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {exampleTemplates.map((template) => (
-              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate({ ...template, exerciseList: template.exerciseList?.map(e => ({ ...e, history: [] })), lastPerformed: null, _isExample: true })}>
-                <h4 className="font-bold text-foreground mb-2">{template.name}</h4>
-                <p className="text-sm text-muted-foreground line-clamp-2">{template.exercises}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
       {showProfile && (
         <ProfileSheet
           onClose={() => setShowProfile(false)}
