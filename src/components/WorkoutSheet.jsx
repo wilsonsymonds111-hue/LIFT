@@ -906,7 +906,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
       )}
 
       {/* Full sheet */}
-      <div className={`fixed inset-x-0 bottom-0 z-40 bg-white rounded-t-3xl shadow-2xl transition-all duration-500 ease-in-out flex flex-col ${minimized ? 'h-0 overflow-hidden' : 'h-[95vh]'}`}>
+      <div className={`fixed inset-x-0 bottom-0 z-40 bg-background rounded-t-3xl shadow-2xl transition-all duration-500 ease-in-out flex flex-col ${minimized ? 'h-0 overflow-hidden' : 'h-[95vh]'}`}
+        style={!minimized ? { paddingTop: 'env(safe-area-inset-top)' } : undefined}
+      >
         <div className="flex justify-center pt-3 pb-1 cursor-pointer flex-shrink-0" onClick={() => setMinimized(true)}>
           <div className="w-10 h-1 rounded-full bg-gray-300" />
         </div>

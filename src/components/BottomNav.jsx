@@ -38,7 +38,7 @@ export default function BottomNav() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="flex h-16 max-w-full">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -52,7 +52,7 @@ export default function BottomNav() {
               key={tab.path}
               onClick={() => handleTabPress(tab)}
               className={`flex-1 flex flex-col items-center justify-center gap-1 select-none transition ${
-                isActive ? 'text-white' : 'text-slate-400 hover:text-slate-300'
+                isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Icon className="w-6 h-6" />

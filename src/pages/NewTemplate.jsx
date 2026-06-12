@@ -174,14 +174,14 @@ export default function NewTemplate() {
   };
 
   return (
-    <div className="flex flex-col bg-white min-h-screen" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <div className="flex flex-col bg-background min-h-screen" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
 
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100 flex-shrink-0">
-        <button onClick={() => navigate(-1)} className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-200 hover:bg-gray-300 transition">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-border flex-shrink-0">
+        <button onClick={() => navigate(-1)} className="w-9 h-9 flex items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition">
           <X className="w-4 h-4 text-gray-700" />
         </button>
-        <span className="font-bold text-base text-gray-900">New Template</span>
+        <span className="font-bold text-base text-foreground">New Template</span>
         <button
           onClick={handleSave}
           disabled={selected.length === 0}
@@ -203,7 +203,7 @@ export default function NewTemplate() {
 
       {/* Search */}
       <div className="px-4 py-2 flex-shrink-0">
-        <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2.5">
+        <div className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2.5">
           <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
           <input
             value={search}
@@ -238,7 +238,7 @@ export default function NewTemplate() {
       <div className="pb-10">
         {grouped.map(([letter, exs]) => (
           <div key={letter}>
-            <div className="px-4 py-1 bg-gray-50 text-xs font-bold text-gray-400 uppercase tracking-widest sticky top-0">
+            <div className="px-4 py-1 bg-muted text-xs font-bold text-muted-foreground uppercase tracking-widest sticky top-0">
               {letter}
             </div>
             {exs.map(ex => {
@@ -247,7 +247,7 @@ export default function NewTemplate() {
                 <button
                   key={ex.name}
                   onClick={() => toggle(ex)}
-                  className={`w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 transition text-left ${sel ? 'bg-blue-50' : 'bg-white active:bg-gray-50'}`}
+                  className={`w-full flex items-center justify-between px-4 py-3 border-b border-border transition text-left ${sel ? 'bg-blue-50 dark:bg-blue-950' : 'bg-background active:bg-muted'}`}
                 >
                   <div>
                     <p className={`text-sm font-semibold ${sel ? 'text-blue-600' : 'text-gray-900'}`}>{ex.name}</p>
