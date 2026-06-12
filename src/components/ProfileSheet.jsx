@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Moon, Sun, Trash2, AlertTriangle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
@@ -19,7 +20,7 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark }) {
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div
@@ -98,6 +99,7 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark }) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
