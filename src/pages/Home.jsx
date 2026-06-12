@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, MoreVertical } from 'lucide-react';
+import { Plus, MoreVertical, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import BottomNav from '../components/BottomNav';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import TemplateDetailModal from '../components/TemplateDetailModal';
+import ProfileSheet from '../components/ProfileSheet';
 
 const daysAgo = (dateStr) => {
   if (!dateStr) return null;
@@ -26,6 +26,15 @@ export default function Home() {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [showProfile, setShowProfile] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
+
+  const handleToggleDark = () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('darkMode', String(next));
+  };
 
   const loadTemplates = useCallback(async () => {
     const data = await base44.entities.WorkoutTemplate.list('sort_order', 100);
@@ -55,12 +64,15 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-10">
       <PullToRefreshIndicator pullY={pullY} refreshing={refreshing} />
 
       {/* Page Title */}
-      <div className="px-4 pb-2" style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top))' }}>
-        <h1 className="text-3xl font-extrabold text-gray-900">Workouts</h1>
+      <div className="px-4 pb-2 flex items-center justify-between" style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top))' }}>
+        <h1 className="text-3xl font-extrabold text-foreground">Workouts</h1>
+        <button onClick={() => setShowProfile(true)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted transition">
+          <UserCircle className="w-7 h-7 text-muted-foreground" />
+        </button>
       </div>
 
       {/* Quick Start */}
@@ -143,7 +155,13 @@ export default function Home() {
           </div>
         </div>
       )}
-      <BottomNav />
+      {showProfile && (
+        <ProfileSheet
+          onClose={() => setShowProfile(false)}
+          darkMode={darkMode}
+          onToggleDark={handleToggleDark}
+        />
+      )}
 
       {selectedTemplate && (
         <TemplateDetailModal

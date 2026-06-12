@@ -7,9 +7,6 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
-import Exercises from './pages/Exercises';
-import Workout from './pages/Workout';
-import Settings from './pages/Settings';
 import NewTemplate from './pages/NewTemplate';
 import ActiveWorkout from './pages/ActiveWorkout';
 
@@ -23,9 +20,6 @@ const AnimatedRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/template/new" element={<NewTemplate />} />
         <Route path="/active-workout/:id" element={<ActiveWorkout />} />
-        <Route path="/exercises" element={<Exercises />} />
-        <Route path="/workout" element={<Workout />} />
-        <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </div>
@@ -58,11 +52,14 @@ const AuthenticatedApp = () => {
 
 function App() {
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const apply = (e) => document.documentElement.classList.toggle('dark', e.matches);
-    apply(mq);
-    mq.addEventListener('change', apply);
-    return () => mq.removeEventListener('change', apply);
+    // Initialize dark mode from localStorage or system preference
+    const stored = localStorage.getItem('darkMode');
+    if (stored !== null) {
+      document.documentElement.classList.toggle('dark', stored === 'true');
+    } else {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      document.documentElement.classList.toggle('dark', mq.matches);
+    }
   }, []);
 
   return (
