@@ -71,7 +71,6 @@ export default function Home() {
       {/* Page Title */}
       <div className="px-4 pb-3 flex items-center justify-between" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-0.5">My App</p>
           <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
         </div>
         <button
