@@ -6,6 +6,7 @@ import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import TemplateDetailModal from '../components/TemplateDetailModal';
 import ProfileSheet from '../components/ProfileSheet';
+import SplitDetailModal from '../components/SplitDetailModal';
 
 const daysAgo = (dateStr) => {
   if (!dateStr) return null;
@@ -29,6 +30,7 @@ export default function Home() {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
+  const [selectedSplit, setSelectedSplit] = useState(null);
 
   const handleToggleDark = () => {
     const next = !darkMode;
@@ -44,7 +46,6 @@ export default function Home() {
   }, []);
 
   const myTemplates = templates;
-  const exampleTemplates = templates;
 
   useEffect(() => { loadTemplates(); }, [loadTemplates]);
 
@@ -153,20 +154,40 @@ export default function Home() {
         )}
       </div>
 
-      {/* Example Templates */}
-      {exampleTemplates.length > 0 && (
-        <div className="px-4 py-2 mb-4">
-          <h3 className="font-semibold text-foreground mb-4">Example Templates ({exampleTemplates.length})</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {exampleTemplates.map((template) => (
-              <div key={template.id} className="bg-card border border-border rounded-lg p-4 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200" onClick={() => setSelectedTemplate({ ...template, exerciseList: template.exerciseList?.map(e => ({ ...e, history: [] })), lastPerformed: null, _isExample: true })}>
-                <h4 className="font-bold text-foreground mb-2">{template.name}</h4>
-                <p className="text-sm text-muted-foreground line-clamp-2">{template.exercises}</p>
-              </div>
-            ))}
-          </div>
+      {/* Example Splits */}
+      <div className="px-4 py-2 mb-4">
+        <h3 className="font-semibold text-foreground mb-4">Example Splits</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <button
+            onClick={() => setSelectedSplit('upper-lower')}
+            className="bg-card border border-border rounded-xl p-5 text-left shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
+          >
+            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-xl mb-3">
+              💪
+            </div>
+            <h4 className="font-bold text-foreground mb-1">Upper-Lower Split</h4>
+            <p className="text-sm text-muted-foreground">Alternate between upper and lower body days</p>
+            <div className="flex gap-1.5 mt-3">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">2 workouts</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Upper • Lower</span>
+            </div>
+          </button>
+          <button
+            onClick={() => setSelectedSplit('push-pull-legs')}
+            className="bg-card border border-border rounded-xl p-5 text-left shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
+          >
+            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-xl mb-3">
+              🏋️
+            </div>
+            <h4 className="font-bold text-foreground mb-1">Push-Pull-Legs</h4>
+            <p className="text-sm text-muted-foreground">Push day, pull day, legs day — 3-day rotation</p>
+            <div className="flex gap-1.5 mt-3">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">3 workouts</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Push • Pull • Legs</span>
+            </div>
+          </button>
         </div>
-      )}
+      </div>
       {showProfile && (
         <ProfileSheet
           onClose={() => setShowProfile(false)}
@@ -186,6 +207,13 @@ export default function Home() {
             setSelectedTemplate(updated);
           }}
           onStartWorkout={(id) => navigate(`/active-workout/${id}`)}
+        />
+      )}
+
+      {selectedSplit && (
+        <SplitDetailModal
+          splitKey={selectedSplit}
+          onClose={() => setSelectedSplit(null)}
         />
       )}
     </div>
