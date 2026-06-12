@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Moon, Sun, Trash2, AlertTriangle } from 'lucide-react';
+import { X, Moon, Sun, Trash2, AlertTriangle, Camera } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
-export default function ProfileSheet({ onClose, darkMode, onToggleDark }) {
+export default function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleDeleteAccount = async () => {
     if (confirmText.trim().toLowerCase() !== 'delete') return;
@@ -20,6 +22,18 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark }) {
     }
   };
 
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      localStorage.setItem('profilePhoto', file_url);
+      onPhotoChange(file_url);
+    } catch {}
+    setUploading(false);
+  };
+
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
@@ -27,15 +41,53 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark }) {
         className="relative bg-card rounded-t-3xl w-full px-5 pt-5 shadow-2xl flex flex-col gap-4 overflow-y-auto"
         style={{ maxHeight: '80vh', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}
       >
-        {/* Handle + close */}
+        {/* Handle */}
         <div className="flex justify-center mb-1">
           <div className="w-10 h-1 rounded-full bg-muted" />
         </div>
+
+        {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-extrabold text-foreground">Profile</h2>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
             <X className="w-4 h-4 text-foreground" />
           </button>
+        </div>
+
+        {/* Photo upload */}
+        <div className="flex flex-col items-center gap-3 py-2">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full overflow-hidden bg-muted border-4 border-background shadow-lg">
+              {profilePhoto ? (
+                <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-primary">
+                  <span className="text-3xl font-extrabold text-primary-foreground">?</span>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="absolute bottom-0 right-0 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md transition active:scale-95"
+            >
+              {uploading ? (
+                <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Camera className="w-3.5 h-3.5" />
+              )}
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {profilePhoto ? 'Tap camera to change photo' : 'Add a profile photo'}
+          </p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handlePhotoUpload}
+          />
         </div>
 
         {/* Dark mode toggle */}

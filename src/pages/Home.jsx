@@ -28,6 +28,7 @@ export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
+  const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
 
   const handleToggleDark = () => {
     const next = !darkMode;
@@ -75,9 +76,15 @@ export default function Home() {
         </div>
         <button
           onClick={() => setShowProfile(true)}
-          className="w-10 h-10 flex items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm active:scale-95 transition-transform"
+          className="w-10 h-10 rounded-full overflow-hidden shadow-md active:scale-95 transition-transform flex-shrink-0 border-2 border-border"
         >
-          <UserCircle className="w-5 h-5" />
+          {profilePhoto ? (
+            <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-primary">
+              <UserCircle className="w-5 h-5 text-primary-foreground" />
+            </div>
+          )}
         </button>
       </div>
 
@@ -166,6 +173,8 @@ export default function Home() {
           onClose={() => setShowProfile(false)}
           darkMode={darkMode}
           onToggleDark={handleToggleDark}
+          profilePhoto={profilePhoto}
+          onPhotoChange={setProfilePhoto}
         />
       )}
 
