@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, MoreVertical } from 'lucide-react';
+import { Plus, MoreVertical, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import TemplateDetailModal from '../components/TemplateDetailModal';
+import ProfileSheet from '../components/ProfileSheet';
 
 const daysAgo = (dateStr) => {
   if (!dateStr) return null;
@@ -25,6 +26,16 @@ export default function Home() {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [showProfile, setShowProfile] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
+  const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
+
+  const handleToggleDark = () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('darkMode', String(next));
+  };
 
   const loadTemplates = useCallback(async () => {
     const data = await base44.entities.WorkoutTemplate.list('sort_order', 100);
@@ -54,12 +65,26 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))' }}>
+    <div className="min-h-screen bg-background pb-10">
       <PullToRefreshIndicator pullY={pullY} refreshing={refreshing} />
 
       {/* Page Title */}
-      <div className="px-4 pb-3" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
-        <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
+      <div className="px-4 pb-3 flex items-center justify-between" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
+        <div>
+          <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
+        </div>
+        <button
+          onClick={() => setShowProfile(true)}
+          className="w-10 h-10 rounded-full overflow-hidden shadow-md active:scale-95 transition-transform flex-shrink-0 border-2 border-border"
+        >
+          {profilePhoto ? (
+            <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-primary">
+              <UserCircle className="w-5 h-5 text-primary-foreground" />
+            </div>
+          )}
+        </button>
       </div>
 
       {/* Quick Start */}
@@ -142,6 +167,16 @@ export default function Home() {
           </div>
         </div>
       )}
+      {showProfile && (
+        <ProfileSheet
+          onClose={() => setShowProfile(false)}
+          darkMode={darkMode}
+          onToggleDark={handleToggleDark}
+          profilePhoto={profilePhoto}
+          onPhotoChange={setProfilePhoto}
+        />
+      )}
+
       {selectedTemplate && (
         <TemplateDetailModal
           template={selectedTemplate}
