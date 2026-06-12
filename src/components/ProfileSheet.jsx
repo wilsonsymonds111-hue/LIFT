@@ -61,8 +61,9 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark, profileP
               {profilePhoto ? (
                 <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-primary">
-                  <span className="text-3xl font-extrabold text-primary-foreground">?</span>
+                <div className="w-full h-full rounded-full bg-[#b0b7c3] flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute w-[40%] h-[40%] rounded-full bg-[#e8eaed]" style={{ top: '18%' }} />
+                  <div className="absolute w-[70%] h-[55%] rounded-t-full bg-[#e8eaed]" style={{ bottom: '-10%' }} />
                 </div>
               )}
             </div>
