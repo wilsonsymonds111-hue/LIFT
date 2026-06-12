@@ -68,10 +68,16 @@ export default function Home() {
       <PullToRefreshIndicator pullY={pullY} refreshing={refreshing} />
 
       {/* Page Title */}
-      <div className="px-4 pb-2 flex items-center justify-between" style={{ paddingTop: 'calc(1.5rem + env(safe-area-inset-top))' }}>
-        <h1 className="text-3xl font-extrabold text-foreground">Workouts</h1>
-        <button onClick={() => setShowProfile(true)} className="w-9 h-9 flex items-center justify-center rounded-full bg-muted hover:bg-muted/70 transition active:scale-95">
-          <UserCircle className="w-5 h-5 text-foreground" />
+      <div className="px-4 pb-3 flex items-center justify-between" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-0.5">My App</p>
+          <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
+        </div>
+        <button
+          onClick={() => setShowProfile(true)}
+          className="w-10 h-10 flex items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm active:scale-95 transition-transform"
+        >
+          <UserCircle className="w-5 h-5" />
         </button>
       </div>
 
