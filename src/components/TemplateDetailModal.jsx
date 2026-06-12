@@ -44,21 +44,21 @@ export default function TemplateDetailModal({ template, onClose, onSave, onStart
 
   return createPortal(
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)' }}>
-      <div className="relative bg-white rounded-3xl w-[90%] max-h-[85vh] flex flex-col shadow-2xl mx-auto">
+      <div className="relative bg-card rounded-3xl w-[90%] max-h-[85vh] flex flex-col shadow-2xl mx-auto">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-gray-300" />
+          <div className="w-10 h-1 rounded-full bg-muted" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-border">
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-muted hover:bg-muted/70 transition"
           >
-            <X className="w-4 h-4 text-gray-700" />
+            <X className="w-4 h-4 text-foreground" />
           </button>
-          <h2 className="font-bold text-base tracking-wide text-gray-900">{template.name}</h2>
+          <h2 className="font-bold text-base tracking-wide text-foreground">{template.name}</h2>
           <button
             onClick={() => setShowEdit(true)}
             className="text-blue-500 font-semibold text-sm hover:text-blue-600 transition"
@@ -67,14 +67,14 @@ export default function TemplateDetailModal({ template, onClose, onSave, onStart
           </button>
         </div>
 
-        <p className="px-5 pt-3 pb-1 text-sm text-gray-400">{lastPerformed}</p>
+        <p className="px-5 pt-3 pb-1 text-sm text-muted-foreground">{lastPerformed}</p>
 
         <div className="px-5 py-3 space-y-3 overflow-y-auto flex-1">
           {template.exerciseList?.map((exercise, idx) => (
             <div key={idx} className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-gray-900 text-sm leading-snug">{exercise.sets} × {exercise.name}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{exercise.muscle}</p>
+                <p className="font-bold text-foreground text-sm leading-snug">{exercise.sets} × {exercise.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
               </div>
               {exercise.history && exercise.history.length > 0 && (
                 <div className="w-16 h-8 flex-shrink-0">

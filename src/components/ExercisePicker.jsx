@@ -87,6 +87,38 @@ const ALL_EXERCISES = [
   { name: 'Wide Grip Pull Up', muscle: 'Back' },
   { name: 'Wrist Curl', muscle: 'Arms' },
   { name: 'Zottman Curl', muscle: 'Arms' },
+  { name: 'Battle Ropes', muscle: 'Full Body' },
+  { name: 'Bent Over Lateral Raise', muscle: 'Shoulders' },
+  { name: 'Bradford Press', muscle: 'Shoulders' },
+  { name: 'Burpee', muscle: 'Full Body' },
+  { name: 'Cable Crossover', muscle: 'Chest' },
+  { name: 'Cable Crunch', muscle: 'Core' },
+  { name: 'Cable Curl', muscle: 'Arms' },
+  { name: 'Cable Lateral Raise', muscle: 'Shoulders' },
+  { name: 'Decline Crunch', muscle: 'Core' },
+  { name: 'Hanging Leg Raise', muscle: 'Core' },
+  { name: 'Hollow Body Hold', muscle: 'Core' },
+  { name: 'JM Press', muscle: 'Arms' },
+  { name: 'L-Sit', muscle: 'Core' },
+  { name: 'Leg Press Calf Raise', muscle: 'Legs' },
+  { name: 'Meadows Row', muscle: 'Back' },
+  { name: 'Nordic Curl', muscle: 'Legs' },
+  { name: 'Overhead Tricep Extension (Dumbbell)', muscle: 'Arms' },
+  { name: 'Pallof Press', muscle: 'Core' },
+  { name: 'Pendlay Row', muscle: 'Back' },
+  { name: 'Preacher Curl', muscle: 'Arms' },
+  { name: 'Reverse Curl', muscle: 'Arms' },
+  { name: 'Reverse Lunge', muscle: 'Legs' },
+  { name: 'Rope Pushdown', muscle: 'Arms' },
+  { name: 'Seal Row', muscle: 'Back' },
+  { name: 'Single Arm Dumbbell Row', muscle: 'Back' },
+  { name: 'Sissy Squat', muscle: 'Legs' },
+  { name: 'Sled Push', muscle: 'Full Body' },
+  { name: 'Spider Curl', muscle: 'Arms' },
+  { name: 'Svend Press', muscle: 'Chest' },
+  { name: 'Thruster', muscle: 'Full Body' },
+  { name: 'Trap Bar Deadlift', muscle: 'Legs' },
+  { name: 'Turkish Get-Up', muscle: 'Full Body' },
 ];
 
 const MUSCLES = ['All', 'Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders', 'Other'];
@@ -146,13 +178,13 @@ export default function ExercisePicker({ onClose, onAdd }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white rounded-t-3xl w-full max-h-[90vh] flex flex-col shadow-2xl">
+      <div className="relative bg-card rounded-t-3xl w-full max-h-[90vh] flex flex-col shadow-2xl" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100">
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200">
-            <X className="w-4 h-4 text-gray-700" />
+        <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-border">
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
+            <X className="w-4 h-4 text-foreground" />
           </button>
-          <span className="font-bold text-gray-900">Add Exercises</span>
+          <span className="font-bold text-foreground">Add Exercises</span>
           <button
             onClick={handleAdd}
             disabled={selected.length === 0}
@@ -164,13 +196,13 @@ export default function ExercisePicker({ onClose, onAdd }) {
 
         {/* Search */}
         <div className="px-4 py-3">
-          <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
-            <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <div className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2">
+            <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search"
-              className="bg-transparent text-sm flex-1 focus:outline-none text-gray-700"
+              className="bg-transparent text-sm flex-1 focus:outline-none text-foreground"
             />
           </div>
         </div>
@@ -184,7 +216,7 @@ export default function ExercisePicker({ onClose, onAdd }) {
               className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
                 muscleFilter === m
                   ? 'bg-blue-500 text-white border-blue-500'
-                  : 'bg-white text-gray-600 border-gray-300'
+                  : 'bg-card text-foreground border-border'
               }`}
             >
               {m}
@@ -196,7 +228,7 @@ export default function ExercisePicker({ onClose, onAdd }) {
         <div className="flex-1 overflow-y-auto pb-6">
           {grouped.map(([letter, exercises]) => (
             <div key={letter}>
-              <div className="px-4 py-1 bg-gray-50 text-xs font-bold text-gray-400 uppercase tracking-widest">
+              <div className="px-4 py-1 bg-muted text-xs font-bold text-muted-foreground uppercase tracking-widest">
                 {letter}
               </div>
               {exercises.map((ex) => {
@@ -205,11 +237,11 @@ export default function ExercisePicker({ onClose, onAdd }) {
                   <button
                     key={ex.name}
                     onClick={() => toggle(ex.name)}
-                    className={`w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 transition ${isSelected ? 'bg-blue-50' : 'bg-white'}`}
+                    className={`w-full flex items-center justify-between px-4 py-3 border-b border-border transition ${isSelected ? 'bg-blue-50 dark:bg-blue-950' : 'bg-card'}`}
                   >
                     <div className="text-left">
-                      <p className={`text-sm font-semibold ${isSelected ? 'text-blue-600' : 'text-gray-900'}`}>{ex.name}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{ex.muscle}</p>
+                      <p className={`text-sm font-semibold ${isSelected ? 'text-blue-600' : 'text-foreground'}`}>{ex.name}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{ex.muscle}</p>
                     </div>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
                       {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
