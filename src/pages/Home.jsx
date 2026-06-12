@@ -70,19 +70,19 @@ export default function Home() {
 
       {/* Page Title */}
       <div className="px-4 pb-3 flex items-center justify-between" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
-        <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-0.5">My App</p>
+          <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
+        </div>
         <button
           onClick={() => setShowProfile(true)}
-          className="w-10 h-10 rounded-full overflow-hidden active:scale-95 transition-transform flex-shrink-0"
+          className="w-10 h-10 rounded-full overflow-hidden shadow-md active:scale-95 transition-transform flex-shrink-0 border-2 border-border"
         >
           {profilePhoto ? (
             <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full rounded-full bg-[#b0b7c3] flex items-center justify-center relative overflow-hidden">
-              {/* Head */}
-              <div className="absolute w-[40%] h-[40%] rounded-full bg-[#e8eaed]" style={{ top: '18%' }} />
-              {/* Body */}
-              <div className="absolute w-[70%] h-[55%] rounded-t-full bg-[#e8eaed]" style={{ bottom: '-10%' }} />
+            <div className="w-full h-full flex items-center justify-center bg-primary">
+              <UserCircle className="w-5 h-5 text-primary-foreground" />
             </div>
           )}
         </button>
