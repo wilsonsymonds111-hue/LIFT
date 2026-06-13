@@ -241,17 +241,16 @@ export default function Splits() {
 
       {/* Example Splits Tab */}
       {activeTab === 'examples' && (
-        <div className="px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="px-4 relative">
+          {/* Subtle neutral glow behind cards */}
+          <div className="absolute -inset-x-8 -inset-y-8 bg-gradient-to-br from-slate-100/60 via-transparent to-slate-200/40 dark:from-slate-800/30 dark:via-transparent dark:to-slate-700/20 rounded-[3rem] blur-3xl pointer-events-none" />
+          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
               <div
                 key={key}
-                className="relative bg-card border border-border/60 rounded-2xl p-5 shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all duration-150 cursor-pointer overflow-hidden group"
+                className="relative bg-card border border-border/50 rounded-2xl p-5 shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group ring-1 ring-black/5 dark:ring-white/5"
                 onClick={() => setSelectedSplit(key)}
               >
-                {/* Subtle gradient accent */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/40 via-blue-400/30 to-cyan-400/20" />
 
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
