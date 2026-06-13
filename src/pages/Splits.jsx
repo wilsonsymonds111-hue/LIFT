@@ -193,7 +193,7 @@ export default function Splits() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="px-4 pt-4 pb-3" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
-        <h1 className="text-3xl font-extrabold text-foreground leading-tight">Splits</h1>
+        <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workout Splits</h1>
       </div>
 
       {/* Top Tabs */}
