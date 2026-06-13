@@ -103,6 +103,8 @@ export default function SplitDetailModal({ splitKey, onClose }) {
       exercises: exercisesStr,
       exerciseList,
       lastPerformed: null,
+      isActiveSplit: true,
+      splitGroup: Date.now().toString(),
     });
     navigate(`/active-workout/${template.id}`);
   };

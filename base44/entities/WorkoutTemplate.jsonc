@@ -36,6 +36,12 @@
     },
     "sort_order": {
       "type": "number"
+    },
+    "splitGroup": {
+      "type": "string"
+    },
+    "isActiveSplit": {
+      "type": "boolean"
     }
   },
   "required": [
