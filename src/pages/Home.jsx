@@ -160,20 +160,22 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             onClick={() => setSelectedSplit('upper-lower')}
-            className="bg-card border border-border rounded-xl shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200 overflow-hidden text-left"
+            className="bg-card border border-border rounded-xl p-4 text-left shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
           >
-            <img
-              src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/8b15e8cde_image.png"
-              alt="Upper-Lower Split"
-              className="w-full h-20 object-cover"
-            />
-            <div className="px-4 py-2.5">
-              <h4 className="font-bold text-foreground mb-1">Upper-Lower Split</h4>
-              <p className="text-sm text-muted-foreground">Alternate between upper and lower body days</p>
-              <div className="flex gap-1.5 mt-3">
-                <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">2 workouts</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Upper • Lower</span>
+            <div className="flex items-start gap-3">
+              <img
+                src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/8b15e8cde_image.png"
+                alt="Upper-Lower Split"
+                className="w-12 h-12 object-contain rounded-lg flex-shrink-0 mt-0.5"
+              />
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-foreground mb-0.5">Upper-Lower Split</h4>
+                <p className="text-sm text-muted-foreground">Alternate between upper and lower body days</p>
               </div>
+            </div>
+            <div className="flex gap-1.5 mt-3">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">2 workouts</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Upper • Lower</span>
             </div>
           </button>
           <button
