@@ -7,7 +7,7 @@ import SplitDetailModal from '../components/SplitDetailModal';
 
 const EXAMPLE_SPLITS_DATA = {
   'upper-lower': {
-    name: 'Upper-Lower Split',
+    name: 'Upper-Lower',
     label: 'Upper • Lower',
     workouts: [
       {
@@ -240,35 +240,39 @@ export default function Splits() {
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
               <div
                 key={key}
-                className="bg-card border border-border rounded-xl p-5 shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
+                className="relative bg-card border border-border/60 rounded-2xl p-5 shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all duration-300 cursor-pointer overflow-hidden group"
+                onClick={() => setSelectedSplit(key)}
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1 cursor-pointer" onClick={() => setSelectedSplit(key)}>
-                    <h4 className="font-bold text-foreground">{split.name}</h4>
-                    <p className="text-sm text-muted-foreground mt-0.5">
-                      {split.workouts.length} workouts — {split.label}
+                {/* Subtle gradient accent */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/40 via-blue-400/30 to-cyan-400/20" />
+
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-extrabold text-foreground text-base tracking-tight">{split.name}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {split.workouts.length} workout{split.workouts.length > 1 ? 's' : ''} — {split.label}
                     </p>
                   </div>
                   <button
                     ref={el => menuRef.current[key] = el}
                     onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === key ? null : key); }}
-                    className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-muted transition flex-shrink-0 select-none -mt-1 -mr-1"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition flex-shrink-0 select-none -mt-1 -mr-1 group/btn"
                   >
-                    <svg className="w-4 h-4 text-muted-foreground" viewBox="0 0 16 16" fill="currentColor">
+                    <svg className="w-4 h-4 text-muted-foreground group-hover/btn:text-foreground transition-colors" viewBox="0 0 16 16" fill="currentColor">
                       <circle cx="8" cy="3" r="1.5" />
                       <circle cx="8" cy="8" r="1.5" />
                       <circle cx="8" cy="13" r="1.5" />
                     </svg>
                   </button>
                 </div>
-                <div onClick={() => setSelectedSplit(key)} className="cursor-pointer">
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    {split.workouts.map((w, i) => (
-                      <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                        {w.name}
-                      </span>
-                    ))}
-                  </div>
+
+                <div className="flex flex-wrap gap-1.5 mt-4">
+                  {split.workouts.map((w, i) => (
+                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                      {w.name}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))}
