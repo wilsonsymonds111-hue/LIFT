@@ -1,9 +1,9 @@
 import { Toaster } from "@/components/ui/toaster"
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -13,42 +13,73 @@ import NewTemplate from './pages/NewTemplate';
 import ActiveWorkout from './pages/ActiveWorkout';
 import BottomNav from './components/BottomNav';
 
+const TABS = ['/', '/splits'];
 
-const pageVariants = {
-  initial: { x: '100%' },
-  animate: { x: 0 },
-  exit: { x: '-30%' },
+const SwipeableTabs = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activeIndex = TABS.indexOf(location.pathname);
+  const constraintsRef = useRef(null);
+  const [pageWidth, setPageWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setPageWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const snapToTab = (index) => {
+    if (index >= 0 && index < TABS.length && index !== activeIndex) {
+      navigate(TABS[index]);
+    }
+  };
+
+  return (
+    <div className="relative overflow-hidden w-full flex-1" ref={constraintsRef} style={{ touchAction: 'pan-y' }}>
+      <motion.div
+        drag="x"
+        dragDirectionLock
+        dragConstraints={constraintsRef}
+        dragElastic={0}
+        dragMomentum={false}
+        onDragEnd={(_, info) => {
+          const threshold = 50;
+          if (info.offset.x < -threshold) snapToTab(activeIndex + 1);
+          else if (info.offset.x > threshold) snapToTab(activeIndex - 1);
+        }}
+        animate={{ x: -activeIndex * pageWidth }}
+        transition={{ duration: 0.12, ease: [0.33, 1, 0.68, 1] }}
+        className="flex"
+        style={{ width: TABS.length * pageWidth }}
+      >
+        <div className="flex-shrink-0 overflow-y-auto" style={{ width: pageWidth }}>
+          <Home />
+        </div>
+        <div className="flex-shrink-0 overflow-y-auto" style={{ width: pageWidth }}>
+          <Splits />
+        </div>
+      </motion.div>
+    </div>
+  );
 };
-
-const pageTransition = { duration: 0.13, ease: [0.25, 0.1, 0.25, 1] };
 
 const AnimatedRoutes = () => {
   const location = useLocation();
-  const noAnimation = location.pathname.startsWith('/active-workout/');
+  const isTabRoute = location.pathname === '/' || location.pathname === '/splits';
 
   return (
     <>
-      <div className="relative overflow-hidden w-full flex-1">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={location.pathname}
-            variants={noAnimation ? undefined : pageVariants}
-            initial={noAnimation ? undefined : 'initial'}
-            animate={noAnimation ? undefined : 'animate'}
-            exit={noAnimation ? undefined : 'exit'}
-            transition={noAnimation ? undefined : pageTransition}
-            className="w-full"
-          >
-            <Routes location={location}>
-              <Route path="/" element={<Home />} />
-              <Route path="/splits" element={<Splits />} />
-              <Route path="/template/new" element={<NewTemplate />} />
-              <Route path="/active-workout/:id" element={<ActiveWorkout />} />
-              <Route path="*" element={<PageNotFound />} />
-            </Routes>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      {isTabRoute ? (
+        <SwipeableTabs />
+      ) : (
+        <div className="w-full flex-1">
+          <Routes location={location}>
+            <Route path="/template/new" element={<NewTemplate />} />
+            <Route path="/active-workout/:id" element={<ActiveWorkout />} />
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </div>
+      )}
       <BottomNav />
     </>
   );
