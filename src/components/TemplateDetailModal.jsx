@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { base44 } from '@/api/base44Client';
 import EditTemplateModal from './EditTemplateModal';
-import ProgressGraph from './ProgressGraph';
+
+const HollowDot = (props) => {
+  const { cx, cy } = props;
+  return <circle cx={cx} cy={cy} r={3} fill="white" stroke="#3b82f6" strokeWidth={1.5} />;
+};
 
 function relativeTime(dateStr) {
   if (!dateStr) return null;
@@ -69,26 +74,23 @@ export default function TemplateDetailModal({ template, onClose, onSave, onStart
         <p className="px-5 pt-3 pb-1 text-sm text-muted-foreground">{lastPerformed}</p>
 
         <div className="px-5 py-3 space-y-3 overflow-y-auto flex-1">
-          {template.exerciseList?.map((exercise, idx) => {
-            const allEntries = exercise.history || [];
-            const isBodyweight = allEntries.length > 0 && allEntries.every(h => {
-              const kg = typeof h === 'object' ? (h.kg ?? 0) : (h ?? 0);
-              return kg === 0 || kg == null;
-            });
-            return (
-              <div key={idx} className="flex flex-col gap-1">
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-foreground text-sm leading-snug">{exercise.sets} × {exercise.name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
-                  </div>
-                </div>
-                {exercise.history && exercise.history.length > 0 && (
-                  <ProgressGraph history={exercise.history} animKey={0} animDir="add" isBodyweight={isBodyweight} height={80} />
-                )}
+          {template.exerciseList?.map((exercise, idx) => (
+            <div key={idx} className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-foreground text-sm leading-snug">{exercise.sets} × {exercise.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
               </div>
-            );
-          })}
+              {exercise.history && exercise.history.length > 0 && (
+                <div className="w-16 h-8 flex-shrink-0">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={exercise.history.slice(-3).map(h => ({ v: typeof h === 'object' ? h.kg : h }))}>
+                      <Line type="monotone" dataKey="v" stroke="#3b82f6" strokeWidth={2} dot={<HollowDot />} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
         <div className="px-5 py-5">
