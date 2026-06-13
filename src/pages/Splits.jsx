@@ -83,6 +83,27 @@ const EXAMPLE_SPLITS_DATA = {
       },
     ],
   },
+  'full-body': {
+    name: 'Full Body',
+    label: 'Full Body',
+    workouts: [
+      {
+        name: 'Full Body Workout',
+        exercises: [
+          { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
+          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
+          { name: 'Barbell Row', muscle: 'Back', sets: 3 },
+          { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 3 },
+          { name: 'Romanian Deadlift (Barbell)', muscle: 'Legs', sets: 3 },
+          { name: 'Pull Up', muscle: 'Back', sets: 3 },
+          { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 3 },
+          { name: 'Bicep Curl (Dumbbell)', muscle: 'Arms', sets: 3 },
+          { name: 'Tricep Pushdown (Cable)', muscle: 'Arms', sets: 3 },
+          { name: 'Plank', muscle: 'Core', sets: 3 },
+        ],
+      },
+    ],
+  },
 };
 
 export default function Splits() {
