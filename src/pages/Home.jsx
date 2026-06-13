@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, MoreVertical, UserCircle } from 'lucide-react';
+import { MoreVertical, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
@@ -129,13 +129,6 @@ export default function Home() {
                 <h2 className="text-xl font-extrabold text-foreground tracking-tight">{currentSplitName}</h2>
               )}
             </div>
-            <button
-              onClick={() => navigate('/template/new')}
-              className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Template
-            </button>
           </div>
 
           {currentSplit.length > 0 ? (
