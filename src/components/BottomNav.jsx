@@ -18,19 +18,19 @@ export default function BottomNav() {
             <Link
               key={path}
               to={path}
-              className="relative flex items-center gap-2 px-5 py-2 rounded-full transition-all duration-300 active:scale-95"
+              className="relative flex items-center gap-2 px-5 py-2 rounded-full transition-all duration-150 active:scale-95"
             >
               {active && (
                                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400 shadow-[0_0_12px_rgba(59,130,246,0.5)]" />
                               )}
               <Icon
-                className={`w-4 h-4 relative z-10 transition-colors duration-200 ${
+                className={`w-4 h-4 relative z-10 transition-colors duration-150 ${
                   active ? 'text-white' : 'text-muted-foreground'
                 }`}
                 strokeWidth={active ? 2.5 : 1.8}
               />
               <span
-                className={`text-xs font-semibold relative z-10 transition-colors duration-200 ${
+                className={`text-xs font-semibold relative z-10 transition-colors duration-150 ${
                   active ? 'text-white' : 'text-muted-foreground'
                 }`}
               >

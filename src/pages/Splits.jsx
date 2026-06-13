@@ -201,7 +201,7 @@ export default function Splits() {
         <div className="flex bg-muted rounded-xl p-1 gap-1">
           <button
             onClick={() => setActiveTab('mine')}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+            className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
               activeTab === 'mine'
                 ? 'bg-card text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
@@ -211,7 +211,7 @@ export default function Splits() {
           </button>
           <button
             onClick={() => setActiveTab('examples')}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+            className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
               activeTab === 'examples'
                 ? 'bg-card text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
@@ -240,11 +240,11 @@ export default function Splits() {
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
               <div
                 key={key}
-                className="relative bg-card border border-border/60 rounded-2xl p-5 shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all duration-300 cursor-pointer overflow-hidden group"
+                className="relative bg-card border border-border/60 rounded-2xl p-5 shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all duration-150 cursor-pointer overflow-hidden group"
                 onClick={() => setSelectedSplit(key)}
               >
                 {/* Subtle gradient accent */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/40 via-blue-400/30 to-cyan-400/20" />
 
                 <div className="flex items-start justify-between">

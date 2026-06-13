@@ -117,8 +117,8 @@
   to   { transform: translateX(-30%); opacity: 0; }
 }
 .route-enter {
-  animation: slideInRight 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: slideInRight 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 .route-exit {
-  animation: slideOutLeft 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: slideOutLeft 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
