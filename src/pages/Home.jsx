@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
-import TemplateDetailModal from '../components/TemplateDetailModal';
 import ProfileButton from '../components/ProfileButton';
 
 const relativeTime = (dateStr) => {
@@ -28,7 +27,6 @@ export default function Home() {
   const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
   const menuRef = useRef({});
 
@@ -150,10 +148,10 @@ export default function Home() {
                     <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
                   </button>
 
-                  <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
+                  <div onClick={() => navigate(`/template/${template.id}`)} className="cursor-pointer">
                     <h4 className="font-bold text-foreground pr-8">{template.name}</h4>
                   </div>
-                  <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
+                  <div onClick={() => navigate(`/template/${template.id}`)} className="cursor-pointer">
                     <p className="text-sm text-muted-foreground my-3 line-clamp-2">{template.exercises}</p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       ⏱ {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
@@ -196,17 +194,7 @@ export default function Home() {
         </div>
       </div>
 
-      {selectedTemplate && (
-        <TemplateDetailModal
-          template={selectedTemplate}
-          onClose={() => setSelectedTemplate(null)}
-          onSave={(updated) => {
-            setTemplates(prev => prev.map(t => t.id === updated.id ? updated : t));
-            setSelectedTemplate(updated);
-          }}
-          onStartWorkout={(id) => navigate(`/active-workout/${id}`)}
-        />
-      )}
+
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -11,9 +11,32 @@ import Home from './pages/Home';
 import Splits from './pages/Splits';
 import NewTemplate from './pages/NewTemplate';
 import ActiveWorkout from './pages/ActiveWorkout';
+import TemplateDetail from './pages/TemplateDetail';
+import SplitDetail from './pages/SplitDetail';
 import BottomNav from './components/BottomNav';
 
 const TABS = ['/', '/splits'];
+
+const pageVariants = {
+  initial: { x: '100%', opacity: 0 },
+  animate: { x: 0, opacity: 1 },
+  exit: { x: '-30%', opacity: 0 },
+};
+
+const transition = { duration: 0.25, ease: [0.33, 1, 0.68, 1] };
+
+const SlideIn = ({ children }) => (
+  <motion.div
+    className="w-full min-h-screen bg-background"
+    variants={pageVariants}
+    initial="initial"
+    animate="animate"
+    exit="exit"
+    transition={transition}
+  >
+    {children}
+  </motion.div>
+);
 
 const SwipeableTabs = () => {
   const location = useLocation();
@@ -69,17 +92,26 @@ const AnimatedRoutes = () => {
 
   return (
     <>
-      {isTabRoute ? (
+      {/* Always mount tabs to preserve scroll position — toggle visibility only */}
+      <div style={{ display: isTabRoute ? 'flex' : 'none' }} className="flex-1 flex-col">
         <SwipeableTabs />
-      ) : (
+      </div>
+
+      {/* Sub-page routes with slide-in transitions */}
+      {!isTabRoute && (
         <div className="w-full flex-1">
-          <Routes location={location}>
-            <Route path="/template/new" element={<NewTemplate />} />
-            <Route path="/active-workout/:id" element={<ActiveWorkout />} />
-            <Route path="*" element={<PageNotFound />} />
-          </Routes>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route path="/template/new" element={<SlideIn><NewTemplate /></SlideIn>} />
+              <Route path="/template/:id" element={<SlideIn><TemplateDetail /></SlideIn>} />
+              <Route path="/split/:key" element={<SlideIn><SplitDetail /></SlideIn>} />
+              <Route path="/active-workout/:id" element={<SlideIn><ActiveWorkout /></SlideIn>} />
+              <Route path="*" element={<SlideIn><PageNotFound /></SlideIn>} />
+            </Routes>
+          </AnimatePresence>
         </div>
       )}
+
       <BottomNav />
     </>
   );

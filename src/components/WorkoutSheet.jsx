@@ -262,7 +262,7 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
         </div>
         {/* Swipeable row */}
         <div
-          className={`grid grid-cols-[40px_1fr_80px_80px_40px] items-center gap-1 py-1.5 px-1 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
+          className={`grid grid-cols-[40px_1fr_80px_80px_44px] items-center gap-1 py-1.5 px-1 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
           style={{ transform: `translateX(${swipeX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease' }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -287,9 +287,9 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
           />
           <button
             onClick={handleToggle}
-            className={`w-8 h-8 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-400 text-white' : 'bg-gray-200 text-gray-400'}`}
+            className={`w-11 h-11 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-400 text-white' : 'bg-gray-200 text-gray-400'}`}
           >
-            <Check className="w-4 h-4" />
+            <Check className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -345,7 +345,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
       <div className="flex items-center justify-between mb-1 relative">
         <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing" {...dragHandleProps}>{exercise.name}</h3>
         <div className="flex items-center gap-3 relative">
-          <button onClick={() => setShowMenu(m => !m)} className="p-1 rounded-lg hover:bg-gray-100 transition">
+          <button onClick={() => setShowMenu(m => !m)} className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-gray-100 transition">
             <MoreHorizontal className="w-4 h-4 text-gray-400" />
           </button>
           {showMenu && (
@@ -421,7 +421,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
         />
       )}
       <ProgressGraph history={graphHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={isBodyweight} />
-      <div className="grid grid-cols-[40px_1fr_80px_80px_40px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
+      <div className="grid grid-cols-[40px_1fr_80px_80px_44px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
         <span className="text-center">kg</span>
@@ -579,16 +579,16 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
 
           {/* Header */}
           <div className="flex items-center justify-between px-4 pt-4 pb-1 flex-shrink-0">
-            <button onClick={onDone} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
-              <X className="w-4 h-4 text-gray-700" />
+            <button onClick={onDone} className="w-11 h-11 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
+              <X className="w-5 h-5 text-gray-700" />
             </button>
             <div className="flex items-end gap-1">
               <Star size={22} delay={0} />
               <Star size={30} delay={120} />
               <Star size={22} delay={240} />
             </div>
-            <button onClick={handleShare} disabled={sharing} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
-              <Share className="w-4 h-4 text-gray-700" />
+            <button onClick={handleShare} disabled={sharing} className="w-11 h-11 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
+              <Share className="w-5 h-5 text-gray-700" />
             </button>
           </div>
 
@@ -923,7 +923,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                   onClick={() => setRestMinimized(false)}
                 />
               ) : (
-                <button onClick={() => setShowRestTimerPicker(true)} className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition">
+                <button onClick={() => setShowRestTimerPicker(true)} className="w-11 h-11 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition">
                   <History className="w-5 h-5 text-gray-600" />
                 </button>
               )}

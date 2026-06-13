@@ -5,181 +5,14 @@ import ProfileButton from '../components/ProfileButton';
 import SplitBuilder from '../components/SplitBuilder';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import SplitDetailModal from '../components/SplitDetailModal';
+import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 
-const EXAMPLE_SPLITS_DATA = {
-  'upper-lower': {
-    name: 'Upper-Lower',
-    label: 'Upper • Lower',
-    workouts: [
-      {
-        name: 'Upper Body Workout',
-        exercises: [
-          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
-          { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 3 },
-          { name: 'Pull Up', muscle: 'Back', sets: 3 },
-          { name: 'Barbell Row', muscle: 'Back', sets: 3 },
-          { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 3 },
-          { name: 'Bicep Curl (Dumbbell)', muscle: 'Arms', sets: 3 },
-          { name: 'Tricep Pushdown (Cable)', muscle: 'Arms', sets: 3 },
-          { name: 'Face Pull', muscle: 'Shoulders', sets: 3 },
-        ],
-      },
-      {
-        name: 'Lower Body Workout',
-        exercises: [
-          { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
-          { name: 'Deadlift (Barbell)', muscle: 'Back', sets: 3 },
-          { name: 'Leg Press', muscle: 'Legs', sets: 3 },
-          { name: 'Leg Curl (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Leg Extension (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Calf Raise (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Crunch', muscle: 'Core', sets: 3 },
-          { name: 'Plank', muscle: 'Core', sets: 3 },
-        ],
-      },
-    ],
-  },
-  'push-pull-legs': {
-    name: 'Push-Pull-Legs',
-    label: 'Push • Pull • Legs',
-    workouts: [
-      {
-        name: 'Push Workout',
-        exercises: [
-          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
-          { name: 'Incline Bench Press (Dumbbell)', muscle: 'Chest', sets: 3 },
-          { name: 'Dumbbell Fly', muscle: 'Chest', sets: 3 },
-          { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 3 },
-          { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 3 },
-          { name: 'Tricep Pushdown (Cable)', muscle: 'Arms', sets: 3 },
-          { name: 'Skull Crusher', muscle: 'Arms', sets: 3 },
-        ],
-      },
-      {
-        name: 'Pull Workout',
-        exercises: [
-          { name: 'Deadlift (Barbell)', muscle: 'Back', sets: 4 },
-          { name: 'Pull Up', muscle: 'Back', sets: 3 },
-          { name: 'Barbell Row', muscle: 'Back', sets: 3 },
-          { name: 'Seated Row (Machine)', muscle: 'Back', sets: 3 },
-          { name: 'Face Pull', muscle: 'Shoulders', sets: 3 },
-          { name: 'Bicep Curl (Dumbbell)', muscle: 'Arms', sets: 3 },
-          { name: 'Hammer Curl', muscle: 'Arms', sets: 3 },
-        ],
-      },
-      {
-        name: 'Legs Workout',
-        exercises: [
-          { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
-          { name: 'Romanian Deadlift (Barbell)', muscle: 'Legs', sets: 3 },
-          { name: 'Leg Press', muscle: 'Legs', sets: 3 },
-          { name: 'Leg Curl (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Leg Extension (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Calf Raise (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Crunch', muscle: 'Core', sets: 3 },
-          { name: 'Plank', muscle: 'Core', sets: 3 },
-        ],
-      },
-    ],
-  },
-  'full-body': {
-    name: 'Full Body',
-    label: 'Full Body',
-    workouts: [
-      {
-        name: 'Full Body Workout',
-        exercises: [
-          { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
-          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
-          { name: 'Barbell Row', muscle: 'Back', sets: 3 },
-          { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 3 },
-          { name: 'Romanian Deadlift (Barbell)', muscle: 'Legs', sets: 3 },
-          { name: 'Pull Up', muscle: 'Back', sets: 3 },
-          { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 3 },
-          { name: 'Bicep Curl (Dumbbell)', muscle: 'Arms', sets: 3 },
-          { name: 'Tricep Pushdown (Cable)', muscle: 'Arms', sets: 3 },
-          { name: 'Plank', muscle: 'Core', sets: 3 },
-        ],
-      },
-    ],
-  },
-  'ul-ppl': {
-    name: 'U L P P L',
-    label: 'Upper • Lower • Push • Pull • Legs',
-    workouts: [
-      {
-        name: 'Upper Body Workout',
-        exercises: [
-          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
-          { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 3 },
-          { name: 'Pull Up', muscle: 'Back', sets: 3 },
-          { name: 'Barbell Row', muscle: 'Back', sets: 3 },
-          { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 3 },
-          { name: 'Bicep Curl (Dumbbell)', muscle: 'Arms', sets: 3 },
-          { name: 'Tricep Pushdown (Cable)', muscle: 'Arms', sets: 3 },
-          { name: 'Face Pull', muscle: 'Shoulders', sets: 3 },
-        ],
-      },
-      {
-        name: 'Lower Body Workout',
-        exercises: [
-          { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
-          { name: 'Deadlift (Barbell)', muscle: 'Back', sets: 3 },
-          { name: 'Leg Press', muscle: 'Legs', sets: 3 },
-          { name: 'Leg Curl (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Leg Extension (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Calf Raise (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Crunch', muscle: 'Core', sets: 3 },
-          { name: 'Plank', muscle: 'Core', sets: 3 },
-        ],
-      },
-      {
-        name: 'Push Workout',
-        exercises: [
-          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
-          { name: 'Incline Bench Press (Dumbbell)', muscle: 'Chest', sets: 3 },
-          { name: 'Dumbbell Fly', muscle: 'Chest', sets: 3 },
-          { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 3 },
-          { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 3 },
-          { name: 'Tricep Pushdown (Cable)', muscle: 'Arms', sets: 3 },
-          { name: 'Skull Crusher', muscle: 'Arms', sets: 3 },
-        ],
-      },
-      {
-        name: 'Pull Workout',
-        exercises: [
-          { name: 'Deadlift (Barbell)', muscle: 'Back', sets: 4 },
-          { name: 'Pull Up', muscle: 'Back', sets: 3 },
-          { name: 'Barbell Row', muscle: 'Back', sets: 3 },
-          { name: 'Seated Row (Machine)', muscle: 'Back', sets: 3 },
-          { name: 'Face Pull', muscle: 'Shoulders', sets: 3 },
-          { name: 'Bicep Curl (Dumbbell)', muscle: 'Arms', sets: 3 },
-          { name: 'Hammer Curl', muscle: 'Arms', sets: 3 },
-        ],
-      },
-      {
-        name: 'Legs Workout',
-        exercises: [
-          { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
-          { name: 'Romanian Deadlift (Barbell)', muscle: 'Legs', sets: 3 },
-          { name: 'Leg Press', muscle: 'Legs', sets: 3 },
-          { name: 'Leg Curl (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Leg Extension (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Calf Raise (Machine)', muscle: 'Legs', sets: 3 },
-          { name: 'Crunch', muscle: 'Core', sets: 3 },
-          { name: 'Plank', muscle: 'Core', sets: 3 },
-        ],
-      },
-    ],
-  },
-};
+
 
 export default function Splits() {
   const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSplit, setSelectedSplit] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
   const [swapping, setSwapping] = useState(false);
   const [showBuilder, setShowBuilder] = useState(false);
@@ -339,7 +172,7 @@ export default function Splits() {
               <div
                 key={key}
                 className="relative bg-card border border-border/50 rounded-2xl p-5 shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group ring-1 ring-black/5 dark:ring-white/5"
-                onClick={() => setSelectedSplit(key)}
+                onClick={() => navigate(`/split/${key}`)}
               >
 
                 <div className="flex items-start justify-between">
@@ -414,13 +247,7 @@ export default function Splits() {
         />
       )}
 
-      {/* Split detail modal */}
-      {selectedSplit && (
-        <SplitDetailModal
-          splitKey={selectedSplit}
-          onClose={() => setSelectedSplit(null)}
-        />
-      )}
+
     </div>
   );
 }
