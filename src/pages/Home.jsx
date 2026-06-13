@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Plus, MoreVertical, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -110,6 +111,20 @@ export default function Home() {
   const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
   const [selectedSplit, setSelectedSplit] = useState(null);
   const [exampleMenuOpen, setExampleMenuOpen] = useState(null);
+  const exampleMenuRef = useRef({});
+
+  useEffect(() => {
+    if (!exampleMenuOpen) return;
+    const close = (e) => {
+      if (exampleMenuRef.current[exampleMenuOpen]?.contains(e.target)) return;
+      setExampleMenuOpen(null);
+    };
+    const timer = setTimeout(() => document.addEventListener('click', close), 0);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('click', close);
+    };
+  }, [exampleMenuOpen]);
 
   const handleToggleDark = () => {
     const next = !darkMode;
@@ -313,13 +328,14 @@ export default function Home() {
         <h3 className="font-semibold text-foreground mb-4">Example Splits</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
-            <div key={key} className="relative bg-card border border-border rounded-xl p-5 shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200">
+            <div key={key} className="bg-card border border-border rounded-xl p-5 shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 cursor-pointer" onClick={() => setSelectedSplit(key)}>
                   <h4 className="font-bold text-foreground">{split.name}</h4>
                   <p className="text-sm text-muted-foreground mt-0.5">{split.workouts.length} workouts — {split.label}</p>
                 </div>
                 <button
+                  ref={el => exampleMenuRef.current[key] = el}
                   onClick={e => { e.stopPropagation(); setExampleMenuOpen(exampleMenuOpen === key ? null : key); }}
                   className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 transition flex-shrink-0 select-none -mt-1 -mr-1"
                 >
@@ -333,23 +349,35 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-              {exampleMenuOpen === key && (
-                <>
-                  <div className="fixed inset-0 z-10" onClick={() => setExampleMenuOpen(null)} />
-                  <div className="absolute top-10 right-3 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[200px]">
-                    <button
-                      onClick={() => handleMakeCurrentSplit(key)}
-                      className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-blue-50 transition"
-                    >
-                      Make this my current split
-                    </button>
-                  </div>
-                </>
-              )}
             </div>
           ))}
         </div>
       </div>
+
+      {/* Portal-rendered example split menu */}
+      {exampleMenuOpen && createPortal(
+        (() => {
+          const btn = exampleMenuRef.current[exampleMenuOpen];
+          const rect = btn?.getBoundingClientRect();
+          const top = rect ? rect.bottom + 4 : 0;
+          const right = rect ? window.innerWidth - rect.right : 0;
+          return (
+            <div
+              onClick={e => e.stopPropagation()}
+              className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[200px]"
+              style={{ top: `${top}px`, right: `${right}px`, zIndex: 100 }}
+            >
+              <button
+                onClick={() => handleMakeCurrentSplit(exampleMenuOpen)}
+                className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition rounded-xl"
+              >
+                Make this my current split
+              </button>
+            </div>
+          );
+        })(),
+        document.body
+      )}
 
       {showProfile && (
         <ProfileSheet
