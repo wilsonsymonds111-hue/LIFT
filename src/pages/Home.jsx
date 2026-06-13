@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { MoreHorizontal } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
@@ -25,6 +25,7 @@ const relativeTime = (dateStr) => {
 
 export default function Home() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(null);
@@ -37,6 +38,10 @@ export default function Home() {
   }, []);
 
   useEffect(() => { loadTemplates(); }, [loadTemplates]);
+  // Re-fetch when navigating back to this tab (e.g., after changing split on Splits tab)
+  useEffect(() => {
+    if (location.pathname === '/') loadTemplates();
+  }, [location.pathname, loadTemplates]);
 
   // Close menu on outside click
   useEffect(() => {
