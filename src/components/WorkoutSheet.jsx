@@ -963,7 +963,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                 Finish
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-6">
+            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-24">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{template.name}</h1>
                 <MoreHorizontal className="w-5 h-5 text-blue-400" />
