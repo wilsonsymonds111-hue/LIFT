@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -13,19 +14,40 @@ import ActiveWorkout from './pages/ActiveWorkout';
 import BottomNav from './components/BottomNav';
 
 
+const pageVariants = {
+  initial: { x: '30%', opacity: 0 },
+  animate: { x: 0, opacity: 1 },
+  exit: { x: '-20%', opacity: 0 },
+};
+
+const pageTransition = { type: 'spring', stiffness: 330, damping: 34, mass: 0.35 };
+
 const AnimatedRoutes = () => {
   const location = useLocation();
   const noAnimation = location.pathname.startsWith('/active-workout/');
+
   return (
     <>
-      <div key={location.pathname} className={noAnimation ? '' : 'route-enter'}>
-        <Routes location={location}>
-          <Route path="/" element={<Home />} />
-          <Route path="/splits" element={<Splits />} />
-          <Route path="/template/new" element={<NewTemplate />} />
-          <Route path="/active-workout/:id" element={<ActiveWorkout />} />
-          <Route path="*" element={<PageNotFound />} />
-        </Routes>
+      <div className="relative overflow-hidden w-full flex-1">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={location.pathname}
+            variants={noAnimation ? undefined : pageVariants}
+            initial={noAnimation ? undefined : 'initial'}
+            animate={noAnimation ? undefined : 'animate'}
+            exit={noAnimation ? undefined : 'exit'}
+            transition={noAnimation ? undefined : pageTransition}
+            className="w-full"
+          >
+            <Routes location={location}>
+              <Route path="/" element={<Home />} />
+              <Route path="/splits" element={<Splits />} />
+              <Route path="/template/new" element={<NewTemplate />} />
+              <Route path="/active-workout/:id" element={<ActiveWorkout />} />
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
       </div>
       <BottomNav />
     </>
