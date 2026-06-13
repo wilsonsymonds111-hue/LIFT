@@ -15,12 +15,12 @@ import BottomNav from './components/BottomNav';
 
 
 const pageVariants = {
-  initial: { x: '30%', opacity: 0 },
-  animate: { x: 0, opacity: 1 },
-  exit: { x: '-20%', opacity: 0 },
+  initial: { x: '100%' },
+  animate: { x: 0 },
+  exit: { x: '-30%' },
 };
 
-const pageTransition = { type: 'spring', stiffness: 330, damping: 34, mass: 0.35 };
+const pageTransition = { duration: 0.13, ease: [0.25, 0.1, 0.25, 1] };
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -29,7 +29,7 @@ const AnimatedRoutes = () => {
   return (
     <>
       <div className="relative overflow-hidden w-full flex-1">
-        <AnimatePresence initial={false}>
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={location.pathname}
             variants={noAnimation ? undefined : pageVariants}
