@@ -7,22 +7,28 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
+import Splits from './pages/Splits';
 import NewTemplate from './pages/NewTemplate';
 import ActiveWorkout from './pages/ActiveWorkout';
+import BottomNav from './components/BottomNav';
 
 
 const AnimatedRoutes = () => {
   const location = useLocation();
   const noAnimation = location.pathname.startsWith('/active-workout/');
   return (
-    <div key={location.pathname} className={noAnimation ? '' : 'route-enter'}>
-      <Routes location={location}>
-        <Route path="/" element={<Home />} />
-        <Route path="/template/new" element={<NewTemplate />} />
-        <Route path="/active-workout/:id" element={<ActiveWorkout />} />
-        <Route path="*" element={<PageNotFound />} />
-      </Routes>
-    </div>
+    <>
+      <div key={location.pathname} className={noAnimation ? '' : 'route-enter'}>
+        <Routes location={location}>
+          <Route path="/" element={<Home />} />
+          <Route path="/splits" element={<Splits />} />
+          <Route path="/template/new" element={<NewTemplate />} />
+          <Route path="/active-workout/:id" element={<ActiveWorkout />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </div>
+      <BottomNav />
+    </>
   );
 };
 
