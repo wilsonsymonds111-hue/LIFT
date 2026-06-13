@@ -1,6 +1,6 @@
 export const EXAMPLE_SPLITS_DATA = {
   'upper-lower': {
-    name: 'Upper-Lower Split',
+    name: 'Upper-Lower',
     description: 'Alternate between upper and lower body days',
     label: 'Upper • Lower',
     workouts: [
@@ -35,7 +35,7 @@ export const EXAMPLE_SPLITS_DATA = {
     ],
   },
   'push-pull-legs': {
-    name: 'Push-Pull-Legs Split',
+    name: 'Push-Pull-Legs',
     description: 'Push day, pull day, legs day — 3-day rotation',
     label: 'Push • Pull • Legs',
     workouts: [
@@ -85,7 +85,7 @@ export const EXAMPLE_SPLITS_DATA = {
     ],
   },
   'full-body': {
-    name: 'Full Body Split',
+    name: 'Full Body',
     description: 'Train every muscle group in one session',
     label: 'Full Body',
     workouts: [
@@ -109,7 +109,7 @@ export const EXAMPLE_SPLITS_DATA = {
     ],
   },
   'ul-ppl': {
-    name: 'U L P P L Split',
+    name: 'U L P P L',
     description: 'Upper-Lower then Push-Pull-Legs — 5-day rotation',
     label: 'Upper • Lower • Push • Pull • Legs',
     workouts: [
