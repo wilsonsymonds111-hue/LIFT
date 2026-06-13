@@ -288,7 +288,10 @@ export default function Home() {
 
       {/* ==================== CURRENT SPLIT (Spotlight) ==================== */}
       <div className="relative px-4 py-2">
-        <div className="absolute -inset-8 bg-blue-500/5 rounded-[3rem] blur-3xl pointer-events-none" />
+        {/* Multi-layered glow for depth */}
+        <div className="absolute -inset-12 bg-gradient-to-br from-blue-500/10 via-blue-400/6 to-cyan-400/4 rounded-[4rem] blur-3xl pointer-events-none" />
+        <div className="absolute -inset-4 bg-blue-400/8 rounded-[2.5rem] blur-2xl pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-cyan-400/5 rounded-[2rem] blur-xl pointer-events-none" />
 
         <div className="relative" ref={currentSplitSectionRef}>
           <div className="flex items-start justify-between mb-4">
@@ -349,7 +352,7 @@ export default function Home() {
                   {currentSplit.map((template) => (
                     <div
                       key={template.id}
-                      className="relative bg-card border border-blue-500/20 rounded-lg p-4 shadow-lg shadow-blue-500/5"
+                      className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10"
                     >
                       <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
                         <h4 className="font-bold text-foreground flex-1 cursor-pointer">{template.name}</h4>
