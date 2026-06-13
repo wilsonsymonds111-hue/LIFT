@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { UserCircle, MoreHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -181,7 +182,7 @@ export default function Home() {
                   </div>
 
                   {/* Dropdown menu */}
-                  {menuOpen === template.id && (
+                  {menuOpen === template.id && createPortal(
                     (() => {
                       const btn = menuRef.current[template.id];
                       const rect = btn?.getBoundingClientRect();
@@ -190,8 +191,8 @@ export default function Home() {
                       return (
                         <div
                           onClick={e => e.stopPropagation()}
-                          className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[220px] z-[100]"
-                          style={{ top: `${top}px`, right: `${right}px` }}
+                          className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[220px]"
+                          style={{ top: `${top}px`, right: `${right}px`, zIndex: 100 }}
                         >
                           <button
                             onClick={() => handleRemoveFromSplit(template)}
@@ -201,7 +202,8 @@ export default function Home() {
                           </button>
                         </div>
                       );
-                    })()
+                    })(),
+                    document.body
                   )}
                 </div>
               ))}
