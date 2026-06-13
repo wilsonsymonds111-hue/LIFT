@@ -9,7 +9,7 @@ const EXAMPLE_SPLITS = {
     description: 'Alternate between upper and lower body days',
     workouts: [
       {
-        name: 'Upper Body',
+        name: 'Upper Body Workout',
         emoji: '💪',
         exercises: [
           { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
@@ -23,7 +23,7 @@ const EXAMPLE_SPLITS = {
         ],
       },
       {
-        name: 'Lower Body',
+        name: 'Lower Body Workout',
         emoji: '🦵',
         exercises: [
           { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
@@ -43,7 +43,7 @@ const EXAMPLE_SPLITS = {
     description: 'Push day, pull day, legs day — 3-day rotation',
     workouts: [
       {
-        name: 'Push',
+        name: 'Push Workout',
         emoji: '🏋️',
         subtitle: 'Chest + Triceps',
         exercises: [
@@ -57,7 +57,7 @@ const EXAMPLE_SPLITS = {
         ],
       },
       {
-        name: 'Pull',
+        name: 'Pull Workout',
         emoji: '🔙',
         subtitle: 'Back + Biceps',
         exercises: [
@@ -71,7 +71,7 @@ const EXAMPLE_SPLITS = {
         ],
       },
       {
-        name: 'Legs',
+        name: 'Legs Workout',
         emoji: '🦵',
         subtitle: 'Legs + Abs',
         exercises: [

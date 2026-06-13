@@ -11,7 +11,7 @@ const EXAMPLE_SPLITS_DATA = {
     label: 'Upper • Lower',
     workouts: [
       {
-        name: 'Upper Body',
+        name: 'Upper Body Workout',
         exercises: [
           { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
           { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 3 },
@@ -24,7 +24,7 @@ const EXAMPLE_SPLITS_DATA = {
         ],
       },
       {
-        name: 'Lower Body',
+        name: 'Lower Body Workout',
         exercises: [
           { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
           { name: 'Deadlift (Barbell)', muscle: 'Back', sets: 3 },
@@ -43,7 +43,7 @@ const EXAMPLE_SPLITS_DATA = {
     label: 'Push • Pull • Legs',
     workouts: [
       {
-        name: 'Push',
+        name: 'Push Workout',
         exercises: [
           { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
           { name: 'Incline Bench Press (Dumbbell)', muscle: 'Chest', sets: 3 },
@@ -55,7 +55,7 @@ const EXAMPLE_SPLITS_DATA = {
         ],
       },
       {
-        name: 'Pull',
+        name: 'Pull Workout',
         exercises: [
           { name: 'Deadlift (Barbell)', muscle: 'Back', sets: 4 },
           { name: 'Pull Up', muscle: 'Back', sets: 3 },
@@ -67,7 +67,7 @@ const EXAMPLE_SPLITS_DATA = {
         ],
       },
       {
-        name: 'Legs',
+        name: 'Legs Workout',
         exercises: [
           { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
           { name: 'Romanian Deadlift (Barbell)', muscle: 'Legs', sets: 3 },
