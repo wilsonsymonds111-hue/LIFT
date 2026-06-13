@@ -174,6 +174,10 @@ export default function Home() {
 
   const mySplitGroups = Object.values(splitGroups);
 
+  const currentSplitName = currentSplit.length > 0
+    ? currentSplit.map(t => t.name).join(' / ').toUpperCase()
+    : '';
+
   const handleMakeCurrentSplit = async (splitKey) => {
     setExampleMenuOpen(null);
     const splitData = EXAMPLE_SPLITS_DATA[splitKey];
@@ -185,78 +189,43 @@ export default function Home() {
     const gridRect = gridEl?.getBoundingClientRect();
 
     oldSplitRef.current = [...currentSplit];
-    const workoutCount = splitData.workouts.length;
     const newGroupId = Date.now().toString();
+    const oldGroupId = Date.now().toString() + '_old';
 
     if (sourceRect && gridRect && currentSplit.length > 0) {
-      // --- ANIMATED SWAP ---
+      // Start old-cards-shaking animation
       setIsSwapping(true);
 
-      // Calculate final grid positions for each workout card
-      const columns = window.innerWidth >= 768 ? 2 : 1;
-      const cardWidth = (gridRect.width - (columns - 1) * 16) / columns;
-      const cardHeight = 140;
-      const headerOffsetY = 52; // accounts for "Current Split" header + mb-4
-
-      const stampPositions = splitData.workouts.map((_, i) => {
-        const col = i % columns;
-        const row = Math.floor(i / columns);
-        return {
-          x: gridRect.left + col * (cardWidth + 16),
-          y: gridRect.top + headerOffsetY + row * (cardHeight + 16),
-          width: cardWidth,
-          height: cardHeight,
-        };
-      });
-
+      // Show the flying overlay — it manages its own stages internally
       setSwapOverlay({
-        stage: 'fly-up',
         sourceRect,
-        gridCenter: {
-          x: gridRect.left + gridRect.width / 2,
-          y: gridRect.top + gridRect.height / 2,
-        },
+        gridRect,
         splitData,
         splitKey,
-        stampPositions,
+        onComplete: async () => {
+          // After animation finishes: update DB and reload
+          const updates = currentSplit.map(t =>
+            base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+          );
+          await Promise.all(updates);
+
+          const newTemplates = splitData.workouts.map((w, i) => ({
+            name: w.name,
+            exercises: w.exercises.map(e => e.name).join(', '),
+            exerciseList: w.exercises.map(e => ({ ...e, history: [] })),
+            lastPerformed: null,
+            sort_order: i,
+            isActiveSplit: true,
+            splitGroup: newGroupId,
+          }));
+          await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+          await loadTemplates();
+          setSwapOverlay(null);
+          setIsSwapping(false);
+        },
       });
-
-      // Stage 1 → 2: card arrives and breaks apart
-      await new Promise(r => setTimeout(r, 550));
-      setSwapOverlay(prev => prev && { ...prev, stage: 'break' });
-
-      // During break → stamp, update DB
-      const oldGroupId = Date.now().toString() + '_old';
-      const updates = currentSplit.map(t =>
-        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
-      );
-      await Promise.all(updates);
-
-      // Stage 2 → 3: mini cards fly to stamp positions
-      await new Promise(r => setTimeout(r, 350));
-      setSwapOverlay(prev => prev && { ...prev, stage: 'stamp' });
-
-      // Create new templates
-      const newTemplates = splitData.workouts.map((w, i) => ({
-        name: w.name,
-        exercises: w.exercises.map(e => e.name).join(', '),
-        exerciseList: w.exercises.map(e => ({ ...e, history: [] })),
-        lastPerformed: null,
-        sort_order: i,
-        isActiveSplit: true,
-        splitGroup: newGroupId,
-      }));
-      await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
-
-      // Let stamp animation play
-      await new Promise(r => setTimeout(r, 500));
-
-      await loadTemplates();
-      setSwapOverlay(null);
-      setIsSwapping(false);
     } else {
-      // --- No old cards to animate out, or no rects captured: simple swap ---
-      const oldGroupId = Date.now().toString() + '_old';
+      // Simple swap without animation
       const updates = currentSplit.map(t =>
         base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
       );
@@ -322,14 +291,19 @@ export default function Home() {
         <div className="absolute -inset-8 bg-blue-500/5 rounded-[3rem] blur-3xl pointer-events-none" />
 
         <div className="relative" ref={currentSplitSectionRef}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <motion.div
-                animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
-                transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-                className="w-2 h-2 rounded-full bg-blue-500"
-              />
-              <h3 className="font-semibold text-foreground">Current Split ({currentSplit.length})</h3>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <motion.div
+                  animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
+                  transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+                  className="w-2 h-2 rounded-full bg-blue-500"
+                />
+                <h3 className="font-semibold text-foreground text-sm">Current Split</h3>
+              </div>
+              {currentSplitName && (
+                <h2 className="text-xl font-extrabold text-foreground tracking-tight">{currentSplitName}</h2>
+              )}
             </div>
             <button
               onClick={() => navigate('/template/new')}
@@ -549,48 +523,64 @@ export default function Home() {
 
 // ==================== Swap Animation Overlay Component ====================
 function SwapAnimationOverlay({ overlay }) {
-  const { stage, sourceRect, gridCenter, splitData, stampPositions } = overlay;
+  const { sourceRect, gridRect, splitData, onComplete } = overlay;
+  const [stage, setStage] = useState('fly-up');
   const workouts = splitData.workouts;
 
-  // Single card flying up (stages: fly-up, break)
-  const showFlyingCard = stage === 'fly-up' || stage === 'break';
-  // Mini cards bursting out (stages: break, stamp)
-  const showMiniCards = stage === 'break' || stage === 'stamp';
+  // Calculate destination center and deltas
+  const destCenterX = gridRect.left + gridRect.width / 2;
+  const destCenterY = gridRect.top + gridRect.height / 2;
+  const cardCenterX = sourceRect.left + sourceRect.width / 2;
+  const cardCenterY = sourceRect.top + sourceRect.height / 2;
+  const flyDeltaX = destCenterX - cardCenterX;
+  const flyDeltaY = destCenterY - cardCenterY;
+
+  // Grid positions for stamp phase
+  const columns = window.innerWidth >= 768 ? 2 : 1;
+  const gap = 16;
+  const headerH = 52;
+  const cellW = (gridRect.width - (columns - 1) * gap) / columns;
+  const cellH = 140;
+
+  // Auto-advance stages
+  useEffect(() => {
+    if (stage === 'fly-up') {
+      const t = setTimeout(() => setStage('break'), 550);
+      return () => clearTimeout(t);
+    }
+    if (stage === 'break') {
+      const t = setTimeout(() => setStage('stamp'), 350);
+      return () => clearTimeout(t);
+    }
+    if (stage === 'stamp') {
+      const t = setTimeout(() => onComplete?.(), 550);
+      return () => clearTimeout(t);
+    }
+  }, [stage, onComplete]);
 
   return (
     <div className="fixed inset-0 z-[200] pointer-events-none">
-      {/* Flying source card */}
-      {showFlyingCard && (
+      {/* Flying card — visible during fly-up and break */}
+      {(stage === 'fly-up' || stage === 'break') && (
         <motion.div
-          key="flying-card"
-          initial={{
-            position: 'absolute',
+          className="bg-card border-2 border-blue-400 rounded-2xl p-4 shadow-2xl absolute"
+          style={{
             left: sourceRect.left,
             top: sourceRect.top,
             width: sourceRect.width,
-            height: sourceRect.height,
-            opacity: 1,
-            scale: 1,
-            borderRadius: 16,
+            minHeight: sourceRect.height,
           }}
-          animate={stage === 'break' ? {
-            left: gridCenter.x - sourceRect.width / 2,
-            top: gridCenter.y - sourceRect.height / 2,
-            scale: 1.08,
-            opacity: 0,
-          } : {
-            left: gridCenter.x - sourceRect.width / 2,
-            top: gridCenter.y - sourceRect.height / 2,
-            scale: 1.02,
-            opacity: 0.85,
-          }}
+          initial={{ x: 0, y: 0, opacity: 0.6, scale: 1 }}
+          animate={
+            stage === 'break'
+              ? { x: flyDeltaX, y: flyDeltaY, opacity: 0, scale: 1.12 }
+              : { x: flyDeltaX, y: flyDeltaY, opacity: 0.9, scale: 1.02 }
+          }
           transition={{
-            left: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
-            top: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
-            scale: { duration: 0.5, ease: 'easeOut' },
-            opacity: stage === 'break' ? { duration: 0.25 } : { duration: 0.4 },
+            x: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+            y: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+            opacity: stage === 'break' ? { duration: 0.25 } : { duration: 0.3 },
           }}
-          className="bg-card border-2 border-blue-400 rounded-2xl p-4 shadow-2xl"
         >
           <h4 className="font-bold text-foreground text-sm">{splitData.name}</h4>
           <p className="text-xs text-muted-foreground mt-1">{splitData.label}</p>
@@ -604,83 +594,70 @@ function SwapAnimationOverlay({ overlay }) {
         </motion.div>
       )}
 
-      {/* Mini workout cards breaking out + stamping */}
-      {showMiniCards && workouts.map((workout, i) => {
-        const target = stampPositions[i];
-        const burstAngle = (i / workouts.length) * Math.PI * 2 - Math.PI / 2;
-        const burstDistance = 80 + i * 20;
-        const burstX = gridCenter.x + Math.cos(burstAngle) * burstDistance - target.width / 2;
-        const burstY = gridCenter.y + Math.sin(burstAngle) * burstDistance - target.height / 2;
+      {/* Mini workout cards — visible during break and stamp */}
+      {(stage === 'break' || stage === 'stamp') &&
+        workouts.map((workout, i) => {
+          // Calculate where this card should land in the grid (viewport coords)
+          const col = i % columns;
+          const row = Math.floor(i / columns);
+          const stampX = gridRect.left + col * (cellW + gap);
+          const stampY = gridRect.top + headerH + row * (cellH + gap);
 
-        return (
-          <motion.div
-            key={`mini-${i}`}
-            initial={{
-              position: 'absolute',
-              left: gridCenter.x - 60,
-              top: gridCenter.y - 40,
-              width: 120,
-              height: 80,
-              opacity: 0,
-              scale: 0.4,
-              borderRadius: 12,
-            }}
-            animate={
-              stage === 'stamp'
-                ? {
-                    left: target.x,
-                    top: target.y,
-                    width: target.width,
-                    height: target.height,
-                    opacity: 1,
-                    scale: 1,
-                  }
-                : {
-                    left: burstX,
-                    top: burstY,
-                    width: target.width * 0.8,
-                    height: target.height * 0.8,
-                    opacity: 0.9,
-                    scale: 0.85,
-                  }
-            }
-            transition={
-              stage === 'stamp'
-                ? {
-                    left: { duration: 0.45, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] },
-                    top: { duration: 0.45, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] },
-                    scale: {
-                      duration: 0.55,
-                      delay: i * 0.08,
-                      type: 'spring',
-                      stiffness: 220,
-                      damping: 16,
-                    },
-                    opacity: { duration: 0.25, delay: i * 0.08 },
-                  }
-                : {
-                    duration: 0.35,
-                    delay: i * 0.06,
-                    ease: 'easeOut',
-                  }
-            }
-            className="bg-card border border-blue-500/30 rounded-xl p-3 shadow-xl flex flex-col justify-center"
-          >
-            <p className="font-extrabold text-foreground text-sm">{workout.name}</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">{workout.exercises.length} exercises</p>
-            <div className="flex flex-wrap gap-0.5 mt-1.5">
-              {workout.exercises.slice(0, 3).map((ex, j) => (
-                <span key={j} className="text-[9px] px-1 py-0.5 rounded-full bg-muted text-muted-foreground">
-                  {ex.name.split(' (')[0]}
-                </span>
-              ))}
-              {workout.exercises.length > 3 && (
-                <span className="text-[9px] text-muted-foreground">+{workout.exercises.length - 3}</span>
-              )}
-            </div>
-          </motion.div>
-        );
-      })}
+          // Burst position (spread outward from center)
+          const burstAngle = (i / workouts.length) * Math.PI * 2 - Math.PI / 2;
+          const burstR = 90 + i * 15;
+          const burstCX = destCenterX + Math.cos(burstAngle) * burstR;
+          const burstCY = destCenterY + Math.sin(burstAngle) * burstR;
+
+          // Deltas from center
+          const burstDX = burstCX - destCenterX;
+          const burstDY = burstCY - destCenterY;
+          const stampDX = stampX - destCenterX;
+          const stampDY = stampY - destCenterY;
+
+          return (
+            <motion.div
+              key={`mini-${i}`}
+              className="bg-card border border-blue-500/30 rounded-xl p-3 shadow-xl flex flex-col justify-center absolute"
+              style={{
+                left: destCenterX,
+                top: destCenterY,
+                width: cellW * 0.7,
+              }}
+              initial={{ x: -((cellW * 0.7) / 2), y: -(cellH / 2), opacity: 0, scale: 0.3 }}
+              animate={
+                stage === 'stamp'
+                  ? { x: stampDX, y: stampDY, opacity: 1, scale: 1 }
+                  : { x: burstDX - (cellW * 0.35), y: burstDY - (cellH * 0.4), opacity: 0.9, scale: 0.8 }
+              }
+              transition={
+                stage === 'stamp'
+                  ? {
+                      x: { duration: 0.45, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] },
+                      y: { duration: 0.45, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] },
+                      scale: { duration: 0.55, delay: i * 0.08, type: 'spring', stiffness: 200, damping: 16 },
+                      opacity: { duration: 0.2, delay: i * 0.08 },
+                    }
+                  : { duration: 0.35, delay: i * 0.05, ease: 'easeOut' }
+              }
+            >
+              <p className="font-extrabold text-foreground text-sm">{workout.name}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                {workout.exercises.length} exercises
+              </p>
+              <div className="flex flex-wrap gap-0.5 mt-1.5">
+                {workout.exercises.slice(0, 3).map((ex, j) => (
+                  <span key={j} className="text-[9px] px-1 py-0.5 rounded-full bg-muted text-muted-foreground">
+                    {ex.name.split(' (')[0]}
+                  </span>
+                ))}
+                {workout.exercises.length > 3 && (
+                  <span className="text-[9px] text-muted-foreground">+{workout.exercises.length - 3}</span>
+                )}
+              </div>
+            </motion.div>
+          );
+        })}
     </div>
   );
 }
