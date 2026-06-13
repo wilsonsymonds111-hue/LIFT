@@ -304,7 +304,7 @@ export default function SplitDetailModal({ splitKey, onClose }) {
         <button
           onClick={handleMakeCurrent}
           disabled={applying}
-          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3.5 rounded-xl text-sm transition disabled:opacity-60"
+          className="w-full border-2 border-orange-400 dark:border-orange-500 text-orange-500 dark:text-orange-400 font-bold py-3 rounded-xl text-sm transition hover:bg-orange-50 dark:hover:bg-orange-950/30 active:scale-[0.98] disabled:opacity-60"
         >
           {applying ? 'Applying...' : 'Make This My Current Split'}
         </button>
