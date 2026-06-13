@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { UserCircle, MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import TemplateDetailModal from '../components/TemplateDetailModal';
-import ProfileSheet from '../components/ProfileSheet';
+import ProfileButton from '../components/ProfileButton';
 
 const relativeTime = (dateStr) => {
   if (!dateStr) return null;
@@ -29,18 +29,8 @@ export default function Home() {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [showProfile, setShowProfile] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
-  const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
   const [menuOpen, setMenuOpen] = useState(null);
   const menuRef = useRef({});
-
-  const handleToggleDark = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    document.documentElement.classList.toggle('dark', next);
-    localStorage.setItem('darkMode', String(next));
-  };
 
   const loadTemplates = useCallback(async () => {
     const data = await base44.entities.WorkoutTemplate.list('sort_order', 100);
@@ -107,18 +97,7 @@ export default function Home() {
         <div>
           <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
         </div>
-        <button
-          onClick={() => setShowProfile(true)}
-          className="w-10 h-10 rounded-full overflow-hidden shadow-md active:scale-95 transition-transform flex-shrink-0 border-2 border-border"
-        >
-          {profilePhoto ? (
-            <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-primary">
-              <UserCircle className="w-5 h-5 text-primary-foreground" />
-            </div>
-          )}
-        </button>
+        <ProfileButton />
       </div>
 
       {/* Quick Start */}
@@ -216,16 +195,6 @@ export default function Home() {
           )}
         </div>
       </div>
-
-      {showProfile && (
-        <ProfileSheet
-          onClose={() => setShowProfile(false)}
-          darkMode={darkMode}
-          onToggleDark={handleToggleDark}
-          profilePhoto={profilePhoto}
-          onPhotoChange={setProfilePhoto}
-        />
-      )}
 
       {selectedTemplate && (
         <TemplateDetailModal

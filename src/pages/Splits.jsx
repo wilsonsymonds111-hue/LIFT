@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Dumbbell, Plus } from 'lucide-react';
+import ProfileButton from '../components/ProfileButton';
 import SplitBuilder from '../components/SplitBuilder';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -194,8 +195,9 @@ export default function Splits() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="px-4 pt-4 pb-3" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
+      <div className="px-4 pb-3 flex items-center justify-between" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
         <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workout Splits</h1>
+        <ProfileButton />
       </div>
 
       {/* Top Tabs */}
