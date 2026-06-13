@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Dumbbell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -193,9 +194,37 @@ const EXAMPLE_SPLITS = {
 
 export default function SplitDetailModal({ splitKey, onClose }) {
   const navigate = useNavigate();
+  const [applying, setApplying] = useState(false);
   const split = EXAMPLE_SPLITS[splitKey];
 
   if (!split) return null;
+
+  const handleMakeCurrent = async () => {
+    setApplying(true);
+    const newGroupId = Date.now().toString();
+    const oldGroupId = Date.now().toString() + '_old';
+    try {
+      const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+      const currentActive = allTemplates.filter(
+        t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
+      );
+      await Promise.all(currentActive.map(t =>
+        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+      ));
+      const newTemplates = split.workouts.map((w, i) => ({
+        name: w.name,
+        exercises: w.exercises.map(e => e.name).join(', '),
+        exerciseList: w.exercises.map(e => ({ ...e, history: [] })),
+        lastPerformed: null,
+        sort_order: i,
+        isActiveSplit: true,
+        splitGroup: newGroupId,
+      }));
+      await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+    } catch (_) {}
+    setApplying(false);
+    navigate('/');
+  };
 
   const handleStart = async (workout) => {
     const exerciseList = workout.exercises.map(e => ({ ...e, history: [] }));
@@ -271,6 +300,14 @@ export default function SplitDetailModal({ splitKey, onClose }) {
             </div>
           ))}
         </div>
+
+        <button
+          onClick={handleMakeCurrent}
+          disabled={applying}
+          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3.5 rounded-xl text-sm transition disabled:opacity-60"
+        >
+          {applying ? 'Applying...' : 'Make This My Current Split'}
+        </button>
       </div>
     </div>,
     document.body
