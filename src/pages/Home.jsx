@@ -165,9 +165,9 @@ export default function Home() {
             <img
               src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/8b15e8cde_image.png"
               alt="Upper-Lower Split"
-              className="w-full h-32 object-cover"
+              className="w-full h-20 object-cover"
             />
-            <div className="p-4">
+            <div className="px-4 py-2.5">
               <h4 className="font-bold text-foreground mb-1">Upper-Lower Split</h4>
               <p className="text-sm text-muted-foreground">Alternate between upper and lower body days</p>
               <div className="flex gap-1.5 mt-3">
