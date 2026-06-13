@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { UserCircle } from 'lucide-react';
+import { UserCircle, MoreHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
@@ -31,6 +31,8 @@ export default function Home() {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
+  const [menuOpen, setMenuOpen] = useState(null);
+  const menuRef = useRef({});
 
   const handleToggleDark = () => {
     const next = !darkMode;
@@ -47,11 +49,34 @@ export default function Home() {
 
   useEffect(() => { loadTemplates(); }, [loadTemplates]);
 
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e) => {
+      if (menuRef.current[menuOpen]?.contains(e.target)) return;
+      setMenuOpen(null);
+    };
+    const timer = setTimeout(() => document.addEventListener('click', close), 0);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('click', close);
+    };
+  }, [menuOpen]);
+
   const { pullY, refreshing } = usePullToRefresh(loadTemplates);
 
   const handleDeleteTemplate = async (id) => {
     setTemplates(prev => prev.filter(t => t.id !== id));
     await base44.entities.WorkoutTemplate.delete(id);
+  };
+
+  const handleRemoveFromSplit = async (template) => {
+    setMenuOpen(null);
+    setTemplates(prev => prev.filter(t => t.id !== template.id));
+    await base44.entities.WorkoutTemplate.update(template.id, {
+      isActiveSplit: false,
+      splitGroup: 'removed_' + Date.now(),
+    });
   };
 
   // --- Split categorization ---
@@ -134,18 +159,50 @@ export default function Home() {
               {currentSplit.map((template) => (
                 <div
                   key={template.id}
-                  className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
+                  className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
                 >
-                  <div className="mb-3" onClick={() => setSelectedTemplate(template)}>
-                    <h4 className="font-bold text-foreground cursor-pointer">{template.name}</h4>
+                  {/* Three-dot menu button */}
+                  <button
+                    ref={el => menuRef.current[template.id] = el}
+                    onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === template.id ? null : template.id); }}
+                    className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition z-10"
+                  >
+                    <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+                  </button>
+
+                  <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
+                    <h4 className="font-bold text-foreground pr-8">{template.name}</h4>
                   </div>
                   <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
+                    <p className="text-sm text-muted-foreground my-3 line-clamp-2">{template.exercises}</p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       ⏱ {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
                     </p>
                   </div>
 
+                  {/* Dropdown menu */}
+                  {menuOpen === template.id && (
+                    (() => {
+                      const btn = menuRef.current[template.id];
+                      const rect = btn?.getBoundingClientRect();
+                      const top = rect ? rect.bottom + 4 : 0;
+                      const right = rect ? window.innerWidth - rect.right : 0;
+                      return (
+                        <div
+                          onClick={e => e.stopPropagation()}
+                          className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[220px] z-[100]"
+                          style={{ top: `${top}px`, right: `${right}px` }}
+                        >
+                          <button
+                            onClick={() => handleRemoveFromSplit(template)}
+                            className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-muted transition rounded-xl"
+                          >
+                            Remove from current split
+                          </button>
+                        </div>
+                      );
+                    })()
+                  )}
                 </div>
               ))}
             </div>
