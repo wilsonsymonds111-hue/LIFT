@@ -106,13 +106,13 @@ export default function Splits() {
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
 
-      // Show success state briefly then navigate
+      // Show success state with time to appreciate it then navigate
       setSwapPhase('success');
       setTimeout(() => {
         setSwapping(false);
         setSwapPhase(null);
         navigate('/');
-      }, 900);
+      }, 2200);
     } catch (_) {
       setSwapping(false);
       setSwapPhase(null);
@@ -266,44 +266,136 @@ export default function Splits() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
             className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }}
+            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(16px)' }}
           >
             <motion.div
-              initial={{ scale: 0.85, opacity: 0, y: 20 }}
+              key={swapPhase}
+              initial={{ scale: 0.92, opacity: 0, y: 16 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: -10 }}
-              transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
-              className="bg-card rounded-3xl px-8 py-10 shadow-2xl flex flex-col items-center gap-5 max-w-[320px] w-[90%]"
+              exit={{ scale: 0.96, opacity: 0, y: -8 }}
+              transition={{ duration: 0.55, ease: [0.25, 0.6, 0.35, 1] }}
+              className="bg-card rounded-3xl px-8 py-10 shadow-2xl flex flex-col items-center gap-6 max-w-[340px] w-[90%] relative overflow-hidden"
             >
+              {/* Subtle glow ring on success */}
+              {swapPhase === 'success' && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: [0, 0.4, 0], scale: [0.8, 1.3, 1.8] }}
+                  transition={{ duration: 1.8, ease: 'easeOut', delay: 0.1 }}
+                  className="absolute inset-0 rounded-3xl bg-emerald-400/20 pointer-events-none"
+                />
+              )}
+
               {swapPhase === 'loading' ? (
                 <>
-                  {/* Animated ring spinner */}
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                    className="w-16 h-16 rounded-full border-[3px] border-blue-200 border-t-blue-500"
-                  />
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Applying split</p>
-                    <p className="text-xl font-extrabold text-foreground uppercase tracking-tight">{swappingSplitName}</p>
+                  {/* Pulsing ring spinner */}
+                  <div className="relative">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ repeat: Infinity, duration: 1.4, ease: 'linear' }}
+                      className="w-20 h-20 rounded-full border-[3px] border-blue-100 dark:border-blue-900/40 border-t-blue-500"
+                    />
+                    <motion.div
+                      animate={{ rotate: -360, scale: [1, 1.08, 0.92, 1] }}
+                      transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
+                      className="absolute inset-1 rounded-full border-[2px] border-blue-200/60 dark:border-blue-700/30"
+                    />
+                    <motion.div
+                      animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.6, 1, 0.6] }}
+                      transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <div className="w-3 h-3 rounded-full bg-blue-500" />
+                    </motion.div>
+                  </div>
+
+                  {/* Staggered text entrance */}
+                  <div className="text-center space-y-2">
+                    <motion.p
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.15 }}
+                      className="text-sm font-medium text-muted-foreground"
+                    >
+                      Applying split
+                    </motion.p>
+                    <motion.p
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.25 }}
+                      className="text-2xl font-extrabold text-foreground uppercase tracking-tight leading-tight"
+                    >
+                      {swappingSplitName}
+                    </motion.p>
+                  </div>
+
+                  {/* Progress dots */}
+                  <div className="flex items-center gap-2">
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.1, 0.8] }}
+                        transition={{ repeat: Infinity, duration: 1.2, delay: i * 0.3, ease: 'easeInOut' }}
+                        className="w-2 h-2 rounded-full bg-blue-400"
+                      />
+                    ))}
                   </div>
                 </>
               ) : (
                 <>
-                  {/* Success checkmark */}
-                  <motion.div
-                    initial={{ scale: 0, rotate: -90 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                    className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center"
-                  >
-                    <Check className="w-8 h-8 text-white" strokeWidth={3} />
-                  </motion.div>
-                  <div className="text-center">
-                    <p className="text-xl font-extrabold text-foreground uppercase tracking-tight">{swappingSplitName}</p>
-                    <p className="text-sm font-medium text-emerald-500 mt-1">Now your current split</p>
+                  {/* Success icon with ripple rings */}
+                  <div className="relative">
+                    {/* Outer ripple */}
+                    <motion.div
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: [1, 2.4], opacity: [0.6, 0] }}
+                      transition={{ duration: 1.2, ease: 'easeOut', delay: 0.15 }}
+                      className="absolute inset-0 rounded-full bg-emerald-400/30"
+                    />
+                    {/* Middle ripple */}
+                    <motion.div
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: [1, 1.8], opacity: [0.5, 0] }}
+                      transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+                      className="absolute inset-0 rounded-full bg-emerald-300/25"
+                    />
+                    {/* Checkmark circle */}
+                    <motion.div
+                      initial={{ scale: 0, rotate: -120 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 16, delay: 0.05 }}
+                      className="relative z-10 w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30"
+                    >
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: 0.35 }}
+                      >
+                        <Check className="w-10 h-10 text-white" strokeWidth={3} />
+                      </motion.div>
+                    </motion.div>
+                  </div>
+
+                  {/* Success text staggered */}
+                  <div className="text-center space-y-1.5">
+                    <motion.p
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.45, delay: 0.5 }}
+                      className="text-2xl font-extrabold text-foreground uppercase tracking-tight leading-tight"
+                    >
+                      {swappingSplitName}
+                    </motion.p>
+                    <motion.p
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: 0.65 }}
+                      className="text-sm font-semibold text-emerald-500"
+                    >
+                      Now your current split
+                    </motion.p>
                   </div>
                 </>
               )}
