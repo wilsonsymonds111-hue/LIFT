@@ -162,9 +162,6 @@ export default function Home() {
             onClick={() => setSelectedSplit('upper-lower')}
             className="bg-card border border-border rounded-xl p-5 text-left shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
           >
-            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-xl mb-3">
-              💪
-            </div>
             <h4 className="font-bold text-foreground mb-1">Upper-Lower Split</h4>
             <p className="text-sm text-muted-foreground">Alternate between upper and lower body days</p>
             <div className="flex gap-1.5 mt-3">
@@ -176,9 +173,6 @@ export default function Home() {
             onClick={() => setSelectedSplit('push-pull-legs')}
             className="bg-card border border-border rounded-xl p-5 text-left shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
           >
-            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-xl mb-3">
-              🏋️
-            </div>
             <h4 className="font-bold text-foreground mb-1">Push-Pull-Legs</h4>
             <p className="text-sm text-muted-foreground">Push day, pull day, legs day — 3-day rotation</p>
             <div className="flex gap-1.5 mt-3">
