@@ -352,7 +352,7 @@ export default function Home() {
                   {currentSplit.map((template) => (
                     <div
                       key={template.id}
-                      className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10"
+                      className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
                     >
                       <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
                         <h4 className="font-bold text-foreground flex-1 cursor-pointer">{template.name}</h4>
