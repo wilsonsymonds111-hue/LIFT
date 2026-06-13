@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Dumbbell } from 'lucide-react';
+import { Dumbbell, Plus } from 'lucide-react';
+import SplitBuilder from '../components/SplitBuilder';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import SplitDetailModal from '../components/SplitDetailModal';
@@ -90,6 +91,7 @@ export default function Splits() {
   const [selectedSplit, setSelectedSplit] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
   const [swapping, setSwapping] = useState(false);
+  const [showBuilder, setShowBuilder] = useState(false);
   const menuRef = useRef({});
 
   // Default to "examples" on first visit, otherwise remember preference
@@ -136,12 +138,12 @@ export default function Splits() {
 
   const mySplitGroups = Object.values(splitGroups);
 
-  // If user has no saved splits, auto-switch to examples tab
+  // If user has no saved splits, auto-switch to examples tab (unless builder is open)
   useEffect(() => {
-    if (!loading && mySplitGroups.length === 0) {
+    if (!loading && mySplitGroups.length === 0 && !showBuilder) {
       setActiveTab('examples');
     }
-  }, [loading, mySplitGroups.length]);
+  }, [loading, mySplitGroups.length, showBuilder]);
 
   const handleMakeCurrentSplit = async (splitKey) => {
     setMenuOpen(null);
@@ -225,11 +227,38 @@ export default function Splits() {
       {/* My Splits Tab */}
       {activeTab === 'mine' && (
         <div className="px-4">
-          <div className="text-center py-16 text-muted-foreground">
-            <Dumbbell className="w-10 h-10 mx-auto mb-3 opacity-30" />
-            <p className="text-lg font-medium mb-1">No saved splits yet</p>
-            <p className="text-sm">Your previous splits will appear here.</p>
-          </div>
+          {mySplitGroups.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {mySplitGroups.map((group) => (
+                <div key={group.groupId} className="bg-card border border-border/60 rounded-2xl p-4">
+                  <div className="flex flex-wrap gap-1.5">
+                    {group.templates.map((t) => (
+                      <span key={t.id} className="text-xs px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                        {t.name}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {group.templates.length} workout{group.templates.length > 1 ? 's' : ''}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 text-muted-foreground">
+              <Dumbbell className="w-10 h-10 mx-auto mb-3 opacity-30" />
+              <p className="text-lg font-medium mb-1">No saved splits yet</p>
+              <p className="text-sm mb-5">Create your own custom workout split.</p>
+            </div>
+          )}
+
+          <button
+            onClick={() => setShowBuilder(true)}
+            className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Create New Split
+          </button>
         </div>
       )}
 
@@ -304,6 +333,19 @@ export default function Splits() {
           );
         })(),
         document.body
+      )}
+
+      {/* Split builder */}
+      {showBuilder && (
+        <SplitBuilder
+          onClose={() => setShowBuilder(false)}
+          onSaved={() => {
+            setShowBuilder(false);
+            loadTemplates();
+            setActiveTab('mine');
+            localStorage.setItem('splitsActiveTab', 'mine');
+          }}
+        />
       )}
 
       {/* Split detail modal */}
