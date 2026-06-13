@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Check } from 'lucide-react';
 import ProfileButton from '../components/ProfileButton';
 import SplitBuilder from '../components/SplitBuilder';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +16,8 @@ export default function Splits() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(null);
   const [swapping, setSwapping] = useState(false);
+  const [swapPhase, setSwapPhase] = useState(null); // null | 'loading' | 'success'
+  const [swappingSplitName, setSwappingSplitName] = useState('');
   const [showBuilder, setShowBuilder] = useState(false);
   const menuRef = useRef({});
 
@@ -75,11 +78,13 @@ export default function Splits() {
     const splitData = EXAMPLE_SPLITS_DATA[splitKey];
     if (!splitData) { setSwapping(false); return; }
 
+    setSwappingSplitName(splitData.name);
+    setSwapPhase('loading');
+
     try {
       const newGroupId = Date.now().toString();
       const oldGroupId = Date.now().toString() + '_old';
 
-      // Load all templates to find current active split
       const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
       const currentActive = allTemplates.filter(
         t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
@@ -100,11 +105,18 @@ export default function Splits() {
         splitGroup: newGroupId,
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+
+      // Show success state briefly then navigate
+      setSwapPhase('success');
+      setTimeout(() => {
+        setSwapping(false);
+        setSwapPhase(null);
+        navigate('/');
+      }, 900);
     } catch (_) {
-      // silently handle
+      setSwapping(false);
+      setSwapPhase(null);
     }
-    setSwapping(false);
-    navigate('/');
   };
 
   if (loading) {
@@ -247,6 +259,58 @@ export default function Splits() {
         />
       )}
 
+      {/* Swap transition overlay */}
+      <AnimatePresence>
+        {swapPhase && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }}
+          >
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
+              className="bg-card rounded-3xl px-8 py-10 shadow-2xl flex flex-col items-center gap-5 max-w-[320px] w-[90%]"
+            >
+              {swapPhase === 'loading' ? (
+                <>
+                  {/* Animated ring spinner */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                    className="w-16 h-16 rounded-full border-[3px] border-blue-200 border-t-blue-500"
+                  />
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Applying split</p>
+                    <p className="text-xl font-extrabold text-foreground uppercase tracking-tight">{swappingSplitName}</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Success checkmark */}
+                  <motion.div
+                    initial={{ scale: 0, rotate: -90 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+                    className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center"
+                  >
+                    <Check className="w-8 h-8 text-white" strokeWidth={3} />
+                  </motion.div>
+                  <div className="text-center">
+                    <p className="text-xl font-extrabold text-foreground uppercase tracking-tight">{swappingSplitName}</p>
+                    <p className="text-sm font-medium text-emerald-500 mt-1">Now your current split</p>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
