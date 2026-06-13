@@ -225,37 +225,11 @@ export default function Splits() {
       {/* My Splits Tab */}
       {activeTab === 'mine' && (
         <div className="px-4">
-          {mySplitGroups.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mySplitGroups.map((group) => (
-                <div
-                  key={group.groupId}
-                  onClick={() => setSelectedSplit('__group__' + group.groupId)}
-                  className="bg-card border border-border rounded-xl p-5 cursor-pointer shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
-                >
-                  <h4 className="font-bold text-foreground mb-2">
-                    {group.templates.length} workout{group.templates.length !== 1 ? 's' : ''}
-                  </h4>
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {group.templates.map(t => (
-                      <span key={t.id} className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                        {t.name}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {group.templates.map(t => t.exercises).join(' | ').slice(0, 80)}…
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16 text-muted-foreground">
-              <Dumbbell className="w-10 h-10 mx-auto mb-3 opacity-30" />
-              <p className="text-lg font-medium mb-1">No saved splits yet</p>
-              <p className="text-sm">Your previous splits will appear here.</p>
-            </div>
-          )}
+          <div className="text-center py-16 text-muted-foreground">
+            <Dumbbell className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <p className="text-lg font-medium mb-1">No saved splits yet</p>
+            <p className="text-sm">Your previous splits will appear here.</p>
+          </div>
         </div>
       )}
 
