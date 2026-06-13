@@ -249,7 +249,7 @@ export default function Splits() {
 
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-extrabold text-foreground text-base tracking-tight">{split.name}</h4>
+                    <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{split.name}</h4>
                     <p className="text-sm text-muted-foreground mt-1">
                       {split.workouts.length} workout{split.workouts.length > 1 ? 's' : ''} — {split.label}
                     </p>
