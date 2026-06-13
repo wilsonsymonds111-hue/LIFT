@@ -10,15 +10,19 @@ const HollowDot = (props) => {
   return <circle cx={cx} cy={cy} r={3} fill="white" stroke="#3b82f6" strokeWidth={1.5} />;
 };
 
-function daysAgo(dateStr) {
+function relativeTime(dateStr) {
   if (!dateStr) return null;
-  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-  const date = isDateOnly ? new Date(dateStr + 'T00:00:00') : new Date(dateStr);
+  const date = new Date(dateStr);
   const now = new Date();
-  const diffDays = Math.floor((now - date) / 86400000);
-  if (diffDays === 0) return 'Today';
+  const diffMs = now - date;
+  if (diffMs < 60000) return 'Just now';
+  if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
+  if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h ago`;
+  const diffDays = Math.floor(diffMs / 86400000);
   if (diffDays === 1) return 'Yesterday';
-  return `${diffDays} days ago`;
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  return `${Math.floor(diffDays / 30)}mo ago`;
 }
 
 export default function TemplateDetailModal({ template, onClose, onSave, onStartWorkout }) {
@@ -39,7 +43,7 @@ export default function TemplateDetailModal({ template, onClose, onSave, onStart
   }
 
   const lastPerformed = template.lastPerformed
-    ? `Last Performed: ${daysAgo(template.lastPerformed)}`
+    ? `Last Performed: ${relativeTime(template.lastPerformed)}`
     : 'Not performed yet';
 
   return createPortal(

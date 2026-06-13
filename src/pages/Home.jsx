@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, MoreVertical, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -9,17 +10,19 @@ import TemplateDetailModal from '../components/TemplateDetailModal';
 import ProfileSheet from '../components/ProfileSheet';
 import SplitDetailModal from '../components/SplitDetailModal';
 
-const daysAgo = (dateStr) => {
+const relativeTime = (dateStr) => {
   if (!dateStr) return null;
-  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-  const date = isDateOnly ? new Date(dateStr + 'T00:00:00') : new Date(dateStr);
+  const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now - date;
+  if (diffMs < 60000) return 'Just now';
+  if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
+  if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h ago`;
   const diffDays = Math.floor(diffMs / 86400000);
-  const timeStr = isDateOnly ? '' : ' at ' + date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
-  if (diffDays === 0) return 'Today' + timeStr;
-  if (diffDays === 1) return 'Yesterday' + timeStr;
-  return `${diffDays} days ago${timeStr}`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  return `${Math.floor(diffDays / 30)}mo ago`;
 };
 
 const EXAMPLE_SPLITS_DATA = {
@@ -111,6 +114,7 @@ export default function Home() {
   const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
   const [selectedSplit, setSelectedSplit] = useState(null);
   const [exampleMenuOpen, setExampleMenuOpen] = useState(null);
+  const [isSwapping, setIsSwapping] = useState(false);
   const exampleMenuRef = useRef({});
 
   useEffect(() => {
@@ -180,6 +184,10 @@ export default function Home() {
       base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
     );
     await Promise.all(updates);
+    setIsSwapping(true);
+
+    // Small delay for exit animation to play
+    await new Promise(r => setTimeout(r, 350));
 
     // Create new templates for the example split
     const newTemplates = splitData.workouts.map((w, i) => ({
@@ -194,6 +202,7 @@ export default function Home() {
 
     await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
     await loadTemplates();
+    setIsSwapping(false);
   };
 
   if (loading) {
@@ -237,60 +246,103 @@ export default function Home() {
         </button>
       </div>
 
-      {/* ==================== CURRENT SPLIT ==================== */}
-      <div className="px-4 py-2">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-foreground">Current Split ({currentSplit.length})</h3>
-          <button
-            onClick={() => navigate('/template/new')}
-            className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Template
-          </button>
-        </div>
+      {/* ==================== CURRENT SPLIT (Spotlight) ==================== */}
+      <div className="relative px-4 py-2">
+        {/* Spotlight glow */}
+        <div className="absolute -inset-8 bg-blue-500/5 rounded-[3rem] blur-3xl pointer-events-none" />
 
-        {currentSplit.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {currentSplit.map((template) => (
-              <div key={template.id} className="relative bg-card border border-border rounded-lg p-4 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200">
-                <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
-                  <h4 className="font-bold text-foreground flex-1 cursor-pointer">{template.name}</h4>
-                  <button
-                    onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
-                    className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 transition flex-shrink-0 select-none -mt-1 -mr-1"
-                  >
-                    <MoreVertical className="w-4 h-4 text-gray-400" />
-                  </button>
-                </div>
-                <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    ⏱ {template.lastPerformed ? daysAgo(template.lastPerformed) : 'Not yet performed'}
-                  </p>
-                </div>
-                {openMenuId === template.id && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                    <div className="absolute top-10 right-3 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[140px]">
-                      <button
-                        onClick={() => handleDeleteTemplate(template.id)}
-                        className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
-                      >
-                        Delete Template
-                      </button>
+        <div className="relative">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <motion.div
+                animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
+                transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+                className="w-2 h-2 rounded-full bg-blue-500"
+              />
+              <h3 className="font-semibold text-foreground">Current Split ({currentSplit.length})</h3>
+            </div>
+            <button
+              onClick={() => navigate('/template/new')}
+              className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Template
+            </button>
+          </div>
+
+          {currentSplit.length > 0 ? (
+            <AnimatePresence mode="wait">
+              {isSwapping ? (
+                <motion.div
+                  key="swapping"
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                  {currentSplit.map((template) => (
+                    <div key={template.id} className="bg-card border border-border rounded-lg p-4 shadow-md opacity-30">
+                      <h4 className="font-bold text-foreground">{template.name}</h4>
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{template.exercises}</p>
                     </div>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 text-muted-foreground">
-            <p className="text-lg font-medium mb-1">No current split</p>
-            <p className="text-sm">Choose an example split below to get started.</p>
-          </div>
-        )}
+                  ))}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="active"
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94], staggerChildren: 0.06 }}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                  {currentSplit.map((template, i) => (
+                    <motion.div
+                      key={template.id}
+                      initial={{ opacity: 0, y: 30, scale: 0.92 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.4, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="relative bg-card border border-blue-500/20 rounded-lg p-4 shadow-lg shadow-blue-500/5"
+                    >
+                      <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
+                        <h4 className="font-bold text-foreground flex-1 cursor-pointer">{template.name}</h4>
+                        <button
+                          onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
+                          className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 transition flex-shrink-0 select-none -mt-1 -mr-1"
+                        >
+                          <MoreVertical className="w-4 h-4 text-gray-400" />
+                        </button>
+                      </div>
+                      <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          ⏱ {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
+                        </p>
+                      </div>
+                      {openMenuId === template.id && (
+                        <>
+                          <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
+                          <div className="absolute top-10 right-3 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[140px]">
+                            <button
+                              onClick={() => handleDeleteTemplate(template.id)}
+                              className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
+                            >
+                              Delete Template
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              <p className="text-lg font-medium mb-1">No current split</p>
+              <p className="text-sm">Choose an example split below to get started.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ==================== MY SPLITS ==================== */}
