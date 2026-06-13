@@ -115,6 +115,7 @@ export default function Home() {
   const [selectedSplit, setSelectedSplit] = useState(null);
   const [exampleMenuOpen, setExampleMenuOpen] = useState(null);
   const [isSwapping, setIsSwapping] = useState(false);
+  const oldSplitRef = useRef([]);
   const exampleMenuRef = useRef({});
 
   useEffect(() => {
@@ -178,16 +179,19 @@ export default function Home() {
 
     const newGroupId = Date.now().toString();
 
+    // Capture old split before mutating state
+    oldSplitRef.current = [...currentSplit];
+    setIsSwapping(true);
+
     // Move existing current split templates to a new split group
     const oldGroupId = Date.now().toString() + '_old';
     const updates = currentSplit.map((t, i) =>
       base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
     );
     await Promise.all(updates);
-    setIsSwapping(true);
 
-    // Small delay for exit animation to play
-    await new Promise(r => setTimeout(r, 350));
+    // Wait for exit animation to be visible
+    await new Promise(r => setTimeout(r, 400));
 
     // Create new templates for the example split
     const newTemplates = splitData.workouts.map((w, i) => ({
@@ -270,37 +274,46 @@ export default function Home() {
             </button>
           </div>
 
-          {currentSplit.length > 0 ? (
+          {(currentSplit.length > 0 || isSwapping) ? (
             <AnimatePresence mode="wait">
               {isSwapping ? (
                 <motion.div
-                  key="swapping"
-                  initial={{ opacity: 1 }}
-                  exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
+                  key="exiting"
+                  exit={{ x: -120, opacity: 0 }}
+                  transition={{ duration: 0.35, ease: [0.4, 0, 0.6, 1] }}
                   className="grid grid-cols-1 md:grid-cols-2 gap-4"
                 >
-                  {currentSplit.map((template) => (
-                    <div key={template.id} className="bg-card border border-border rounded-lg p-4 shadow-md opacity-30">
-                      <h4 className="font-bold text-foreground">{template.name}</h4>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{template.exercises}</p>
-                    </div>
+                  {oldSplitRef.current.map((template, i) => (
+                    <motion.div
+                      key={template.id}
+                      exit={{ x: -60, opacity: 0 }}
+                      transition={{ duration: 0.3, delay: i * 0.05 }}
+                      className="bg-card/60 border border-border rounded-lg p-4 shadow-sm"
+                    >
+                      <h4 className="font-bold text-foreground/50 line-through">{template.name}</h4>
+                      <p className="text-sm text-muted-foreground/50 mt-1 line-clamp-2">{template.exercises}</p>
+                    </motion.div>
                   ))}
                 </motion.div>
               ) : (
                 <motion.div
-                  key="active"
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94], staggerChildren: 0.06 }}
+                  key="entering"
+                  initial={{ x: 120, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
                   className="grid grid-cols-1 md:grid-cols-2 gap-4"
                 >
                   {currentSplit.map((template, i) => (
                     <motion.div
                       key={template.id}
-                      initial={{ opacity: 0, y: 30, scale: 0.92 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ duration: 0.4, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      initial={{ x: 80, opacity: 0, scale: 0.9 }}
+                      animate={{ x: 0, opacity: 1, scale: 1 }}
+                      transition={{
+                        duration: 0.5,
+                        delay: i * 0.1,
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                        scale: { type: 'spring', stiffness: 200, damping: 18 }
+                      }}
                       className="relative bg-card border border-blue-500/20 rounded-lg p-4 shadow-lg shadow-blue-500/5"
                     >
                       <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
