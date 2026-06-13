@@ -115,8 +115,11 @@ export default function Home() {
   const [selectedSplit, setSelectedSplit] = useState(null);
   const [exampleMenuOpen, setExampleMenuOpen] = useState(null);
   const [isSwapping, setIsSwapping] = useState(false);
+  const [swapOverlay, setSwapOverlay] = useState(null);
   const oldSplitRef = useRef([]);
   const exampleMenuRef = useRef({});
+  const exampleCardRefs = useRef({});
+  const currentSplitSectionRef = useRef(null);
 
   useEffect(() => {
     if (!exampleMenuOpen) return;
@@ -162,7 +165,6 @@ export default function Home() {
 
   const remainingTemplates = templates.filter(t => !currentSplit.includes(t));
 
-  // Group remaining by splitGroup
   const splitGroups = remainingTemplates.reduce((acc, t) => {
     const key = t.splitGroup || '__ungrouped__' + t.id;
     if (!acc[key]) acc[key] = { groupId: key, templates: [] };
@@ -177,36 +179,101 @@ export default function Home() {
     const splitData = EXAMPLE_SPLITS_DATA[splitKey];
     if (!splitData) return;
 
+    const sourceEl = exampleCardRefs.current[splitKey];
+    const gridEl = currentSplitSectionRef.current;
+    const sourceRect = sourceEl?.getBoundingClientRect();
+    const gridRect = gridEl?.getBoundingClientRect();
+
+    oldSplitRef.current = [...currentSplit];
+    const workoutCount = splitData.workouts.length;
     const newGroupId = Date.now().toString();
 
-    // Capture old split before mutating state
-    oldSplitRef.current = [...currentSplit];
-    setIsSwapping(true);
+    if (sourceRect && gridRect && currentSplit.length > 0) {
+      // --- ANIMATED SWAP ---
+      setIsSwapping(true);
 
-    // Move existing current split templates to a new split group
-    const oldGroupId = Date.now().toString() + '_old';
-    const updates = currentSplit.map((t, i) =>
-      base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
-    );
-    await Promise.all(updates);
+      // Calculate final grid positions for each workout card
+      const columns = window.innerWidth >= 768 ? 2 : 1;
+      const cardWidth = (gridRect.width - (columns - 1) * 16) / columns;
+      const cardHeight = 140;
+      const headerOffsetY = 52; // accounts for "Current Split" header + mb-4
 
-    // Wait for exit animation to be visible
-    await new Promise(r => setTimeout(r, 400));
+      const stampPositions = splitData.workouts.map((_, i) => {
+        const col = i % columns;
+        const row = Math.floor(i / columns);
+        return {
+          x: gridRect.left + col * (cardWidth + 16),
+          y: gridRect.top + headerOffsetY + row * (cardHeight + 16),
+          width: cardWidth,
+          height: cardHeight,
+        };
+      });
 
-    // Create new templates for the example split
-    const newTemplates = splitData.workouts.map((w, i) => ({
-      name: w.name,
-      exercises: w.exercises.map(e => e.name).join(', '),
-      exerciseList: w.exercises.map(e => ({ ...e, history: [] })),
-      lastPerformed: null,
-      sort_order: i,
-      isActiveSplit: true,
-      splitGroup: newGroupId,
-    }));
+      setSwapOverlay({
+        stage: 'fly-up',
+        sourceRect,
+        gridCenter: {
+          x: gridRect.left + gridRect.width / 2,
+          y: gridRect.top + gridRect.height / 2,
+        },
+        splitData,
+        splitKey,
+        stampPositions,
+      });
 
-    await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
-    await loadTemplates();
-    setIsSwapping(false);
+      // Stage 1 → 2: card arrives and breaks apart
+      await new Promise(r => setTimeout(r, 550));
+      setSwapOverlay(prev => prev && { ...prev, stage: 'break' });
+
+      // During break → stamp, update DB
+      const oldGroupId = Date.now().toString() + '_old';
+      const updates = currentSplit.map(t =>
+        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+      );
+      await Promise.all(updates);
+
+      // Stage 2 → 3: mini cards fly to stamp positions
+      await new Promise(r => setTimeout(r, 350));
+      setSwapOverlay(prev => prev && { ...prev, stage: 'stamp' });
+
+      // Create new templates
+      const newTemplates = splitData.workouts.map((w, i) => ({
+        name: w.name,
+        exercises: w.exercises.map(e => e.name).join(', '),
+        exerciseList: w.exercises.map(e => ({ ...e, history: [] })),
+        lastPerformed: null,
+        sort_order: i,
+        isActiveSplit: true,
+        splitGroup: newGroupId,
+      }));
+      await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+
+      // Let stamp animation play
+      await new Promise(r => setTimeout(r, 500));
+
+      await loadTemplates();
+      setSwapOverlay(null);
+      setIsSwapping(false);
+    } else {
+      // --- No old cards to animate out, or no rects captured: simple swap ---
+      const oldGroupId = Date.now().toString() + '_old';
+      const updates = currentSplit.map(t =>
+        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+      );
+      await Promise.all(updates);
+
+      const newTemplates = splitData.workouts.map((w, i) => ({
+        name: w.name,
+        exercises: w.exercises.map(e => e.name).join(', '),
+        exerciseList: w.exercises.map(e => ({ ...e, history: [] })),
+        lastPerformed: null,
+        sort_order: i,
+        isActiveSplit: true,
+        splitGroup: newGroupId,
+      }));
+      await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+      await loadTemplates();
+    }
   };
 
   if (loading) {
@@ -252,10 +319,9 @@ export default function Home() {
 
       {/* ==================== CURRENT SPLIT (Spotlight) ==================== */}
       <div className="relative px-4 py-2">
-        {/* Spotlight glow */}
         <div className="absolute -inset-8 bg-blue-500/5 rounded-[3rem] blur-3xl pointer-events-none" />
 
-        <div className="relative">
+        <div className="relative" ref={currentSplitSectionRef}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <motion.div
@@ -279,41 +345,36 @@ export default function Home() {
               {isSwapping ? (
                 <motion.div
                   key="exiting"
-                  exit={{ x: -120, opacity: 0 }}
-                  transition={{ duration: 0.35, ease: [0.4, 0, 0.6, 1] }}
+                  exit={{ x: -120, opacity: 0, y: 200 }}
+                  transition={{ duration: 0.45, ease: [0.4, 0, 0.6, 1] }}
                   className="grid grid-cols-1 md:grid-cols-2 gap-4"
                 >
                   {oldSplitRef.current.map((template, i) => (
                     <motion.div
                       key={template.id}
-                      exit={{ x: -60, opacity: 0 }}
-                      transition={{ duration: 0.3, delay: i * 0.05 }}
+                      animate={isSwapping ? {
+                        x: [0, -8, 8, -6, 4, 0, -60],
+                        opacity: [1, 1, 1, 1, 1, 0.6, 0],
+                      } : {}}
+                      transition={{ duration: 0.55, delay: i * 0.06, ease: 'easeIn' }}
                       className="bg-card/60 border border-border rounded-lg p-4 shadow-sm"
                     >
-                      <h4 className="font-bold text-foreground/50 line-through">{template.name}</h4>
-                      <p className="text-sm text-muted-foreground/50 mt-1 line-clamp-2">{template.exercises}</p>
+                      <h4 className="font-bold text-foreground/60">{template.name}</h4>
+                      <p className="text-sm text-muted-foreground/60 mt-1 line-clamp-2">{template.exercises}</p>
                     </motion.div>
                   ))}
                 </motion.div>
               ) : (
                 <motion.div
                   key="entering"
-                  initial={{ x: 120, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
                   className="grid grid-cols-1 md:grid-cols-2 gap-4"
                 >
-                  {currentSplit.map((template, i) => (
-                    <motion.div
+                  {currentSplit.map((template) => (
+                    <div
                       key={template.id}
-                      initial={{ x: 80, opacity: 0, scale: 0.9 }}
-                      animate={{ x: 0, opacity: 1, scale: 1 }}
-                      transition={{
-                        duration: 0.5,
-                        delay: i * 0.1,
-                        ease: [0.25, 0.46, 0.45, 0.94],
-                        scale: { type: 'spring', stiffness: 200, damping: 18 }
-                      }}
                       className="relative bg-card border border-blue-500/20 rounded-lg p-4 shadow-lg shadow-blue-500/5"
                     >
                       <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
@@ -344,7 +405,7 @@ export default function Home() {
                           </div>
                         </>
                       )}
-                    </motion.div>
+                    </div>
                   ))}
                 </motion.div>
               )}
@@ -393,7 +454,11 @@ export default function Home() {
         <h3 className="font-semibold text-foreground mb-4">Example Splits</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
-            <div key={key} className="bg-card border border-border rounded-xl p-5 shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200">
+            <div
+              key={key}
+              ref={el => exampleCardRefs.current[key] = el}
+              className="bg-card border border-border rounded-xl p-5 shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
+            >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 cursor-pointer" onClick={() => setSelectedSplit(key)}>
                   <h4 className="font-bold text-foreground">{split.name}</h4>
@@ -444,6 +509,12 @@ export default function Home() {
         document.body
       )}
 
+      {/* Swap Animation Overlay */}
+      {swapOverlay && createPortal(
+        <SwapAnimationOverlay overlay={swapOverlay} />,
+        document.body
+      )}
+
       {showProfile && (
         <ProfileSheet
           onClose={() => setShowProfile(false)}
@@ -472,6 +543,144 @@ export default function Home() {
           onClose={() => setSelectedSplit(null)}
         />
       )}
+    </div>
+  );
+}
+
+// ==================== Swap Animation Overlay Component ====================
+function SwapAnimationOverlay({ overlay }) {
+  const { stage, sourceRect, gridCenter, splitData, stampPositions } = overlay;
+  const workouts = splitData.workouts;
+
+  // Single card flying up (stages: fly-up, break)
+  const showFlyingCard = stage === 'fly-up' || stage === 'break';
+  // Mini cards bursting out (stages: break, stamp)
+  const showMiniCards = stage === 'break' || stage === 'stamp';
+
+  return (
+    <div className="fixed inset-0 z-[200] pointer-events-none">
+      {/* Flying source card */}
+      {showFlyingCard && (
+        <motion.div
+          key="flying-card"
+          initial={{
+            position: 'absolute',
+            left: sourceRect.left,
+            top: sourceRect.top,
+            width: sourceRect.width,
+            height: sourceRect.height,
+            opacity: 1,
+            scale: 1,
+            borderRadius: 16,
+          }}
+          animate={stage === 'break' ? {
+            left: gridCenter.x - sourceRect.width / 2,
+            top: gridCenter.y - sourceRect.height / 2,
+            scale: 1.08,
+            opacity: 0,
+          } : {
+            left: gridCenter.x - sourceRect.width / 2,
+            top: gridCenter.y - sourceRect.height / 2,
+            scale: 1.02,
+            opacity: 0.85,
+          }}
+          transition={{
+            left: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+            top: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+            scale: { duration: 0.5, ease: 'easeOut' },
+            opacity: stage === 'break' ? { duration: 0.25 } : { duration: 0.4 },
+          }}
+          className="bg-card border-2 border-blue-400 rounded-2xl p-4 shadow-2xl"
+        >
+          <h4 className="font-bold text-foreground text-sm">{splitData.name}</h4>
+          <p className="text-xs text-muted-foreground mt-1">{splitData.label}</p>
+          <div className="flex flex-wrap gap-1 mt-2">
+            {workouts.map((w, i) => (
+              <span key={i} className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">
+                {w.name}
+              </span>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Mini workout cards breaking out + stamping */}
+      {showMiniCards && workouts.map((workout, i) => {
+        const target = stampPositions[i];
+        const burstAngle = (i / workouts.length) * Math.PI * 2 - Math.PI / 2;
+        const burstDistance = 80 + i * 20;
+        const burstX = gridCenter.x + Math.cos(burstAngle) * burstDistance - target.width / 2;
+        const burstY = gridCenter.y + Math.sin(burstAngle) * burstDistance - target.height / 2;
+
+        return (
+          <motion.div
+            key={`mini-${i}`}
+            initial={{
+              position: 'absolute',
+              left: gridCenter.x - 60,
+              top: gridCenter.y - 40,
+              width: 120,
+              height: 80,
+              opacity: 0,
+              scale: 0.4,
+              borderRadius: 12,
+            }}
+            animate={
+              stage === 'stamp'
+                ? {
+                    left: target.x,
+                    top: target.y,
+                    width: target.width,
+                    height: target.height,
+                    opacity: 1,
+                    scale: 1,
+                  }
+                : {
+                    left: burstX,
+                    top: burstY,
+                    width: target.width * 0.8,
+                    height: target.height * 0.8,
+                    opacity: 0.9,
+                    scale: 0.85,
+                  }
+            }
+            transition={
+              stage === 'stamp'
+                ? {
+                    left: { duration: 0.45, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] },
+                    top: { duration: 0.45, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] },
+                    scale: {
+                      duration: 0.55,
+                      delay: i * 0.08,
+                      type: 'spring',
+                      stiffness: 220,
+                      damping: 16,
+                    },
+                    opacity: { duration: 0.25, delay: i * 0.08 },
+                  }
+                : {
+                    duration: 0.35,
+                    delay: i * 0.06,
+                    ease: 'easeOut',
+                  }
+            }
+            className="bg-card border border-blue-500/30 rounded-xl p-3 shadow-xl flex flex-col justify-center"
+          >
+            <p className="font-extrabold text-foreground text-sm">{workout.name}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{workout.exercises.length} exercises</p>
+            <div className="flex flex-wrap gap-0.5 mt-1.5">
+              {workout.exercises.slice(0, 3).map((ex, j) => (
+                <span key={j} className="text-[9px] px-1 py-0.5 rounded-full bg-muted text-muted-foreground">
+                  {ex.name.split(' (')[0]}
+                </span>
+              ))}
+              {workout.exercises.length > 3 && (
+                <span className="text-[9px] text-muted-foreground">+{workout.exercises.length - 3}</span>
+              )}
+            </div>
+          </motion.div>
+        );
+      })}
     </div>
   );
 }
