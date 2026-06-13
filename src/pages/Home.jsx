@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { MoreVertical, UserCircle } from 'lucide-react';
+import { UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
@@ -25,7 +25,6 @@ const relativeTime = (dateStr) => {
 
 export default function Home() {
   const navigate = useNavigate();
-  const [openMenuId, setOpenMenuId] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -52,7 +51,6 @@ export default function Home() {
 
   const handleDeleteTemplate = async (id) => {
     setTemplates(prev => prev.filter(t => t.id !== id));
-    setOpenMenuId(null);
     await base44.entities.WorkoutTemplate.delete(id);
   };
 
@@ -138,14 +136,8 @@ export default function Home() {
                   key={template.id}
                   className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
                 >
-                  <div className="flex items-start justify-between mb-3" onClick={() => setSelectedTemplate(template)}>
-                    <h4 className="font-bold text-foreground flex-1 cursor-pointer">{template.name}</h4>
-                    <button
-                      onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === template.id ? null : template.id); }}
-                      className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 transition flex-shrink-0 select-none -mt-1 -mr-1"
-                    >
-                      <MoreVertical className="w-4 h-4 text-gray-400" />
-                    </button>
+                  <div className="mb-3" onClick={() => setSelectedTemplate(template)}>
+                    <h4 className="font-bold text-foreground cursor-pointer">{template.name}</h4>
                   </div>
                   <div onClick={() => setSelectedTemplate(template)} className="cursor-pointer">
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{template.exercises}</p>
@@ -153,19 +145,7 @@ export default function Home() {
                       ⏱ {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
                     </p>
                   </div>
-                  {openMenuId === template.id && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                      <div className="absolute top-10 right-3 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[140px]">
-                        <button
-                          onClick={() => handleDeleteTemplate(template.id)}
-                          className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
-                        >
-                          Delete Template
-                        </button>
-                      </div>
-                    </>
-                  )}
+
                 </div>
               ))}
             </div>
