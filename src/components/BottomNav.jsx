@@ -1,9 +1,9 @@
-import { Dumbbell, Columns } from 'lucide-react';
+import { Dumbbell, Layers } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const tabs = [
   { path: '/', label: 'Workouts', Icon: Dumbbell },
-  { path: '/splits', label: 'Splits', Icon: Columns },
+  { path: '/splits', label: 'Splits', Icon: Layers },
 ];
 
 export default function BottomNav() {
