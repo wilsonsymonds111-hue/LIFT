@@ -63,7 +63,7 @@ export default function Home() {
     : templates.filter(t => !t.splitGroup || t.splitGroup === '');
 
   const currentSplitName = currentSplit.length > 0
-    ? currentSplit.map(t => t.name).join(' / ').toUpperCase()
+    ? currentSplit.map(t => t.name.replace(/ Workout$/, '').replace(/ Body$/, '')).join(' / ').toUpperCase()
     : '';
 
   if (loading) {
