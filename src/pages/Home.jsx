@@ -124,7 +124,7 @@ export default function Home() {
       <div className="px-4 py-4">
         <button
           onClick={() => navigate('/active-workout/empty-' + Date.now())}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition"
+          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99]"
         >
           Start an Empty Workout
         </button>
