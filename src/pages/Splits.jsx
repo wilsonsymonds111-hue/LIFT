@@ -104,6 +104,75 @@ const EXAMPLE_SPLITS_DATA = {
       },
     ],
   },
+  'ul-ppl': {
+    name: 'U L P P L',
+    label: 'Upper • Lower • Push • Pull • Legs',
+    workouts: [
+      {
+        name: 'Upper Body Workout',
+        exercises: [
+          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
+          { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 3 },
+          { name: 'Pull Up', muscle: 'Back', sets: 3 },
+          { name: 'Barbell Row', muscle: 'Back', sets: 3 },
+          { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 3 },
+          { name: 'Bicep Curl (Dumbbell)', muscle: 'Arms', sets: 3 },
+          { name: 'Tricep Pushdown (Cable)', muscle: 'Arms', sets: 3 },
+          { name: 'Face Pull', muscle: 'Shoulders', sets: 3 },
+        ],
+      },
+      {
+        name: 'Lower Body Workout',
+        exercises: [
+          { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
+          { name: 'Deadlift (Barbell)', muscle: 'Back', sets: 3 },
+          { name: 'Leg Press', muscle: 'Legs', sets: 3 },
+          { name: 'Leg Curl (Machine)', muscle: 'Legs', sets: 3 },
+          { name: 'Leg Extension (Machine)', muscle: 'Legs', sets: 3 },
+          { name: 'Calf Raise (Machine)', muscle: 'Legs', sets: 3 },
+          { name: 'Crunch', muscle: 'Core', sets: 3 },
+          { name: 'Plank', muscle: 'Core', sets: 3 },
+        ],
+      },
+      {
+        name: 'Push Workout',
+        exercises: [
+          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 4 },
+          { name: 'Incline Bench Press (Dumbbell)', muscle: 'Chest', sets: 3 },
+          { name: 'Dumbbell Fly', muscle: 'Chest', sets: 3 },
+          { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 3 },
+          { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 3 },
+          { name: 'Tricep Pushdown (Cable)', muscle: 'Arms', sets: 3 },
+          { name: 'Skull Crusher', muscle: 'Arms', sets: 3 },
+        ],
+      },
+      {
+        name: 'Pull Workout',
+        exercises: [
+          { name: 'Deadlift (Barbell)', muscle: 'Back', sets: 4 },
+          { name: 'Pull Up', muscle: 'Back', sets: 3 },
+          { name: 'Barbell Row', muscle: 'Back', sets: 3 },
+          { name: 'Seated Row (Machine)', muscle: 'Back', sets: 3 },
+          { name: 'Face Pull', muscle: 'Shoulders', sets: 3 },
+          { name: 'Bicep Curl (Dumbbell)', muscle: 'Arms', sets: 3 },
+          { name: 'Hammer Curl', muscle: 'Arms', sets: 3 },
+        ],
+      },
+      {
+        name: 'Legs Workout',
+        exercises: [
+          { name: 'Squat (Barbell)', muscle: 'Legs', sets: 4 },
+          { name: 'Romanian Deadlift (Barbell)', muscle: 'Legs', sets: 3 },
+          { name: 'Leg Press', muscle: 'Legs', sets: 3 },
+          { name: 'Leg Curl (Machine)', muscle: 'Legs', sets: 3 },
+          { name: 'Leg Extension (Machine)', muscle: 'Legs', sets: 3 },
+          { name: 'Calf Raise (Machine)', muscle: 'Legs', sets: 3 },
+          { name: 'Crunch', muscle: 'Core', sets: 3 },
+          { name: 'Plank', muscle: 'Core', sets: 3 },
+        ],
+      },
+    ],
+  },
 };
 
 export default function Splits() {
