@@ -47,7 +47,7 @@ export default function TemplateDetailModal({ template, onClose, onSave, onStart
     : 'Not performed yet';
 
   return createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)' }}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
       <div className="relative bg-card rounded-3xl w-[90%] max-h-[85vh] flex flex-col shadow-2xl mx-auto">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
