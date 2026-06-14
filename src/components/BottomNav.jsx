@@ -11,7 +11,7 @@ export default function BottomNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-5" style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}>
-      <nav className="flex items-center gap-1 px-1.5 py-1.5 rounded-full bg-gray-900 dark:bg-gray-950 border border-gray-800 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+      <nav className="flex items-center gap-1 px-1.5 py-1.5 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
         {tabs.map(({ path, label, Icon }) => {
           const active = location.pathname === path;
           return (
@@ -21,17 +21,17 @@ export default function BottomNav() {
               className="relative flex items-center gap-2 px-5 py-2 rounded-full transition-all duration-150 active:scale-95"
             >
               {active && (
-                                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400 shadow-[0_0_12px_rgba(59,130,246,0.5)]" />
+                                <div className="absolute inset-0 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.4)]" />
                               )}
               <Icon
                 className={`w-4 h-4 relative z-10 transition-colors duration-150 ${
-                  active ? 'text-white' : 'text-gray-400'
+                  active ? 'text-white' : 'text-muted-foreground'
                 }`}
                 strokeWidth={active ? 2.5 : 1.8}
               />
               <span
                 className={`text-xs font-semibold relative z-10 transition-colors duration-150 ${
-                  active ? 'text-white' : 'text-gray-400'
+                  active ? 'text-white' : 'text-muted-foreground'
                 }`}
               >
                 {label}
