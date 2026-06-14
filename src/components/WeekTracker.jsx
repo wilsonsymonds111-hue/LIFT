@@ -14,11 +14,11 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
   return (
     <div className="px-4 pb-2">
       {/* Day labels */}
-      <div className="flex justify-between mb-1.5 px-1">
+      <div className="flex justify-between mb-1 px-0.5">
         {DAY_LETTERS.map((letter, i) => (
           <span
             key={i}
-            className="text-[11px] font-semibold w-8 text-center text-muted-foreground"
+            className="text-[10px] font-semibold w-5 text-center text-muted-foreground"
           >
             {letter}
           </span>
@@ -26,30 +26,30 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
       </div>
 
       {/* Circles row */}
-      <div className="flex justify-between px-1">
+      <div className="flex justify-between px-0.5">
         {schedule.map((isGymDay, i) => {
           const isToday = i === todayMonSun;
           return (
-            <div key={i} className="flex flex-col items-center w-8">
+            <div key={i} className="flex flex-col items-center w-5">
               {/* Today indicator dot */}
               {isToday && (
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mb-0.5" />
+                <div className="w-1 h-1 rounded-full bg-emerald-500 mb-0.5" />
               )}
-              {!isToday && <div className="w-1.5 h-1.5 mb-0.5" />}
+              {!isToday && <div className="w-1 h-1 mb-0.5" />}
 
               {/* Circle */}
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-150 ${
+                className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-150 ${
                   isToday
-                    ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-background'
+                    ? 'ring-[1.5px] ring-emerald-500 ring-offset-1 ring-offset-background'
                     : ''
                 } ${
                   isGymDay
                     ? 'bg-blue-500'
-                    : 'border-2 border-blue-300 dark:border-blue-700 bg-transparent'
+                    : 'border border-blue-300 dark:border-blue-700 bg-transparent'
                 }`}
               >
-                {isGymDay && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                {isGymDay && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
               </div>
             </div>
           );
