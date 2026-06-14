@@ -281,9 +281,10 @@ export default function Splits() {
         />
       )}
 
-      {/* Card pop-out → swap → success overlay */}
-      <AnimatePresence>
-        {swapPhase && (
+      {/* Card pop-out → swap → success overlay — portaled to body to escape SwipeableTabs transform context */}
+      {createPortal(
+        <AnimatePresence>
+          {swapPhase && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -344,7 +345,6 @@ export default function Splits() {
             {/* ── Phase 2: Card swap — old slides left, new slides in from right ── */}
             {(swapPhase === 'swap' || swapPhase === 'success') && (
               <div className="relative pointer-events-none" style={{ width: 340 }}>
-                {/* Old card — centered, slides left toward Workouts tab */}
                 <motion.div
                   initial={{ x: 0, opacity: 1, scale: 1 }}
                   animate={{ x: -window.innerWidth, opacity: 0.6, scale: 0.92, rotate: -4 }}
@@ -368,7 +368,6 @@ export default function Splits() {
                   </div>
                 </motion.div>
 
-                {/* New split card — slides in from right, settles at center */}
                 <motion.div
                   initial={{ x: window.innerWidth, opacity: 0, scale: 0.9, rotate: 3 }}
                   animate={{ x: 0, opacity: 1, scale: 1, rotate: 0 }}
@@ -428,8 +427,10 @@ export default function Splits() {
             )}
 
           </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
     </div>
   );
