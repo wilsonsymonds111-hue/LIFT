@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, ChevronLeft, Plus, Dumbbell, Check, Sparkles } from 'lucide-react';
+import { X, ChevronLeft, Plus, Dumbbell, Check, Sparkles, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
@@ -229,12 +229,15 @@ export default function SplitBuilder({ onClose, onSaved }) {
                       {idx + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <input
-                        value={workout.name}
-                        onChange={e => handleNameChange(idx, e.target.value)}
-                        placeholder={`Workout ${idx + 1}`}
-                        className="w-full bg-transparent font-bold text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/60 border-b border-dashed border-muted-foreground/20 focus:border-blue-500 pb-0.5"
-                      />
+                      <div className="relative">
+                        <input
+                          value={workout.name}
+                          onChange={e => handleNameChange(idx, e.target.value)}
+                          placeholder={`Workout ${idx + 1}`}
+                          className="w-full bg-transparent font-bold text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/60 border-b border-dashed border-muted-foreground/20 focus:border-blue-500 pb-0.5 pr-5"
+                        />
+                        <Pencil className="absolute right-0 top-0 w-3.5 h-3.5 text-muted-foreground/40 pointer-events-none" />
+                      </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {workout.exercises.length > 0
                           ? `${workout.exercises.length} exercise${workout.exercises.length > 1 ? 's' : ''}`
