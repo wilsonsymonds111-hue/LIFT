@@ -14,6 +14,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
   const [editingWorkoutIdx, setEditingWorkoutIdx] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [splitName, setSplitName] = useState('');
 
   const handlePickCount = (count) => {
     setWorkoutCount(count);
@@ -128,7 +129,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
             >
               <div className="flex items-center gap-1.5 justify-center mb-1">
                 <Sparkles className="w-4 h-4 text-blue-500" />
-                <h3 className="text-lg font-extrabold text-foreground">Split Created!</h3>
+                <h3 className="text-lg font-extrabold text-foreground">{splitName || 'Split Created!'}</h3>
                 <Sparkles className="w-4 h-4 text-blue-500" />
               </div>
               <p className="text-sm text-muted-foreground">
@@ -153,9 +154,12 @@ export default function SplitBuilder({ onClose, onSaved }) {
               <button onClick={() => setStep(1)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
                 <ChevronLeft className="w-4 h-4 text-foreground" />
               </button>
-              <span className="font-extrabold text-foreground text-base">
-                {populatedCount}/{workoutCount} Workouts
-              </span>
+              <input
+                value={splitName}
+                onChange={e => setSplitName(e.target.value)}
+                placeholder="Name your split"
+                className="flex-1 mx-3 bg-transparent font-extrabold text-foreground text-base text-center focus:outline-none placeholder:text-muted-foreground/50"
+              />
               <button
                 onClick={handleSave}
                 disabled={!allWorkoutsNamed || !allWorkoutsHaveExercises || saving || saved}
