@@ -11,7 +11,7 @@ export default function BottomNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-5" style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}>
-      <nav className="flex items-center gap-1 px-1.5 py-1.5 rounded-full bg-gradient-to-b from-white/80 to-white/40 dark:from-white/15 dark:to-white/5 backdrop-blur-2xl border border-white/30 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12),0_0_0_1px_rgba(255,255,255,0.3)_inset,0_0_24px_rgba(59,130,246,0.15)]">
+      <nav className="flex items-center gap-1 px-1.5 py-1.5 rounded-full bg-gray-900 dark:bg-gray-950 border border-gray-800 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
         {tabs.map(({ path, label, Icon }) => {
           const active = location.pathname === path;
           return (
@@ -25,13 +25,13 @@ export default function BottomNav() {
                               )}
               <Icon
                 className={`w-4 h-4 relative z-10 transition-colors duration-150 ${
-                  active ? 'text-white' : 'text-muted-foreground'
+                  active ? 'text-white' : 'text-gray-400'
                 }`}
                 strokeWidth={active ? 2.5 : 1.8}
               />
               <span
                 className={`text-xs font-semibold relative z-10 transition-colors duration-150 ${
-                  active ? 'text-white' : 'text-muted-foreground'
+                  active ? 'text-white' : 'text-gray-400'
                 }`}
               >
                 {label}
