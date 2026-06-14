@@ -289,14 +289,14 @@ export default function Splits() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.55, ease: 'easeInOut' }}
-            className="fixed inset-0 z-50"
+            className="fixed inset-0 z-50 flex items-center justify-center"
             style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(18px)' }}
           >
             {/* ── Phase 1: Card pops out of grid to center ── */}
             {swapPhase === 'popup' && swapOriginRect && (
               <motion.div
+                style={{ position: 'fixed' }}
                 initial={{
-                  position: 'fixed',
                   top: swapOriginRect.top,
                   left: swapOriginRect.left,
                   width: swapOriginRect.width,
@@ -306,9 +306,8 @@ export default function Splits() {
                   opacity: 1,
                 }}
                 animate={{
-                  top: '50%',
-                  left: '50%',
-                  x: '-50%',
+                  top: window.innerHeight / 2,
+                  left: window.innerWidth / 2 - 170,
                   y: '-50%',
                   width: 340,
                   height: 'auto',
@@ -346,14 +345,13 @@ export default function Splits() {
 
             {/* ── Phase 2: Card swap — old slides left, new slides in from right ── */}
             {(swapPhase === 'swap' || swapPhase === 'success') && (
-              <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
-                {/* Old card sliding out left (toward Workouts tab) */}
+              <div className="relative pointer-events-none" style={{ width: 340 }}>
+                {/* Old card — centered, slides left toward Workouts tab */}
                 <motion.div
                   initial={{ x: 0, opacity: 1, scale: 1 }}
                   animate={{ x: -window.innerWidth, opacity: 0.6, scale: 0.92, rotate: -4 }}
                   transition={{ duration: 0.55, ease: [0.5, 0, 0.75, 0] }}
-                  className="absolute bg-card border border-border/50 rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5 pointer-events-none"
-                  style={{ width: 340 }}
+                  className="absolute left-0 top-0 w-full bg-card border border-border/50 rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -372,7 +370,7 @@ export default function Splits() {
                   </div>
                 </motion.div>
 
-                {/* New split card sliding in from right */}
+                {/* New split card — slides in from right, settles at center */}
                 <motion.div
                   initial={{ x: window.innerWidth, opacity: 0, scale: 0.9, rotate: 3 }}
                   animate={{ x: 0, opacity: 1, scale: 1, rotate: 0 }}
@@ -380,10 +378,8 @@ export default function Splits() {
                   onAnimationComplete={() => {
                     if (swapPhase === 'swap') setSwapPhase('success');
                   }}
-                  className="bg-card rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5 pointer-events-none relative overflow-hidden"
-                  style={{ width: 340 }}
+                  className="absolute left-0 top-0 w-full bg-card rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5 overflow-hidden"
                 >
-                  {/* Green glow background on success */}
                   {swapPhase === 'success' && (
                     <motion.div
                       initial={{ opacity: 0 }}

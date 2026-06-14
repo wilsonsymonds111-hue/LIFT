@@ -5,6 +5,7 @@ import { History, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } 
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
+import { getDefaultRestDuration } from '../lib/exerciseDefaults';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 
@@ -314,7 +315,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
   const [showMenu, setShowMenu] = useState(false);
   const [note, setNote] = useState('');
   const [showNote, setShowNote] = useState(false);
-  const [restDuration, setRestDuration] = useState(120);
+  const [restDuration, setRestDuration] = useState(() => getDefaultRestDuration(exercise.name));
   const [restEnabled, setRestEnabled] = useState(true);
   const [showCustomRest, setShowCustomRest] = useState(false);
   const [customRestInput, setCustomRestInput] = useState('');
@@ -363,14 +364,14 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
                 {/* Rest timer options */}
                 <p className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rest Timer</p>
                 <button
-                  onClick={() => { setRestEnabled(true); setRestDuration(120); setShowCustomRest(false); setShowMenu(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration === 120 ? 'text-blue-500' : 'text-gray-700'}`}
+                  onClick={() => { setRestEnabled(true); setRestDuration(getDefaultRestDuration(exercise.name)); setShowCustomRest(false); setShowMenu(false); }}
+                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration === getDefaultRestDuration(exercise.name) ? 'text-blue-500' : 'text-gray-700'}`}
                 >
-                  Default (2 min)
+                  Default ({getDefaultRestDuration(exercise.name) / 60} min)
                 </button>
                 <button
                   onClick={() => setShowCustomRest(c => !c)}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration !== 120 ? 'text-blue-500' : 'text-gray-700'}`}
+                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration !== getDefaultRestDuration(exercise.name) ? 'text-blue-500' : 'text-gray-700'}`}
                 >
                   Custom…
                 </button>
