@@ -233,7 +233,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
                         value={workout.name}
                         onChange={e => handleNameChange(idx, e.target.value)}
                         placeholder={`Workout ${idx + 1}`}
-                        className="w-full bg-transparent font-bold text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/60"
+                        className="w-full bg-transparent font-bold text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/60 border-b border-dashed border-muted-foreground/20 focus:border-blue-500 pb-0.5"
                       />
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {workout.exercises.length > 0
