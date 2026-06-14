@@ -51,8 +51,12 @@ export default function Splits() {
   const loadTemplates = useCallback(async () => {
     const data = await base44.entities.WorkoutTemplate.list('sort_order', 100);
     if (data) {
-      // Only show non-active templates (saved splits)
-      setTemplates(data.filter(t => t.isActiveSplit !== true));
+      // Only show saved splits: non-active, has a splitGroup, and not archived (_old)
+      setTemplates(data.filter(t =>
+        t.isActiveSplit !== true &&
+        t.splitGroup &&
+        !t.splitGroup.endsWith('_old')
+      ));
     }
     setLoading(false);
   }, []);
@@ -207,8 +211,15 @@ export default function Splits() {
       {/* My Splits Tab */}
       {activeTab === 'mine' && (
         <div className="px-4">
-          {mySplitGroups.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+          <button
+            onClick={() => setShowBuilder(true)}
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Create New Split
+          </button>
+          {mySplitGroups.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {mySplitGroups.map((group) => (
                 <div
                   key={group.groupId}
@@ -235,14 +246,7 @@ export default function Splits() {
                 </div>
               ))}
             </div>
-          ) : null}
-          <button
-            onClick={() => setShowBuilder(true)}
-            className={`w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 ${mySplitGroups.length > 0 ? 'mt-5' : 'mt-3'}`}
-          >
-            <Plus className="w-4 h-4" />
-            Create New Split
-          </button>
+          )}
         </div>
       )}
 
