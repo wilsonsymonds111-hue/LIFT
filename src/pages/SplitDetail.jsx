@@ -83,12 +83,14 @@ export default function SplitDetail() {
     navigate('/');
   };
 
-  const handleStart = async (workout) => {
-    // For custom splits, use the existing template directly
+  const handleViewWorkout = async (workout) => {
+    // For custom splits, use the existing template
     if (workout.templateId) {
-      navigate(`/active-workout/${workout.templateId}`);
+      navigate(`/template/${workout.templateId}`);
       return;
     }
+    // For example splits, create the template first
+    setApplying(true);
     const exerciseList = workout.exercises.map(e => ({ ...e, history: [] }));
     const exercisesStr = workout.exercises.map(e => e.name).join(', ');
     const template = await base44.entities.WorkoutTemplate.create({
@@ -96,10 +98,11 @@ export default function SplitDetail() {
       exercises: exercisesStr,
       exerciseList,
       lastPerformed: null,
-      isActiveSplit: true,
-      splitGroup: Date.now().toString(),
+      isActiveSplit: false,
+      splitGroup: key,
     });
-    navigate(`/active-workout/${template.id}`);
+    setApplying(false);
+    navigate(`/template/${template.id}`);
   };
 
   return (
@@ -150,10 +153,11 @@ export default function SplitDetail() {
             </div>
 
             <button
-              onClick={() => handleStart(workout)}
-              className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition"
+              onClick={() => handleViewWorkout(workout)}
+              disabled={applying}
+              className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60"
             >
-              Start {workout.name}
+              {applying ? 'Loading…' : `View ${workout.name}`}
             </button>
           </div>
         ))}
