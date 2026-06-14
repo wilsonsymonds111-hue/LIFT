@@ -223,7 +223,7 @@ export default function Splits() {
               {mySplitGroups.map((group) => (
                 <div
                   key={group.groupId}
-                  className="bg-card border border-amber-300/60 dark:border-amber-500/30 rounded-2xl p-5 shadow-md shadow-amber-200/30 dark:shadow-amber-900/20 hover:shadow-lg hover:scale-[1.01] transition-all duration-150 cursor-pointer ring-1 ring-amber-300/20 dark:ring-amber-700/20"
+                  className="bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/40 rounded-2xl p-5 shadow-md shadow-blue-200/40 dark:shadow-blue-900/20 hover:shadow-lg hover:scale-[1.01] transition-all duration-150 cursor-pointer ring-1 ring-blue-200/50 dark:ring-blue-800/20"
                   onClick={() => navigate(`/split/${group.groupId}`)}
                 >
                   <div className="flex items-start justify-between">
@@ -260,7 +260,7 @@ export default function Splits() {
               <div
                 key={key}
                 ref={el => cardRefs.current[key] = el}
-                className="relative bg-card border border-amber-300/60 dark:border-amber-500/30 rounded-2xl p-5 shadow-md shadow-amber-200/30 dark:shadow-amber-900/20 hover:shadow-lg hover:scale-[1.01] transition-all duration-150 cursor-pointer group ring-1 ring-amber-300/20 dark:ring-amber-700/20"
+                className="relative bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/40 rounded-2xl p-5 shadow-md shadow-blue-200/40 dark:shadow-blue-900/20 hover:shadow-lg hover:scale-[1.01] transition-all duration-150 cursor-pointer group ring-1 ring-blue-200/50 dark:ring-blue-800/20"
                 onClick={() => navigate(`/split/${key}`)}
               >
 
