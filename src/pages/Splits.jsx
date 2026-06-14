@@ -81,12 +81,12 @@ export default function Splits() {
 
   const mySplitGroups = Object.values(splitGroups);
 
-  // If user has no saved splits, auto-switch to examples tab (unless builder is open)
+  // If user has no saved splits, auto-switch to examples tab (unless builder is open or user just chose "mine")
   useEffect(() => {
-    if (!loading && mySplitGroups.length === 0 && !showBuilder) {
+    if (!loading && mySplitGroups.length === 0 && !showBuilder && activeTab !== 'mine') {
       setActiveTab('examples');
     }
-  }, [loading, mySplitGroups.length, showBuilder]);
+  }, [loading, mySplitGroups.length, showBuilder, activeTab]);
 
   const handleMakeCurrentSplit = async (splitKey) => {
     setMenuOpen(null);

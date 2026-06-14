@@ -133,7 +133,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
                 <Sparkles className="w-4 h-4 text-blue-500" />
               </div>
               <p className="text-sm text-muted-foreground">
-                {workoutCount} workout{workoutCount > 1 ? 's' : ''} saved
+                {workoutCount} workout{workoutCount > 1 ? 's' : ''} saved — find it in My Splits
               </p>
             </motion.div>
           </motion.div>
