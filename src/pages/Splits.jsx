@@ -221,27 +221,31 @@ export default function Splits() {
           {mySplitGroups.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {mySplitGroups.map((group) => (
-                <div
-                  key={group.groupId}
-                  className="bg-card border-4 border-gray-800 dark:border-gray-500 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.2)] hover:scale-[1.01] transition-all duration-150 cursor-pointer"
-                  onClick={() => navigate(`/split/${group.groupId}`)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
-                        {group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ')}
-                      </h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {group.templates.length} workout{group.templates.length > 1 ? 's' : ''}
-                      </p>
+                <div key={group.groupId} className="relative" style={{ paddingBottom: 12 }}>
+                  {/* Stacked shadow cards behind */}
+                  <div className="absolute top-3 left-1 right-1 bottom-0 bg-card border-[3px] border-gray-300/60 dark:border-gray-600/50 rounded-2xl pointer-events-none" />
+                  <div className="absolute top-1.5 left-0.5 right-0.5 bottom-1.5 bg-card border-[3px] border-gray-300/80 dark:border-gray-600/70 rounded-2xl pointer-events-none" />
+                  <div
+                    className="relative bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.45)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.18)] hover:scale-[1.01] transition-all duration-150 cursor-pointer"
+                    onClick={() => navigate(`/split/${group.groupId}`)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
+                          {group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ')}
+                        </h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {group.templates.length} workout{group.templates.length > 1 ? 's' : ''}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 mt-4">
-                    {group.templates.map((t, i) => (
-                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
-                        {t.name}
-                      </span>
-                    ))}
+                    <div className="flex flex-wrap gap-1.5 mt-4">
+                      {group.templates.map((t, i) => (
+                        <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                          {t.name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -257,39 +261,44 @@ export default function Splits() {
           <div className="absolute -inset-x-8 -inset-y-8 bg-gradient-to-br from-slate-100/60 via-transparent to-slate-200/40 dark:from-slate-800/30 dark:via-transparent dark:to-slate-700/20 rounded-[3rem] blur-3xl pointer-events-none" />
           <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
-              <div
-                key={key}
-                ref={el => cardRefs.current[key] = el}
-                className="relative bg-card border-4 border-gray-800 dark:border-gray-500 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.2)] hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
-                onClick={() => navigate(`/split/${key}`)}
-              >
+              <div key={key} className="relative" style={{ paddingBottom: 12 }}>
+                {/* Stacked shadow cards behind */}
+                <div className="absolute top-3 left-1 right-1 bottom-0 bg-card border-[3px] border-gray-300/60 dark:border-gray-600/50 rounded-2xl pointer-events-none" />
+                <div className="absolute top-1.5 left-0.5 right-0.5 bottom-1.5 bg-card border-[3px] border-gray-300/80 dark:border-gray-600/70 rounded-2xl pointer-events-none" />
+                <div
+                  key={key}
+                  ref={el => cardRefs.current[key] = el}
+                  className="relative bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.45)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.18)] hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
+                  onClick={() => navigate(`/split/${key}`)}
+                >
 
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{split.name}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {split.workouts.length} workout{split.workouts.length > 1 ? 's' : ''} — {split.label}
-                    </p>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{split.name}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {split.workouts.length} workout{split.workouts.length > 1 ? 's' : ''} — {split.label}
+                      </p>
+                    </div>
+                    <button
+                      ref={el => menuRef.current[key] = el}
+                      onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === key ? null : key); }}
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition flex-shrink-0 select-none -mt-1 -mr-1 group/btn"
+                    >
+                      <svg className="w-4 h-4 text-muted-foreground group-hover/btn:text-foreground transition-colors" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="8" cy="3" r="1.5" />
+                        <circle cx="8" cy="8" r="1.5" />
+                        <circle cx="8" cy="13" r="1.5" />
+                      </svg>
+                    </button>
                   </div>
-                  <button
-                    ref={el => menuRef.current[key] = el}
-                    onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === key ? null : key); }}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition flex-shrink-0 select-none -mt-1 -mr-1 group/btn"
-                  >
-                    <svg className="w-4 h-4 text-muted-foreground group-hover/btn:text-foreground transition-colors" viewBox="0 0 16 16" fill="currentColor">
-                      <circle cx="8" cy="3" r="1.5" />
-                      <circle cx="8" cy="8" r="1.5" />
-                      <circle cx="8" cy="13" r="1.5" />
-                    </svg>
-                  </button>
-                </div>
 
-                <div className="flex flex-wrap gap-1.5 mt-4">
-                  {split.workouts.map((w, i) => (
-                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
-                      {w.name}
-                    </span>
-                  ))}
+                  <div className="flex flex-wrap gap-1.5 mt-4">
+                    {split.workouts.map((w, i) => (
+                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                        {w.name}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
