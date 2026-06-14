@@ -243,8 +243,8 @@ export default function ExercisePicker({ onClose, onAdd }) {
                       <p className={`text-sm font-semibold ${isSelected ? 'text-blue-600' : 'text-foreground'}`}>{ex.name}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">{ex.muscle}</p>
                     </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
-                      {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-[11px] font-extrabold transition ${isSelected ? 'bg-blue-500 border-blue-500 text-white' : 'border-gray-300 text-transparent'}`}>
+                      {selected.indexOf(ex.name) + 1}
                     </div>
                   </button>
                 );
