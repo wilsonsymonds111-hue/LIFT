@@ -221,19 +221,11 @@ export default function Splits() {
           {mySplitGroups.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {mySplitGroups.map((group) => (
-                <div key={group.groupId} className="relative" style={{ paddingBottom: (group.templates.length - 1) * 3 }}>
-                  {/* Stacked shadow cards behind — one per extra workout */}
-                  {Array.from({ length: group.templates.length - 1 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute bg-card border-[3px] border-gray-300/60 dark:border-gray-600/50 rounded-2xl pointer-events-none"
-                      style={{ top: (i + 1) * 3, left: i + 1, right: i + 1, bottom: (group.templates.length - 2 - i) * 3 }}
-                    />
-                  ))}
-                  <div
-                    className="relative bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.45)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.18)] hover:scale-[1.01] transition-all duration-150 cursor-pointer"
-                    onClick={() => navigate(`/split/${group.groupId}`)}
-                  >
+                <div
+                  key={group.groupId}
+                  className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 hover:scale-[1.01] transition-all duration-150 cursor-pointer"
+                  onClick={() => navigate(`/split/${group.groupId}`)}
+                >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
@@ -251,7 +243,6 @@ export default function Splits() {
                         </span>
                       ))}
                     </div>
-                  </div>
                 </div>
               ))}
             </div>
@@ -266,20 +257,12 @@ export default function Splits() {
           <div className="absolute -inset-x-8 -inset-y-8 bg-gradient-to-br from-slate-100/60 via-transparent to-slate-200/40 dark:from-slate-800/30 dark:via-transparent dark:to-slate-700/20 rounded-[3rem] blur-3xl pointer-events-none" />
           <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
-              <div key={key} className="relative" style={{ paddingBottom: (split.workouts.length - 1) * 3 }}>
-                {/* Stacked shadow cards behind — one per extra workout */}
-                {Array.from({ length: split.workouts.length - 1 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute bg-card border-[3px] border-gray-300/60 dark:border-gray-600/50 rounded-2xl pointer-events-none"
-                    style={{ top: (i + 1) * 3, left: i + 1, right: i + 1, bottom: (split.workouts.length - 2 - i) * 3 }}
-                  />
-                ))}
-                <div
-                  ref={el => cardRefs.current[key] = el}
-                  className="relative bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.45)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.18)] hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
-                  onClick={() => navigate(`/split/${key}`)}
-                >
+              <div
+                key={key}
+                ref={el => cardRefs.current[key] = el}
+                className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
+                onClick={() => navigate(`/split/${key}`)}
+              >
 
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -308,7 +291,6 @@ export default function Splits() {
                       </span>
                     ))}
                   </div>
-                </div>
               </div>
             ))}
           </div>
