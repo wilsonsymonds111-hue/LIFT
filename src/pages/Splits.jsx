@@ -19,6 +19,8 @@ export default function Splits() {
   const [swapPhase, setSwapPhase] = useState(null); // null | 'popup' | 'swap' | 'success'
   const [swappingSplitName, setSwappingSplitName] = useState('');
   const [swappingSplitData, setSwappingSplitData] = useState(null);
+  const [swappingOldSplitName, setSwappingOldSplitName] = useState('');
+  const [swappingOldSplitData, setSwappingOldSplitData] = useState(null);
   const [swapOriginRect, setSwapOriginRect] = useState(null);
   const [showBuilder, setShowBuilder] = useState(false);
   const menuRef = useRef({});
@@ -110,6 +112,30 @@ export default function Splits() {
     setSwapping(true);
     setSwappingSplitName(splitData.name);
     setSwappingSplitData(splitData);
+
+    // Capture current active split info for the "old" card in animation
+    try {
+      const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+      const currentActive = allTemplates.filter(
+        t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
+      );
+      if (currentActive.length > 0) {
+        const names = currentActive.map(t => t.name.replace(/ Workout$/, '').replace(/ Body$/, ''));
+        const uniqueNames = [...new Set(names)];
+        setSwappingOldSplitName(uniqueNames.join(' / ').toUpperCase());
+        setSwappingOldSplitData({
+          workouts: currentActive.map(t => ({ name: t.name })),
+          label: `${currentActive.length} workout${currentActive.length > 1 ? 's' : ''}`,
+        });
+      } else {
+        setSwappingOldSplitName('No Current Split');
+        setSwappingOldSplitData({ workouts: [], label: '' });
+      }
+    } catch (_) {
+      setSwappingOldSplitName('');
+      setSwappingOldSplitData(null);
+    }
+
     setSwapPhase('popup');
 
     // Run DB ops in background while animation plays
@@ -345,6 +371,7 @@ export default function Splits() {
             {/* ── Phase 2: Card swap — old slides left, new slides in from right ── */}
             {(swapPhase === 'swap' || swapPhase === 'success') && (
               <div className="relative pointer-events-none" style={{ width: 340 }}>
+                {/* Old (current) split slides left */}
                 <motion.div
                   initial={{ x: 0, opacity: 1, scale: 1 }}
                   animate={{ x: -window.innerWidth, opacity: 0.6, scale: 0.92, rotate: -4 }}
@@ -353,14 +380,14 @@ export default function Splits() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{swappingSplitName}</h4>
+                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{swappingOldSplitName || 'Current Split'}</h4>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {swappingSplitData?.workouts.length || 0} workout{(swappingSplitData?.workouts.length || 0) > 1 ? 's' : ''} — {swappingSplitData?.label}
+                        {swappingOldSplitData?.workouts.length || 0} workout{(swappingOldSplitData?.workouts.length || 0) !== 1 ? 's' : ''} — {swappingOldSplitData?.label || ''}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-4">
-                    {swappingSplitData?.workouts.map((w, i) => (
+                    {swappingOldSplitData?.workouts.map((w, i) => (
                       <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                         {w.name}
                       </span>
