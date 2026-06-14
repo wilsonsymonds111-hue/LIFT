@@ -16,10 +16,13 @@ export default function Splits() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(null);
   const [swapping, setSwapping] = useState(false);
-  const [swapPhase, setSwapPhase] = useState(null); // null | 'loading' | 'success'
+  const [swapPhase, setSwapPhase] = useState(null); // null | 'popup' | 'swap' | 'success'
   const [swappingSplitName, setSwappingSplitName] = useState('');
+  const [swappingSplitData, setSwappingSplitData] = useState(null);
+  const [swapOriginRect, setSwapOriginRect] = useState(null);
   const [showBuilder, setShowBuilder] = useState(false);
   const menuRef = useRef({});
+  const cardRefs = useRef({});
 
   // Default to "examples" on first visit, otherwise remember preference
   const [activeTab, setActiveTab] = useState(() => {
@@ -55,6 +58,23 @@ export default function Splits() {
 
   useEffect(() => { loadTemplates(); }, [loadTemplates]);
 
+  // Phase transitions: popup → swap → success → navigate
+  useEffect(() => {
+    if (swapPhase === 'popup' && !swapOriginRect) {
+      // No card rect captured — skip straight to swap
+      const t = setTimeout(() => setSwapPhase('swap'), 50);
+      return () => clearTimeout(t);
+    }
+    if (swapPhase === 'success') {
+      const t = setTimeout(() => {
+        setSwapping(false);
+        setSwapPhase(null);
+        navigate('/');
+      }, 2000);
+      return () => clearTimeout(t);
+    }
+  }, [swapPhase, swapOriginRect, navigate]);
+
   // Group templates by splitGroup
   const splitGroups = templates.reduce((acc, t) => {
     const key = t.splitGroup || '__ungrouped__' + t.id;
@@ -74,27 +94,36 @@ export default function Splits() {
 
   const handleMakeCurrentSplit = async (splitKey) => {
     setMenuOpen(null);
-    setSwapping(true);
     const splitData = EXAMPLE_SPLITS_DATA[splitKey];
-    if (!splitData) { setSwapping(false); return; }
+    if (!splitData) return;
 
+    // Capture the card's screen position
+    const cardEl = cardRefs.current[splitKey];
+    if (cardEl) {
+      const r = cardEl.getBoundingClientRect();
+      setSwapOriginRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+    } else {
+      // Fallback: start from center at smaller scale
+      setSwapOriginRect(null);
+    }
+
+    setSwapping(true);
     setSwappingSplitName(splitData.name);
-    setSwapPhase('loading');
+    setSwappingSplitData(splitData);
+    setSwapPhase('popup');
 
+    // Run DB ops in background while animation plays
     try {
       const newGroupId = Date.now().toString();
       const oldGroupId = Date.now().toString() + '_old';
-
       const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
       const currentActive = allTemplates.filter(
         t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
       );
-
       const updates = currentActive.map(t =>
         base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
       );
       await Promise.all(updates);
-
       const newTemplates = splitData.workouts.map((w, i) => ({
         name: w.name,
         exercises: w.exercises.map(e => e.name).join(', '),
@@ -105,14 +134,6 @@ export default function Splits() {
         splitGroup: newGroupId,
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
-
-      // Show success state with time to appreciate it then navigate
-      setSwapPhase('success');
-      setTimeout(() => {
-        setSwapping(false);
-        setSwapPhase(null);
-        navigate('/');
-      }, 2200);
     } catch (_) {
       setSwapping(false);
       setSwapPhase(null);
@@ -183,6 +204,7 @@ export default function Splits() {
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
               <div
                 key={key}
+                ref={el => cardRefs.current[key] = el}
                 className="relative bg-card border border-border/50 rounded-2xl p-5 shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group ring-1 ring-black/5 dark:ring-white/5"
                 onClick={() => navigate(`/split/${key}`)}
               >
@@ -259,147 +281,158 @@ export default function Splits() {
         />
       )}
 
-      {/* Swap transition overlay */}
+      {/* Card pop-out → swap → success overlay */}
       <AnimatePresence>
         {swapPhase && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(16px)' }}
+            transition={{ duration: 0.55, ease: 'easeInOut' }}
+            className="fixed inset-0 z-50"
+            style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(18px)' }}
           >
-            <motion.div
-              key={swapPhase}
-              initial={{ scale: 0.92, opacity: 0, y: 16 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.96, opacity: 0, y: -8 }}
-              transition={{ duration: 0.55, ease: [0.25, 0.6, 0.35, 1] }}
-              className="bg-card rounded-3xl px-8 py-10 shadow-2xl flex flex-col items-center gap-6 max-w-[340px] w-[90%] relative overflow-hidden"
-            >
-              {/* Subtle glow ring on success */}
-              {swapPhase === 'success' && (
+            {/* ── Phase 1: Card pops out of grid to center ── */}
+            {swapPhase === 'popup' && swapOriginRect && (
+              <motion.div
+                initial={{
+                  position: 'fixed',
+                  top: swapOriginRect.top,
+                  left: swapOriginRect.left,
+                  width: swapOriginRect.width,
+                  height: swapOriginRect.height,
+                  borderRadius: 16,
+                  scale: 1,
+                  opacity: 1,
+                }}
+                animate={{
+                  top: '50%',
+                  left: '50%',
+                  x: '-50%',
+                  y: '-50%',
+                  width: 340,
+                  height: 'auto',
+                  scale: 1,
+                  opacity: 1,
+                }}
+                transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
+                onAnimationComplete={() => setSwapPhase('swap')}
+                className="bg-card border border-border/50 rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{swappingSplitName}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {swappingSplitData?.workouts.length || 0} workout{(swappingSplitData?.workouts.length || 0) > 1 ? 's' : ''} — {swappingSplitData?.label}
+                    </p>
+                  </div>
+                  <button className="w-8 h-8 flex items-center justify-center rounded-full flex-shrink-0 -mt-1 -mr-1">
+                    <svg className="w-4 h-4 text-muted-foreground" viewBox="0 0 16 16" fill="currentColor">
+                      <circle cx="8" cy="3" r="1.5" />
+                      <circle cx="8" cy="8" r="1.5" />
+                      <circle cx="8" cy="13" r="1.5" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5 mt-4">
+                  {swappingSplitData?.workouts.map((w, i) => (
+                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                      {w.name}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── Phase 2: Card swap — old slides left, new slides in from right ── */}
+            {(swapPhase === 'swap' || swapPhase === 'success') && (
+              <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+                {/* Old card sliding out left (toward Workouts tab) */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: [0, 0.4, 0], scale: [0.8, 1.3, 1.8] }}
-                  transition={{ duration: 1.8, ease: 'easeOut', delay: 0.1 }}
-                  className="absolute inset-0 rounded-3xl bg-emerald-400/20 pointer-events-none"
-                />
-              )}
-
-              {swapPhase === 'loading' ? (
-                <>
-                  {/* Pulsing ring spinner */}
-                  <div className="relative">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ repeat: Infinity, duration: 1.4, ease: 'linear' }}
-                      className="w-20 h-20 rounded-full border-[3px] border-blue-100 dark:border-blue-900/40 border-t-blue-500"
-                    />
-                    <motion.div
-                      animate={{ rotate: -360, scale: [1, 1.08, 0.92, 1] }}
-                      transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
-                      className="absolute inset-1 rounded-full border-[2px] border-blue-200/60 dark:border-blue-700/30"
-                    />
-                    <motion.div
-                      animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.6, 1, 0.6] }}
-                      transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <div className="w-3 h-3 rounded-full bg-blue-500" />
-                    </motion.div>
+                  initial={{ x: 0, opacity: 1, scale: 1 }}
+                  animate={{ x: -window.innerWidth, opacity: 0.6, scale: 0.92, rotate: -4 }}
+                  transition={{ duration: 0.55, ease: [0.5, 0, 0.75, 0] }}
+                  className="absolute bg-card border border-border/50 rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5 pointer-events-none"
+                  style={{ width: 340 }}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{swappingSplitName}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {swappingSplitData?.workouts.length || 0} workout{(swappingSplitData?.workouts.length || 0) > 1 ? 's' : ''} — {swappingSplitData?.label}
+                      </p>
+                    </div>
                   </div>
-
-                  {/* Staggered text entrance */}
-                  <div className="text-center space-y-2">
-                    <motion.p
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.15 }}
-                      className="text-sm font-medium text-muted-foreground"
-                    >
-                      Applying split
-                    </motion.p>
-                    <motion.p
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.25 }}
-                      className="text-2xl font-extrabold text-foreground uppercase tracking-tight leading-tight"
-                    >
-                      {swappingSplitName}
-                    </motion.p>
-                  </div>
-
-                  {/* Progress dots */}
-                  <div className="flex items-center gap-2">
-                    {[0, 1, 2].map((i) => (
-                      <motion.div
-                        key={i}
-                        animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.1, 0.8] }}
-                        transition={{ repeat: Infinity, duration: 1.2, delay: i * 0.3, ease: 'easeInOut' }}
-                        className="w-2 h-2 rounded-full bg-blue-400"
-                      />
+                  <div className="flex flex-wrap gap-1.5 mt-4">
+                    {swappingSplitData?.workouts.map((w, i) => (
+                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                        {w.name}
+                      </span>
                     ))}
                   </div>
-                </>
-              ) : (
-                <>
-                  {/* Success icon with ripple rings */}
-                  <div className="relative">
-                    {/* Outer ripple */}
-                    <motion.div
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: [1, 2.4], opacity: [0.6, 0] }}
-                      transition={{ duration: 1.2, ease: 'easeOut', delay: 0.15 }}
-                      className="absolute inset-0 rounded-full bg-emerald-400/30"
-                    />
-                    {/* Middle ripple */}
-                    <motion.div
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: [1, 1.8], opacity: [0.5, 0] }}
-                      transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
-                      className="absolute inset-0 rounded-full bg-emerald-300/25"
-                    />
-                    {/* Checkmark circle */}
-                    <motion.div
-                      initial={{ scale: 0, rotate: -120 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ type: 'spring', stiffness: 200, damping: 16, delay: 0.05 }}
-                      className="relative z-10 w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30"
-                    >
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: 0.35 }}
-                      >
-                        <Check className="w-10 h-10 text-white" strokeWidth={3} />
-                      </motion.div>
-                    </motion.div>
-                  </div>
+                </motion.div>
 
-                  {/* Success text staggered */}
-                  <div className="text-center space-y-1.5">
-                    <motion.p
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.45, delay: 0.5 }}
-                      className="text-2xl font-extrabold text-foreground uppercase tracking-tight leading-tight"
-                    >
-                      {swappingSplitName}
-                    </motion.p>
-                    <motion.p
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, delay: 0.65 }}
-                      className="text-sm font-semibold text-emerald-500"
-                    >
-                      Now your current split
-                    </motion.p>
+                {/* New split card sliding in from right */}
+                <motion.div
+                  initial={{ x: window.innerWidth, opacity: 0, scale: 0.9, rotate: 3 }}
+                  animate={{ x: 0, opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.55, ease: [0.33, 1, 0.68, 1] }}
+                  onAnimationComplete={() => {
+                    if (swapPhase === 'swap') setSwapPhase('success');
+                  }}
+                  className="bg-card rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5 pointer-events-none relative overflow-hidden"
+                  style={{ width: 340 }}
+                >
+                  {/* Green glow background on success */}
+                  {swapPhase === 'success' && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.25 }}
+                      transition={{ duration: 0.6 }}
+                      className="absolute inset-0 bg-emerald-400 rounded-2xl pointer-events-none"
+                    />
+                  )}
+                  <div className="flex items-start justify-between relative z-10">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{swappingSplitName}</h4>
+                        {swapPhase === 'success' && (
+                          <motion.div
+                            initial={{ scale: 0, rotate: -90 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ type: 'spring', stiffness: 220, damping: 18, delay: 0.1 }}
+                            className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0"
+                          >
+                            <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                          </motion.div>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1 relative z-10">
+                        {swappingSplitData?.workouts.length || 0} workout{(swappingSplitData?.workouts.length || 0) > 1 ? 's' : ''} — {swappingSplitData?.label}
+                      </p>
+                      {swapPhase === 'success' && (
+                        <motion.p
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.35, delay: 0.4 }}
+                          className="text-xs font-semibold text-emerald-500 mt-1 relative z-10"
+                        >
+                          Now your current split
+                        </motion.p>
+                      )}
+                    </div>
                   </div>
-                </>
-              )}
-            </motion.div>
+                  <div className="flex flex-wrap gap-1.5 mt-4 relative z-10">
+                    {swappingSplitData?.workouts.map((w, i) => (
+                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                        {w.name}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            )}
+
           </motion.div>
         )}
       </AnimatePresence>
