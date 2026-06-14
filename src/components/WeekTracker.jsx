@@ -3,8 +3,9 @@ import { Check } from 'lucide-react';
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+// Day status: 0 = rest, 1 = scheduled (no check), 2 = completed (check)
 // Full Body split: one day on, one day off → gym on Mon, Wed, Fri, Sun
-const FULL_BODY_SCHEDULE = [true, false, true, false, true, false, true];
+const FULL_BODY_SCHEDULE = [1, 0, 1, 0, 1, 0, 1];
 
 export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
   const todayIndex = new Date().getDay(); // 0=Sun → 6 in Mon-Sun scale
@@ -27,8 +28,10 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
 
       {/* Circles row */}
       <div className="flex justify-between px-0.5">
-        {schedule.map((isGymDay, i) => {
+        {schedule.map((status, i) => {
           const isToday = i === todayMonSun;
+          const isGymDay = status >= 1;
+          const isCompleted = status === 2;
           return (
             <div key={i} className="flex flex-col items-center w-5">
               {/* Today indicator dot */}
@@ -49,7 +52,7 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
                     : 'border border-blue-300 dark:border-blue-700 bg-transparent'
                 }`}
               >
-                {isGymDay && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                {isCompleted && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
               </div>
             </div>
           );
