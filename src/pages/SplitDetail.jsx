@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Dumbbell } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -8,7 +8,44 @@ export default function SplitDetail() {
   const { key } = useParams();
   const navigate = useNavigate();
   const [applying, setApplying] = useState(false);
-  const split = EXAMPLE_SPLITS_DATA[key];
+  const [customSplit, setCustomSplit] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const exampleSplit = EXAMPLE_SPLITS_DATA[key];
+
+  // If not an example split, load custom split from database
+  useEffect(() => {
+    if (!exampleSplit && key) {
+      setLoading(true);
+      base44.entities.WorkoutTemplate.list('sort_order', 100).then(data => {
+        const templates = (data || []).filter(t => t.splitGroup === key);
+        if (templates.length > 0) {
+          setCustomSplit({
+            name: templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ').toUpperCase(),
+            description: `${templates.length} workout${templates.length > 1 ? 's' : ''}`,
+            workouts: templates.map(t => ({
+              name: t.name,
+              emoji: '💪',
+              subtitle: `${(t.exerciseList || []).length} exercises`,
+              exercises: (t.exerciseList || []).map(e => ({ name: e.name })),
+              templateId: t.id,
+            })),
+          });
+        }
+        setLoading(false);
+      });
+    }
+  }, [key, exampleSplit]);
+
+  const split = exampleSplit || customSplit;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!split) {
     return (
@@ -33,8 +70,8 @@ export default function SplitDetail() {
       ));
       const newTemplates = split.workouts.map((w, i) => ({
         name: w.name,
-        exercises: w.exercises.map(e => e.name).join(', '),
-        exerciseList: w.exercises.map(e => ({ ...e, history: [] })),
+        exercises: (w.exercises || []).map(e => e.name).join(', '),
+        exerciseList: (w.exercises || []).map(e => ({ ...e, history: [] })),
         lastPerformed: null,
         sort_order: i,
         isActiveSplit: true,
@@ -47,6 +84,11 @@ export default function SplitDetail() {
   };
 
   const handleStart = async (workout) => {
+    // For custom splits, use the existing template directly
+    if (workout.templateId) {
+      navigate(`/active-workout/${workout.templateId}`);
+      return;
+    }
     const exerciseList = workout.exercises.map(e => ({ ...e, history: [] }));
     const exercisesStr = workout.exercises.map(e => e.name).join(', ');
     const template = await base44.entities.WorkoutTemplate.create({
@@ -96,7 +138,7 @@ export default function SplitDetail() {
             </div>
 
             <div className="flex flex-wrap gap-1.5">
-              {workout.exercises.map((ex, i) => (
+              {(workout.exercises || []).map((ex, i) => (
                 <span
                   key={i}
                   className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background text-xs text-muted-foreground"

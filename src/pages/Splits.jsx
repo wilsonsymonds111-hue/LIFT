@@ -207,9 +207,38 @@ export default function Splits() {
       {/* My Splits Tab */}
       {activeTab === 'mine' && (
         <div className="px-4">
+          {mySplitGroups.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+              {mySplitGroups.map((group) => (
+                <div
+                  key={group.groupId}
+                  className="bg-card border border-border/50 rounded-2xl p-5 shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer ring-1 ring-black/5 dark:ring-white/5"
+                  onClick={() => navigate(`/split/${group.groupId}`)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
+                        {group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ')}
+                      </h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {group.templates.length} workout{group.templates.length > 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mt-4">
+                    {group.templates.map((t, i) => (
+                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                        {t.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
           <button
             onClick={() => setShowBuilder(true)}
-            className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+            className={`w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 ${mySplitGroups.length > 0 ? 'mt-5' : 'mt-3'}`}
           >
             <Plus className="w-4 h-4" />
             Create New Split
