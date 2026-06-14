@@ -113,39 +113,40 @@ export default function Splits() {
     setSwappingSplitName(splitData.name);
     setSwappingSplitData(splitData);
 
-    // Capture current active split info for the "old" card in animation
+    // Fetch once, use for both animation caption AND DB migration
+    let allTemplates;
     try {
-      const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
-      const currentActive = allTemplates.filter(
-        t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
-      );
-      if (currentActive.length > 0) {
-        const names = currentActive.map(t => t.name.replace(/ Workout$/, '').replace(/ Body$/, ''));
-        const uniqueNames = [...new Set(names)];
-        setSwappingOldSplitName(uniqueNames.join(' / ').toUpperCase());
-        setSwappingOldSplitData({
-          workouts: currentActive.map(t => ({ name: t.name })),
-          label: `${currentActive.length} workout${currentActive.length > 1 ? 's' : ''}`,
-        });
-      } else {
-        setSwappingOldSplitName('No Current Split');
-        setSwappingOldSplitData({ workouts: [], label: '' });
-      }
+      allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
     } catch (_) {
-      setSwappingOldSplitName('');
-      setSwappingOldSplitData(null);
+      setSwapping(false);
+      setSwapPhase(null);
+      return;
+    }
+
+    const currentActive = allTemplates.filter(
+      t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
+    );
+
+    // Capture current active split for the "old" card in the swap animation
+    if (currentActive.length > 0) {
+      const names = currentActive.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, ''));
+      const uniqueNames = [...new Set(names)];
+      setSwappingOldSplitName(uniqueNames.join(' / ').toUpperCase());
+      setSwappingOldSplitData({
+        workouts: currentActive.map(t => ({ name: t.name })),
+        label: `${currentActive.length} workout${currentActive.length > 1 ? 's' : ''}`,
+      });
+    } else {
+      setSwappingOldSplitName('No Current Split');
+      setSwappingOldSplitData({ workouts: [], label: '' });
     }
 
     setSwapPhase('popup');
 
-    // Run DB ops in background while animation plays
+    // Run DB migration in background while animation plays
     try {
       const newGroupId = Date.now().toString();
       const oldGroupId = Date.now().toString() + '_old';
-      const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
-      const currentActive = allTemplates.filter(
-        t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
-      );
       const updates = currentActive.map(t =>
         base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
       );
