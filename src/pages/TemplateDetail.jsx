@@ -116,7 +116,7 @@ export default function TemplateDetail() {
                 <div className="w-16 h-8 flex-shrink-0">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={exercise.history.slice(-6).map(h => ({ v: typeof h === 'object' ? h.kg : h }))}>
-                      <Line type="monotone" dataKey="v" stroke="#3b82b6" strokeWidth={2} dot={<HollowDot />} />
+                      <Line type="monotone" dataKey="v" stroke="#3b82b6" strokeWidth={2} dot={<HollowDot />} animationDuration={300} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
