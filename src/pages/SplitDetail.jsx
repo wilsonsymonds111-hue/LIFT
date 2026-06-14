@@ -1,8 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Dumbbell } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
+
+function relativeTime(dateStr) {
+  if (!dateStr) return null;
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now - date;
+  if (diffMs < 60000) return 'Just now';
+  if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
+  if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h ago`;
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  return `${Math.floor(diffDays / 30)}mo ago`;
+}
 
 export default function SplitDetail() {
   const { key } = useParams();
@@ -25,8 +40,9 @@ export default function SplitDetail() {
             description: `${templates.length} workout${templates.length > 1 ? 's' : ''}`,
             workouts: templates.map(t => ({
               name: t.name,
-              emoji: '💪',
-              subtitle: `${(t.exerciseList || []).length} exercises`,
+              exercisesText: t.exercises || (t.exerciseList || []).map(e => e.name).join(', '),
+              exerciseCount: (t.exerciseList || []).length,
+              lastPerformed: t.lastPerformed,
               exercises: (t.exerciseList || []).map(e => ({ name: e.name })),
               templateId: t.id,
             })),
@@ -126,39 +142,16 @@ export default function SplitDetail() {
         {split.workouts.map((workout, idx) => (
           <div
             key={idx}
-            className="bg-muted rounded-2xl p-4 flex flex-col gap-3"
+            onClick={() => handleViewWorkout(workout)}
+            className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 hover:shadow-xl hover:scale-[1.02] transition-all duration-150 cursor-pointer"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-xl flex-shrink-0">
-                {workout.emoji}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-extrabold text-foreground text-base">{workout.name}</h3>
-                {workout.subtitle && (
-                  <p className="text-xs text-muted-foreground">{workout.subtitle}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-1.5">
-              {(workout.exercises || []).map((ex, i) => (
-                <span
-                  key={i}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background text-xs text-muted-foreground"
-                >
-                  <Dumbbell className="w-3 h-3" />
-                  {ex.name}
-                </span>
-              ))}
-            </div>
-
-            <button
-              onClick={() => handleViewWorkout(workout)}
-              disabled={applying}
-              className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60"
-            >
-              {applying ? 'Loading…' : `View ${workout.name}`}
-            </button>
+            <h4 className="font-bold text-foreground pr-8">{workout.name}</h4>
+            <p className="text-sm text-muted-foreground my-3 line-clamp-2">
+              {workout.exercisesText || (workout.exercises || []).map(e => e.name).join(', ')}
+            </p>
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              ⏱ {workout.lastPerformed ? relativeTime(workout.lastPerformed) : 'Not yet performed'}
+            </p>
           </div>
         ))}
       </div>
