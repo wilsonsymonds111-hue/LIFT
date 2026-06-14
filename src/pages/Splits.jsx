@@ -226,15 +226,13 @@ export default function Splits() {
                   className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer"
                   onClick={() => navigate(`/split/${group.groupId}`)}
                 >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
-                          {group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ')}
-                        </h4>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {group.templates.length} workout{group.templates.length > 1 ? 's' : ''}
-                        </p>
-                      </div>
+                    <div className="text-center">
+                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
+                        {group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ')}
+                      </h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {group.templates.length} workout{group.templates.length > 1 ? 's' : ''}
+                      </p>
                     </div>
                     <div className="flex flex-wrap gap-1.5 mt-4">
                       {group.templates.map((t, i) => (
@@ -264,17 +262,15 @@ export default function Splits() {
                 onClick={() => navigate(`/split/${key}`)}
               >
 
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{split.name}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {split.workouts.length} workout{split.workouts.length > 1 ? 's' : ''} — {split.label}
-                      </p>
-                    </div>
+                  <div className="text-center relative">
+                    <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{split.name}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {split.workouts.length} workout{split.workouts.length > 1 ? 's' : ''} — {split.label}
+                    </p>
                     <button
                       ref={el => menuRef.current[key] = el}
                       onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === key ? null : key); }}
-                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition flex-shrink-0 select-none -mt-1 -mr-1 group/btn"
+                      className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition select-none group/btn"
                     >
                       <svg className="w-4 h-4 text-muted-foreground group-hover/btn:text-foreground transition-colors" viewBox="0 0 16 16" fill="currentColor">
                         <circle cx="8" cy="3" r="1.5" />
