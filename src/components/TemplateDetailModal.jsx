@@ -83,7 +83,7 @@ export default function TemplateDetailModal({ template, onClose, onSave, onStart
               {exercise.history && exercise.history.length > 0 && (
                 <div className="w-16 h-8 flex-shrink-0">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={exercise.history.slice(-3).map(h => ({ v: typeof h === 'object' ? h.kg : h }))}>
+                    <LineChart data={exercise.history.slice(-6).map(h => ({ v: typeof h === 'object' ? h.kg : h }))}>
                       <Line type="monotone" dataKey="v" stroke="#3b82f6" strokeWidth={2} dot={<HollowDot />} />
                     </LineChart>
                   </ResponsiveContainer>
