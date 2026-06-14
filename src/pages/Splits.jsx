@@ -295,10 +295,9 @@ export default function Splits() {
             {/* ── Phase 1: Card pops out of grid to center ── */}
             {swapPhase === 'popup' && swapOriginRect && (
               <motion.div
-                style={{ position: 'fixed' }}
                 initial={{
-                  top: swapOriginRect.top,
-                  left: swapOriginRect.left,
+                  x: swapOriginRect.left + swapOriginRect.width / 2 - window.innerWidth / 2,
+                  y: swapOriginRect.top + swapOriginRect.height / 2 - window.innerHeight / 2,
                   width: swapOriginRect.width,
                   height: swapOriginRect.height,
                   borderRadius: 16,
@@ -306,9 +305,8 @@ export default function Splits() {
                   opacity: 1,
                 }}
                 animate={{
-                  top: window.innerHeight / 2,
-                  left: window.innerWidth / 2 - 170,
-                  y: '-50%',
+                  x: 0,
+                  y: 0,
                   width: 340,
                   height: 'auto',
                   scale: 1,
