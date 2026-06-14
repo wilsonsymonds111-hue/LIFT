@@ -223,7 +223,7 @@ export default function Splits() {
               {mySplitGroups.map((group) => (
                 <div
                   key={group.groupId}
-                  className="bg-card border-2 border-gray-300 dark:border-gray-600 rounded-2xl p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:scale-[1.01] transition-all duration-150 cursor-pointer"
+                  className="bg-card border-4 border-gray-800 dark:border-gray-500 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.2)] hover:scale-[1.01] transition-all duration-150 cursor-pointer"
                   onClick={() => navigate(`/split/${group.groupId}`)}
                 >
                   <div className="flex items-start justify-between">
@@ -260,7 +260,7 @@ export default function Splits() {
               <div
                 key={key}
                 ref={el => cardRefs.current[key] = el}
-                className="relative bg-card border-2 border-gray-300 dark:border-gray-600 rounded-2xl p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
+                className="relative bg-card border-4 border-gray-800 dark:border-gray-500 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.2)] hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
                 onClick={() => navigate(`/split/${key}`)}
               >
 
