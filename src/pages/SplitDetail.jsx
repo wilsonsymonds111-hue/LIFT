@@ -143,7 +143,7 @@ export default function SplitDetail() {
           <div
             key={idx}
             onClick={() => handleViewWorkout(workout)}
-            className="relative bg-card border border-slate-300 dark:border-slate-700 rounded-xl p-4 shadow-md shadow-slate-200/80 dark:shadow-slate-900/40 ring-1 ring-slate-200/50 dark:ring-slate-700/30 hover:shadow-lg hover:scale-[1.02] transition-all duration-150 cursor-pointer"
+            className="relative bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 shadow-md shadow-amber-100/60 dark:shadow-amber-900/20 ring-1 ring-amber-200/50 dark:ring-amber-800/20 hover:shadow-lg hover:scale-[1.02] transition-all duration-150 cursor-pointer"
           >
             <h4 className="font-bold text-foreground pr-8">{workout.name}</h4>
             <p className="text-sm text-muted-foreground my-3 line-clamp-2">
