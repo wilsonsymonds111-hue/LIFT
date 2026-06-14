@@ -234,7 +234,7 @@ export default function Splits() {
                         {group.templates.length} workout{group.templates.length > 1 ? 's' : ''}
                       </p>
                     </div>
-                    <div className="flex flex-wrap gap-1.5 mt-4">
+                    <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
                       {group.templates.map((t, i) => (
                         <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                           {t.name}
@@ -280,7 +280,7 @@ export default function Splits() {
                     </button>
                   </div>
 
-                  <div className="flex flex-wrap gap-1.5 mt-4">
+                  <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
                     {split.workouts.map((w, i) => (
                       <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                         {w.name}

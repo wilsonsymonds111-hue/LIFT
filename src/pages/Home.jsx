@@ -7,6 +7,7 @@ import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
+import WeekTracker from '../components/WeekTracker';
 
 const relativeTime = (dateStr) => {
   if (!dateStr) return null;
@@ -102,6 +103,9 @@ export default function Home() {
         </div>
         <ProfileButton />
       </div>
+
+      {/* Weekly Tracker */}
+      <WeekTracker />
 
       {/* Quick Start */}
       <div className="px-4 py-4">
