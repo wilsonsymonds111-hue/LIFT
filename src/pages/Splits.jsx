@@ -19,8 +19,7 @@ export default function Splits() {
   const [swapPhase, setSwapPhase] = useState(null); // null | 'popup' | 'swap' | 'success'
   const [swappingSplitName, setSwappingSplitName] = useState('');
   const [swappingSplitData, setSwappingSplitData] = useState(null);
-  const [swappingOldSplitName, setSwappingOldSplitName] = useState('');
-  const [swappingOldSplitData, setSwappingOldSplitData] = useState(null);
+  const swapRef = useRef({ oldName: '', oldData: null, newName: '', newData: null });
   const [swapOriginRect, setSwapOriginRect] = useState(null);
   const [showBuilder, setShowBuilder] = useState(false);
   const menuRef = useRef({});
@@ -60,13 +59,8 @@ export default function Splits() {
 
   useEffect(() => { loadTemplates(); }, [loadTemplates]);
 
-  // Phase transitions: popup → swap → success → navigate
+  // Phase transitions: success → navigate
   useEffect(() => {
-    if (swapPhase === 'popup' && !swapOriginRect) {
-      // No card rect captured — skip straight to swap
-      const t = setTimeout(() => setSwapPhase('swap'), 50);
-      return () => clearTimeout(t);
-    }
     if (swapPhase === 'success') {
       const t = setTimeout(() => {
         setSwapping(false);
@@ -113,13 +107,12 @@ export default function Splits() {
     setSwappingSplitName(splitData.name);
     setSwappingSplitData(splitData);
 
-    // Fetch once, use for both animation caption AND DB migration
+    // Fetch once, store in ref (immune to React batching) for the animation
     let allTemplates;
     try {
       allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
     } catch (_) {
       setSwapping(false);
-      setSwapPhase(null);
       return;
     }
 
@@ -127,19 +120,21 @@ export default function Splits() {
       t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
     );
 
-    // Capture current active split for the "old" card in the swap animation
+    // Store old split in ref — guaranteed correct, won't get clobbered by state batching
     if (currentActive.length > 0) {
       const names = currentActive.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, ''));
       const uniqueNames = [...new Set(names)];
-      setSwappingOldSplitName(uniqueNames.join(' / ').toUpperCase());
-      setSwappingOldSplitData({
+      swapRef.current.oldName = uniqueNames.join(' / ').toUpperCase();
+      swapRef.current.oldData = {
         workouts: currentActive.map(t => ({ name: t.name })),
         label: `${currentActive.length} workout${currentActive.length > 1 ? 's' : ''}`,
-      });
+      };
     } else {
-      setSwappingOldSplitName('No Current Split');
-      setSwappingOldSplitData({ workouts: [], label: '' });
+      swapRef.current.oldName = 'No Current Split';
+      swapRef.current.oldData = { workouts: [], label: '' };
     }
+    swapRef.current.newName = splitData.name;
+    swapRef.current.newData = splitData;
 
     setSwapPhase('popup');
 
@@ -308,7 +303,7 @@ export default function Splits() {
         />
       )}
 
-      {/* Card pop-out → swap → success overlay — portaled to body to escape SwipeableTabs transform context */}
+      {/* Split swap animation overlay — portaled to body to escape SwipeableTabs transform context */}
       {createPortal(
         <AnimatePresence>
           {swapPhase && (
@@ -320,47 +315,28 @@ export default function Splits() {
             className="fixed inset-0 z-50 flex items-center justify-center"
             style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(18px)' }}
           >
-            {/* ── Phase 1: Card pops out of grid to center ── */}
-            {swapPhase === 'popup' && swapOriginRect && (
+            {/* ── Phase 1: Current (old) split appears at center ── */}
+            {swapPhase === 'popup' && (
               <motion.div
-                initial={{
-                  x: swapOriginRect.left + swapOriginRect.width / 2 - window.innerWidth / 2,
-                  y: swapOriginRect.top + swapOriginRect.height / 2 - window.innerHeight / 2,
-                  width: swapOriginRect.width,
-                  height: swapOriginRect.height,
-                  borderRadius: 16,
-                  scale: 1,
-                  opacity: 1,
-                }}
-                animate={{
-                  x: 0,
-                  y: 0,
-                  width: 340,
-                  height: 'auto',
-                  scale: 1,
-                  opacity: 1,
-                }}
-                transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
                 onAnimationComplete={() => setSwapPhase('swap')}
                 className="bg-card border border-border/50 rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5"
+                style={{ width: 340 }}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{swappingSplitName}</h4>
+                    <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
+                      {swapRef.current.oldName || 'Current Split'}
+                    </h4>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {swappingSplitData?.workouts.length || 0} workout{(swappingSplitData?.workouts.length || 0) > 1 ? 's' : ''} — {swappingSplitData?.label}
+                      {swapRef.current.oldData?.workouts?.length || 0} workout{(swapRef.current.oldData?.workouts?.length || 0) !== 1 ? 's' : ''} — {swapRef.current.oldData?.label || ''}
                     </p>
                   </div>
-                  <button className="w-8 h-8 flex items-center justify-center rounded-full flex-shrink-0 -mt-1 -mr-1">
-                    <svg className="w-4 h-4 text-muted-foreground" viewBox="0 0 16 16" fill="currentColor">
-                      <circle cx="8" cy="3" r="1.5" />
-                      <circle cx="8" cy="8" r="1.5" />
-                      <circle cx="8" cy="13" r="1.5" />
-                    </svg>
-                  </button>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-4">
-                  {swappingSplitData?.workouts.map((w, i) => (
+                  {swapRef.current.oldData?.workouts?.map((w, i) => (
                     <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                       {w.name}
                     </span>
@@ -369,10 +345,10 @@ export default function Splits() {
               </motion.div>
             )}
 
-            {/* ── Phase 2: Card swap — old slides left, new slides in from right ── */}
+            {/* ── Phase 2: Old slides left, new stamps over it from right ── */}
             {(swapPhase === 'swap' || swapPhase === 'success') && (
               <div className="relative pointer-events-none" style={{ width: 340 }}>
-                {/* Old (current) split slides left */}
+                {/* Old split slides out to the left */}
                 <motion.div
                   initial={{ x: 0, opacity: 1, scale: 1 }}
                   animate={{ x: -window.innerWidth, opacity: 0.6, scale: 0.92, rotate: -4 }}
@@ -381,14 +357,16 @@ export default function Splits() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{swappingOldSplitName || 'Current Split'}</h4>
+                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
+                        {swapRef.current.oldName || 'Current Split'}
+                      </h4>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {swappingOldSplitData?.workouts.length || 0} workout{(swappingOldSplitData?.workouts.length || 0) !== 1 ? 's' : ''} — {swappingOldSplitData?.label || ''}
+                        {swapRef.current.oldData?.workouts?.length || 0} workout{(swapRef.current.oldData?.workouts?.length || 0) !== 1 ? 's' : ''} — {swapRef.current.oldData?.label || ''}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-4">
-                    {swappingOldSplitData?.workouts.map((w, i) => (
+                    {swapRef.current.oldData?.workouts?.map((w, i) => (
                       <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                         {w.name}
                       </span>
@@ -396,6 +374,7 @@ export default function Splits() {
                   </div>
                 </motion.div>
 
+                {/* New split stamps in from the right */}
                 <motion.div
                   initial={{ x: window.innerWidth, opacity: 0, scale: 0.9, rotate: 3 }}
                   animate={{ x: 0, opacity: 1, scale: 1, rotate: 0 }}
@@ -416,7 +395,9 @@ export default function Splits() {
                   <div className="flex items-start justify-between relative z-10">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{swappingSplitName}</h4>
+                        <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
+                          {swapRef.current.newName}
+                        </h4>
                         {swapPhase === 'success' && (
                           <motion.div
                             initial={{ scale: 0, rotate: -90 }}
@@ -429,7 +410,7 @@ export default function Splits() {
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground mt-1 relative z-10">
-                        {swappingSplitData?.workouts.length || 0} workout{(swappingSplitData?.workouts.length || 0) > 1 ? 's' : ''} — {swappingSplitData?.label}
+                        {swapRef.current.newData?.workouts?.length || 0} workout{(swapRef.current.newData?.workouts?.length || 0) > 1 ? 's' : ''} — {swapRef.current.newData?.label}
                       </p>
                       {swapPhase === 'success' && (
                         <motion.p
@@ -444,7 +425,7 @@ export default function Splits() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-4 relative z-10">
-                    {swappingSplitData?.workouts.map((w, i) => (
+                    {swapRef.current.newData?.workouts?.map((w, i) => (
                       <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                         {w.name}
                       </span>
