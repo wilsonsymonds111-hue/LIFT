@@ -223,7 +223,7 @@ export default function Splits() {
               {mySplitGroups.map((group) => (
                 <div
                   key={group.groupId}
-                  className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 hover:scale-[1.01] transition-all duration-150 cursor-pointer"
+                  className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer"
                   onClick={() => navigate(`/split/${group.groupId}`)}
                 >
                     <div className="flex items-start justify-between">
@@ -260,7 +260,7 @@ export default function Splits() {
               <div
                 key={key}
                 ref={el => cardRefs.current[key] = el}
-                className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
+                className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
                 onClick={() => navigate(`/split/${key}`)}
               >
 
