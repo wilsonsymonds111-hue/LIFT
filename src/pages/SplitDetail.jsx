@@ -146,9 +146,13 @@ export default function SplitDetail() {
             className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 hover:shadow-xl hover:scale-[1.02] transition-all duration-150 cursor-pointer"
           >
             <h4 className="font-bold text-foreground pr-8">{workout.name}</h4>
-            <p className="text-sm text-muted-foreground my-3 line-clamp-2">
-              {workout.exercisesText || (workout.exercises || []).map(e => e.name).join(', ')}
-            </p>
+            <div className="flex flex-wrap gap-1.5 my-3">
+              {(workout.exercises || []).map((e, i) => (
+                <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                  {e.name}
+                </span>
+              ))}
+            </div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               ⏱ {workout.lastPerformed ? relativeTime(workout.lastPerformed) : 'Not yet performed'}
             </p>
