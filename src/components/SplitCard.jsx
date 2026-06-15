@@ -60,7 +60,7 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
     >
       {/* Bottom gradient for text readability */}
       <div className="absolute inset-0" style={{
-        background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.2) 75%, transparent 92%)'
+        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.15) 70%, transparent 92%)'
       }} />
 
       {/* Content layer */}
@@ -86,8 +86,8 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
             </button>
           </div>
 
-          {/* Subtitle with dark backdrop for legibility */}
-          <p className="text-xs text-white font-medium mt-2 leading-relaxed line-clamp-2 inline-block px-2 py-0.5 -ml-2 rounded-md" style={{ background: 'rgba(0,0,0,0.4)' }}>
+          {/* Subtitle */}
+          <p className="text-xs text-white/90 font-medium mt-2 leading-relaxed line-clamp-2" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
             {subtitle}
           </p>
 
