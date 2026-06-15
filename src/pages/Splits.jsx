@@ -56,7 +56,6 @@ export default function Splits() {
     if (data) {
       // Only show saved splits: non-active, has a splitGroup, and not archived (_old)
       setTemplates(data.filter(t =>
-        t.isActiveSplit !== true &&
         t.splitGroup &&
         !t.splitGroup.endsWith('_old')
       ));
