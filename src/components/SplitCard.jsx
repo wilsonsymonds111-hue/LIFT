@@ -1,7 +1,5 @@
 import { Dumbbell, ChevronRight } from 'lucide-react';
 
-const GLASS_BG = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/83fc56b79_generated_image.png';
-
 const SPLIT_IMAGES = {
   'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e29160df2_generated_image.png',
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6eff308c1_generated_image.png',
@@ -11,28 +9,28 @@ const SPLIT_IMAGES = {
 
 const ACCENT = {
   blue: {
-    stripe: 'from-cyan-400 to-emerald-400',
-    glow: 'shadow-[0_0_20px_rgba(6,182,212,0.3)]',
-    tagBg: 'bg-white/10',
-    tagText: 'text-cyan-300',
+    stripe: 'from-blue-400 to-cyan-400',
+    tagBg: 'bg-blue-50',
+    tagText: 'text-blue-600',
+    iconBorder: 'border-blue-100',
   },
   green: {
     stripe: 'from-emerald-400 to-teal-400',
-    glow: 'shadow-[0_0_20px_rgba(52,211,153,0.3)]',
-    tagBg: 'bg-white/10',
-    tagText: 'text-emerald-300',
+    tagBg: 'bg-emerald-50',
+    tagText: 'text-emerald-600',
+    iconBorder: 'border-emerald-100',
   },
   purple: {
-    stripe: 'from-violet-400 to-fuchsia-400',
-    glow: 'shadow-[0_0_20px_rgba(167,139,250,0.3)]',
-    tagBg: 'bg-white/10',
-    tagText: 'text-violet-300',
+    stripe: 'from-violet-400 to-purple-400',
+    tagBg: 'bg-violet-50',
+    tagText: 'text-violet-600',
+    iconBorder: 'border-violet-100',
   },
   orange: {
     stripe: 'from-amber-400 to-orange-400',
-    glow: 'shadow-[0_0_20px_rgba(251,191,36,0.3)]',
-    tagBg: 'bg-white/10',
-    tagText: 'text-amber-300',
+    tagBg: 'bg-amber-50',
+    tagText: 'text-amber-600',
+    iconBorder: 'border-amber-100',
   },
 };
 
@@ -68,74 +66,53 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
   return (
     <div
       ref={cardRef}
-      className="relative rounded-2xl cursor-pointer group active:scale-[0.99] transition-transform duration-150"
+      className="relative rounded-2xl cursor-pointer group active:scale-[0.99] transition-all duration-150 bg-card border border-border hover:border-blue-200 hover:shadow-md"
       onClick={onCardClick}
-      style={{
-        background: 'linear-gradient(135deg, #06b6d4 0%, #a855f7 50%, #f97316 100%)',
-        padding: '1.5px',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.35), 0 0 20px rgba(6,182,212,0.15), 0 0 20px rgba(251,146,60,0.1)',
-      }}
     >
-      {/* Glass card body */}
-      <div
-        className="relative rounded-[15px] overflow-hidden"
-        style={{
-          backgroundImage: `url(${GLASS_BG})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundColor: 'rgba(15,15,30,0.85)',
-          backgroundBlendMode: 'overlay',
-        }}
-      >
-        {/* Left accent gradient strip */}
-        <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${accent.stripe} rounded-l-full opacity-90`} />
+      {/* Left accent gradient strip */}
+      <div className={`absolute left-0 top-3 bottom-3 w-1 bg-gradient-to-b ${accent.stripe} rounded-full`} />
 
-        <div className="flex items-center gap-3 p-4 pl-5">
-          {/* Anatomy image with glow */}
-          <div className={`w-14 h-14 rounded-xl flex-shrink-0 overflow-hidden ${accent.glow}`}>
-            <div className="w-full h-full rounded-xl bg-gradient-to-br from-white/5 to-white/10 p-[1px]">
-              <div className="w-full h-full rounded-[11px] overflow-hidden">
-                <img src={image} alt="" className="w-full h-full object-cover opacity-90" />
-              </div>
-            </div>
-          </div>
+      <div className="flex items-center gap-3 py-4 pl-5 pr-4">
+        {/* Anatomy image */}
+        <div className={`w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden border-2 ${accent.iconBorder}`}>
+          <img src={image} alt="" className="w-full h-full object-cover" />
+        </div>
 
-          {/* Center content */}
-          <div className="flex-1 min-w-0">
-            <h4 className="font-extrabold text-white text-sm tracking-tight">
-              {name.replace(/ Workout$/, '')}
-            </h4>
-            <div className="flex flex-wrap gap-1 mt-1.5">
-              {workouts.map((w, i) => (
-                <span
-                  key={i}
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${accent.tagBg} ${accent.tagText} backdrop-blur-sm`}
-                >
-                  {w.name}
-                </span>
-              ))}
-            </div>
+        {/* Center content */}
+        <div className="flex-1 min-w-0">
+          <h4 className="font-extrabold text-foreground text-sm tracking-tight">
+            {name.replace(/ Workout$/, '')}
+          </h4>
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            {workouts.map((w, i) => (
+              <span
+                key={i}
+                className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${accent.tagBg} ${accent.tagText}`}
+              >
+                {w.name}
+              </span>
+            ))}
           </div>
+        </div>
 
-          {/* Right side */}
-          <div className="flex flex-col items-center gap-1 flex-shrink-0">
-            <button
-              ref={menuRef}
-              onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-              className="w-7 h-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition select-none"
-            >
-              <svg className="w-3.5 h-3.5 text-white/60" viewBox="0 0 16 16" fill="currentColor">
-                <circle cx="8" cy="3" r="1.5" />
-                <circle cx="8" cy="8" r="1.5" />
-                <circle cx="8" cy="13" r="1.5" />
-              </svg>
-            </button>
-            <div className="flex items-center gap-1 text-xs text-white/60">
-              <Dumbbell className="w-3 h-3" />
-              <span className="font-semibold">{workouts.length}</span>
-            </div>
-            <ChevronRight className="w-4 h-4 text-white/20" />
+        {/* Right side */}
+        <div className="flex flex-col items-center gap-1 flex-shrink-0">
+          <button
+            ref={menuRef}
+            onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-muted transition select-none"
+          >
+            <svg className="w-3.5 h-3.5 text-muted-foreground" viewBox="0 0 16 16" fill="currentColor">
+              <circle cx="8" cy="3" r="1.5" />
+              <circle cx="8" cy="8" r="1.5" />
+              <circle cx="8" cy="13" r="1.5" />
+            </svg>
+          </button>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Dumbbell className="w-3 h-3" />
+            <span className="font-semibold">{workouts.length}</span>
           </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
         </div>
       </div>
     </div>
