@@ -43,13 +43,7 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
           else bgClass = 'border border-blue-300 dark:border-blue-700 bg-transparent';
 
           return (
-            <div key={i} className="flex flex-col items-center w-5">
-              {/* Today indicator dot */}
-              {isToday && (
-                <div className="w-1 h-1 rounded-full bg-emerald-500 mb-0.5" />
-              )}
-              {!isToday && <div className="w-1 h-1 mb-0.5" />}
-
+            <div key={i} className="flex items-center w-5 justify-center">
               {/* Circle */}
               <div
                 className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-150 ${
