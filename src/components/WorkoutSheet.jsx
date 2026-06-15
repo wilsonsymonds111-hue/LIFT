@@ -226,9 +226,22 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
 
 
 
-  // Preload audio once so it plays instantly on tap
-  const audioRef = useRef(typeof Audio !== 'undefined' ? new Audio(SET_COMPLETE_SOUND) : null);
-  useEffect(() => { if (audioRef.current) { audioRef.current.load(); } }, []);
+  // Pre-decode audio buffer for zero-latency playback
+  const audioCtxRef = useRef(null);
+  const audioBufferRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      audioCtxRef.current = ctx;
+      fetch(SET_COMPLETE_SOUND)
+        .then(r => r.arrayBuffer())
+        .then(buf => ctx.decodeAudioData(buf))
+        .then(decoded => { audioBufferRef.current = decoded; })
+        .catch(() => {});
+      return () => { ctx.close(); };
+    } catch (_) {}
+  }, []);
 
   const handleToggle = () => {
     const next = !done;
@@ -236,10 +249,15 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
     if (next && reps) {
       // Haptic feedback
       if (navigator.vibrate) navigator.vibrate(15);
-      // Instant audio
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(() => {});
+      // Instant audio from pre-decoded buffer
+      const ctx = audioCtxRef.current;
+      const buf = audioBufferRef.current;
+      if (ctx && buf) {
+        if (ctx.state === 'suspended') ctx.resume();
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(ctx.destination);
+        src.start(0);
       }
       onComplete?.({ kg: kg !== '' ? parseFloat(kg) : 0, reps: parseInt(reps) });
     } else if (!next) {
