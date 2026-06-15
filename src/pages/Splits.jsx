@@ -89,6 +89,12 @@ export default function Splits() {
 
   const mySplitGroups = Object.values(splitGroups);
 
+  // Pre-compute menu values so the portal doesn't rely on an IIFE closure
+  const menuIsExample = menuOpen ? EXAMPLE_SPLITS_DATA[menuOpen] != null : false;
+  const menuGroup = (!menuIsExample && menuOpen) ? mySplitGroups.find(g => g.groupId === menuOpen) : null;
+  const menuBtnEl = menuOpen ? menuRef.current[menuOpen] : null;
+  const menuRect = menuBtnEl?.getBoundingClientRect();
+
   // If user has no saved splits, auto-switch to examples tab (unless builder is open or user just chose "mine")
   useEffect(() => {
     if (!loading && mySplitGroups.length === 0 && !showBuilder && activeTab !== 'mine') {
@@ -385,48 +391,41 @@ export default function Splits() {
         </div>
       )}
 
-      {/* Compute menu values at render level — no stale closures */}
-      {menuOpen && (() => {
-        const isExample = EXAMPLE_SPLITS_DATA[menuOpen] != null;
-        const group = isExample ? null : mySplitGroups.find(g => g.groupId === menuOpen);
-        const btnEl = menuRef.current[menuOpen];
-        const rect = btnEl?.getBoundingClientRect();
-
-        return createPortal(
-          <div
-            ref={menuPortalRef}
-            className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[200px]"
-            style={{
-              top: `${rect ? rect.bottom + 4 : 0}px`,
-              right: `${rect ? window.innerWidth - rect.right : 0}px`,
-              zIndex: 100,
+      {/* Portal menu */}
+      {menuOpen && createPortal(
+        <div
+          ref={menuPortalRef}
+          className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[200px]"
+          style={{
+            top: `${menuRect ? menuRect.bottom + 4 : 0}px`,
+            right: `${menuRect ? window.innerWidth - menuRect.right : 0}px`,
+            zIndex: 100,
+          }}
+        >
+          <button
+            onClick={() => {
+              if (menuIsExample) {
+                handleMakeCurrentSplit(menuOpen);
+              } else if (menuGroup) {
+                handleMakeMySplitCurrent(menuGroup);
+              }
             }}
+            disabled={swapping}
+            className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition rounded-xl disabled:opacity-50"
           >
+            {swapping ? 'Applying…' : 'Make this my current split'}
+          </button>
+          {!menuIsExample && (
             <button
-              onClick={() => {
-                if (isExample) {
-                  handleMakeCurrentSplit(menuOpen);
-                } else if (group) {
-                  handleMakeMySplitCurrent(group);
-                }
-              }}
-              disabled={swapping}
-              className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition rounded-xl disabled:opacity-50"
+              onClick={() => { setMenuOpen(null); setDeleteTarget(menuGroup); }}
+              className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition rounded-xl"
             >
-              {swapping ? 'Applying…' : 'Make this my current split'}
+              Delete split
             </button>
-            {!isExample && (
-              <button
-                onClick={() => { setMenuOpen(null); setDeleteTarget(group); }}
-                className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition rounded-xl"
-              >
-                Delete split
-              </button>
-            )}
-          </div>,
-          document.body
-        );
-      })()}
+          )}
+        </div>,
+        document.body
+      )}
 
       {/* Delete confirmation */}
       {deleteTarget && createPortal(
