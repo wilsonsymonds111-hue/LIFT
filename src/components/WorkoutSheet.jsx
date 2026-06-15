@@ -12,6 +12,33 @@ import confetti from 'canvas-confetti';
 /* ─── Sound Effect ──────────────────────────────────────────── */
 const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/b48c46396_ScreenRecording_06-16-202607-45-53_1.mp3';
 
+// Shared module-level audio — pre-decoded once, shared by all SetRows
+let _audioCtx = null;
+let _audioBuf = null;
+let _loaded = false;
+
+function _initAudio() {
+  if (_loaded) return;
+  _loaded = true;
+  try {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    fetch(SET_COMPLETE_SOUND)
+      .then(r => r.arrayBuffer())
+      .then(buf => _audioCtx.decodeAudioData(buf))
+      .then(decoded => { _audioBuf = decoded; })
+      .catch(() => {});
+  } catch (_) {}
+}
+
+function playTick() {
+  if (_audioCtx && _audioBuf) {
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    const src = _audioCtx.createBufferSource();
+    src.buffer = _audioBuf;
+    src.connect(_audioCtx.destination);
+    src.start(0);
+  }
+}
 
 /* ─── Timer ──────────────────────────────────────────────────── */
 function useTimer() {
@@ -226,39 +253,15 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
 
 
 
-  // Pre-decode audio buffer for zero-latency playback
-  const audioCtxRef = useRef(null);
-  const audioBufferRef = useRef(null);
-
-  useEffect(() => {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      audioCtxRef.current = ctx;
-      fetch(SET_COMPLETE_SOUND)
-        .then(r => r.arrayBuffer())
-        .then(buf => ctx.decodeAudioData(buf))
-        .then(decoded => { audioBufferRef.current = decoded; })
-        .catch(() => {});
-      return () => { ctx.close(); };
-    } catch (_) {}
-  }, []);
+  // Trigger shared audio preload on first render
+  useEffect(() => { _initAudio(); }, []);
 
   const handleToggle = () => {
     const next = !done;
     setDone(next);
     if (next && reps) {
-      // Haptic feedback
       if (navigator.vibrate) navigator.vibrate(15);
-      // Instant audio from pre-decoded buffer
-      const ctx = audioCtxRef.current;
-      const buf = audioBufferRef.current;
-      if (ctx && buf) {
-        if (ctx.state === 'suspended') ctx.resume();
-        const src = ctx.createBufferSource();
-        src.buffer = buf;
-        src.connect(ctx.destination);
-        src.start(0);
-      }
+      playTick();
       onComplete?.({ kg: kg !== '' ? parseFloat(kg) : 0, reps: parseInt(reps) });
     } else if (!next) {
       onComplete?.(null);
