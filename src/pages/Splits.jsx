@@ -385,49 +385,48 @@ export default function Splits() {
         </div>
       )}
 
-      {/* Portal menu */}
-      {menuOpen && createPortal(
-        (() => {
-          const isExample = EXAMPLE_SPLITS_DATA[menuOpen] != null;
-          const menuGroup = isExample ? null : mySplitGroups.find(g => g.groupId === menuOpen);
-          const btnEl = menuRef.current[menuOpen];
-          const rect = btnEl?.getBoundingClientRect();
+      {/* Portal menu — compute values before JSX so the IIFE doesn't create stale closures */}
+      {menuOpen && (() => {
+        const isExample = EXAMPLE_SPLITS_DATA[menuOpen] != null;
+        const menuGroup = isExample ? null : mySplitGroups.find(g => g.groupId === menuOpen);
+        const btnEl = menuRef.current[menuOpen];
+        const rect = btnEl?.getBoundingClientRect();
 
-          return (
-            <div
-              ref={menuPortalRef}
-              onClick={e => e.stopPropagation()}
-              className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[200px]"
-              style={{
-                top: `${rect ? rect.bottom + 4 : 0}px`,
-                right: `${rect ? window.innerWidth - rect.right : 0}px`,
-                zIndex: 100,
+        return createPortal(
+          <div
+            ref={menuPortalRef}
+            className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[200px]"
+            style={{
+              top: `${rect ? rect.bottom + 4 : 0}px`,
+              right: `${rect ? window.innerWidth - rect.right : 0}px`,
+              zIndex: 100,
+            }}
+          >
+            <button
+              onClick={() => {
+                if (isExample) {
+                  handleMakeCurrentSplit(menuOpen);
+                } else if (menuGroup) {
+                  handleMakeMySplitCurrent(menuGroup);
+                }
               }}
+              disabled={swapping}
+              className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition rounded-xl disabled:opacity-50"
             >
-              <button
-                onClick={() => {
-                  if (isExample) {
-                    handleMakeCurrentSplit(menuOpen);
-                  } else if (menuGroup) {
-                    handleMakeMySplitCurrent(menuGroup);
-                  }
-                }}
-                disabled={swapping}
-                className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition rounded-xl disabled:opacity-50"
-              >
-                {swapping ? 'Applying…' : 'Make this my current split'}
-              </button>
+              {swapping ? 'Applying…' : 'Make this my current split'}
+            </button>
+            {!isExample && menuGroup && (
               <button
                 onClick={() => { setMenuOpen(null); setDeleteTarget(menuGroup); }}
                 className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition rounded-xl"
               >
                 Delete split
               </button>
-            </div>
-          );
-        })(),
-        document.body
-      )}
+            )}
+          </div>,
+          document.body
+        );
+      })()}
 
       {/* Delete confirmation */}
       {deleteTarget && createPortal(
