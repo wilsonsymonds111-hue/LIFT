@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
 import ProfileButton from '../components/ProfileButton';
 import SplitBuilder from '../components/SplitBuilder';
+import SplitModal from '../components/SplitModal';
 
 
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +26,7 @@ export default function Splits() {
   const [swapOriginRect, setSwapOriginRect] = useState(null);
   const [showBuilder, setShowBuilder] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null); // group to confirm deletion
+  const [activeSplit, setActiveSplit] = useState(null);
   const menuRef = useRef({});
   const cardRefs = useRef({});
 
@@ -303,7 +305,7 @@ export default function Splits() {
                 <div
                   key={group.groupId}
                   className="relative bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
-                  onClick={() => navigate(`/split/${group.groupId}`)}
+                  onClick={() => setActiveSplit(group.groupId)}
                 >
                     <div className="text-center relative">
                       <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
@@ -350,7 +352,7 @@ export default function Splits() {
                 key={key}
                 ref={el => cardRefs.current[key] = el}
                 className="relative bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
-                onClick={() => navigate(`/split/${key}`)}
+                onClick={() => setActiveSplit(key)}
               >
 
                   <div className="text-center relative">
@@ -463,6 +465,14 @@ export default function Splits() {
             setActiveTab('mine');
             localStorage.setItem('splitsActiveTab', 'mine');
           }}
+        />
+      )}
+
+      {/* Split detail modal */}
+      {activeSplit && (
+        <SplitModal
+          splitKey={activeSplit}
+          onClose={() => setActiveSplit(null)}
         />
       )}
 

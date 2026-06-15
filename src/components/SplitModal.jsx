@@ -1,0 +1,196 @@
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { base44 } from '@/api/base44Client';
+import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
+
+function relativeTime(dateStr) {
+  if (!dateStr) return null;
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now - date;
+  if (diffMs < 60000) return 'Just now';
+  if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
+  if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h ago`;
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  return `${Math.floor(diffDays / 30)}mo ago`;
+}
+
+export default function SplitModal({ splitKey, onClose }) {
+  const navigate = useNavigate();
+  const [applying, setApplying] = useState(false);
+  const [customSplit, setCustomSplit] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const exampleSplit = EXAMPLE_SPLITS_DATA[splitKey];
+
+  useEffect(() => {
+    if (!exampleSplit && splitKey) {
+      setLoading(true);
+      base44.entities.WorkoutTemplate.list('sort_order', 100).then(data => {
+        const templates = (data || []).filter(t => t.splitGroup === splitKey);
+        if (templates.length > 0) {
+          setCustomSplit({
+            name: templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ').toUpperCase(),
+            description: `${templates.length} workout${templates.length > 1 ? 's' : ''}`,
+            workouts: templates.map(t => ({
+              name: t.name,
+              exercisesText: t.exercises || (t.exerciseList || []).map(e => e.name).join(', '),
+              exerciseCount: (t.exerciseList || []).length,
+              lastPerformed: t.lastPerformed,
+              exercises: (t.exerciseList || []).map(e => ({ name: e.name })),
+              templateId: t.id,
+            })),
+          });
+        }
+        setLoading(false);
+      });
+    }
+  }, [splitKey, exampleSplit]);
+
+  const split = exampleSplit || customSplit;
+
+  const handleMakeCurrent = async () => {
+    setApplying(true);
+    const newGroupId = Date.now().toString();
+    const oldGroupId = Date.now().toString() + '_old';
+    try {
+      const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+      const currentActive = allTemplates.filter(
+        t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
+      );
+      await Promise.all(currentActive.map(t =>
+        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+      ));
+      const newTemplates = split.workouts.map((w, i) => ({
+        name: w.name,
+        exercises: (w.exercises || []).map(e => e.name).join(', '),
+        exerciseList: (w.exercises || []).map(e => ({ ...e, history: [] })),
+        lastPerformed: null,
+        sort_order: i,
+        isActiveSplit: true,
+        splitGroup: newGroupId,
+      }));
+      await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+    } catch (_) {}
+    setApplying(false);
+    onClose();
+    navigate('/');
+  };
+
+  const handleViewWorkout = async (workout) => {
+    if (workout.templateId) {
+      onClose();
+      navigate(`/template/${workout.templateId}`);
+      return;
+    }
+    setApplying(true);
+    const exerciseList = workout.exercises.map(e => ({ ...e, history: [] }));
+    const exercisesStr = workout.exercises.map(e => e.name).join(', ');
+    const template = await base44.entities.WorkoutTemplate.create({
+      name: workout.name,
+      exercises: exercisesStr,
+      exerciseList,
+      lastPerformed: null,
+      isActiveSplit: false,
+      splitGroup: splitKey,
+    });
+    setApplying(false);
+    onClose();
+    navigate(`/template/${template.id}`);
+  };
+
+  return createPortal(
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
+        onClick={onClose}
+      >
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+        
+        <motion.div
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          onClick={e => e.stopPropagation()}
+          className="relative bg-card rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg flex flex-col shadow-2xl overflow-hidden"
+          style={{ maxHeight: '90vh', paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}
+        >
+          {/* Drag handle */}
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="w-10 h-1 rounded-full bg-border" />
+          </div>
+
+          {loading || !split ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+            </div>
+          ) : (
+            <>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-border">
+                <button
+                  onClick={onClose}
+                  className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-muted/70 transition -ml-2"
+                >
+                  <ArrowLeft className="w-5 h-5 text-foreground" />
+                </button>
+                <div className="text-center">
+                  <h2 className="text-lg font-extrabold text-foreground">{split.name}</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">{split.description}</p>
+                </div>
+                <div className="w-11" />
+              </div>
+
+              {/* Workout cards */}
+              <div className="flex-1 overflow-y-auto px-5 pt-4 pb-3">
+                <div className="flex flex-col gap-3">
+                  {split.workouts.map((workout, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => handleViewWorkout(workout)}
+                      className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 hover:shadow-xl hover:scale-[1.02] transition-all duration-150 cursor-pointer"
+                    >
+                      <h4 className="font-bold text-foreground pr-8">{workout.name}</h4>
+                      <div className="flex flex-wrap gap-1.5 my-3">
+                        {(workout.exercises || []).map((e, i) => (
+                          <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                            {e.name}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        ⏱ {workout.lastPerformed ? relativeTime(workout.lastPerformed) : 'Not yet performed'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Make Current button */}
+              <div className="px-5 pb-4 pt-2">
+                <button
+                  onClick={handleMakeCurrent}
+                  disabled={applying}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60"
+                >
+                  {applying ? 'Applying...' : 'Make This My Current Split'}
+                </button>
+              </div>
+            </>
+          )}
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>,
+    document.body
+  );
+}
