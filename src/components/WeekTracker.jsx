@@ -19,10 +19,10 @@ function getTooltipText(status, isPast, isToday) {
 }
 
 export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
-  const [activeDay, setActiveDay] = useState(null);
   const todayIndex = new Date().getDay(); // 0=Sun → 6 in Mon-Sun scale
   // Convert JS day (0=Sun,6=Sat) to Mon-Sun (0=Mon,6=Sun)
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
+  const [activeDay, setActiveDay] = useState(todayMonSun);
 
   return (
     <div className="px-4 pb-2">
@@ -58,9 +58,9 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
             <div
               key={i}
               className="flex items-center w-5 justify-center"
-              onClick={() => setActiveDay(activeDay === i ? null : i)}
+              onClick={() => setActiveDay(activeDay === i ? todayMonSun : i)}
               onMouseEnter={() => setActiveDay(i)}
-              onMouseLeave={() => setActiveDay(null)}
+              onMouseLeave={() => setActiveDay(todayMonSun)}
             >
               {/* Circle */}
               <div
@@ -82,9 +82,7 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
       {/* Tooltip */}
       <div className="flex justify-center mt-2">
         <span className="text-[11px] font-medium text-muted-foreground text-center min-h-[16px]">
-          {activeDay !== null
-            ? getTooltipText(schedule[activeDay], activeDay < todayMonSun, activeDay === todayMonSun)
-            : '\u00A0'}
+          {getTooltipText(schedule[activeDay], activeDay < todayMonSun, activeDay === todayMonSun)}
         </span>
       </div>
     </div>
