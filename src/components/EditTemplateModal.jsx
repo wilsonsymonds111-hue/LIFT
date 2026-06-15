@@ -72,7 +72,7 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex flex-col bg-white">
+      <div className="fixed inset-0 z-[60] flex flex-col bg-card">
         {/* Top bar */}
         <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100">
           <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-200 hover:bg-gray-300 transition">
@@ -88,7 +88,7 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-4 pt-5 pb-10">
+        <div className="flex-1 overflow-y-auto px-4 pt-5 pb-28">
           {/* Template name */}
           <input
             value={name}

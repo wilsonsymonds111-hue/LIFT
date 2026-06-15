@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, ChevronLeft, Plus, Dumbbell, Check, Sparkles, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import ExercisePicker from './ExercisePicker';
+import WorkoutBuilder from './WorkoutBuilder';
 
 const WORKOUT_LABELS = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
 
@@ -25,17 +25,13 @@ export default function SplitBuilder({ onClose, onSaved }) {
     setStep(2);
   };
 
-  const handleAddExercises = (idx, exercises) => {
+  const handleBuildSave = (exerciseList) => {
     setWorkouts(prev => {
       const updated = [...prev];
-      const existing = updated[idx].exercises;
-      const newList = [...existing];
-      exercises.forEach(ex => {
-        if (!newList.find(e => e.name === ex.name)) {
-          newList.push({ ...ex, sets: 3, history: [] });
-        }
-      });
-      updated[idx] = { ...updated[idx], exercises: newList };
+      updated[editingWorkoutIdx] = {
+        ...updated[editingWorkoutIdx],
+        exercises: exerciseList.map(ex => ({ ...ex, sets: ex.defaultSets.length })),
+      };
       return updated;
     });
     setEditingWorkoutIdx(null);
@@ -287,11 +283,12 @@ export default function SplitBuilder({ onClose, onSaved }) {
           </div>
         )}
 
-        {/* Exercise Picker */}
+        {/* Workout Builder */}
         {editingWorkoutIdx !== null && (
-          <ExercisePicker
+          <WorkoutBuilder
             onClose={() => setEditingWorkoutIdx(null)}
-            onAdd={(exercises) => handleAddExercises(editingWorkoutIdx, exercises)}
+            onSave={handleBuildSave}
+            initialExercises={workouts[editingWorkoutIdx]?.exercises || []}
           />
         )}
       </motion.div>
