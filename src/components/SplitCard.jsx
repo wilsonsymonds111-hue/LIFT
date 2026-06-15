@@ -1,10 +1,10 @@
 import { Dumbbell, ChevronRight, MoreHorizontal } from 'lucide-react';
 
 const SPLIT_BG_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/35a120ac0_generated_image.png',
-  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a86904896_generated_image.png',
-  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/4f618e97f_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/949b26cf8_generated_image.png',
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9987dd7bf_generated_image.png',
+  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/438697cad_generated_image.png',
+  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6f45c2e2d_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/ed16a64c9_generated_image.png',
 };
 
 const ACCENT_COLORS = {
@@ -50,23 +50,18 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
       ref={cardRef}
       onClick={onCardClick}
       className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-200 overflow-hidden"
-      style={{ height: 170 }}
+      style={{
+        height: 200,
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center 30%',
+        backgroundColor: '#1a1a2e',
+      }}
     >
-      {/* Background image — fills the card edge to edge */}
-      <div className="absolute inset-0">
-        <img
-          src={bgImage}
-          alt=""
-          className="w-full h-full object-cover"
-          style={{ objectPosition: '50% 30%' }}
-        />
-        {/* Colored tint overlay */}
-        <div className="absolute inset-0" style={{ backgroundColor: accent.tint }} />
-        {/* Subtle bottom gradient — only darkens the lower portion for badge readability */}
-        <div className="absolute inset-0" style={{
-          background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 20%, transparent 35%)'
-        }} />
-      </div>
+      {/* Bottom gradient for text readability */}
+      <div className="absolute inset-0" style={{
+        background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 30%, transparent 50%)'
+      }} />
 
       {/* Content layer */}
       <div className="relative h-full flex flex-col justify-between px-4 py-3.5">
