@@ -163,7 +163,7 @@ export default function SplitModal({ splitKey, onClose }) {
                       <h4 className="font-bold text-foreground pr-8">{workout.name}</h4>
                       <div className="flex flex-wrap gap-1.5 my-3">
                         {(workout.exercises || []).map((e, i) => (
-                          <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                          <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-[#E3F2FD] dark:bg-blue-950/50 text-[#1565C0] dark:text-blue-400 font-medium">
                             {e.name}
                           </span>
                         ))}
