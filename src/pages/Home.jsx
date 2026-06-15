@@ -24,6 +24,70 @@ const relativeTime = (dateStr) => {
   return `${Math.floor(diffDays / 30)}mo ago`;
 };
 
+function detectSplitType(workoutNames) {
+  const lower = workoutNames.map(n => n.toLowerCase());
+  const hasUpper = lower.some(n => n.includes('upper'));
+  const hasLower = lower.some(n => n.includes('lower'));
+  const hasPush = lower.some(n => n.includes('push'));
+  const hasPull = lower.some(n => n.includes('pull'));
+  const hasLegs = lower.some(n => n.includes('legs'));
+  const hasFull = lower.some(n => n.includes('full'));
+
+  if (hasFull && !hasUpper && !hasLower) return 'full-body';
+  if (hasPush && hasPull && hasLegs) return 'push-pull-legs';
+  if (hasUpper && hasLower && hasPush && hasPull && hasLegs) return 'ul-ppl';
+  if (hasUpper && hasLower) return 'upper-lower';
+  if (hasPush || hasPull || hasLegs) return 'push-pull-legs';
+  return 'upper-lower';
+}
+
+const SPLIT_THEMES = {
+  'upper-lower': {
+    glow1: 'from-blue-500/10 via-blue-400/6 to-cyan-400/4',
+    glow2: 'bg-blue-400/8',
+    glow3: 'from-blue-500/5 via-transparent to-cyan-400/5',
+    dot: 'bg-blue-500',
+    cardBorder: 'border-blue-400/30',
+    cardShadow: 'shadow-blue-500/10',
+    cardRing: 'ring-blue-400/10',
+    tagBg: 'bg-blue-50 dark:bg-blue-950/40',
+    tagText: 'text-blue-600 dark:text-blue-400',
+  },
+  'push-pull-legs': {
+    glow1: 'from-emerald-500/10 via-emerald-400/6 to-teal-400/4',
+    glow2: 'bg-emerald-400/8',
+    glow3: 'from-emerald-500/5 via-transparent to-teal-400/5',
+    dot: 'bg-emerald-500',
+    cardBorder: 'border-emerald-400/30',
+    cardShadow: 'shadow-emerald-500/10',
+    cardRing: 'ring-emerald-400/10',
+    tagBg: 'bg-emerald-50 dark:bg-emerald-950/40',
+    tagText: 'text-emerald-600 dark:text-emerald-400',
+  },
+  'full-body': {
+    glow1: 'from-purple-500/10 via-purple-400/6 to-violet-400/4',
+    glow2: 'bg-purple-400/8',
+    glow3: 'from-purple-500/5 via-transparent to-violet-400/5',
+    dot: 'bg-purple-500',
+    cardBorder: 'border-purple-400/30',
+    cardShadow: 'shadow-purple-500/10',
+    cardRing: 'ring-purple-400/10',
+    tagBg: 'bg-purple-50 dark:bg-purple-950/40',
+    tagText: 'text-purple-600 dark:text-purple-400',
+  },
+  'ul-ppl': {
+    glow1: 'from-amber-500/10 via-amber-400/6 to-yellow-400/4',
+    glow2: 'bg-amber-400/8',
+    glow3: 'from-amber-500/5 via-transparent to-yellow-400/5',
+    dot: 'bg-amber-500',
+    cardBorder: 'border-amber-400/30',
+    cardShadow: 'shadow-amber-500/10',
+    cardRing: 'ring-amber-400/10',
+    tagBg: 'bg-amber-50 dark:bg-amber-950/40',
+    tagText: 'text-amber-600 dark:text-amber-400',
+  },
+};
+
 export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -84,6 +148,11 @@ export default function Home() {
     ? currentSplit.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ').toUpperCase()
     : '';
 
+  const splitType = currentSplit.length > 0
+    ? detectSplitType(currentSplit.map(t => t.name))
+    : 'upper-lower';
+  const theme = SPLIT_THEMES[splitType];
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -120,9 +189,9 @@ export default function Home() {
       {/* ==================== CURRENT SPLIT (Spotlight) ==================== */}
       <div className="relative px-4 py-2">
         {/* Multi-layered glow for depth */}
-        <div className="absolute -inset-12 bg-gradient-to-br from-blue-500/10 via-blue-400/6 to-cyan-400/4 rounded-[4rem] blur-3xl pointer-events-none" />
-        <div className="absolute -inset-4 bg-blue-400/8 rounded-[2.5rem] blur-2xl pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-cyan-400/5 rounded-[2rem] blur-xl pointer-events-none" />
+        <div className={`absolute -inset-12 bg-gradient-to-br ${theme.glow1} rounded-[4rem] blur-3xl pointer-events-none`} />
+        <div className={`absolute -inset-4 ${theme.glow2} rounded-[2.5rem] blur-2xl pointer-events-none`} />
+        <div className={`absolute inset-0 bg-gradient-to-r ${theme.glow3} rounded-[2rem] blur-xl pointer-events-none`} />
 
         <div className="relative">
           <div className="flex items-start justify-between mb-4">
@@ -131,7 +200,7 @@ export default function Home() {
                 <motion.div
                   animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
                   transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-                  className="w-2 h-2 rounded-full bg-blue-500"
+                  className={`w-2 h-2 rounded-full ${theme.dot}`}
                 />
                 <h3 className="font-semibold text-foreground text-sm">Current Split</h3>
               </div>
@@ -146,7 +215,7 @@ export default function Home() {
               {currentSplit.map((template) => (
                 <div
                   key={template.id}
-                  className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 hover:shadow-xl hover:scale-[1.02] transition-all duration-150"
+                  className={`relative bg-card border ${theme.cardBorder} rounded-xl p-4 shadow-lg ${theme.cardShadow} ring-1 ${theme.cardRing} hover:shadow-xl hover:scale-[1.02] transition-all duration-150`}
                 >
                   {/* Three-dot menu button */}
                   <button
@@ -164,7 +233,7 @@ export default function Home() {
                         ? template.exerciseList.map(e => e.name)
                         : (template.exercises || '').split(',').map(s => s.trim()).filter(Boolean)
                       ).map((name, i) => (
-                        <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                        <span key={i} className={`text-[11px] px-2.5 py-1 rounded-full ${theme.tagBg} ${theme.tagText} font-medium`}>
                           {name}
                         </span>
                       ))}
