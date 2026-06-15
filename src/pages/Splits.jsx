@@ -162,6 +162,13 @@ export default function Splits() {
     }
   };
 
+  const handleDeleteMySplit = async (group) => {
+    setMenuOpen(null);
+    const ids = group.templates.map(t => t.id);
+    setTemplates(prev => prev.filter(t => !ids.includes(t.id)));
+    await Promise.all(ids.map(id => base44.entities.WorkoutTemplate.delete(id)));
+  };
+
   const handleMakeCurrentSplit = async (splitKey) => {
     setMenuOpen(null);
     const splitData = EXAMPLE_SPLITS_DATA[splitKey];
@@ -402,6 +409,17 @@ export default function Splits() {
               >
                 {swapping ? 'Applying…' : 'Make this my current split'}
               </button>
+              {EXAMPLE_SPLITS_DATA[menuOpen] == null && (
+                <button
+                  onClick={() => {
+                    const group = mySplitGroups.find(g => g.groupId === menuOpen);
+                    if (group) handleDeleteMySplit(group);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition rounded-xl"
+                >
+                  Delete split
+                </button>
+              )}
             </div>
           );
         })(),
