@@ -63,11 +63,19 @@ export default function SplitDetail() {
     );
   }
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/splits');
+    }
+  };
+
   if (!split) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Split not found</p>
-        <button onClick={() => navigate(-1)} className="text-blue-500 font-semibold">Go back</button>
+        <button onClick={handleBack} className="text-blue-500 font-semibold">Go back</button>
       </div>
     );
   }
@@ -126,7 +134,7 @@ export default function SplitDetail() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border" style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}>
         <button
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
           className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-muted/70 transition -ml-2"
         >
           <ArrowLeft className="w-5 h-5 text-foreground" />
