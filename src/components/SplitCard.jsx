@@ -1,10 +1,10 @@
 import { Dumbbell, ChevronRight } from 'lucide-react';
 
 const SPLIT_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e29160df2_generated_image.png',
-  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6eff308c1_generated_image.png',
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e83e946a6_generated_image.png',
+  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/152997e59_generated_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/d0951c90c_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/580205ec8_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a7b899de9_generated_image.png',
 };
 
 const ACCENT = {
@@ -66,7 +66,7 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
   return (
     <div
       ref={cardRef}
-      className="relative rounded-2xl cursor-pointer group active:scale-[0.99] transition-all duration-150 bg-card border border-border hover:border-blue-200 hover:shadow-md"
+      className="relative rounded-2xl cursor-pointer group active:scale-[0.99] transition-all duration-200 bg-card border border-border shadow-sm hover:shadow-lg hover:scale-[1.02] hover:border-blue-200"
       onClick={onCardClick}
     >
       {/* Left accent gradient strip */}
