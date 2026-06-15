@@ -49,7 +49,7 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
     <div
       ref={cardRef}
       onClick={onCardClick}
-      className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-200 overflow-hidden"
+      className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-200 overflow-hidden shadow-lg hover:shadow-xl hover:scale-[1.02]"
       style={{
         height: 200,
         backgroundImage: `url(${bgImage})`,
