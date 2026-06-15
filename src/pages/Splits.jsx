@@ -384,11 +384,11 @@ export default function Splits() {
       {/* Portal menu */}
       {menuOpen && (() => {
         const isExample = EXAMPLE_SPLITS_DATA[menuOpen] != null;
+        const menuGroup = isExample ? null : mySplitGroups.find(g => g.groupId === menuOpen);
         const btnEl = menuRef.current[menuOpen];
         const btnRect = btnEl?.getBoundingClientRect();
         const top = btnRect ? btnRect.bottom + 4 : 0;
         const right = btnRect ? window.innerWidth - btnRect.right : 0;
-        const menuGroup = !isExample ? mySplitGroups.find(g => g.groupId === menuOpen) : null;
 
         return createPortal(
           <div
@@ -409,9 +409,9 @@ export default function Splits() {
             >
               {swapping ? 'Applying…' : 'Make this my current split'}
             </button>
-            {!isExample && (
+            {menuGroup != null && (
               <button
-                onClick={() => { if (menuGroup) handleDeleteMySplit(menuGroup); }}
+                onClick={() => handleDeleteMySplit(menuGroup)}
                 className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition rounded-xl"
               >
                 Delete split
