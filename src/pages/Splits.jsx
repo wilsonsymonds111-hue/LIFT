@@ -422,7 +422,7 @@ export default function Splits() {
             }}
             className="w-full text-left px-4 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
           >
-            Delete split
+            Delete split from {activeTab === 'mine' ? 'My Splits' : 'Example Splits'}
           </button>
         </div>,
         document.body
@@ -434,7 +434,7 @@ export default function Splits() {
           <div onClick={e => e.stopPropagation()} className="bg-card rounded-2xl p-6 mx-5 max-w-sm w-full shadow-2xl border border-border">
             <h3 className="text-lg font-extrabold text-foreground">Delete Split?</h3>
             <p className="text-sm text-muted-foreground mt-2">
-              Are you sure you want to delete this split? This cannot be undone.
+              Are you sure you want to delete this split from {activeTab === 'mine' ? 'My Splits' : 'Example Splits'}? This cannot be undone.
             </p>
             <div className="flex gap-3 mt-5">
               <button
