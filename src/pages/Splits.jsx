@@ -92,6 +92,76 @@ export default function Splits() {
     }
   }, [loading, mySplitGroups.length, showBuilder, activeTab]);
 
+  const handleMakeMySplitCurrent = async (group) => {
+    setMenuOpen(null);
+
+    // Build display data from the group's templates
+    const names = group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, ''));
+    const uniqueNames = [...new Set(names)];
+    const splitName = uniqueNames.join(' / ').toUpperCase();
+    const splitData = {
+      name: splitName,
+      workouts: group.templates.map(t => ({
+        name: t.name,
+        exercises: (t.exerciseList || []).map(e => ({ name: e.name })),
+      })),
+      label: `${group.templates.length} workout${group.templates.length > 1 ? 's' : ''}`,
+    };
+
+    setSwapping(true);
+    setSwappingSplitName(splitData.name);
+    setSwappingSplitData(splitData);
+
+    let allTemplates;
+    try {
+      allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+    } catch (_) {
+      setSwapping(false);
+      return;
+    }
+
+    const currentActive = allTemplates.filter(
+      t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
+    );
+
+    if (currentActive.length > 0) {
+      const oldNames = currentActive.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, ''));
+      const oldUniqueNames = [...new Set(oldNames)];
+      swapRef.current.oldName = oldUniqueNames.join(' / ').toUpperCase();
+      swapRef.current.oldData = {
+        workouts: currentActive.map(t => ({ name: t.name })),
+        label: `${currentActive.length} workout${currentActive.length > 1 ? 's' : ''}`,
+      };
+    } else {
+      swapRef.current.oldName = 'No Current Split';
+      swapRef.current.oldData = { workouts: [], label: '' };
+    }
+    swapRef.current.newName = splitData.name;
+    swapRef.current.newData = splitData;
+
+    setSwapPhase('popup');
+
+    try {
+      const newGroupId = Date.now().toString();
+      const oldGroupId = Date.now().toString() + '_old';
+      const deactivateUpdates = currentActive.map(t =>
+        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+      );
+      await Promise.all(deactivateUpdates);
+      const activateUpdates = group.templates.map((t, i) =>
+        base44.entities.WorkoutTemplate.update(t.id, {
+          isActiveSplit: true,
+          splitGroup: newGroupId,
+          sort_order: i,
+        })
+      );
+      await Promise.all(activateUpdates);
+    } catch (_) {
+      setSwapping(false);
+      setSwapPhase(null);
+    }
+  };
+
   const handleMakeCurrentSplit = async (splitKey) => {
     setMenuOpen(null);
     const splitData = EXAMPLE_SPLITS_DATA[splitKey];
@@ -223,16 +293,27 @@ export default function Splits() {
               {mySplitGroups.map((group) => (
                 <div
                   key={group.groupId}
-                  className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer"
+                  className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
                   onClick={() => navigate(`/split/${group.groupId}`)}
                 >
-                    <div className="text-center">
+                    <div className="text-center relative">
                       <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
                         {group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ')}
                       </h4>
                       <p className="text-sm text-muted-foreground mt-1">
                         {group.templates.length} workout{group.templates.length > 1 ? 's' : ''}
                       </p>
+                      <button
+                        ref={el => menuRef.current[group.groupId] = el}
+                        onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === group.groupId ? null : group.groupId); }}
+                        className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition select-none group/btn"
+                      >
+                        <svg className="w-4 h-4 text-muted-foreground group-hover/btn:text-foreground transition-colors" viewBox="0 0 16 16" fill="currentColor">
+                          <circle cx="8" cy="3" r="1.5" />
+                          <circle cx="8" cy="8" r="1.5" />
+                          <circle cx="8" cy="13" r="1.5" />
+                        </svg>
+                      </button>
                     </div>
                     <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
                       {group.templates.map((t, i) => (
@@ -307,7 +388,15 @@ export default function Splits() {
               style={{ top: `${top}px`, right: `${right}px`, zIndex: 100 }}
             >
               <button
-                onClick={() => handleMakeCurrentSplit(menuOpen)}
+                onClick={() => {
+                  const exampleData = EXAMPLE_SPLITS_DATA[menuOpen];
+                  if (exampleData) {
+                    handleMakeCurrentSplit(menuOpen);
+                  } else {
+                    const group = mySplitGroups.find(g => g.groupId === menuOpen);
+                    if (group) handleMakeMySplitCurrent(group);
+                  }
+                }}
                 disabled={swapping}
                 className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition rounded-xl disabled:opacity-50"
               >
