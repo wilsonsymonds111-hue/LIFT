@@ -1,36 +1,36 @@
 import { Dumbbell, ChevronRight } from 'lucide-react';
 
 const SPLIT_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e71bda804_generated_image.png',
-  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/53fb5d56d_generated_image.png',
-  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/d0951c90c_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e4658d191_generated_image.png',
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/0b33c1635_generated_image.png',
+  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/20f6bb485_generated_image.png',
+  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9bd01ac0a_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/f9cb45692_generated_image.png',
 };
 
 const ACCENT = {
   blue: {
-    stripe: 'from-blue-400 to-cyan-400',
-    tagBg: 'bg-blue-50',
-    tagText: 'text-blue-600',
-    iconBorder: 'border-blue-100',
+    tagBg: 'bg-blue-500/15',
+    tagText: 'text-blue-200',
+    countBg: 'bg-blue-100',
+    countText: 'text-blue-700',
   },
   green: {
-    stripe: 'from-emerald-400 to-teal-400',
-    tagBg: 'bg-emerald-50',
-    tagText: 'text-emerald-600',
-    iconBorder: 'border-emerald-100',
+    tagBg: 'bg-emerald-500/15',
+    tagText: 'text-emerald-200',
+    countBg: 'bg-emerald-100',
+    countText: 'text-emerald-700',
   },
   purple: {
-    stripe: 'from-violet-400 to-purple-400',
-    tagBg: 'bg-violet-50',
-    tagText: 'text-violet-600',
-    iconBorder: 'border-violet-100',
+    tagBg: 'bg-purple-500/15',
+    tagText: 'text-purple-200',
+    countBg: 'bg-purple-100',
+    countText: 'text-purple-700',
   },
   orange: {
-    stripe: 'from-amber-400 to-orange-400',
-    tagBg: 'bg-amber-50',
-    tagText: 'text-amber-600',
-    iconBorder: 'border-amber-100',
+    tagBg: 'bg-amber-500/15',
+    tagText: 'text-amber-200',
+    countBg: 'bg-amber-100',
+    countText: 'text-amber-700',
   },
 };
 
@@ -62,56 +62,50 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
   const colorKey = SPLIT_COLORS[splitKey] || detectSplitType(workouts.map(w => w.name));
   const accent = ACCENT[colorKey] || ACCENT.blue;
   const image = SPLIT_IMAGES[splitKey] || SPLIT_IMAGES[colorKey] || SPLIT_IMAGES['upper-lower'];
+  const displayName = name.replace(/ Workout$/, '');
+  const workoutLabels = workouts.map(w => w.name).join(' | ');
 
   return (
     <div
       ref={cardRef}
-      className="relative rounded-2xl cursor-pointer group active:scale-[0.99] transition-all duration-200 bg-card border border-border shadow-sm hover:shadow-lg hover:scale-[1.02] hover:border-blue-200"
+      className="relative rounded-2xl cursor-pointer group active:scale-[0.99] transition-all duration-200 shadow-md hover:shadow-xl hover:scale-[1.02] overflow-hidden bg-card"
       onClick={onCardClick}
     >
-      {/* Left accent gradient strip */}
-      <div className={`absolute left-0 top-3 bottom-3 w-1 bg-gradient-to-b ${accent.stripe} rounded-full`} />
-
-      <div className="flex items-center gap-3 py-4 pl-5 pr-4">
-        {/* Anatomy image */}
-        <div className={`w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden border-2 ${accent.iconBorder}`}>
-          <img src={image} alt="" className="w-full h-full object-cover" />
+      {/* Header image area */}
+      <div className="relative w-full aspect-[16/9] overflow-hidden">
+        <img src={image} alt="" className="w-full h-full object-cover" />
+        {/* Text overlay */}
+        <div className="absolute inset-0 flex flex-col justify-end p-4"
+          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 60%)' }}
+        >
+          <h3 className="text-white font-extrabold text-lg leading-tight tracking-tight">
+            {displayName}
+          </h3>
+          <p className="text-white/80 text-xs font-medium mt-1">
+            {workoutLabels}
+          </p>
         </div>
+      </div>
 
-        {/* Center content */}
-        <div className="flex-1 min-w-0">
-          <h4 className="font-extrabold text-foreground text-sm tracking-tight">
-            {name.replace(/ Workout$/, '')}
-          </h4>
-          <div className="flex flex-wrap gap-1 mt-1.5">
-            {workouts.map((w, i) => (
-              <span
-                key={i}
-                className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${accent.tagBg} ${accent.tagText}`}
-              >
-                {w.name}
-              </span>
-            ))}
-          </div>
-        </div>
+      {/* Footer bar */}
+      <div className="flex items-center justify-between px-4 py-2.5 bg-card">
+        <button
+          ref={menuRef}
+          onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition select-none"
+        >
+          <svg className="w-3.5 h-3.5 text-muted-foreground" viewBox="0 0 16 16" fill="currentColor">
+            <circle cx="8" cy="3" r="1.5" />
+            <circle cx="8" cy="8" r="1.5" />
+            <circle cx="8" cy="13" r="1.5" />
+          </svg>
+        </button>
 
-        {/* Right side */}
-        <div className="flex flex-col items-center gap-1 flex-shrink-0">
-          <button
-            ref={menuRef}
-            onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-muted transition select-none"
-          >
-            <svg className="w-3.5 h-3.5 text-muted-foreground" viewBox="0 0 16 16" fill="currentColor">
-              <circle cx="8" cy="3" r="1.5" />
-              <circle cx="8" cy="8" r="1.5" />
-              <circle cx="8" cy="13" r="1.5" />
-            </svg>
-          </button>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Dumbbell className="w-3 h-3" />
-            <span className="font-semibold">{workouts.length}</span>
-          </div>
+        <div className="flex items-center gap-2">
+          <Dumbbell className="w-4 h-4 text-muted-foreground" />
+          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${accent.countBg} ${accent.countText}`}>
+            {workouts.length}
+          </span>
           <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
         </div>
       </div>
