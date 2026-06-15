@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Check, Dumbbell, X } from 'lucide-react';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -7,7 +8,18 @@ const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satu
 // Full Body split: one day on, one day off → gym on Mon, Wed, Fri, Sun
 const FULL_BODY_SCHEDULE = [1, 0, 1, 0, 1, 0, 1];
 
+function getTooltipText(status, isPast, isToday) {
+  const isGymDay = status >= 1;
+  const isCompleted = status === 2;
+  if (!isGymDay) return 'Rest day 😌';
+  if (isPast && isCompleted) return 'Workout completed ✅';
+  if (isPast && !isCompleted) return 'Missed workout ❌';
+  if (isToday) return 'Workout today — let\'s go! 💪';
+  return 'Workout day ahead 💪';
+}
+
 export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
+  const [activeDay, setActiveDay] = useState(null);
   const todayIndex = new Date().getDay(); // 0=Sun → 6 in Mon-Sun scale
   // Convert JS day (0=Sun,6=Sat) to Mon-Sun (0=Mon,6=Sun)
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
@@ -43,10 +55,16 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
           else bgClass = 'border border-blue-300 dark:border-blue-700 bg-transparent';
 
           return (
-            <div key={i} className="flex items-center w-5 justify-center">
+            <div
+              key={i}
+              className="flex items-center w-5 justify-center"
+              onClick={() => setActiveDay(activeDay === i ? null : i)}
+              onMouseEnter={() => setActiveDay(i)}
+              onMouseLeave={() => setActiveDay(null)}
+            >
               {/* Circle */}
               <div
-                className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-150 ${
+                className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-150 cursor-pointer ${
                   isToday
                     ? 'ring-[1.5px] ring-emerald-500 ring-offset-1 ring-offset-background'
                     : ''
@@ -59,6 +77,15 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
             </div>
           );
         })}
+      </div>
+
+      {/* Tooltip */}
+      <div className="flex justify-center mt-2">
+        <span className="text-[11px] font-medium text-muted-foreground text-center min-h-[16px]">
+          {activeDay !== null
+            ? getTooltipText(schedule[activeDay], activeDay < todayMonSun, activeDay === todayMonSun)
+            : '\u00A0'}
+        </span>
       </div>
     </div>
   );
