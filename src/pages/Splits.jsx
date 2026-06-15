@@ -26,6 +26,7 @@ export default function Splits() {
   const [deleteTarget, setDeleteTarget] = useState(null); // group to confirm deletion
   const menuRef = useRef({});
   const cardRefs = useRef({});
+  const menuPortalRef = useRef(null);
 
   // Default to "examples" on first visit, otherwise remember preference
   const [activeTab, setActiveTab] = useState(() => {
@@ -41,6 +42,7 @@ export default function Splits() {
     if (!menuOpen) return;
     const close = (e) => {
       if (menuRef.current[menuOpen]?.contains(e.target)) return;
+      if (menuPortalRef.current?.contains(e.target)) return;
       setMenuOpen(null);
     };
     const timer = setTimeout(() => document.addEventListener('click', close), 0);
@@ -393,7 +395,8 @@ export default function Splits() {
 
           return (
             <div
-              onClick={e => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}
+              ref={menuPortalRef}
+              onClick={e => e.stopPropagation()}
               className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[200px]"
               style={{
                 top: `${rect ? rect.bottom + 4 : 0}px`,
