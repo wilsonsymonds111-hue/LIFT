@@ -226,15 +226,21 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
 
 
 
-  const audioRef = useRef(null);
+  // Preload audio once so it plays instantly on tap
+  const audioRef = useRef(typeof Audio !== 'undefined' ? new Audio(SET_COMPLETE_SOUND) : null);
+  useEffect(() => { if (audioRef.current) { audioRef.current.load(); } }, []);
 
   const handleToggle = () => {
     const next = !done;
     setDone(next);
     if (next && reps) {
-      if (!audioRef.current) audioRef.current = new Audio(SET_COMPLETE_SOUND);
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
+      // Haptic feedback
+      if (navigator.vibrate) navigator.vibrate(15);
+      // Instant audio
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {});
+      }
       onComplete?.({ kg: kg !== '' ? parseFloat(kg) : 0, reps: parseInt(reps) });
     } else if (!next) {
       onComplete?.(null);
