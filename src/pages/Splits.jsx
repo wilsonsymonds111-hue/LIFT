@@ -382,49 +382,45 @@ export default function Splits() {
       )}
 
       {/* Portal menu */}
-      {menuOpen && createPortal(
-        (() => {
-          const btn = menuRef.current[menuOpen];
-          const rect = btn?.getBoundingClientRect();
-          const top = rect ? rect.bottom + 4 : 0;
-          const right = rect ? window.innerWidth - rect.right : 0;
-          return (
-            <div
-              onClick={e => e.stopPropagation()}
-              className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[200px]"
-              style={{ top: `${top}px`, right: `${right}px`, zIndex: 100 }}
+      {menuOpen && (() => {
+        const isExample = EXAMPLE_SPLITS_DATA[menuOpen] != null;
+        const btnEl = menuRef.current[menuOpen];
+        const btnRect = btnEl?.getBoundingClientRect();
+        const top = btnRect ? btnRect.bottom + 4 : 0;
+        const right = btnRect ? window.innerWidth - btnRect.right : 0;
+        const menuGroup = !isExample ? mySplitGroups.find(g => g.groupId === menuOpen) : null;
+
+        return createPortal(
+          <div
+            onClick={e => e.stopPropagation()}
+            className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[200px]"
+            style={{ top: `${top}px`, right: `${right}px`, zIndex: 100 }}
+          >
+            <button
+              onClick={() => {
+                if (isExample) {
+                  handleMakeCurrentSplit(menuOpen);
+                } else if (menuGroup) {
+                  handleMakeMySplitCurrent(menuGroup);
+                }
+              }}
+              disabled={swapping}
+              className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition rounded-xl disabled:opacity-50"
             >
+              {swapping ? 'Applying…' : 'Make this my current split'}
+            </button>
+            {!isExample && (
               <button
-                onClick={() => {
-                  const exampleData = EXAMPLE_SPLITS_DATA[menuOpen];
-                  if (exampleData) {
-                    handleMakeCurrentSplit(menuOpen);
-                  } else {
-                    const group = mySplitGroups.find(g => g.groupId === menuOpen);
-                    if (group) handleMakeMySplitCurrent(group);
-                  }
-                }}
-                disabled={swapping}
-                className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition rounded-xl disabled:opacity-50"
+                onClick={() => { if (menuGroup) handleDeleteMySplit(menuGroup); }}
+                className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition rounded-xl"
               >
-                {swapping ? 'Applying…' : 'Make this my current split'}
+                Delete split
               </button>
-              {EXAMPLE_SPLITS_DATA[menuOpen] == null && (
-                <button
-                  onClick={() => {
-                    const group = mySplitGroups.find(g => g.groupId === menuOpen);
-                    if (group) handleDeleteMySplit(group);
-                  }}
-                  className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition rounded-xl"
-                >
-                  Delete split
-                </button>
-              )}
-            </div>
-          );
-        })(),
-        document.body
-      )}
+            )}
+          </div>,
+          document.body
+        );
+      })()}
 
       {/* Split builder */}
       {showBuilder && (
