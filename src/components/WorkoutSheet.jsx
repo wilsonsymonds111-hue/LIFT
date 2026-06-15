@@ -12,32 +12,14 @@ import confetti from 'canvas-confetti';
 /* ─── Sound Effect ──────────────────────────────────────────── */
 const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/b48c46396_ScreenRecording_06-16-202607-45-53_1.mp3';
 
-// Shared module-level audio — pre-decoded once, shared by all SetRows
-let _audioCtx = null;
-let _audioBuf = null;
-let _loaded = false;
-
-function _initAudio() {
-  if (_loaded) return;
-  _loaded = true;
-  try {
-    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    fetch(SET_COMPLETE_SOUND)
-      .then(r => r.arrayBuffer())
-      .then(buf => _audioCtx.decodeAudioData(buf))
-      .then(decoded => { _audioBuf = decoded; })
-      .catch(() => {});
-  } catch (_) {}
-}
+// Preloaded immediately when this module loads — ready by the time user taps
+const _tickAudio = new Audio(SET_COMPLETE_SOUND);
+_tickAudio.preload = 'auto';
+_tickAudio.load();
 
 function playTick() {
-  if (_audioCtx && _audioBuf) {
-    if (_audioCtx.state === 'suspended') _audioCtx.resume();
-    const src = _audioCtx.createBufferSource();
-    src.buffer = _audioBuf;
-    src.connect(_audioCtx.destination);
-    src.start(0);
-  }
+  _tickAudio.currentTime = 0;
+  _tickAudio.play().catch(() => {});
 }
 
 /* ─── Timer ──────────────────────────────────────────────────── */
@@ -252,9 +234,6 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
   const DELETE_THRESHOLD = 80;
 
 
-
-  // Trigger shared audio preload on first render
-  useEffect(() => { _initAudio(); }, []);
 
   const handleToggle = () => {
     const next = !done;
