@@ -17,7 +17,7 @@ export default function SplitCard({ splitKey, split, isExample, menuRef, menuOpe
         className="relative rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-150 cursor-pointer group overflow-hidden aspect-[4/3]"
         onClick={onCardClick}
       >
-        <img src={fullCardImage} alt={split.name} className="w-full h-full object-cover" />
+        <img src={fullCardImage} alt={split.name} className="w-full h-full object-contain" />
         {/* Invisible overlay for the kebab menu — positioned top-right */}
         <button
           ref={el => { if (menuRef) menuRef.current[splitKey] = el; }}
