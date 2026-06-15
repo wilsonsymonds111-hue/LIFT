@@ -9,7 +9,8 @@ import { getDefaultRestDuration } from '../lib/exerciseDefaults';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 
-/* ─── Victory Sound ─────────────────────────────────────────── */
+/* ─── Sound Effect ──────────────────────────────────────────── */
+const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/b48c46396_ScreenRecording_06-16-202607-45-53_1.mp3';
 
 
 /* ─── Timer ──────────────────────────────────────────────────── */
@@ -225,12 +226,19 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
 
 
 
+  const audioRef = useRef(null);
+
   const handleToggle = () => {
     const next = !done;
     setDone(next);
-    // Allow kg to be empty/0 (bodyweight), only require reps
-    if (next && reps) onComplete?.({ kg: kg !== '' ? parseFloat(kg) : 0, reps: parseInt(reps) });
-    else if (!next) onComplete?.(null);
+    if (next && reps) {
+      if (!audioRef.current) audioRef.current = new Audio(SET_COMPLETE_SOUND);
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+      onComplete?.({ kg: kg !== '' ? parseFloat(kg) : 0, reps: parseInt(reps) });
+    } else if (!next) {
+      onComplete?.(null);
+    }
   };
 
   const onPointerDown = (e) => {
