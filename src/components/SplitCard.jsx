@@ -3,7 +3,7 @@ import { Dumbbell, ChevronRight, MoreHorizontal } from 'lucide-react';
 const SPLIT_BG_IMAGES = {
   'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/839011abd_generated_image.png',
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/799340377_generated_image.png',
-  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/ac2fa1836_generated_image.png',
+  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/c3b55ac90_generated_image.png',
   'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/1149e87fc_generated_image.png',
 };
 
@@ -91,12 +91,7 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
             {subtitle}
           </p>
 
-          {/* Three dots separator */}
-          <div className="flex items-center justify-center gap-1 mt-3">
-            <div className="w-1 h-1 rounded-full bg-white" />
-            <div className="w-1 h-1 rounded-full bg-white/30" />
-            <div className="w-1 h-1 rounded-full bg-white/20" />
-          </div>
+
         </div>
 
         {/* Bottom row: badge + chevron */}
