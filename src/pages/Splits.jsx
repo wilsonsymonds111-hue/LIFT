@@ -5,6 +5,7 @@ import { Plus, Check } from 'lucide-react';
 import ProfileButton from '../components/ProfileButton';
 import SplitBuilder from '../components/SplitBuilder';
 import SplitModal from '../components/SplitModal';
+import SplitCard from '../components/SplitCard';
 
 
 import { useNavigate } from 'react-router-dom';
@@ -302,39 +303,15 @@ export default function Splits() {
           {mySplitGroups.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {mySplitGroups.map((group) => (
-                <div
+                <SplitCard
                   key={group.groupId}
-                  className="relative bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
-                  onClick={() => setActiveSplit(group.groupId)}
-                >
-                    <div className="text-center relative">
-                      <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">
-                        {group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ')}
-                      </h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {group.templates.length} workout{group.templates.length > 1 ? 's' : ''}
-                      </p>
-                      <button
-                        ref={el => menuRef.current[group.groupId] = el}
-                        onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === group.groupId ? null : group.groupId); }}
-                        className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition select-none group/btn"
-                      >
-                        <svg className="w-4 h-4 text-muted-foreground group-hover/btn:text-foreground transition-colors" viewBox="0 0 16 16" fill="currentColor">
-                          <circle cx="8" cy="3" r="1.5" />
-                          <circle cx="8" cy="8" r="1.5" />
-                          <circle cx="8" cy="13" r="1.5" />
-                        </svg>
-                      </button>
-
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
-                      {group.templates.map((t, i) => (
-                        <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
-                          {t.name}
-                        </span>
-                      ))}
-                    </div>
-                </div>
+                  splitKey={group.groupId}
+                  name={group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
+                  workouts={group.templates.map(t => ({ name: t.name }))}
+                  onCardClick={() => setActiveSplit(group.groupId)}
+                  onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
+                  menuRef={el => menuRef.current[group.groupId] = el}
+                />
               ))}
             </div>
           )}
@@ -348,40 +325,16 @@ export default function Splits() {
           <div className="absolute -inset-x-8 -inset-y-8 bg-gradient-to-br from-slate-100/60 via-transparent to-slate-200/40 dark:from-slate-800/30 dark:via-transparent dark:to-slate-700/20 rounded-[3rem] blur-3xl pointer-events-none" />
           <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
-              <div
+              <SplitCard
                 key={key}
-                ref={el => cardRefs.current[key] = el}
-                className="relative bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
-                onClick={() => setActiveSplit(key)}
-              >
-
-                  <div className="text-center relative">
-                    <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase">{split.name}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {split.workouts.length} workout{split.workouts.length > 1 ? 's' : ''} — {split.label}
-                    </p>
-                    <button
-                      ref={el => menuRef.current[key] = el}
-                      onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === key ? null : key); }}
-                      className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition select-none group/btn"
-                    >
-                      <svg className="w-4 h-4 text-muted-foreground group-hover/btn:text-foreground transition-colors" viewBox="0 0 16 16" fill="currentColor">
-                        <circle cx="8" cy="3" r="1.5" />
-                        <circle cx="8" cy="8" r="1.5" />
-                        <circle cx="8" cy="13" r="1.5" />
-                      </svg>
-                    </button>
-
-                  </div>
-
-                  <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
-                    {split.workouts.map((w, i) => (
-                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
-                        {w.name}
-                      </span>
-                    ))}
-                  </div>
-              </div>
+                splitKey={key}
+                name={split.name}
+                workouts={split.workouts}
+                onCardClick={() => setActiveSplit(key)}
+                onMenuToggle={() => setMenuOpen(menuOpen === key ? null : key)}
+                menuRef={el => menuRef.current[key] = el}
+                cardRef={el => cardRefs.current[key] = el}
+              />
             ))}
           </div>
         </div>
