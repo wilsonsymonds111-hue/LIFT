@@ -1,17 +1,17 @@
-import { ChevronRight } from 'lucide-react';
+import { Dumbbell, ChevronRight, MoreHorizontal } from 'lucide-react';
 
-const SPLIT_ICONS = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/cdafd5431_generated_image.png',
-  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/4513db152_generated_image.png',
-  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9f6a596bd_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/da876d60f_generated_image.png',
+const SPLIT_BG_IMAGES = {
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/35a120ac0_generated_image.png',
+  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a86904896_generated_image.png',
+  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/4f618e97f_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/949b26cf8_generated_image.png',
 };
 
-const GLOW_COLORS = {
-  blue: { glow: 'shadow-[0_0_20px_rgba(0,242,255,0.3)]', border: 'border-cyan-400/30', badge: 'bg-cyan-500/10 text-cyan-400 border-cyan-400/30', iconGlow: 'drop-shadow-[0_0_8px_rgba(0,242,255,0.6)]', chevron: 'text-cyan-400' },
-  green: { glow: 'shadow-[0_0_20px_rgba(52,211,153,0.3)]', border: 'border-emerald-400/30', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-400/30', iconGlow: 'drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]', chevron: 'text-emerald-400' },
-  purple: { glow: 'shadow-[0_0_20px_rgba(168,85,247,0.3)]', border: 'border-purple-400/30', badge: 'bg-purple-500/10 text-purple-400 border-purple-400/30', iconGlow: 'drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]', chevron: 'text-purple-400' },
-  orange: { glow: 'shadow-[0_0_20px_rgba(251,146,60,0.3)]', border: 'border-orange-400/30', badge: 'bg-orange-500/10 text-orange-400 border-orange-400/30', iconGlow: 'drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]', chevron: 'text-orange-400' },
+const ACCENT_COLORS = {
+  blue: { badge: 'bg-[#2A8FFF]', chevron: 'bg-[#2A8FFF]' },
+  green: { badge: 'bg-[#43A047]', chevron: 'bg-[#43A047]' },
+  purple: { badge: 'bg-[#8E24AA]', chevron: 'bg-[#8E24AA]' },
+  orange: { badge: 'bg-[#F57C00]', chevron: 'bg-[#F57C00]' },
 };
 
 const SPLIT_COLORS = {
@@ -40,57 +40,75 @@ function detectSplitType(workoutNames) {
 
 export default function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
   const colorKey = SPLIT_COLORS[splitKey] || detectSplitType(workouts.map(w => w.name));
-  const glow = GLOW_COLORS[colorKey] || GLOW_COLORS.blue;
-  const icon = SPLIT_ICONS[splitKey] || SPLIT_ICONS[colorKey] || SPLIT_ICONS['upper-lower'];
+  const accent = ACCENT_COLORS[colorKey] || ACCENT_COLORS.blue;
+  const bgImage = SPLIT_BG_IMAGES[splitKey] || SPLIT_BG_IMAGES[colorKey] || SPLIT_BG_IMAGES['upper-lower'];
+  const subtitle = workouts.map(w => w.name).join(' | ');
+  const workoutCount = workouts.length;
 
   return (
     <div
       ref={cardRef}
       onClick={onCardClick}
-      className={`relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-200 bg-[#121212] border ${glow.border} ${glow.glow} hover:shadow-[0_0_30px_rgba(0,242,255,0.2)]`}
+      className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-200 overflow-hidden"
+      style={{ aspectRatio: '16/10' }}
     >
-      {/* Card body */}
-      <div className="px-4 pt-4 pb-3">
-        {/* Top row: icon + title */}
-        <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden bg-transparent flex items-center justify-center">
-            <img src={icon} alt="" className="w-10 h-10 object-contain" style={{ filter: glow.iconGlow }} />
-          </div>
-          <div className="flex-1 min-w-0 pt-1">
-            <h4 className="font-extrabold text-white text-sm tracking-tight leading-tight">
-              {name.replace(/ Workout$/, '')}
-            </h4>
-            <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
-              {workouts.map(w => w.name).join(' | ')}
-            </p>
-          </div>
-          <button
-            ref={menuRef}
-            onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-            className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 transition flex-shrink-0 mt-1"
-          >
-            <svg className="w-3 h-3 text-gray-500" viewBox="0 0 16 16" fill="currentColor">
-              <circle cx="8" cy="3" r="1.5" />
-              <circle cx="8" cy="8" r="1.5" />
-              <circle cx="8" cy="13" r="1.5" />
-            </svg>
-          </button>
-        </div>
+      {/* Background image with dark overlay */}
+      <div className="absolute inset-0">
+        <img
+          src={bgImage}
+          alt=""
+          className="w-full h-full object-cover object-right"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/10" />
+      </div>
 
-        {/* Three cyan dots separator */}
-        <div className="flex items-center justify-center gap-1.5 my-3">
-          <div className="w-1 h-1 rounded-full bg-cyan-400/60" />
-          <div className="w-1 h-1 rounded-full bg-cyan-400/40" />
-          <div className="w-1 h-1 rounded-full bg-cyan-400/20" />
+      {/* Content layer */}
+      <div className="relative h-full flex flex-col justify-between px-5 py-5">
+        {/* Top section */}
+        <div>
+          {/* Top row: icon + title + menu */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <Dumbbell className="w-5 h-5 text-white" strokeWidth={1.5} />
+              <h4 className="font-extrabold text-white text-base tracking-widest uppercase leading-tight">
+                {name.replace(/ Workout$/, '')}
+              </h4>
+            </div>
+
+            {/* Menu button */}
+            <button
+              ref={menuRef}
+              onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition flex-shrink-0"
+            >
+              <MoreHorizontal className="w-4 h-4 text-white" />
+            </button>
+          </div>
+
+          {/* Subtitle */}
+          <p className="text-sm text-white/70 font-medium mt-3 leading-relaxed">
+            {subtitle}
+          </p>
+
+          {/* Three dots separator */}
+          <div className="flex items-center justify-center gap-1.5 mt-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-white" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+          </div>
         </div>
 
         {/* Bottom row: badge + chevron */}
         <div className="flex items-center justify-between">
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${glow.badge}`}>
-            <span>🏋️</span>
-            <span>{workouts.length} workout{workouts.length !== 1 ? 's' : ''}</span>
+          {/* Workout count badge */}
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-white text-black text-xs font-bold tracking-wide">
+            {workoutCount} WORKOUT{workoutCount !== 1 ? 'S' : ''}
           </span>
-          <ChevronRight className={`w-4 h-4 ${glow.chevron}`} />
+
+          {/* Chevron button */}
+          <div className={`w-9 h-9 rounded-full ${accent.chevron} flex items-center justify-center`}>
+            <ChevronRight className="w-5 h-5 text-white" strokeWidth={2.5} />
+          </div>
         </div>
       </div>
     </div>
