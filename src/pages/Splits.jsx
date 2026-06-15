@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
 import ProfileButton from '../components/ProfileButton';
 import SplitBuilder from '../components/SplitBuilder';
-import SplitCardMenu from '../components/SplitCardMenu';
+
 
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -303,7 +303,7 @@ export default function Splits() {
               {mySplitGroups.map((group) => (
                 <div
                   key={group.groupId}
-                  className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
+                  className="relative bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
                   onClick={() => navigate(`/split/${group.groupId}`)}
                 >
                     <div className="text-center relative">
@@ -324,6 +324,7 @@ export default function Splits() {
                           <circle cx="8" cy="13" r="1.5" />
                         </svg>
                       </button>
+
                     </div>
                     <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
                       {group.templates.map((t, i) => (
@@ -349,7 +350,7 @@ export default function Splits() {
               <div
                 key={key}
                 ref={el => cardRefs.current[key] = el}
-                className="bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
+                className="relative bg-card border-[3px] border-gray-400 dark:border-gray-500 rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-150 cursor-pointer group"
                 onClick={() => navigate(`/split/${key}`)}
               >
 
@@ -369,6 +370,7 @@ export default function Splits() {
                         <circle cx="8" cy="13" r="1.5" />
                       </svg>
                     </button>
+
                   </div>
 
                   <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
@@ -384,27 +386,45 @@ export default function Splits() {
         </div>
       )}
 
-      {/* Portal menu */}
-      {menuOpen && (
-        <SplitCardMenu
-          menuOpen={menuOpen}
-          onClose={() => setMenuOpen(null)}
-          menuRef={menuRef}
-          swapping={swapping}
-          isExample={EXAMPLE_SPLITS_DATA[menuOpen] != null}
-          onMakeCurrent={() => {
-            if (EXAMPLE_SPLITS_DATA[menuOpen]) {
-              handleMakeCurrentSplit(menuOpen);
-            } else {
-              const group = mySplitGroups.find(g => g.groupId === menuOpen);
-              if (group) handleMakeMySplitCurrent(group);
-            }
+
+
+      {/* Portal menu — uses createPortal to escape overflow-hidden clipping from SwipeableTabs */}
+      {menuOpen && createPortal(
+        <div
+          className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[190px]"
+          style={{
+            top: `${(() => { const el = menuRef.current[menuOpen]; return el ? el.getBoundingClientRect().bottom + 4 : 0; })()}px`,
+            right: `${(() => { const el = menuRef.current[menuOpen]; return el ? window.innerWidth - el.getBoundingClientRect().right : 0; })()}px`,
+            zIndex: 100,
           }}
-          onDelete={() => {
-            const group = mySplitGroups.find(g => g.groupId === menuOpen);
-            if (group) setDeleteTarget(group);
-          }}
-        />
+        >
+          <button
+            onClick={() => {
+              setMenuOpen(null);
+              if (EXAMPLE_SPLITS_DATA[menuOpen]) {
+                handleMakeCurrentSplit(menuOpen);
+              } else {
+                const g = mySplitGroups.find(x => x.groupId === menuOpen);
+                if (g) handleMakeMySplitCurrent(g);
+              }
+            }}
+            disabled={swapping}
+            className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition"
+          >
+            {swapping ? 'Applying…' : 'Make this my current split'}
+          </button>
+          <button
+            onClick={() => {
+              setMenuOpen(null);
+              const g = mySplitGroups.find(x => x.groupId === menuOpen);
+              if (g) setDeleteTarget(g);
+            }}
+            className="w-full text-left px-4 py-2.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 transition"
+          >
+            🗑 Delete split
+          </button>
+        </div>,
+        document.body
       )}
 
       {/* Delete confirmation */}
