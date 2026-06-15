@@ -361,7 +361,7 @@ export default function Splits() {
               }
             }}
             disabled={swapping}
-            className="w-full text-left px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted/60 transition-colors"
+            className="w-full text-left px-4 py-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 transition-colors"
           >
             Make this my current split
           </button>
