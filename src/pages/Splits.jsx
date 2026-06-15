@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Check, Trash2 } from 'lucide-react';
+import { Plus, Check } from 'lucide-react';
 import ProfileButton from '../components/ProfileButton';
 import SplitBuilder from '../components/SplitBuilder';
 
@@ -311,12 +311,6 @@ export default function Splits() {
                       <p className="text-sm text-muted-foreground mt-1">
                         {group.templates.length} workout{group.templates.length > 1 ? 's' : ''}
                       </p>
-                      <button
-                        onClick={e => { e.stopPropagation(); handleDeleteMySplit(group); }}
-                        className="absolute top-0 right-9 w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-950/30 transition select-none"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-400 hover:text-red-500 transition-colors" />
-                      </button>
                       <button
                         ref={el => menuRef.current[group.groupId] = el}
                         onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === group.groupId ? null : group.groupId); }}
