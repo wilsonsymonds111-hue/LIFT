@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react';
+import { Check, Dumbbell, X } from 'lucide-react';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -32,6 +32,16 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
           const isToday = i === todayMonSun;
           const isGymDay = status >= 1;
           const isCompleted = status === 2;
+          const isPast = i < todayMonSun; // day has already passed
+          const missed = isPast && isGymDay && !isCompleted; // due but not done
+          const showCheck = isPast && isGymDay && isCompleted;
+          const showDumbbell = isGymDay && !isPast; // today or future → upcoming
+
+          let bgClass = '';
+          if (missed) bgClass = 'bg-red-500';
+          else if (isGymDay) bgClass = 'bg-blue-500';
+          else bgClass = 'border border-blue-300 dark:border-blue-700 bg-transparent';
+
           return (
             <div key={i} className="flex flex-col items-center w-5">
               {/* Today indicator dot */}
@@ -46,13 +56,11 @@ export default function WeekTracker({ schedule = FULL_BODY_SCHEDULE }) {
                   isToday
                     ? 'ring-[1.5px] ring-emerald-500 ring-offset-1 ring-offset-background'
                     : ''
-                } ${
-                  isGymDay
-                    ? 'bg-blue-500'
-                    : 'border border-blue-300 dark:border-blue-700 bg-transparent'
-                }`}
+                } ${bgClass}`}
               >
-                {isCompleted && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                {showCheck && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                {missed && <X className="w-3 h-3 text-white" strokeWidth={3} />}
+                {showDumbbell && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
               </div>
             </div>
           );
