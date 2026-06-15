@@ -23,6 +23,7 @@ export default function Splits() {
   const swapRef = useRef({ oldName: '', oldData: null, newName: '', newData: null });
   const [swapOriginRect, setSwapOriginRect] = useState(null);
   const [showBuilder, setShowBuilder] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null); // group to confirm deletion
   const menuRef = useRef({});
   const cardRefs = useRef({});
 
@@ -392,7 +393,7 @@ export default function Splits() {
 
           return (
             <div
-              onClick={e => e.stopPropagation()}
+              onClick={e => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}
               className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[200px]"
               style={{
                 top: `${rect ? rect.bottom + 4 : 0}px`,
@@ -414,7 +415,7 @@ export default function Splits() {
                 {swapping ? 'Applying…' : 'Make this my current split'}
               </button>
               <button
-                onClick={() => { if (menuGroup) handleDeleteMySplit(menuGroup); }}
+                onClick={() => { setMenuOpen(null); setDeleteTarget(menuGroup); }}
                 className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition rounded-xl"
               >
                 Delete split
@@ -422,6 +423,33 @@ export default function Splits() {
             </div>
           );
         })(),
+        document.body
+      )}
+
+      {/* Delete confirmation */}
+      {deleteTarget && createPortal(
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50" onClick={() => setDeleteTarget(null)}>
+          <div onClick={e => e.stopPropagation()} className="bg-card rounded-2xl p-6 mx-5 max-w-sm w-full shadow-2xl border border-border">
+            <h3 className="text-lg font-extrabold text-foreground">Delete Split?</h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              Are you sure you want to delete this split? This cannot be undone.
+            </p>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 py-2.5 rounded-xl bg-muted text-foreground font-semibold text-sm hover:bg-muted/70 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { handleDeleteMySplit(deleteTarget); setDeleteTarget(null); }}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-semibold text-sm hover:bg-red-600 transition"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>,
         document.body
       )}
 
