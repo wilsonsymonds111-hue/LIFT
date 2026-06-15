@@ -327,7 +327,7 @@ export default function Splits() {
                     </div>
                     <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
                       {group.templates.map((t, i) => (
-                        <span key={i} className="text-[11px] px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 font-medium">
+                        <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                           {t.name}
                         </span>
                       ))}
@@ -374,7 +374,7 @@ export default function Splits() {
 
                   <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
                     {split.workouts.map((w, i) => (
-                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 font-medium">
+                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                         {w.name}
                       </span>
                     ))}
@@ -500,7 +500,7 @@ export default function Splits() {
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-4">
                   {swapRef.current.oldData?.workouts?.map((w, i) => (
-                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 font-medium">
+                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                       {w.name}
                     </span>
                   ))}
@@ -530,7 +530,7 @@ export default function Splits() {
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-4">
                     {swapRef.current.oldData?.workouts?.map((w, i) => (
-                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 font-medium">
+                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                         {w.name}
                       </span>
                     ))}
@@ -589,7 +589,7 @@ export default function Splits() {
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-4 relative z-10">
                     {swapRef.current.newData?.workouts?.map((w, i) => (
-                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 font-medium">
+                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                         {w.name}
                       </span>
                     ))}
