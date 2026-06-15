@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
 import ProfileButton from '../components/ProfileButton';
 import SplitBuilder from '../components/SplitBuilder';
+import SplitCardMenu from '../components/SplitCardMenu';
 
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -26,7 +27,6 @@ export default function Splits() {
   const [deleteTarget, setDeleteTarget] = useState(null); // group to confirm deletion
   const menuRef = useRef({});
   const cardRefs = useRef({});
-  const menuPortalRef = useRef(null);
 
   // Default to "examples" on first visit, otherwise remember preference
   const [activeTab, setActiveTab] = useState(() => {
@@ -42,7 +42,6 @@ export default function Splits() {
     if (!menuOpen) return;
     const close = (e) => {
       if (menuRef.current[menuOpen]?.contains(e.target)) return;
-      if (menuPortalRef.current?.contains(e.target)) return;
       setMenuOpen(null);
     };
     const timer = setTimeout(() => document.addEventListener('click', close), 0);
@@ -88,12 +87,6 @@ export default function Splits() {
   }, {});
 
   const mySplitGroups = Object.values(splitGroups);
-
-  // Pre-compute menu values so the portal doesn't rely on an IIFE closure
-  const menuIsExample = menuOpen ? EXAMPLE_SPLITS_DATA[menuOpen] != null : false;
-  const menuGroup = (!menuIsExample && menuOpen) ? mySplitGroups.find(g => g.groupId === menuOpen) : null;
-  const menuBtnEl = menuOpen ? menuRef.current[menuOpen] : null;
-  const menuRect = menuBtnEl?.getBoundingClientRect();
 
   // If user has no saved splits, auto-switch to examples tab (unless builder is open or user just chose "mine")
   useEffect(() => {
@@ -392,39 +385,26 @@ export default function Splits() {
       )}
 
       {/* Portal menu */}
-      {menuOpen && createPortal(
-        <div
-          ref={menuPortalRef}
-          className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[200px]"
-          style={{
-            top: `${menuRect ? menuRect.bottom + 4 : 0}px`,
-            right: `${menuRect ? window.innerWidth - menuRect.right : 0}px`,
-            zIndex: 100,
+      {menuOpen && (
+        <SplitCardMenu
+          menuOpen={menuOpen}
+          onClose={() => setMenuOpen(null)}
+          menuRef={menuRef}
+          swapping={swapping}
+          isExample={EXAMPLE_SPLITS_DATA[menuOpen] != null}
+          onMakeCurrent={() => {
+            if (EXAMPLE_SPLITS_DATA[menuOpen]) {
+              handleMakeCurrentSplit(menuOpen);
+            } else {
+              const group = mySplitGroups.find(g => g.groupId === menuOpen);
+              if (group) handleMakeMySplitCurrent(group);
+            }
           }}
-        >
-          <button
-            onClick={() => {
-              if (menuIsExample) {
-                handleMakeCurrentSplit(menuOpen);
-              } else if (menuGroup) {
-                handleMakeMySplitCurrent(menuGroup);
-              }
-            }}
-            disabled={swapping}
-            className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition rounded-xl disabled:opacity-50"
-          >
-            {swapping ? 'Applying…' : 'Make this my current split'}
-          </button>
-          {!menuIsExample && (
-            <button
-              onClick={() => { setMenuOpen(null); setDeleteTarget(menuGroup); }}
-              className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition rounded-xl"
-            >
-              Delete split
-            </button>
-          )}
-        </div>,
-        document.body
+          onDelete={() => {
+            const group = mySplitGroups.find(g => g.groupId === menuOpen);
+            if (group) setDeleteTarget(group);
+          }}
+        />
       )}
 
       {/* Delete confirmation */}
