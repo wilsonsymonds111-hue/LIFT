@@ -14,15 +14,15 @@ export default function SplitCard({ splitKey, split, isExample, menuRef, menuOpe
     return (
       <div
         ref={cardRef}
-        className="relative rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-150 cursor-pointer group overflow-hidden"
+        className="relative rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-150 cursor-pointer group overflow-hidden aspect-[4/3]"
         onClick={onCardClick}
       >
-        <img src={fullCardImage} alt={split.name} className="w-full h-auto" />
+        <img src={fullCardImage} alt={split.name} className="w-full h-full object-cover" />
         {/* Invisible overlay for the kebab menu — positioned top-right */}
         <button
           ref={el => { if (menuRef) menuRef.current[splitKey] = el; }}
           onClick={(e) => { e.stopPropagation(); setMenuOpen(menuOpen === splitKey ? null : splitKey); }}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition select-none"
+          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition select-none"
         >
           <svg className="w-4 h-4 text-muted-foreground" viewBox="0 0 16 16" fill="currentColor">
             <circle cx="8" cy="3" r="1.5" />
@@ -42,16 +42,16 @@ export default function SplitCard({ splitKey, split, isExample, menuRef, menuOpe
       onClick={onCardClick}
     >
       {/* Header */}
-      <div className="text-center pt-5 pb-1 relative">
-        <h4 className="font-extrabold text-foreground text-base tracking-tight uppercase px-8">
+      <div className="text-center pt-3 pb-0.5 relative">
+        <h4 className="font-extrabold text-foreground text-sm tracking-tight uppercase px-8">
           {split.name || splitKey}
         </h4>
         <button
           ref={el => { if (menuRef) menuRef.current[splitKey] = el; }}
           onClick={(e) => { e.stopPropagation(); setMenuOpen(menuOpen === splitKey ? null : splitKey); }}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition select-none group/btn"
+          className="absolute top-2.5 right-3 w-7 h-7 flex items-center justify-center rounded-full hover:bg-muted transition select-none group/btn"
         >
-          <svg className="w-4 h-4 text-muted-foreground group-hover/btn:text-foreground transition-colors" viewBox="0 0 16 16" fill="currentColor">
+          <svg className="w-3.5 h-3.5 text-muted-foreground group-hover/btn:text-foreground transition-colors" viewBox="0 0 16 16" fill="currentColor">
             <circle cx="8" cy="3" r="1.5" />
             <circle cx="8" cy="8" r="1.5" />
             <circle cx="8" cy="13" r="1.5" />
@@ -60,7 +60,7 @@ export default function SplitCard({ splitKey, split, isExample, menuRef, menuOpe
       </div>
 
       {/* Blue pills */}
-      <div className="flex flex-wrap gap-1.5 px-4 pb-2 pt-1 justify-center">
+      <div className="flex flex-wrap gap-1 px-3 pb-1.5 pt-0.5 justify-center">
         {split.templates?.map((t, i) => (
           <span key={i} className={BLUEPILL_STYLE}>
             {t.name}
@@ -69,8 +69,8 @@ export default function SplitCard({ splitKey, split, isExample, menuRef, menuOpe
       </div>
 
       {/* Footer */}
-      <div className="text-center pb-4">
-        <p className="text-xs text-muted-foreground">
+      <div className="text-center pb-3">
+        <p className="text-[11px] text-muted-foreground">
           {split.templates?.length || 0} workout{(split.templates?.length || 0) !== 1 ? 's' : ''}
         </p>
       </div>
