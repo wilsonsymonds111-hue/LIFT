@@ -435,7 +435,7 @@ export default function Splits() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.55, ease: 'easeInOut' }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="fixed inset-0 z-50 flex items-center justify-center"
             style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(18px)' }}
           >
@@ -444,7 +444,8 @@ export default function Splits() {
               <motion.div
                 initial={{ scale: 0.85, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
+                transition={{ duration: 0.3, ease: [0.33, 1, 0.68, 1] }}
+                  transition={{ duration: 0.3, ease: [0.33, 1, 0.68, 1] }}
                 onAnimationComplete={() => setSwapPhase('swap')}
                 className="bg-card border border-border/50 rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5"
                 style={{ width: 340 }}
@@ -476,7 +477,7 @@ export default function Splits() {
                 <motion.div
                   initial={{ x: 0, opacity: 1, scale: 1 }}
                   animate={{ x: -window.innerWidth, opacity: 0.6, scale: 0.92, rotate: -4 }}
-                  transition={{ duration: 0.55, ease: [0.5, 0, 0.75, 0] }}
+                  transition={{ duration: 0.35, ease: [0.5, 0, 0.75, 0] }}
                   className="absolute left-0 top-0 w-full bg-card border border-border/50 rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5"
                 >
                   <div className="flex items-start justify-between">
@@ -502,7 +503,7 @@ export default function Splits() {
                 <motion.div
                   initial={{ x: window.innerWidth, opacity: 0, scale: 0.9, rotate: 3 }}
                   animate={{ x: 0, opacity: 1, scale: 1, rotate: 0 }}
-                  transition={{ duration: 0.55, ease: [0.33, 1, 0.68, 1] }}
+                  transition={{ duration: 0.35, ease: [0.33, 1, 0.68, 1] }}
                   onAnimationComplete={() => {
                     if (swapPhase === 'swap') setSwapPhase('success');
                   }}

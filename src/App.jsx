@@ -23,7 +23,7 @@ const pageVariants = {
   exit: { x: '-30%', opacity: 0 },
 };
 
-const transition = { duration: 0.25, ease: [0.33, 1, 0.68, 1] };
+const transition = { duration: 0.18, ease: [0.33, 1, 0.68, 1] };
 
 const SlideIn = ({ children }) => (
   <motion.div
@@ -71,7 +71,7 @@ const SwipeableTabs = () => {
           else if (info.offset.x > threshold) snapToTab(activeIndex - 1);
         }}
         animate={{ x: -activeIndex * pageWidth }}
-        transition={{ duration: 0.12, ease: [0.33, 1, 0.68, 1] }}
+        transition={{ duration: 0.08, ease: [0.33, 1, 0.68, 1] }}
         className="flex"
         style={{ width: TABS.length * pageWidth }}
       >
