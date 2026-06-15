@@ -159,9 +159,16 @@ export default function Home() {
 
                   <div onClick={() => navigate(`/template/${template.id}`)} className="cursor-pointer">
                     <h4 className="font-bold text-foreground pr-8">{template.name}</h4>
-                  </div>
-                  <div onClick={() => navigate(`/template/${template.id}`)} className="cursor-pointer">
-                    <p className="text-sm text-muted-foreground my-3 line-clamp-2">{template.exercises}</p>
+                    <div className="flex flex-wrap gap-1.5 my-3">
+                      {(template.exerciseList?.length > 0
+                        ? template.exerciseList.map(e => e.name)
+                        : (template.exercises || '').split(',').map(s => s.trim()).filter(Boolean)
+                      ).map((name, i) => (
+                        <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                          {name}
+                        </span>
+                      ))}
+                    </div>
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       ⏱ {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
                     </p>
