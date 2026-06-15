@@ -1,10 +1,10 @@
 import { Dumbbell, ChevronRight, MoreHorizontal } from 'lucide-react';
 
 const SPLIT_BG_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5851dec9e_generated_image.png',
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/ed5aff080_generated_image.png',
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/799340377_generated_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6f45c2e2d_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/ed16a64c9_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/0de2e4088_generated_image.png',
 };
 
 const ACCENT_COLORS = {
