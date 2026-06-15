@@ -385,10 +385,10 @@ export default function Splits() {
         </div>
       )}
 
-      {/* Portal menu — compute values before JSX so the IIFE doesn't create stale closures */}
+      {/* Compute menu values at render level — no stale closures */}
       {menuOpen && (() => {
         const isExample = EXAMPLE_SPLITS_DATA[menuOpen] != null;
-        const menuGroup = isExample ? null : mySplitGroups.find(g => g.groupId === menuOpen);
+        const group = isExample ? null : mySplitGroups.find(g => g.groupId === menuOpen);
         const btnEl = menuRef.current[menuOpen];
         const rect = btnEl?.getBoundingClientRect();
 
@@ -406,8 +406,8 @@ export default function Splits() {
               onClick={() => {
                 if (isExample) {
                   handleMakeCurrentSplit(menuOpen);
-                } else if (menuGroup) {
-                  handleMakeMySplitCurrent(menuGroup);
+                } else if (group) {
+                  handleMakeMySplitCurrent(group);
                 }
               }}
               disabled={swapping}
@@ -415,9 +415,9 @@ export default function Splits() {
             >
               {swapping ? 'Applying…' : 'Make this my current split'}
             </button>
-            {!isExample && menuGroup && (
+            {!isExample && (
               <button
-                onClick={() => { setMenuOpen(null); setDeleteTarget(menuGroup); }}
+                onClick={() => { setMenuOpen(null); setDeleteTarget(group); }}
                 className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition rounded-xl"
               >
                 Delete split
