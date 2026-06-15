@@ -320,10 +320,8 @@ export default function Splits() {
 
       {/* Example Splits Tab */}
       {activeTab === 'examples' && (
-        <div className="px-4 relative">
-          {/* Subtle neutral glow behind cards */}
-          <div className="absolute -inset-x-4 -inset-y-4 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/30 rounded-[3rem] blur-3xl pointer-events-none" />
-          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
               <SplitCard
                 key={key}

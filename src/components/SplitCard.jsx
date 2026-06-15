@@ -1,37 +1,17 @@
-import { Dumbbell, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
-const SPLIT_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e71bda804_generated_image.png',
-  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/53fb5d56d_generated_image.png',
-  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/d0951c90c_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e4658d191_generated_image.png',
+const SPLIT_ICONS = {
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/cdafd5431_generated_image.png',
+  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/4513db152_generated_image.png',
+  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9f6a596bd_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/da876d60f_generated_image.png',
 };
 
-const ACCENT = {
-  blue: {
-    stripe: 'from-blue-400 to-cyan-400',
-    tagBg: 'bg-blue-50',
-    tagText: 'text-blue-600',
-    iconBorder: 'border-blue-100',
-  },
-  green: {
-    stripe: 'from-emerald-400 to-teal-400',
-    tagBg: 'bg-emerald-50',
-    tagText: 'text-emerald-600',
-    iconBorder: 'border-emerald-100',
-  },
-  purple: {
-    stripe: 'from-violet-400 to-purple-400',
-    tagBg: 'bg-violet-50',
-    tagText: 'text-violet-600',
-    iconBorder: 'border-violet-100',
-  },
-  orange: {
-    stripe: 'from-amber-400 to-orange-400',
-    tagBg: 'bg-amber-50',
-    tagText: 'text-amber-600',
-    iconBorder: 'border-amber-100',
-  },
+const GLOW_COLORS = {
+  blue: { glow: 'shadow-[0_0_20px_rgba(0,242,255,0.3)]', border: 'border-cyan-400/30', badge: 'bg-cyan-500/10 text-cyan-400 border-cyan-400/30', iconGlow: 'drop-shadow-[0_0_8px_rgba(0,242,255,0.6)]', chevron: 'text-cyan-400' },
+  green: { glow: 'shadow-[0_0_20px_rgba(52,211,153,0.3)]', border: 'border-emerald-400/30', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-400/30', iconGlow: 'drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]', chevron: 'text-emerald-400' },
+  purple: { glow: 'shadow-[0_0_20px_rgba(168,85,247,0.3)]', border: 'border-purple-400/30', badge: 'bg-purple-500/10 text-purple-400 border-purple-400/30', iconGlow: 'drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]', chevron: 'text-purple-400' },
+  orange: { glow: 'shadow-[0_0_20px_rgba(251,146,60,0.3)]', border: 'border-orange-400/30', badge: 'bg-orange-500/10 text-orange-400 border-orange-400/30', iconGlow: 'drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]', chevron: 'text-orange-400' },
 };
 
 const SPLIT_COLORS = {
@@ -60,59 +40,57 @@ function detectSplitType(workoutNames) {
 
 export default function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
   const colorKey = SPLIT_COLORS[splitKey] || detectSplitType(workouts.map(w => w.name));
-  const accent = ACCENT[colorKey] || ACCENT.blue;
-  const image = SPLIT_IMAGES[splitKey] || SPLIT_IMAGES[colorKey] || SPLIT_IMAGES['upper-lower'];
+  const glow = GLOW_COLORS[colorKey] || GLOW_COLORS.blue;
+  const icon = SPLIT_ICONS[splitKey] || SPLIT_ICONS[colorKey] || SPLIT_ICONS['upper-lower'];
 
   return (
     <div
       ref={cardRef}
-      className="relative rounded-2xl cursor-pointer group active:scale-[0.99] transition-all duration-200 bg-card border border-border shadow-sm hover:shadow-lg hover:scale-[1.02] hover:border-blue-200"
       onClick={onCardClick}
+      className={`relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-200 bg-[#121212] border ${glow.border} ${glow.glow} hover:shadow-[0_0_30px_rgba(0,242,255,0.2)]`}
     >
-      {/* Left accent gradient strip */}
-      <div className={`absolute left-0 top-3 bottom-3 w-1 bg-gradient-to-b ${accent.stripe} rounded-full`} />
-
-      <div className="flex items-center gap-3 py-4 pl-5 pr-4">
-        {/* Anatomy image */}
-        <div className={`w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden border-2 ${accent.iconBorder}`}>
-          <img src={image} alt="" className="w-full h-full object-cover" />
-        </div>
-
-        {/* Center content */}
-        <div className="flex-1 min-w-0">
-          <h4 className="font-extrabold text-foreground text-sm tracking-tight">
-            {name.replace(/ Workout$/, '')}
-          </h4>
-          <div className="flex flex-wrap gap-1 mt-1.5">
-            {workouts.map((w, i) => (
-              <span
-                key={i}
-                className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${accent.tagBg} ${accent.tagText}`}
-              >
-                {w.name}
-              </span>
-            ))}
+      {/* Card body */}
+      <div className="px-4 pt-4 pb-3">
+        {/* Top row: icon + title */}
+        <div className="flex items-start gap-3">
+          <div className="w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden bg-transparent flex items-center justify-center">
+            <img src={icon} alt="" className="w-10 h-10 object-contain" style={{ filter: glow.iconGlow }} />
           </div>
-        </div>
-
-        {/* Right side */}
-        <div className="flex flex-col items-center gap-1 flex-shrink-0">
+          <div className="flex-1 min-w-0 pt-1">
+            <h4 className="font-extrabold text-white text-sm tracking-tight leading-tight">
+              {name.replace(/ Workout$/, '')}
+            </h4>
+            <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+              {workouts.map(w => w.name).join(' | ')}
+            </p>
+          </div>
           <button
             ref={menuRef}
             onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-muted transition select-none"
+            className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 transition flex-shrink-0 mt-1"
           >
-            <svg className="w-3.5 h-3.5 text-muted-foreground" viewBox="0 0 16 16" fill="currentColor">
+            <svg className="w-3 h-3 text-gray-500" viewBox="0 0 16 16" fill="currentColor">
               <circle cx="8" cy="3" r="1.5" />
               <circle cx="8" cy="8" r="1.5" />
               <circle cx="8" cy="13" r="1.5" />
             </svg>
           </button>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Dumbbell className="w-3 h-3" />
-            <span className="font-semibold">{workouts.length}</span>
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
+        </div>
+
+        {/* Three cyan dots separator */}
+        <div className="flex items-center justify-center gap-1.5 my-3">
+          <div className="w-1 h-1 rounded-full bg-cyan-400/60" />
+          <div className="w-1 h-1 rounded-full bg-cyan-400/40" />
+          <div className="w-1 h-1 rounded-full bg-cyan-400/20" />
+        </div>
+
+        {/* Bottom row: badge + chevron */}
+        <div className="flex items-center justify-between">
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${glow.badge}`}>
+            <span>🏋️</span>
+            <span>{workouts.length} workout{workouts.length !== 1 ? 's' : ''}</span>
+          </span>
+          <ChevronRight className={`w-4 h-4 ${glow.chevron}`} />
         </div>
       </div>
     </div>
