@@ -391,7 +391,7 @@ export default function Splits() {
       {/* Portal menu — uses createPortal to escape overflow-hidden clipping from SwipeableTabs */}
       {menuOpen && createPortal(
         <div
-          className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[190px]"
+          className="fixed bg-card rounded-2xl shadow-xl border border-border/60 py-1.5 overflow-hidden"
           style={{
             top: `${(() => { const el = menuRef.current[menuOpen]; return el ? el.getBoundingClientRect().bottom + 4 : 0; })()}px`,
             right: `${(() => { const el = menuRef.current[menuOpen]; return el ? window.innerWidth - el.getBoundingClientRect().right : 0; })()}px`,
@@ -409,9 +409,9 @@ export default function Splits() {
               }
             }}
             disabled={swapping}
-            className="w-full text-left px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition"
+            className="w-full text-left px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted/60 transition-colors"
           >
-            {swapping ? 'Applying…' : 'Make this my current split'}
+            Make this my current split
           </button>
           <button
             onClick={() => {
@@ -419,9 +419,9 @@ export default function Splits() {
               const g = mySplitGroups.find(x => x.groupId === menuOpen);
               if (g) setDeleteTarget(g);
             }}
-            className="w-full text-left px-4 py-2.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 transition"
+            className="w-full text-left px-4 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
           >
-            🗑 Delete split
+            Delete split
           </button>
         </div>,
         document.body
