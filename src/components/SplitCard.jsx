@@ -50,16 +50,19 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
       ref={cardRef}
       onClick={onCardClick}
       className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-200 overflow-hidden"
-      style={{ aspectRatio: '16/10' }}
+      style={{ minHeight: 240 }}
     >
       {/* Background image with dark overlay */}
       <div className="absolute inset-0">
         <img
           src={bgImage}
           alt=""
-          className="w-full h-full object-cover object-right"
+          className="w-full h-full object-cover"
+          style={{ objectPosition: '50% 33%' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/10" />
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse at 62% 48%, transparent 30%, rgba(0,0,0,0.1) 55%, rgba(0,0,0,0.65) 90%)'
+        }} />
       </div>
 
       {/* Content layer */}
