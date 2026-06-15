@@ -1,6 +1,7 @@
 const FULL_CARD_IMAGES = {
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/1392536e9_image.png',
   'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/cf4988248_image.png',
+  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9a2a05990_image.png',
 };
 
 const BLUEPILL_STYLE = 'text-[11px] px-2.5 py-1 rounded-full bg-[#E3F2FD] dark:bg-blue-950/50 text-[#1565C0] dark:text-blue-400 font-medium';
