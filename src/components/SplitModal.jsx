@@ -258,9 +258,9 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                   >
                     😴
                   </button>
-                  <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-gray-800 text-white text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none">
+                  <div className="absolute top-full mt-1.5 right-0 px-2.5 py-1 bg-gray-800 text-white text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none z-20">
                     Edit rest frequency
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800" />
+                    <div className="absolute bottom-full right-3 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-gray-800" />
                   </div>
                 </div>
               </div>

@@ -3,17 +3,18 @@ import { Check, Dumbbell, X } from 'lucide-react';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-function getTooltipText(status, isPast, isToday) {
+function getTooltipText(status, isPast, isToday, isNoData) {
   const isGymDay = status >= 1;
   const isCompleted = status === 2;
   if (!isGymDay) return 'Rest day 😌';
+  if (isNoData) return 'Split starts here — no data yet';
   if (isPast && isCompleted) return 'Workout completed ✅';
   if (isPast && !isCompleted) return 'Missed workout ❌';
   if (isToday) return "Workout today — let's go! 💪";
   return 'Workout day ahead 💪';
 }
 
-export default function WeekTracker({ schedule, cycleLabel }) {
+export default function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
   const [activeDay, setActiveDay] = useState(todayMonSun);
@@ -39,12 +40,15 @@ export default function WeekTracker({ schedule, cycleLabel }) {
           const isGymDay = status >= 1;
           const isCompleted = status === 2;
           const isPast = i < todayMonSun;
-          const missed = isPast && isGymDay && !isCompleted;
+          const beforeSplitStart = isPast && i < startDayIndex;
+          const missed = isPast && isGymDay && !isCompleted && !beforeSplitStart;
+          const noData = isPast && isGymDay && !isCompleted && beforeSplitStart;
           const showCheck = isPast && isGymDay && isCompleted;
           const showDumbbell = isGymDay && !isPast;
 
           let bgClass = '';
           if (missed) bgClass = 'bg-red-500';
+          else if (noData) bgClass = 'border border-gray-300 dark:border-gray-600 bg-transparent';
           else if (isGymDay) bgClass = 'bg-blue-500';
           else bgClass = 'border border-blue-300 dark:border-blue-700 bg-transparent';
 
@@ -64,6 +68,7 @@ export default function WeekTracker({ schedule, cycleLabel }) {
               >
                 {showCheck && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                 {missed && <X className="w-3 h-3 text-white" strokeWidth={3} />}
+                {noData && <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 leading-none">—</span>}
                 {showDumbbell && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
               </div>
             </div>
@@ -79,7 +84,7 @@ export default function WeekTracker({ schedule, cycleLabel }) {
           </span>
         )}
         <span className="text-[11px] font-medium text-muted-foreground text-center min-h-[16px]">
-          {getTooltipText(schedule[activeDay], activeDay < todayMonSun, activeDay === todayMonSun)}
+          {getTooltipText(schedule[activeDay], activeDay < todayMonSun, activeDay === todayMonSun, activeDay < todayMonSun && activeDay < startDayIndex && schedule[activeDay] >= 1)}
         </span>
       </div>
     </div>

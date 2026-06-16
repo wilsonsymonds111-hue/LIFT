@@ -100,16 +100,16 @@ export default function Home() {
             const pos = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
             schedule.push(pos < onDays ? 1 : 0);
           }
-          return schedule;
+          return { schedule, startDayIndex };
         }
         // Fall back to legacy schedule format
         const raw = localStorage.getItem(`splitSchedule_${key}`);
-        if (raw) return JSON.parse(raw);
+        if (raw) return { schedule: JSON.parse(raw), startDayIndex: 0 };
       } catch {}
-      return defaultSchedule;
+      return { schedule: defaultSchedule, startDayIndex: 0 };
     };
 
-    if (currentSplit.length === 0) return { key: 'full-body', schedule: resolveSchedule('full-body') };
+    if (currentSplit.length === 0) return { key: 'full-body', ...resolveSchedule('full-body') };
     const names = currentSplit.map(t => (t.name || '').toLowerCase());
     const hasUpper = names.some(n => n.includes('upper'));
     const hasLower = names.some(n => n.includes('lower'));
@@ -118,11 +118,11 @@ export default function Home() {
     const hasLegs  = names.some(n => n.includes('legs'));
     const hasFull  = names.some(n => n.includes('full'));
 
-    if (hasFull && !hasUpper && !hasLower) return { key: 'full-body', schedule: resolveSchedule('full-body') };
-    if (hasUpper && hasLower && hasPush && hasPull && hasLegs) return { key: 'ul-ppl', schedule: resolveSchedule('ul-ppl') };
-    if (hasPush && hasPull && hasLegs) return { key: 'push-pull-legs', schedule: resolveSchedule('push-pull-legs') };
-    if (hasUpper && hasLower) return { key: 'upper-lower', schedule: resolveSchedule('upper-lower') };
-    return { key: 'full-body', schedule: resolveSchedule('full-body') };
+    if (hasFull && !hasUpper && !hasLower) return { key: 'full-body', ...resolveSchedule('full-body') };
+    if (hasUpper && hasLower && hasPush && hasPull && hasLegs) return { key: 'ul-ppl', ...resolveSchedule('ul-ppl') };
+    if (hasPush && hasPull && hasLegs) return { key: 'push-pull-legs', ...resolveSchedule('push-pull-legs') };
+    if (hasUpper && hasLower) return { key: 'upper-lower', ...resolveSchedule('upper-lower') };
+    return { key: 'full-body', ...resolveSchedule('full-body') };
   })();
 
   const cycleLabel = useMemo(() => {
@@ -160,7 +160,7 @@ export default function Home() {
       </div>
 
       {/* Weekly Tracker */}
-      <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} />
+      <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} />
 
       {/* Quick Start */}
       <div className="px-4 py-4">
