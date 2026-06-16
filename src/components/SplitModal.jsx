@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings } from 'lucide-react';
+import { ArrowLeft, Dumbbell, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
@@ -138,6 +138,9 @@ export default function SplitModal({ splitKey, onClose }) {
     saveCustomSchedule(splitKey, next);
   };
 
+  const todayIndex = new Date().getDay();
+  const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
+
   const cycleLabel = useMemo(() => {
     const days = customSchedule.map(s => s === 0 ? 'Rest' : 'Train').join(' — ');
     return days;
@@ -207,11 +210,14 @@ export default function SplitModal({ splitKey, onClose }) {
 
                   {/* Day letters */}
                   <div className="flex justify-between mb-1.5">
-                    {DAY_LETTERS.map((l, i) => (
-                      <span key={i} className="text-[10px] font-bold text-muted-foreground w-9 text-center">
-                        {l}
-                      </span>
-                    ))}
+                    {DAY_LETTERS.map((l, i) => {
+                      const isToday = i === todayMonSun;
+                      return (
+                        <span key={i} className={`text-[10px] font-bold w-9 text-center ${isToday ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                          {l}
+                        </span>
+                      );
+                    })}
                   </div>
 
                   {/* Tappable dots */}
@@ -229,7 +235,7 @@ export default function SplitModal({ splitKey, onClose }) {
                             }`}
                           >
                             {isGymDay && (
-                              <span className="text-[10px] font-bold text-white">▼</span>
+                              <Dumbbell className="w-3 h-3 text-white" strokeWidth={2.5} />
                             )}
                           </div>
                         </div>
