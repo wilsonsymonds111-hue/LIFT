@@ -46,73 +46,72 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
   const workoutCount = workouts.length;
 
   return (
-    <div
-      ref={cardRef}
-      onClick={onCardClick}
-      className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.35)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.65)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.8)] hover:scale-[1.02]"
-      style={{
-        height: 200,
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center 30%',
-        backgroundColor: '#0f0f1a',
-      }}
-    >
-      {/* Bottom gradient for text readability */}
-      <div className="absolute inset-0" style={{
-        background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.1) 100%)'
-      }} />
+    <div ref={cardRef} className="relative">
+      {/* Endorsement sticker — hangs off top-right edge, outside overflow-hidden card */}
+      {endorsement && (
+        <div className="absolute -top-3 -right-6 z-10">
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-400 text-black text-[9px] font-bold leading-none whitespace-nowrap shadow-lg shadow-yellow-400/30">
+            ⭐ {endorsement}
+          </span>
+        </div>
+      )}
 
-      {/* Content layer */}
-      <div className="relative h-full flex flex-col justify-between px-4 py-3.5">
-        {/* Top section */}
-        <div>
-          {/* Top row: icon + title + menu */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Dumbbell className="w-4 h-4 text-white" strokeWidth={1.5} />
-              <h4 className="font-extrabold text-white text-sm tracking-widest uppercase leading-tight">
-                {name.replace(/ Workout$/, '')}
-              </h4>
+      <div
+        onClick={onCardClick}
+        className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.35)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.65)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.8)] hover:scale-[1.02]"
+        style={{
+          height: 200,
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 30%',
+          backgroundColor: '#0f0f1a',
+        }}
+      >
+        {/* Bottom gradient for text readability */}
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.1) 100%)'
+        }} />
+
+        {/* Content layer */}
+        <div className="relative h-full flex flex-col justify-between px-4 py-3.5">
+          {/* Top section */}
+          <div>
+            {/* Top row: icon + title + menu */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Dumbbell className="w-4 h-4 text-white" strokeWidth={1.5} />
+                <h4 className="font-extrabold text-white text-sm tracking-widest uppercase leading-tight">
+                  {name.replace(/ Workout$/, '')}
+                </h4>
+              </div>
+
+              {/* Menu button */}
+              <button
+                ref={menuRef}
+                onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition flex-shrink-0"
+              >
+                <MoreHorizontal className="w-3.5 h-3.5 text-white" />
+              </button>
             </div>
 
-            {/* Menu button */}
-            <button
-              ref={menuRef}
-              onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-              className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition flex-shrink-0"
-            >
-              <MoreHorizontal className="w-3.5 h-3.5 text-white" />
-            </button>
+            {/* Subtitle */}
+            <p className="text-xs text-white/90 font-medium mt-2 leading-relaxed line-clamp-2" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
+              {subtitle}
+            </p>
           </div>
 
-          {/* Subtitle */}
-          <p className="text-xs text-white/90 font-medium mt-2 leading-relaxed line-clamp-2" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
-            {subtitle}
-          </p>
-
-
-        </div>
-
-        {/* Endorsement sticker — overlaps top-right edge (50% on, 50% off) */}
-        {endorsement && (
-          <div className="absolute -top-2.5 -right-5 z-10">
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-400 text-black text-[9px] font-bold leading-none whitespace-nowrap shadow-lg shadow-yellow-400/30">
-              ⭐ {endorsement}
+          {/* Bottom row: badge + chevron */}
+          <div className="flex items-center justify-between">
+            {/* Workout count badge */}
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white text-black text-[11px] font-bold tracking-wide">
+              {workoutCount} WORKOUT{workoutCount !== 1 ? 'S' : ''}
             </span>
-          </div>
-        )}
 
-        {/* Bottom row: badge + chevron */}
-        <div className="flex items-center justify-between">
-          {/* Workout count badge */}
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white text-black text-[11px] font-bold tracking-wide">
-            {workoutCount} WORKOUT{workoutCount !== 1 ? 'S' : ''}
-          </span>
-
-          {/* Chevron button */}
-          <div className={`w-7 h-7 rounded-full ${accent.chevron} flex items-center justify-center`}>
-            <ChevronRight className="w-4 h-4 text-white" strokeWidth={2.5} />
+            {/* Chevron button */}
+            <div className={`w-7 h-7 rounded-full ${accent.chevron} flex items-center justify-center`}>
+              <ChevronRight className="w-4 h-4 text-white" strokeWidth={2.5} />
+            </div>
           </div>
         </div>
       </div>
