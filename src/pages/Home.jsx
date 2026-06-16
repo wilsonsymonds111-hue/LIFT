@@ -27,6 +27,37 @@ const relativeTime = (dateStr) => {
   return `${Math.floor(diffDays / 30)}mo ago`;
 };
 
+const SPLIT_ACCENTS = {
+  'upper-lower': {
+    hex: '#2A8FFF',
+    tint: 'rgba(30, 100, 220, 0.18)',
+    cardClasses: 'border-blue-400/30 shadow-blue-500/10 ring-blue-400/10',
+    tagClasses: 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400',
+    dotClass: 'bg-blue-500',
+  },
+  'push-pull-legs': {
+    hex: '#43A047',
+    tint: 'rgba(50, 140, 50, 0.18)',
+    cardClasses: 'border-emerald-400/30 shadow-emerald-500/10 ring-emerald-400/10',
+    tagClasses: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400',
+    dotClass: 'bg-emerald-500',
+  },
+  'full-body': {
+    hex: '#8E24AA',
+    tint: 'rgba(120, 30, 150, 0.18)',
+    cardClasses: 'border-purple-400/30 shadow-purple-500/10 ring-purple-400/10',
+    tagClasses: 'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400',
+    dotClass: 'bg-purple-500',
+  },
+  'ul-ppl': {
+    hex: '#F57C00',
+    tint: 'rgba(220, 100, 0, 0.18)',
+    cardClasses: 'border-amber-400/30 shadow-amber-500/10 ring-amber-400/10',
+    tagClasses: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400',
+    dotClass: 'bg-amber-500',
+  },
+};
+
 export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -174,6 +205,8 @@ export default function Home() {
     return { currentSplit: split, currentSplitName: splitName, splitDetection: detection };
   }, [templates]);
 
+  const accent = useMemo(() => SPLIT_ACCENTS[splitDetection.key] || SPLIT_ACCENTS['full-body'], [splitDetection.key]);
+
   const isApple = useMemo(() => {
     const ua = navigator.userAgent || '';
     return /(iPhone|iPad|iPod|Macintosh|Mac OS X)/i.test(ua) && !/Android/i.test(ua);
@@ -243,10 +276,10 @@ export default function Home() {
 
       {/* ==================== CURRENT SPLIT (Spotlight) ==================== */}
       <div className="relative px-4 py-2">
-        {/* Multi-layered glow for depth */}
-        <div className="absolute -inset-12 bg-gradient-to-br from-blue-500/10 via-blue-400/6 to-cyan-400/4 rounded-[4rem] blur-3xl pointer-events-none" />
-        <div className="absolute -inset-4 bg-blue-400/8 rounded-[2.5rem] blur-2xl pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-cyan-400/5 rounded-[2rem] blur-xl pointer-events-none" />
+        {/* Multi-layered glow for depth — dynamic hue based on split type */}
+        <div className="absolute -inset-12 rounded-[4rem] blur-3xl pointer-events-none" style={{ background: `radial-gradient(ellipse at center, ${accent.hex}18 0%, ${accent.hex}0A 50%, transparent 70%)` }} />
+        <div className="absolute -inset-4 rounded-[2.5rem] blur-2xl pointer-events-none" style={{ background: `radial-gradient(ellipse at center, ${accent.hex}18 0%, transparent 60%)` }} />
+        <div className="absolute inset-0 rounded-[2rem] blur-xl pointer-events-none" style={{ background: `radial-gradient(ellipse at center, ${accent.hex}0C 0%, transparent 50%)` }} />
 
         <div className="relative">
           <div className="flex items-start justify-between mb-4">
@@ -255,7 +288,7 @@ export default function Home() {
                 <motion.div
                   animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
                   transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-                  className="w-2 h-2 rounded-full bg-blue-500"
+                  className={`w-2 h-2 rounded-full ${accent.dotClass}`}
                 />
                 <h3 className="font-semibold text-foreground text-sm">Current Split</h3>
               </div>
@@ -279,7 +312,7 @@ export default function Home() {
               {currentSplit.map((template) => (
                 <div
                   key={template.id}
-                  className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 hover:shadow-xl hover:scale-[1.02] transition-all duration-150"
+                  className={`relative bg-card border rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses}`}
                 >
                   {/* Three-dot menu button */}
                   <button
@@ -297,7 +330,7 @@ export default function Home() {
                         ? template.exerciseList.map(e => e.name)
                         : (template.exercises || '').split(',').map(s => s.trim()).filter(Boolean)
                       ).map((name, i) => (
-                        <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                        <span key={i} className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${accent.tagClasses}`}>
                           {name}
                         </span>
                       ))}
@@ -359,7 +392,7 @@ export default function Home() {
                   onClick={handleSyncToCalendar}
                   className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
                 >
-                  <CalendarPlus className="w-4 h-4 text-blue-500" />
+                  <CalendarPlus className={`w-4 h-4 ${accent.dotClass.replace('bg-', 'text-')}`} />
                   {isApple ? 'Sync to Apple Calendar' : 'Sync to Android Calendar'}
                 </button>
               </div>
