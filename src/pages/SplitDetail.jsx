@@ -131,9 +131,9 @@ export default function SplitDetail() {
       <div className="flex items-center justify-between px-4 py-3 border-b border-border" style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}>
         <button
           onClick={handleBack}
-          className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-muted/70 transition -ml-2"
+          className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-blue-500 transition group -ml-2"
         >
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+          <ArrowLeft className="w-5 h-5 text-foreground group-hover:text-white transition" />
         </button>
         <div className="text-center">
           <h2 className="text-lg font-extrabold text-foreground">{split.name}</h2>
