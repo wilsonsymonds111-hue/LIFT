@@ -27,6 +27,7 @@ export default function Splits() {
   const templates = useMemo(() => allTemplates.filter(t =>
     t.splitGroup &&
     !t.splitGroup.endsWith('_old') &&
+    !t.splitGroup.startsWith('removed_') &&
     !t.isActiveSplit
   ), [allTemplates]);
   const [menuOpen, setMenuOpen] = useState(null);
@@ -342,7 +343,7 @@ export default function Splits() {
         <div className="px-4">
           <button
             onClick={() => setShowBuilder(true)}
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-2 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Create New Split
