@@ -15,6 +15,9 @@ const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0eba
 // Fetch + decode once. Playing a decoded AudioBuffer bypasses seek latency.
 let _decodedBufPromise = null;
 let _ctx = null;
+let _soundEnabled = true;        // gate: respects hardware silent switch
+let _silentDetected = false;     // cache detection result
+let _detectionRan = false;
 
 function _loadBuf() {
   try {
@@ -29,8 +32,38 @@ function _loadBuf() {
 }
 _loadBuf();
 
+async function detectSilentMode() {
+  if (_detectionRan) return _silentDetected;
+  _detectionRan = true;
+  try {
+    const testCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (testCtx.state === 'suspended') await testCtx.resume();
+    const osc = testCtx.createOscillator();
+    const gain = testCtx.createGain();
+    const analyser = testCtx.createAnalyser();
+    analyser.fftSize = 256;
+    osc.type = 'sine';
+    osc.frequency.value = 660;
+    gain.gain.value = 0.05;
+    osc.connect(gain);
+    gain.connect(analyser);
+    osc.start();
+    await new Promise(r => setTimeout(r, 80));
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteTimeDomainData(data);
+    osc.stop();
+    testCtx.close();
+    // On iOS with silent switch on, all samples stay at centre (128)
+    _silentDetected = data.every(v => v === 128);
+    _soundEnabled = !_silentDetected;
+  } catch {
+    _silentDetected = false;
+  }
+  return _silentDetected;
+}
+
 function playTick() {
-  if (!_ctx) return;
+  if (!_ctx || !_soundEnabled) return;
   _decodedBufPromise.then(buf => {
     if (!buf) return;
     try {
@@ -41,6 +74,17 @@ function playTick() {
       src.start(0);
     } catch (_) {}
   });
+}
+
+// Run detection on first user interaction
+if (typeof window !== 'undefined') {
+  const runDetection = () => {
+    detectSilentMode();
+    document.removeEventListener('pointerdown', runDetection);
+    document.removeEventListener('keydown', runDetection);
+  };
+  document.addEventListener('pointerdown', runDetection, { once: true });
+  document.addEventListener('keydown', runDetection, { once: true });
 }
 
 /* ─── Timer ──────────────────────────────────────────────────── */

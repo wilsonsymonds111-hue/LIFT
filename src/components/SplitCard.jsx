@@ -4,7 +4,7 @@ const SPLIT_BG_IMAGES = {
   'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/839011abd_generated_image.png',
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/799340377_generated_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/8cc98624d_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a1ee22d3a_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/0d40836a8_generated_image.png',
 };
 
 const ACCENT_COLORS = {
@@ -54,7 +54,7 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
         height: 200,
         backgroundImage: `url(${bgImage})`,
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundPosition: 'center 30%',
         backgroundColor: '#0f0f1a',
       }}
     >
