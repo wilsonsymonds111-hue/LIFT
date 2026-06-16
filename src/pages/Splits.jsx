@@ -253,6 +253,22 @@ export default function Splits() {
         splitGroup: newGroupId,
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+      // Persist default cycle so Home page knows the schedule
+      const schedule = splitData.schedule;
+      if (schedule) {
+        let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
+        for (let i = 0; i < schedule.length; i++) {
+          if (schedule[i] >= 1) { curOn++; if (curOff > maxOff) maxOff = curOff; curOff = 0; }
+          else { curOff++; if (curOn > maxOn) maxOn = curOn; curOn = 0; }
+        }
+        if (curOn > maxOn) maxOn = curOn;
+        if (curOff > maxOff) maxOff = curOff;
+        const todayIndex = new Date().getDay();
+        const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
+        localStorage.setItem(`splitCycle_${splitKey}`, JSON.stringify({
+          onDays: maxOn || 1, offDays: maxOff || 1, startDayIndex: todayMonSun,
+        }));
+      }
     } catch (_) {
       setSwapping(false);
       setSwapPhase(null);
@@ -537,7 +553,6 @@ export default function Splits() {
                 initial={{ scale: 0.85, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.3, ease: [0.33, 1, 0.68, 1] }}
-                  transition={{ duration: 0.3, ease: [0.33, 1, 0.68, 1] }}
                 onAnimationComplete={() => setSwapPhase('swap')}
                 className="bg-card border border-border/50 rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5"
                 style={{ width: 340 }}

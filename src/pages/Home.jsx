@@ -108,7 +108,27 @@ export default function Home() {
         const raw = localStorage.getItem(`splitSchedule_${key}`);
         if (raw) return { schedule: JSON.parse(raw), startDayIndex: todayMonSun };
       } catch {}
-      return { schedule: defaultSchedule, startDayIndex: todayMonSun };
+      // No saved cycle — compute from default schedule and anchor today as first workout day
+      if (defaultSchedule) {
+        let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
+        for (let i = 0; i < defaultSchedule.length; i++) {
+          if (defaultSchedule[i] >= 1) { curOn++; if (curOff > maxOff) maxOff = curOff; curOff = 0; }
+          else { curOff++; if (curOn > maxOn) maxOn = curOn; curOn = 0; }
+        }
+        if (curOn > maxOn) maxOn = curOn;
+        if (curOff > maxOff) maxOff = curOff;
+        const onDays = maxOn || 1;
+        const offDays = maxOff || 1;
+        const startDayIndex = todayMonSun;
+        const cycleLength = onDays + offDays;
+        const schedule = [];
+        for (let i = 0; i < 7; i++) {
+          const pos = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
+          schedule.push(pos < onDays ? 1 : 0);
+        }
+        return { schedule, startDayIndex };
+      }
+      return { schedule: defaultSchedule || [], startDayIndex: todayMonSun };
     };
 
     if (currentSplit.length === 0) return { key: 'full-body', ...resolveSchedule('full-body') };
@@ -129,6 +149,7 @@ export default function Home() {
 
   const cycleLabel = useMemo(() => {
     const key = splitDetection.key;
+    const defaultSchedule = EXAMPLE_SPLITS_DATA[key]?.schedule;
     try {
       const cycleRaw = localStorage.getItem(`splitCycle_${key}`);
       if (cycleRaw) {
@@ -138,6 +159,20 @@ export default function Home() {
         return `${onPart}, ${offPart}`;
       }
     } catch {}
+    if (defaultSchedule) {
+      let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
+      for (let i = 0; i < defaultSchedule.length; i++) {
+        if (defaultSchedule[i] >= 1) { curOn++; if (curOff > maxOff) maxOff = curOff; curOff = 0; }
+        else { curOff++; if (curOn > maxOn) maxOn = curOn; curOn = 0; }
+      }
+      if (curOn > maxOn) maxOn = curOn;
+      if (curOff > maxOff) maxOff = curOff;
+      const onDays = maxOn || 1;
+      const offDays = maxOff || 1;
+      const onPart = `${onDays} day${onDays !== 1 ? 's' : ''} on`;
+      const offPart = `${offDays} day${offDays !== 1 ? 's' : ''} off`;
+      return `${onPart}, ${offPart}`;
+    }
     return null;
   }, [splitDetection.key]);
 
