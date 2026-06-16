@@ -1,7 +1,7 @@
 import { Dumbbell, ChevronRight, MoreHorizontal } from 'lucide-react';
 
 const SPLIT_BG_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/7860b7640_generated_image.png',
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/394d180a1_generated_image.png',
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/799340377_generated_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/8cc98624d_generated_image.png',
   'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/0d40836a8_generated_image.png',
