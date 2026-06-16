@@ -96,8 +96,8 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
 
         {/* Endorsement sticker — overlaps top-right edge */}
         {endorsement && (
-          <div className="absolute -top-2 -right-6 z-10">
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-400/60 text-black/80 text-[9px] font-bold leading-none whitespace-nowrap shadow-md shadow-black/10 backdrop-blur-sm">
+          <div className="absolute -top-1 -right-2 z-10">
+            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-yellow-400 text-black text-[10px] font-bold leading-none whitespace-nowrap shadow-lg shadow-yellow-400/30">
               ⭐ {endorsement}
             </span>
           </div>
