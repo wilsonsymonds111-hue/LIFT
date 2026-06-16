@@ -124,7 +124,7 @@ export default function Home() {
       </div>
 
       {/* Weekly Tracker */}
-      <WeekTracker schedule={splitDetection.schedule} splitKey={splitDetection.key} />
+      <WeekTracker schedule={splitDetection.schedule} />
 
       {/* Quick Start */}
       <div className="px-4 py-4">
