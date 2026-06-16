@@ -21,12 +21,12 @@ export default function BottomNav() {
       className="fixed bottom-0 left-0 z-50 flex pl-4"
       style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}
     >
-      <nav className={`flex items-center gap-0.5 px-1.5 py-1.5 rounded-full backdrop-blur-xl transition-colors duration-300 border border-border/50 ${
+      <nav className={`flex items-center gap-0.5 px-1.5 py-1.5 rounded-full backdrop-blur-xl transition-colors duration-300 border ${
         isWorkouts
-          ? 'bg-card/85 dark:bg-card/80 shadow-[0_4px_24px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)]'
+          ? 'bg-gray-200/80 dark:bg-gray-800/70 border-gray-300/60 dark:border-gray-600/40 shadow-[0_4px_24px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)]'
           : isSplits
-            ? 'bg-card/70 dark:bg-card/60 shadow-[0_4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
-            : 'bg-card/70 dark:bg-card/60 shadow-[0_4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
+            ? 'bg-gray-100/70 dark:bg-gray-800/50 border-gray-200/50 dark:border-gray-600/30 shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
+            : 'bg-gray-100/70 dark:bg-gray-800/50 border-gray-200/50 dark:border-gray-600/30 shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
       }`}>
         {tabs.map(({ path, label, Icon }) => {
           const active = location.pathname === path;
