@@ -54,7 +54,7 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
           height: 200,
           backgroundImage: `url(${bgImage})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center 65%',
+          backgroundPosition: 'center 50%',
           backgroundColor: '#0f0f1a',
         }}
       >
