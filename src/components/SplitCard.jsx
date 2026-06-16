@@ -1,4 +1,5 @@
 import { Dumbbell, ChevronRight, MoreHorizontal } from 'lucide-react';
+import useInView from '../hooks/useInView';
 
 const SPLIT_BG_IMAGES = {
   'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/394d180a1_generated_image.png',
@@ -46,15 +47,17 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
   const bgImage = SPLIT_BG_IMAGES[splitKey] || SPLIT_BG_IMAGES[colorKey] || SPLIT_BG_IMAGES['upper-lower'];
   const subtitle = workouts.map(w => w.name).join(' | ');
   const workoutCount = workouts.length;
+  const [imgRef, inView] = useInView();
 
   return (
     <div ref={cardRef} className="relative">
       <div
+        ref={imgRef}
         onClick={onCardClick}
         className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.35)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.65)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.8)] hover:scale-[1.02]"
         style={{
           height: 200,
-          backgroundImage: `url(${bgImage})`,
+          backgroundImage: inView ? `url(${bgImage})` : 'none',
           backgroundSize: 'cover',
           backgroundPosition: 'center 50%',
           backgroundColor: '#0f0f1a',
