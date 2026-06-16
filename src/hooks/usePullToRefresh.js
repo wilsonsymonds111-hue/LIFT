@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const THRESHOLD = 70;
 
@@ -7,11 +7,16 @@ export default function usePullToRefresh(onRefresh) {
   const [pullY, setPullY] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startYRef = useRef(null);
+  const pullYRef = useRef(0);
   const containerRef = useRef(null);
+  const onRefreshRef = useRef(onRefresh);
+  onRefreshRef.current = onRefresh;
+
+  const stableOnRefresh = useCallback(async () => {
+    await onRefreshRef.current();
+  }, []);
 
   useEffect(() => {
-    const el = containerRef.current || window;
-
     const onTouchStart = (e) => {
       const scrollTop = containerRef.current
         ? containerRef.current.scrollTop
@@ -26,19 +31,22 @@ export default function usePullToRefresh(onRefresh) {
       const dy = e.touches[0].clientY - startYRef.current;
       if (dy > 0) {
         setPulling(true);
-        setPullY(Math.min(dy * 0.45, THRESHOLD + 20));
+        const y = Math.min(dy * 0.45, THRESHOLD + 20);
+        pullYRef.current = y;
+        setPullY(y);
       }
     };
 
     const onTouchEnd = async () => {
-      if (pullY >= THRESHOLD) {
+      if (pullYRef.current >= THRESHOLD) {
         setRefreshing(true);
         setPullY(THRESHOLD * 0.6);
-        await onRefresh();
+        await stableOnRefresh();
         setRefreshing(false);
       }
       setPulling(false);
       setPullY(0);
+      pullYRef.current = 0;
       startYRef.current = null;
     };
 
@@ -51,7 +59,7 @@ export default function usePullToRefresh(onRefresh) {
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
     };
-  }, [pullY, onRefresh]);
+  }, [stableOnRefresh]);
 
   return { containerRef, pulling, pullY, refreshing };
 }
