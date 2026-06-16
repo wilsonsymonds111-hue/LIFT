@@ -94,6 +94,11 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* iOS momentum scrolling for all scrollable containers */
+  .overflow-y-auto, .overflow-auto, .overflow-y-scroll, .overflow-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+
   button, a, nav, [role="button"] {
     -webkit-user-select: none;
     user-select: none;

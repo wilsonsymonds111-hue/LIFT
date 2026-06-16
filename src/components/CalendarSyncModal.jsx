@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,6 +13,134 @@ const TIME_PRESETS = [
   { label: '6:00 PM', hour: 18 },
   { label: '7:00 PM', hour: 19 },
 ];
+
+function CustomTimePicker({ hour, min, onChange }) {
+  const hourRef = useRef(null);
+  const minRef = useRef(null);
+  const [period, setPeriod] = useState(hour < 12 ? 'AM' : 'PM');
+
+  const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+
+  // Auto-scroll selected items into view
+  useEffect(() => {
+    if (hourRef.current) {
+      const el = hourRef.current.querySelector('[data-selected="true"]');
+      el?.scrollIntoView({ block: 'center', behavior: 'auto' });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (minRef.current) {
+      const el = minRef.current.querySelector('[data-selected="true"]');
+      el?.scrollIntoView({ block: 'center', behavior: 'auto' });
+    }
+  }, []);
+
+  const handleHourChange = (displayH) => {
+    let h24;
+    if (period === 'AM') {
+      h24 = displayH === 12 ? 0 : displayH;
+    } else {
+      h24 = displayH === 12 ? 12 : displayH + 12;
+    }
+    onChange(h24, min);
+  };
+
+  const handleMinChange = (m) => {
+    onChange(hour, m);
+  };
+
+  const handlePeriodToggle = (p) => {
+    setPeriod(p);
+    let h24;
+    if (p === 'AM') {
+      h24 = displayHour === 12 ? 0 : displayHour;
+    } else {
+      h24 = displayHour === 12 ? 12 : displayHour;
+    }
+    onChange(h24, min);
+  };
+
+  const hours = Array.from({ length: 12 }, (_, i) => i + 1);
+  const mins = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+
+  return (
+    <div className="flex gap-3">
+      {/* Hour column */}
+      <div className="flex-1">
+        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-2">Hour</p>
+        <div
+          ref={hourRef}
+          className="h-[160px] overflow-y-auto rounded-xl bg-muted/50 border border-border/50 snap-y snap-mandatory scroll-smooth"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          {hours.map((h) => {
+            const isSelected = h === displayHour;
+            return (
+              <button
+                key={h}
+                data-selected={isSelected}
+                onClick={() => handleHourChange(h)}
+                className={`w-full py-2.5 text-center text-lg font-bold snap-center transition-colors ${
+                  isSelected
+                    ? 'bg-blue-500 text-white'
+                    : 'text-foreground hover:bg-muted'
+                }`}
+              >
+                {String(h).padStart(2, '0')}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Minute column */}
+      <div className="flex-1">
+        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-2">Minute</p>
+        <div
+          ref={minRef}
+          className="h-[160px] overflow-y-auto rounded-xl bg-muted/50 border border-border/50 snap-y snap-mandatory scroll-smooth"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          {mins.map((m) => {
+            const isSelected = m === min;
+            return (
+              <button
+                key={m}
+                data-selected={isSelected}
+                onClick={() => handleMinChange(m)}
+                className={`w-full py-2.5 text-center text-lg font-bold snap-center transition-colors ${
+                  isSelected
+                    ? 'bg-blue-500 text-white'
+                    : 'text-foreground hover:bg-muted'
+                }`}
+              >
+                {String(m).padStart(2, '0')}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* AM/PM toggle */}
+      <div className="flex flex-col justify-center gap-2">
+        {['AM', 'PM'].map((p) => (
+          <button
+            key={p}
+            onClick={() => handlePeriodToggle(p)}
+            className={`px-3 py-3 rounded-xl text-sm font-bold transition-all ${
+              period === p
+                ? 'bg-blue-500 text-white shadow-md shadow-blue-500/25'
+                : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/70'
+            }`}
+          >
+            {p}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function CalendarSyncModal({ onClose, onSync }) {
   const [selectedHour, setSelectedHour] = useState(null);
@@ -111,30 +239,12 @@ export default function CalendarSyncModal({ onClose, onSync }) {
             </button>
 
             {isCustom && (
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="flex items-center gap-1 bg-muted rounded-xl px-3 py-2">
-                  <select
-                    value={customHour}
-                    onChange={e => setCustomHour(e.target.value)}
-                    className="bg-transparent text-foreground font-bold text-lg text-center outline-none appearance-none"
-                  >
-                    {Array.from({ length: 24 }, (_, i) => (
-                      <option key={i} value={i}>{String(i).padStart(2, '0')}</option>
-                    ))}
-                  </select>
-                  <span className="text-muted-foreground font-bold text-lg">:</span>
-                  <select
-                    value={customMin}
-                    onChange={e => setCustomMin(e.target.value)}
-                    className="bg-transparent text-foreground font-bold text-lg text-center outline-none appearance-none"
-                  >
-                    <option value="00">00</option>
-                    <option value="30">30</option>
-                  </select>
-                </div>
-                <span className="text-sm font-medium text-muted-foreground">
-                  {parseInt(customHour, 10) < 12 ? 'AM' : parseInt(customHour, 10) === 12 ? 'PM' : 'PM'}
-                </span>
+              <div className="mb-4">
+                <CustomTimePicker
+                  hour={parseInt(customHour, 10)}
+                  min={parseInt(customMin, 10)}
+                  onChange={(h, m) => { setCustomHour(String(h)); setCustomMin(String(m).padStart(2, '0')); }}
+                />
               </div>
             )}
 
