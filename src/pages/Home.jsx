@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { MoreHorizontal, CalendarPlus } from 'lucide-react';
+import CalendarSyncModal from '../components/CalendarSyncModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
@@ -33,6 +34,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(null);
   const [splitMenuOpen, setSplitMenuOpen] = useState(false);
+  const [showCalendarSync, setShowCalendarSync] = useState(false);
   const menuRef = useRef({});
   const splitMenuBtnRef = useRef(null);
 
@@ -66,11 +68,6 @@ export default function Home() {
 
   const { pullY, refreshing } = usePullToRefresh(loadTemplates);
 
-  const handleDeleteTemplate = async (id) => {
-    setTemplates(prev => prev.filter(t => t.id !== id));
-    await base44.entities.WorkoutTemplate.delete(id);
-  };
-
   const handleRemoveFromSplit = async (template) => {
     setMenuOpen(null);
     setTemplates(prev => prev.filter(t => t.id !== template.id));
@@ -82,11 +79,17 @@ export default function Home() {
 
   const handleSyncToCalendar = () => {
     setSplitMenuOpen(false);
+    setShowCalendarSync(true);
+  };
+
+  const handleCalendarSyncConfirm = (hour) => {
+    setShowCalendarSync(false);
     const ics = generateWorkoutICS({
       splitName: currentSplitName,
       workouts: currentSplit.map(t => ({ name: t.name })),
       schedule: splitDetection.schedule,
       startDayIndex: splitDetection.startDayIndex,
+      workoutHour: hour,
     });
     const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -98,23 +101,21 @@ export default function Home() {
   };
 
   // --- Split categorization ---
-  const hasActiveSplit = templates.some(t => t.isActiveSplit === true);
-  const currentSplit = hasActiveSplit
-    ? templates.filter(t => t.isActiveSplit === true)
-    : templates.filter(t => !t.splitGroup || t.splitGroup === '');
+  const { currentSplit, currentSplitName, splitDetection } = useMemo(() => {
+    const hasActive = templates.some(t => t.isActiveSplit === true);
+    const split = hasActive
+      ? templates.filter(t => t.isActiveSplit === true)
+      : templates.filter(t => !t.splitGroup || t.splitGroup === '');
 
-  const currentSplitName = currentSplit.length > 0
-    ? currentSplit.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ').toUpperCase()
-    : '';
+    const splitName = split.length > 0
+      ? split.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ').toUpperCase()
+      : '';
 
-  // Detect which schedule/split key to use based on the active split's workout names
-  const splitDetection = (() => {
     const resolveSchedule = (key) => {
       const defaultSchedule = EXAMPLE_SPLITS_DATA[key]?.schedule;
       const todayIndex = new Date().getDay();
       const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
       try {
-        // Check for new cycle-based format first
         const cycleRaw = localStorage.getItem(`splitCycle_${key}`);
         if (cycleRaw) {
           const { onDays, offDays, startDayIndex } = JSON.parse(cycleRaw);
@@ -126,11 +127,9 @@ export default function Home() {
           }
           return { schedule, startDayIndex };
         }
-        // Fall back to legacy schedule format
         const raw = localStorage.getItem(`splitSchedule_${key}`);
         if (raw) return { schedule: JSON.parse(raw), startDayIndex: todayMonSun };
       } catch {}
-      // No saved cycle — compute from default schedule and anchor today as first workout day
       if (defaultSchedule) {
         let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
         for (let i = 0; i < defaultSchedule.length; i++) {
@@ -153,21 +152,27 @@ export default function Home() {
       return { schedule: defaultSchedule || [], startDayIndex: todayMonSun };
     };
 
-    if (currentSplit.length === 0) return { key: 'full-body', ...resolveSchedule('full-body') };
-    const names = currentSplit.map(t => (t.name || '').toLowerCase());
-    const hasUpper = names.some(n => n.includes('upper'));
-    const hasLower = names.some(n => n.includes('lower'));
-    const hasPush  = names.some(n => n.includes('push'));
-    const hasPull  = names.some(n => n.includes('pull'));
-    const hasLegs  = names.some(n => n.includes('legs'));
-    const hasFull  = names.some(n => n.includes('full'));
+    let detection;
+    if (split.length === 0) {
+      detection = { key: 'full-body', ...resolveSchedule('full-body') };
+    } else {
+      const names = split.map(t => (t.name || '').toLowerCase());
+      const hasUpper = names.some(n => n.includes('upper'));
+      const hasLower = names.some(n => n.includes('lower'));
+      const hasPush  = names.some(n => n.includes('push'));
+      const hasPull  = names.some(n => n.includes('pull'));
+      const hasLegs  = names.some(n => n.includes('legs'));
+      const hasFull  = names.some(n => n.includes('full'));
 
-    if (hasFull && !hasUpper && !hasLower) return { key: 'full-body', ...resolveSchedule('full-body') };
-    if (hasUpper && hasLower && hasPush && hasPull && hasLegs) return { key: 'ul-ppl', ...resolveSchedule('ul-ppl') };
-    if (hasPush && hasPull && hasLegs) return { key: 'push-pull-legs', ...resolveSchedule('push-pull-legs') };
-    if (hasUpper && hasLower) return { key: 'upper-lower', ...resolveSchedule('upper-lower') };
-    return { key: 'full-body', ...resolveSchedule('full-body') };
-  })();
+      if (hasFull && !hasUpper && !hasLower) detection = { key: 'full-body', ...resolveSchedule('full-body') };
+      else if (hasUpper && hasLower && hasPush && hasPull && hasLegs) detection = { key: 'ul-ppl', ...resolveSchedule('ul-ppl') };
+      else if (hasPush && hasPull && hasLegs) detection = { key: 'push-pull-legs', ...resolveSchedule('push-pull-legs') };
+      else if (hasUpper && hasLower) detection = { key: 'upper-lower', ...resolveSchedule('upper-lower') };
+      else detection = { key: 'full-body', ...resolveSchedule('full-body') };
+    }
+
+    return { currentSplit: split, currentSplitName: splitName, splitDetection: detection };
+  }, [templates]);
 
   const cycleLabel = useMemo(() => {
     const key = splitDetection.key;
@@ -220,8 +225,6 @@ export default function Home() {
 
       {/* Weekly Tracker */}
       <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} />
-
-
 
       {/* Quick Start */}
       <div className="px-4 py-4">
@@ -361,6 +364,12 @@ export default function Home() {
         )}
       </div>
 
+      {showCalendarSync && (
+        <CalendarSyncModal
+          onClose={() => setShowCalendarSync(false)}
+          onSync={handleCalendarSyncConfirm}
+        />
+      )}
 
     </div>
   );

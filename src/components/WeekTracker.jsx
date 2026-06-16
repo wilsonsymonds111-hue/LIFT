@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Check, Dumbbell, Minus } from 'lucide-react';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -14,7 +14,7 @@ function getTooltipText(status, isPast, isToday, isNoData) {
   return 'Workout day ahead 💪';
 }
 
-export default function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
+function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
   const [activeDay, setActiveDay] = useState(todayMonSun);
@@ -90,3 +90,5 @@ export default function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 })
     </div>
   );
 }
+
+export default memo(WeekTracker);
