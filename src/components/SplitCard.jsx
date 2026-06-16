@@ -85,14 +85,16 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
                 </h4>
               </div>
 
-              {/* Menu button */}
-              <button
-                ref={menuRef}
-                onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition flex-shrink-0"
-              >
-                <MoreHorizontal className="w-3.5 h-3.5 text-white" />
-              </button>
+              {/* Menu button — only for user-created splits */}
+              {onMenuToggle && (
+                <button
+                  ref={menuRef}
+                  onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+                  className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition flex-shrink-0"
+                >
+                  <MoreHorizontal className="w-3.5 h-3.5 text-white" />
+                </button>
+              )}
             </div>
 
             {/* Subtitle */}

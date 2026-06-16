@@ -70,7 +70,8 @@ export default function Splits() {
       // Only show saved splits: non-active, has a splitGroup, and not archived (_old)
       setTemplates(data.filter(t =>
         t.splitGroup &&
-        !t.splitGroup.endsWith('_old')
+        !t.splitGroup.endsWith('_old') &&
+        !t.isActiveSplit
       ));
     }
     setLoading(false);
@@ -340,8 +341,6 @@ export default function Splits() {
                 workouts={split.workouts}
                 endorsement={SPLIT_ENDORSEMENTS[key]}
                 onCardClick={() => setActiveSplit(key)}
-                onMenuToggle={() => setMenuOpen(menuOpen === key ? null : key)}
-                menuRef={el => menuRef.current[key] = el}
                 cardRef={el => cardRefs.current[key] = el}
               />
             ))}
