@@ -3,7 +3,7 @@ export const EXAMPLE_SPLITS_DATA = {
     name: 'Upper-Lower',
     description: 'Alternate between upper and lower body days',
     label: 'Upper • Lower',
-    schedule: [1, 1, 0, 1, 1, 0, 0], // M:Upper, T:Lower, W:Rest, T:Upper, F:Lower, S:Rest, S:Rest
+    schedule: [1, 1, 0, 1, 1, 0, 1], // 2 on, 1 off cycling — Upper, Lower, Rest, Upper, Lower, Rest, Upper (Sun starts next cycle)
     workouts: [
       {
         name: 'Upper Body Workout',
