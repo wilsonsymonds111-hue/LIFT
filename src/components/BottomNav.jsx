@@ -21,12 +21,12 @@ export default function BottomNav() {
       className="fixed bottom-0 left-0 z-50 flex pl-4"
       style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}
     >
-      <nav className={`flex items-center gap-0.5 px-1.5 py-1.5 rounded-full backdrop-blur-2xl border border-white/30 dark:border-white/15 transition-colors duration-300 ${
+      <nav className={`flex items-center gap-0.5 px-1.5 py-1.5 rounded-full backdrop-blur-xl transition-colors duration-300 border border-border/50 ${
         isWorkouts
-          ? 'bg-white/45 dark:bg-white/16 shadow-[0_4px_24px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)]'
+          ? 'bg-card/85 dark:bg-card/80 shadow-[0_4px_24px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)]'
           : isSplits
-            ? 'bg-white/30 dark:bg-white/12 shadow-[0_4px_20px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.35)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.06)]'
-            : 'bg-white/30 dark:bg-white/12 shadow-[0_4px_20px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.35)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.06)]'
+            ? 'bg-card/70 dark:bg-card/60 shadow-[0_4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
+            : 'bg-card/70 dark:bg-card/60 shadow-[0_4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]'
       }`}>
         {tabs.map(({ path, label, Icon }) => {
           const active = location.pathname === path;
