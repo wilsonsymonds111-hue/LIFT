@@ -85,14 +85,14 @@ const SwipeableTabs = () => {
         className="flex"
         style={{ width: TABS.length * pageWidth }}
       >
-        <div className="flex-shrink-0 overflow-y-auto" style={{ width: pageWidth, display: activeIndex === 0 ? 'block' : 'none' }}>
+        <div className="flex-shrink-0 overflow-y-auto" style={{ width: pageWidth }}>
           <Suspense fallback={<div className="w-full h-screen bg-background" />}>
-            <Home />
+            {activeIndex === 0 && <Home />}
           </Suspense>
         </div>
-        <div className="flex-shrink-0 overflow-y-auto" style={{ width: pageWidth, display: activeIndex === 1 ? 'block' : 'none' }}>
+        <div className="flex-shrink-0 overflow-y-auto" style={{ width: pageWidth }}>
           <Suspense fallback={<div className="w-full h-screen bg-background" />}>
-            <Splits />
+            {activeIndex === 1 && <Splits />}
           </Suspense>
         </div>
       </motion.div>
