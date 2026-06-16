@@ -38,7 +38,7 @@ function detectSplitType(workoutNames) {
   return 'upper-lower';
 }
 
-export default function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef, endorsement }) {
+export default function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
   const colorKey = SPLIT_COLORS[splitKey] || detectSplitType(workouts.map(w => w.name));
   const accent = ACCENT_COLORS[colorKey] || ACCENT_COLORS.blue;
   const bgImage = SPLIT_BG_IMAGES[splitKey] || SPLIT_BG_IMAGES[colorKey] || SPLIT_BG_IMAGES['upper-lower'];
@@ -47,15 +47,6 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
 
   return (
     <div ref={cardRef} className="relative">
-      {/* Endorsement sticker — hangs off top-right edge, outside overflow-hidden card */}
-      {endorsement && (
-        <div className="absolute -top-3 right-2 z-10">
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-400 text-black text-[9px] font-bold leading-none whitespace-nowrap shadow-lg shadow-yellow-400/30">
-            ⭐ {endorsement}
-          </span>
-        </div>
-      )}
-
       <div
         onClick={onCardClick}
         className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.35)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.65)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.8)] hover:scale-[1.02]"
