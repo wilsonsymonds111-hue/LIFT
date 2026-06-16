@@ -41,6 +41,8 @@ const SlideIn = ({ children }) => (
   </motion.div>
 );
 
+const preloadMap = { '/splits': () => import('./pages/Splits'), '/': () => import('./pages/Home') };
+
 const SwipeableTabs = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -60,6 +62,16 @@ const SwipeableTabs = () => {
       clearTimeout(id);
     };
   }, []);
+
+  // Preload the other tab's chunk after initial render
+  useEffect(() => {
+    const otherPath = activeIndex === 0 ? '/splits' : '/';
+    const preload = preloadMap[otherPath];
+    if (preload) {
+      const id = requestIdleCallback ? requestIdleCallback(preload, { timeout: 2000 }) : setTimeout(preload, 200);
+      return () => (requestIdleCallback ? cancelIdleCallback(id) : clearTimeout(id));
+    }
+  }, [activeIndex]);
 
   const snapToTab = (index) => {
     if (index >= 0 && index < TABS.length && index !== activeIndex) {
@@ -100,9 +112,25 @@ const SwipeableTabs = () => {
   );
 };
 
+// Preload sub-pages after tab content settles
+const usePreloadSubPages = () => {
+  useEffect(() => {
+    const preload = () => {
+      import('./pages/NewTemplate');
+      import('./pages/ActiveWorkout');
+      import('./pages/TemplateDetail');
+      import('./pages/SplitDetail');
+      import('./pages/SupportChat');
+    };
+    const id = requestIdleCallback ? requestIdleCallback(preload, { timeout: 5000 }) : setTimeout(preload, 3000);
+    return () => (requestIdleCallback ? cancelIdleCallback(id) : clearTimeout(id));
+  }, []);
+};
+
 const AnimatedRoutes = () => {
   const location = useLocation();
   const isTabRoute = location.pathname === '/' || location.pathname === '/splits';
+  usePreloadSubPages();
 
   return (
     <>
