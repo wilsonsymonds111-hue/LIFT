@@ -12,12 +12,31 @@ import confetti from 'canvas-confetti';
 /* ─── Sound Effect ──────────────────────────────────────────── */
 const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/ecebf8262_ScreenRecording_06-16-202607-45-53_12.mp3';
 
-const _tickAudio = new Audio(SET_COMPLETE_SOUND);
-_tickAudio.preload = 'auto';
+// Fetch + decode once. Playing a decoded AudioBuffer bypasses seek latency.
+let _decodedBuf = null;
+let _ctx = null;
+
+function _loadBuf() {
+  try {
+    _ctx = new (window.AudioContext || window.webkitAudioContext)();
+    fetch(SET_COMPLETE_SOUND)
+      .then(r => r.arrayBuffer())
+      .then(buf => _ctx.decodeAudioData(buf))
+      .then(decoded => { _decodedBuf = decoded; })
+      .catch(() => {});
+  } catch (_) {}
+}
+_loadBuf();
 
 function playTick() {
-  _tickAudio.currentTime = 0;
-  _tickAudio.play().catch(() => {});
+  if (!_ctx || !_decodedBuf) return;
+  try {
+    if (_ctx.state === 'suspended') _ctx.resume();
+    const src = _ctx.createBufferSource();
+    src.buffer = _decodedBuf;
+    src.connect(_ctx.destination);
+    src.start(0);
+  } catch (_) {}
 }
 
 /* ─── Timer ──────────────────────────────────────────────────── */
