@@ -1,5 +1,6 @@
 import { Dumbbell, Layers } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useNavVisibility } from '@/lib/NavContext';
 
 const tabs = [
   { path: '/', label: 'Workouts', Icon: Dumbbell },
@@ -8,6 +9,10 @@ const tabs = [
 
 export default function BottomNav() {
   const location = useLocation();
+  const { hideNav } = useNavVisibility();
+
+  if (hideNav || location.pathname.startsWith('/support-chat')) return null;
+
   const isWorkouts = location.pathname === '/';
   const isSplits = location.pathname === '/splits';
 
@@ -16,12 +21,12 @@ export default function BottomNav() {
       className="fixed bottom-0 left-0 z-50 flex pl-4"
       style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}
     >
-      <nav className={`flex items-center gap-0.5 px-1.5 py-1.5 rounded-full backdrop-blur-xl border shadow-lg transition-colors duration-300 ${
+      <nav className={`flex items-center gap-0.5 px-1.5 py-1.5 rounded-full backdrop-blur-2xl border border-white/30 dark:border-white/15 transition-colors duration-300 ${
         isWorkouts
-          ? 'bg-gray-300/95 dark:bg-gray-600/90 border-gray-400/50 dark:border-gray-500/40 shadow-[0_4px_20px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)]'
+          ? 'bg-white/30 dark:bg-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.5)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
           : isSplits
-            ? 'bg-gray-200/90 dark:bg-gray-700/90 border-gray-300/50 dark:border-gray-500/30 shadow-[0_4px_16px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)]'
-            : 'bg-gray-200/90 dark:bg-gray-700/90 border-gray-300/50 dark:border-gray-500/30 shadow-[0_4px_16px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)]'
+            ? 'bg-white/20 dark:bg-white/8 shadow-[0_4px_20px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.08)]'
+            : 'bg-white/20 dark:bg-white/8 shadow-[0_4px_20px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.08)]'
       }`}>
         {tabs.map(({ path, label, Icon }) => {
           const active = location.pathname === path;

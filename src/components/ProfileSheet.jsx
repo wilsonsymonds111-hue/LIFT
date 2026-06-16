@@ -1,11 +1,19 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
+import { useNavVisibility } from '@/lib/NavContext';
 
 export default function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange }) {
   const [showFeedback, setShowFeedback] = useState(false);
+  const { setHideNav } = useNavVisibility();
+
+  // Hide bottom nav while profile sheet is open
+  useEffect(() => {
+    setHideNav(true);
+    return () => setHideNav(false);
+  }, [setHideNav]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);

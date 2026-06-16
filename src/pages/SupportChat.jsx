@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { base44 } from '@/api/base44Client';
+import { useNavVisibility } from '@/lib/NavContext';
 
 export default function SupportChat() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { setHideNav } = useNavVisibility();
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -14,6 +16,11 @@ export default function SupportChat() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const bottomRef = useRef(null);
+
+  useEffect(() => {
+    setHideNav(true);
+    return () => setHideNav(false);
+  }, [setHideNav]);
 
   useEffect(() => {
     loadConversation();

@@ -8,6 +8,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import BottomNav from './components/BottomNav';
+import { NavProvider } from '@/lib/NavContext';
 
 const Home = lazy(() => import('./pages/Home'));
 const Splits = lazy(() => import('./pages/Splits'));
@@ -176,9 +177,11 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <AuthenticatedApp />
-        </Router>
+        <NavProvider>
+          <Router>
+            <AuthenticatedApp />
+          </Router>
+        </NavProvider>
         <Toaster />
       </QueryClientProvider>
     </AuthProvider>
