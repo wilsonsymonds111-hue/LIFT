@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
-import { useEffect, useRef, useState, lazy, Suspense } from 'react';
+import { useEffect, useRef, lazy, Suspense } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -43,18 +43,24 @@ const SlideIn = ({ children }) => (
 
 const preloadMap = { '/splits': () => import('./pages/Splits'), '/': () => import('./pages/Home') };
 
+const TAB_STYLES = { touchAction: 'pan-y', contain: 'layout style' };
+
 const SwipeableTabs = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const activeIndex = TABS.indexOf(location.pathname);
   const constraintsRef = useRef(null);
-  const [pageWidth, setPageWidth] = useState(window.innerWidth);
+  const containerRef = useRef(null);
 
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const setVar = () => el.style.setProperty('--pw', `${window.innerWidth}px`);
+    setVar();
     let id;
     const handleResize = () => {
       clearTimeout(id);
-      id = setTimeout(() => setPageWidth(window.innerWidth), 150);
+      id = setTimeout(setVar, 150);
     };
     window.addEventListener('resize', handleResize);
     return () => {
@@ -80,30 +86,30 @@ const SwipeableTabs = () => {
   };
 
   return (
-    <div className="relative overflow-hidden w-full flex-1" ref={constraintsRef} style={{ touchAction: 'pan-y', contain: 'layout style' }}>
+    <div className="relative overflow-hidden w-full flex-1" ref={constraintsRef} style={TAB_STYLES}>
       <motion.div
+        ref={containerRef}
         drag="x"
         dragDirectionLock
         dragConstraints={constraintsRef}
         dragElastic={0}
         dragMomentum={false}
-        style={{ willChange: 'transform' }}
         onDragEnd={(_, info) => {
           const threshold = 50;
           if (info.offset.x < -threshold) snapToTab(activeIndex + 1);
           else if (info.offset.x > threshold) snapToTab(activeIndex - 1);
         }}
-        animate={{ x: -activeIndex * pageWidth }}
+        animate={{ x: `calc(-1 * ${activeIndex} * var(--pw, 100vw))` }}
         transition={{ duration: 0.08, ease: [0.33, 1, 0.68, 1] }}
         className="flex"
-        style={{ width: TABS.length * pageWidth }}
+        style={{ width: `calc(${TABS.length} * var(--pw, 100vw))`, willChange: 'transform' }}
       >
-        <div className="flex-shrink-0 overflow-y-auto" style={{ width: pageWidth }}>
+        <div className="flex-shrink-0 overflow-y-auto" style={{ width: 'var(--pw, 100vw)' }}>
           <Suspense fallback={<div className="w-full h-screen bg-background" />}>
             <div style={{ display: activeIndex === 0 ? 'block' : 'none' }}><Home /></div>
           </Suspense>
         </div>
-        <div className="flex-shrink-0 overflow-y-auto" style={{ width: pageWidth }}>
+        <div className="flex-shrink-0 overflow-y-auto" style={{ width: 'var(--pw, 100vw)' }}>
           <Suspense fallback={<div className="w-full h-screen bg-background" />}>
             <div style={{ display: activeIndex === 1 ? 'block' : 'none' }}><Splits /></div>
           </Suspense>

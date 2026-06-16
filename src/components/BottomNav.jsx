@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Dumbbell, Layers } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useNavVisibility } from '@/lib/NavContext';
@@ -7,7 +8,7 @@ const tabs = [
   { path: '/splits', label: 'Splits', Icon: Layers },
 ];
 
-export default function BottomNav() {
+const BottomNav = memo(function BottomNav() {
   const location = useLocation();
   const { hideNav } = useNavVisibility();
 
@@ -58,4 +59,6 @@ export default function BottomNav() {
       </nav>
     </div>
   );
-}
+});
+
+export default BottomNav;
