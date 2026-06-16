@@ -14,7 +14,7 @@ export default function BottomNav() {
       className="fixed bottom-0 left-0 z-50 flex pl-4"
       style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}
     >
-      <nav className="flex items-center gap-0.5 px-1.5 py-1.5 rounded-full bg-white/95 dark:bg-gray-800/90 backdrop-blur-xl border border-blue-300/40 dark:border-blue-500/30 ring-1 ring-blue-400/15 shadow-[0_4px_24px_rgba(59,130,246,0.12)] dark:shadow-[0_4px_32px_rgba(59,130,246,0.15)]">
+      <nav className="flex items-center gap-0.5 px-1.5 py-1.5 rounded-full bg-gray-200/90 dark:bg-gray-700/90 backdrop-blur-xl border border-gray-300/60 dark:border-gray-500/40 shadow-[0_4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
         {tabs.map(({ path, label, Icon }) => {
           const active = location.pathname === path;
           return (
