@@ -10,32 +10,14 @@ import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 
 /* ─── Sound Effect ──────────────────────────────────────────── */
-// Generated on-the-fly via Web Audio — no file, no fetch, zero latency
-let _audioCtx = null;
+const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/ecebf8262_ScreenRecording_06-16-202607-45-53_12.mp3';
 
-function getCtx() {
-  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (_audioCtx.state === 'suspended') _audioCtx.resume();
-  return _audioCtx;
-}
+const _tickAudio = new Audio(SET_COMPLETE_SOUND);
+_tickAudio.preload = 'auto';
 
 function playTick() {
-  try {
-    const ctx = getCtx();
-    const t = ctx.currentTime;
-    // Quick two-tone "tick-tock" — 60ms total
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1800, t);
-    osc.frequency.setValueAtTime(2400, t + 0.03);
-    gain.gain.setValueAtTime(0.25, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(t);
-    osc.stop(t + 0.08);
-  } catch (_) {}
+  _tickAudio.currentTime = 0;
+  _tickAudio.play().catch(() => {});
 }
 
 /* ─── Timer ──────────────────────────────────────────────────── */
