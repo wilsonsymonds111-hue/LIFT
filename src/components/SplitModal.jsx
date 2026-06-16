@@ -62,7 +62,7 @@ function cycleToSchedule(onDays, offDays, startDayIndex) {
   return schedule;
 }
 
-export default function SplitModal({ splitKey, onClose }) {
+export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
   const navigate = useNavigate();
   const [applying, setApplying] = useState(false);
   const [customSplit, setCustomSplit] = useState(null);
@@ -132,33 +132,42 @@ export default function SplitModal({ splitKey, onClose }) {
 
   const handleMakeCurrent = async () => {
     setApplying(true);
-    const newGroupId = Date.now().toString();
-    const oldGroupId = Date.now().toString() + '_old';
     // Save the cycle so the Home page can read it
     saveCycle(splitKey, { onDays, offDays, startDayIndex });
-    try {
-      const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
-      const currentActive = allTemplates.filter(
-        t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
-      );
-      await Promise.all(currentActive.map(t =>
-        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
-      ));
-      const workouts = orderedWorkouts.length > 0 ? orderedWorkouts : split.workouts;
-      const newTemplates = workouts.map((w, i) => ({
-        name: w.name,
-        exercises: (w.exercises || []).map(e => e.name).join(', '),
-        exerciseList: (w.exercises || []).map(e => ({ ...e, history: [] })),
-        lastPerformed: null,
-        sort_order: i,
-        isActiveSplit: true,
-        splitGroup: newGroupId,
-      }));
-      await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
-    } catch (_) {}
+    const workouts = orderedWorkouts.length > 0 ? orderedWorkouts : split.workouts;
     setApplying(false);
     onClose();
-    navigate('/');
+    if (onMakeCurrent) {
+      onMakeCurrent(splitKey, workouts.map((w, i) => ({
+        name: w.name,
+        exercises: (w.exercises || []).map(e => ({ ...e })),
+        templateId: w.templateId,
+      })), split);
+    } else {
+      // Fallback: do inline DB migration
+      try {
+        const newGroupId = Date.now().toString();
+        const oldGroupId = Date.now().toString() + '_old';
+        const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+        const currentActive = allTemplates.filter(
+          t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
+        );
+        await Promise.all(currentActive.map(t =>
+          base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+        ));
+        const newTemplates = workouts.map((w, i) => ({
+          name: w.name,
+          exercises: (w.exercises || []).map(e => e.name).join(', '),
+          exerciseList: (w.exercises || []).map(e => ({ ...e, history: [] })),
+          lastPerformed: null,
+          sort_order: i,
+          isActiveSplit: true,
+          splitGroup: newGroupId,
+        }));
+        await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+      } catch (_) {}
+      navigate('/');
+    }
   };
 
   const handleViewWorkout = async (workout) => {

@@ -424,6 +424,63 @@ export default function Splits() {
         <SplitModal
           splitKey={activeSplit}
           onClose={() => setActiveSplit(null)}
+          onMakeCurrent={async (splitKey, workouts, splitData) => {
+            // Trigger swap animation from inside the modal
+            setSwapping(true);
+            setSwappingSplitName(splitData.name);
+            setSwappingSplitData({ name: splitData.name, workouts, label: `${workouts.length} workout${workouts.length !== 1 ? 's' : ''}` });
+
+            let allTemplates;
+            try {
+              allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+            } catch (_) {
+              setSwapping(false);
+              return;
+            }
+
+            const currentActive = allTemplates.filter(
+              t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
+            );
+
+            if (currentActive.length > 0) {
+              const names = currentActive.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, ''));
+              const uniqueNames = [...new Set(names)];
+              swapRef.current.oldName = uniqueNames.join(' / ').toUpperCase();
+              swapRef.current.oldData = {
+                workouts: currentActive.map(t => ({ name: t.name })),
+                label: `${currentActive.length} workout${currentActive.length > 1 ? 's' : ''}`,
+              };
+            } else {
+              swapRef.current.oldName = 'No Current Split';
+              swapRef.current.oldData = { workouts: [], label: '' };
+            }
+            swapRef.current.newName = splitData.name;
+            swapRef.current.newData = { name: splitData.name, workouts, label: `${workouts.length} workout${workouts.length !== 1 ? 's' : ''}` };
+
+            setSwapPhase('popup');
+
+            // DB migration in background
+            try {
+              const newGroupId = Date.now().toString();
+              const oldGroupId = Date.now().toString() + '_old';
+              await Promise.all(currentActive.map(t =>
+                base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+              ));
+              const newTemplates = workouts.map((w, i) => ({
+                name: w.name,
+                exercises: (w.exercises || []).map(e => e.name).join(', '),
+                exerciseList: (w.exercises || []).map(e => ({ ...e, history: [] })),
+                lastPerformed: null,
+                sort_order: i,
+                isActiveSplit: true,
+                splitGroup: newGroupId,
+              }));
+              await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+            } catch (_) {
+              setSwapping(false);
+              setSwapPhase(null);
+            }
+          }}
         />
       )}
 
