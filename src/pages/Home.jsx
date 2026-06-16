@@ -1,14 +1,16 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { MoreHorizontal, CalendarPlus } from 'lucide-react';
 import CalendarSyncModal from '../components/CalendarSyncModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useQueryClient } from '@tanstack/react-query';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
 import WeekTracker from '../components/WeekTracker';
+import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 import { generateWorkoutICS } from '../lib/icsGenerator';
 
@@ -61,25 +63,18 @@ const SPLIT_ACCENTS = {
 export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [templates, setTemplates] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: templates = [], isLoading: loading } = useWorkoutTemplates();
+  const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(null);
   const [splitMenuOpen, setSplitMenuOpen] = useState(false);
   const [showCalendarSync, setShowCalendarSync] = useState(false);
   const menuRef = useRef({});
   const splitMenuBtnRef = useRef(null);
 
-  const loadTemplates = useCallback(async () => {
-    const data = await base44.entities.WorkoutTemplate.list('sort_order', 100);
-    if (data) setTemplates(data);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { loadTemplates(); }, [loadTemplates]);
   // Re-fetch when navigating back to this tab (e.g., after changing split on Splits tab)
   useEffect(() => {
-    if (location.pathname === '/') loadTemplates();
-  }, [location.pathname, loadTemplates]);
+    if (location.pathname === '/') invalidateWorkoutTemplates(queryClient);
+  }, [location.pathname, queryClient]);
 
   // Close menus on outside click
   useEffect(() => {
@@ -97,15 +92,17 @@ export default function Home() {
     };
   }, [menuOpen, splitMenuOpen]);
 
-  const { pullY, refreshing } = usePullToRefresh(loadTemplates);
+  const { pullY, refreshing } = usePullToRefresh(() => invalidateWorkoutTemplates(queryClient));
 
   const handleRemoveFromSplit = async (template) => {
     setMenuOpen(null);
-    setTemplates(prev => prev.filter(t => t.id !== template.id));
+    // Optimistically update cache
+    queryClient.setQueryData(['workoutTemplates'], (prev) => prev?.filter(t => t.id !== template.id));
     await base44.entities.WorkoutTemplate.update(template.id, {
       isActiveSplit: false,
       splitGroup: 'removed_' + Date.now(),
     });
+    invalidateWorkoutTemplates(queryClient);
   };
 
   const handleSyncToCalendar = () => {

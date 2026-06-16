@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import ProfileButton from '../components/ProfileButton';
 import SplitBuilder from '../components/SplitBuilder';
 import SplitModal from '../components/SplitModal';
@@ -11,12 +12,18 @@ import RestFrequencyConfirmModal from '../components/RestFrequencyConfirmModal';
 
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 
 export default function Splits() {
   const navigate = useNavigate();
-  const [templates, setTemplates] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: allTemplates = [], isLoading: loading } = useWorkoutTemplates();
+  const queryClient = useQueryClient();
+  const templates = useMemo(() => allTemplates.filter(t =>
+    t.splitGroup &&
+    !t.splitGroup.endsWith('_old') &&
+    !t.isActiveSplit
+  ), [allTemplates]);
   const [menuOpen, setMenuOpen] = useState(null);
   const [swapping, setSwapping] = useState(false);
   const [swapPhase, setSwapPhase] = useState(null); // null | 'popup' | 'swap' | 'success'
@@ -54,21 +61,6 @@ export default function Splits() {
       document.removeEventListener('click', close);
     };
   }, [menuOpen]);
-
-  const loadTemplates = useCallback(async () => {
-    const data = await base44.entities.WorkoutTemplate.list('sort_order', 100);
-    if (data) {
-      // Only show saved splits: non-active, has a splitGroup, and not archived (_old)
-      setTemplates(data.filter(t =>
-        t.splitGroup &&
-        !t.splitGroup.endsWith('_old') &&
-        !t.isActiveSplit
-      ));
-    }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { loadTemplates(); }, [loadTemplates]);
 
   // Phase transitions: success → navigate
   useEffect(() => {
@@ -172,8 +164,9 @@ export default function Splits() {
   const handleDeleteMySplit = async (group) => {
     setMenuOpen(null);
     const ids = group.templates.map(t => t.id);
-    setTemplates(prev => prev.filter(t => !ids.includes(t.id)));
+    queryClient.setQueryData(['workoutTemplates'], (prev) => prev?.filter(t => !ids.includes(t.id)));
     await Promise.all(ids.map(id => base44.entities.WorkoutTemplate.delete(id)));
+    invalidateWorkoutTemplates(queryClient);
   };
 
   const handleMakeCurrentSplit = async (splitKey) => {
@@ -429,7 +422,7 @@ export default function Splits() {
           onClose={() => setShowBuilder(false)}
           onSaved={() => {
             setShowBuilder(false);
-            loadTemplates();
+            invalidateWorkoutTemplates(queryClient);
             setActiveTab('mine');
             localStorage.setItem('splitsActiveTab', 'mine');
           }}

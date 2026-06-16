@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -7,13 +7,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import Home from './pages/Home';
-import Splits from './pages/Splits';
-import NewTemplate from './pages/NewTemplate';
-import ActiveWorkout from './pages/ActiveWorkout';
-import TemplateDetail from './pages/TemplateDetail';
-import SplitDetail from './pages/SplitDetail';
 import BottomNav from './components/BottomNav';
+
+const Home = lazy(() => import('./pages/Home'));
+const Splits = lazy(() => import('./pages/Splits'));
+const NewTemplate = lazy(() => import('./pages/NewTemplate'));
+const ActiveWorkout = lazy(() => import('./pages/ActiveWorkout'));
+const TemplateDetail = lazy(() => import('./pages/TemplateDetail'));
+const SplitDetail = lazy(() => import('./pages/SplitDetail'));
 
 const TABS = ['/', '/splits'];
 
@@ -100,15 +101,21 @@ const AnimatedRoutes = () => {
       {/* Sub-page routes with slide-in transitions */}
       {!isTabRoute && (
         <div className="w-full flex-1">
-          <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-              <Route path="/template/new" element={<SlideIn><NewTemplate /></SlideIn>} />
-              <Route path="/template/:id" element={<SlideIn><TemplateDetail /></SlideIn>} />
-              <Route path="/split/:key" element={<SlideIn><SplitDetail /></SlideIn>} />
-              <Route path="/active-workout/:id" element={<SlideIn><ActiveWorkout /></SlideIn>} />
-              <Route path="*" element={<SlideIn><PageNotFound /></SlideIn>} />
-            </Routes>
-          </AnimatePresence>
+          <Suspense fallback={
+            <div className="fixed inset-0 flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+            </div>
+          }>
+            <AnimatePresence mode="wait">
+              <Routes location={location} key={location.pathname}>
+                <Route path="/template/new" element={<SlideIn><NewTemplate /></SlideIn>} />
+                <Route path="/template/:id" element={<SlideIn><TemplateDetail /></SlideIn>} />
+                <Route path="/split/:key" element={<SlideIn><SplitDetail /></SlideIn>} />
+                <Route path="/active-workout/:id" element={<SlideIn><ActiveWorkout /></SlideIn>} />
+                <Route path="*" element={<SlideIn><PageNotFound /></SlideIn>} />
+              </Routes>
+            </AnimatePresence>
+          </Suspense>
         </div>
       )}
 
