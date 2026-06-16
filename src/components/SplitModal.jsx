@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Dumbbell, Pencil } from 'lucide-react';
+import { ArrowLeft, Dumbbell, Pencil, GripVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { base44 } from '@/api/base44Client';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 
@@ -23,16 +24,42 @@ function relativeTime(dateStr) {
   return `${Math.floor(diffDays / 30)}mo ago`;
 }
 
-function loadCustomSchedule(splitKey, fallback) {
+function loadCycle(splitKey, fallbackSchedule) {
   try {
-    const raw = localStorage.getItem(`splitSchedule_${splitKey}`);
+    const raw = localStorage.getItem(`splitCycle_${splitKey}`);
     if (raw) return JSON.parse(raw);
   } catch {}
-  return fallback;
+  // Compute default cycle from the fallback schedule (longest consecutive runs)
+  let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
+  for (let i = 0; i < fallbackSchedule.length; i++) {
+    if (fallbackSchedule[i] === 1) {
+      curOn++;
+      if (curOff > maxOff) maxOff = curOff;
+      curOff = 0;
+    } else {
+      curOff++;
+      if (curOn > maxOn) maxOn = curOn;
+      curOn = 0;
+    }
+  }
+  if (curOn > maxOn) maxOn = curOn;
+  if (curOff > maxOff) maxOff = curOff;
+  const startDayIndex = fallbackSchedule.findIndex(s => s === 1);
+  return { onDays: maxOn || 1, offDays: maxOff || 1, startDayIndex: startDayIndex >= 0 ? startDayIndex : 0 };
 }
 
-function saveCustomSchedule(splitKey, schedule) {
-  localStorage.setItem(`splitSchedule_${splitKey}`, JSON.stringify(schedule));
+function saveCycle(splitKey, cycle) {
+  localStorage.setItem(`splitCycle_${splitKey}`, JSON.stringify(cycle));
+}
+
+function cycleToSchedule(onDays, offDays, startDayIndex) {
+  const cycleLength = onDays + offDays;
+  const schedule = [];
+  for (let i = 0; i < 7; i++) {
+    const pos = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
+    schedule.push(pos < onDays ? 1 : 0);
+  }
+  return schedule;
 }
 
 export default function SplitModal({ splitKey, onClose }) {
@@ -45,13 +72,22 @@ export default function SplitModal({ splitKey, onClose }) {
   const exampleSplit = EXAMPLE_SPLITS_DATA[splitKey];
   const defaultSchedule = exampleSplit?.schedule || [1, 0, 1, 0, 1, 0, 1];
 
-  const [customSchedule, setCustomSchedule] = useState(() =>
-    loadCustomSchedule(splitKey, defaultSchedule)
+  const defaultCycle = useMemo(() => loadCycle(splitKey, defaultSchedule), [splitKey]);
+  const [onDays, setOnDays] = useState(defaultCycle.onDays);
+  const [offDays, setOffDays] = useState(defaultCycle.offDays);
+  const [startDayIndex, setStartDayIndex] = useState(defaultCycle.startDayIndex);
+
+  const previewSchedule = useMemo(
+    () => cycleToSchedule(onDays, offDays, startDayIndex),
+    [onDays, offDays, startDayIndex]
   );
 
-  // When the modal opens for a different split, reload schedule
+  // When the modal opens for a different split, reload cycle
   useEffect(() => {
-    setCustomSchedule(loadCustomSchedule(splitKey, defaultSchedule));
+    const c = loadCycle(splitKey, defaultSchedule);
+    setOnDays(c.onDays);
+    setOffDays(c.offDays);
+    setStartDayIndex(c.startDayIndex);
     setEditing(false);
   }, [splitKey]);
 
@@ -81,10 +117,25 @@ export default function SplitModal({ splitKey, onClose }) {
 
   const split = exampleSplit || customSplit;
 
+  const [orderedWorkouts, setOrderedWorkouts] = useState([]);
+  useEffect(() => {
+    if (split?.workouts) setOrderedWorkouts([...split.workouts]);
+  }, [split]);
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    const items = [...orderedWorkouts];
+    const [reordered] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reordered);
+    setOrderedWorkouts(items);
+  };
+
   const handleMakeCurrent = async () => {
     setApplying(true);
     const newGroupId = Date.now().toString();
     const oldGroupId = Date.now().toString() + '_old';
+    // Save the cycle so the Home page can read it
+    saveCycle(splitKey, { onDays, offDays, startDayIndex });
     try {
       const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
       const currentActive = allTemplates.filter(
@@ -93,7 +144,8 @@ export default function SplitModal({ splitKey, onClose }) {
       await Promise.all(currentActive.map(t =>
         base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
       ));
-      const newTemplates = split.workouts.map((w, i) => ({
+      const workouts = orderedWorkouts.length > 0 ? orderedWorkouts : split.workouts;
+      const newTemplates = workouts.map((w, i) => ({
         name: w.name,
         exercises: (w.exercises || []).map(e => e.name).join(', '),
         exerciseList: (w.exercises || []).map(e => ({ ...e, history: [] })),
@@ -131,42 +183,16 @@ export default function SplitModal({ splitKey, onClose }) {
     navigate(`/template/${template.id}`);
   };
 
-  const handleToggleDay = (i) => {
-    const next = [...customSchedule];
-    next[i] = next[i] === 0 ? 1 : 0;
-    setCustomSchedule(next);
-    saveCustomSchedule(splitKey, next);
-  };
-
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
 
-  const cycleLabel = useMemo(() => {
-    const days = customSchedule.map(s => s === 0 ? 'Rest' : 'Train').join(' — ');
-    return days;
-  }, [customSchedule]);
-
   const frequencyLabel = useMemo(() => {
-    // Find longest consecutive run of each — avoids miscounting
-    // a past rest day and an upcoming rest day as "2 off"
-    let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
-    for (let i = 0; i < customSchedule.length; i++) {
-      if (customSchedule[i] === 1) {
-        curOn++;
-        if (curOff > maxOff) maxOff = curOff;
-        curOff = 0;
-      } else {
-        curOff++;
-        if (curOn > maxOn) maxOn = curOn;
-        curOn = 0;
-      }
-    }
-    if (curOn > maxOn) maxOn = curOn;
-    if (curOff > maxOff) maxOff = curOff;
-    const onPart = `${maxOn} day${maxOn !== 1 ? 's' : ''} on`;
-    const offPart = `${maxOff} day${maxOff !== 1 ? 's' : ''} off`;
+    const onPart = `${onDays} day${onDays !== 1 ? 's' : ''} on`;
+    const offPart = `${offDays} day${offDays !== 1 ? 's' : ''} off`;
     return `${onPart}, ${offPart}, repeat`;
-  }, [customSchedule]);
+  }, [onDays, offDays]);
+
+  const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   return createPortal(
     <AnimatePresence>
@@ -223,93 +249,154 @@ export default function SplitModal({ splitKey, onClose }) {
                 </button>
               </div>
 
-              {/* Rest day editor — inline calendar row */}
+              {/* Cycle editor */}
               {editing && (
                 <div className="px-5 py-4 border-b border-border bg-blue-50/50 dark:bg-blue-950/10">
-                  <p className="text-xs font-semibold text-muted-foreground mb-3 text-center uppercase tracking-wider">
-                    Rest Day Frequency — Tap to toggle
+                  <p className="text-xs font-semibold text-muted-foreground mb-4 text-center uppercase tracking-wider">
+                    Cycle Settings
                   </p>
 
-                  {/* Day letters */}
-                  <div className="flex justify-between mb-1.5">
-                    {DAY_LETTERS.map((l, i) => (
-                      <span key={i} className="text-[10px] font-bold text-muted-foreground w-9 text-center">
-                        {l}
-                      </span>
+                  {/* Days on / off inputs */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="flex-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days On</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={6}
+                        value={onDays}
+                        onChange={(e) => setOnDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
+                        className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days Off</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={6}
+                        value={offDays}
+                        onChange={(e) => setOffDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
+                        className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Frequency summary */}
+                  <p className="text-sm font-bold text-foreground text-center mb-4">
+                    {frequencyLabel}
+                  </p>
+
+                  {/* Start day selector */}
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mb-2">
+                    Cycle starts on
+                  </p>
+                  <div className="flex justify-between gap-1 mb-4">
+                    {DAY_LABELS.map((label, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setStartDayIndex(i)}
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 ${
+                          startDayIndex === i
+                            ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30'
+                            : 'bg-white dark:bg-gray-900 text-muted-foreground border border-blue-200 dark:border-blue-800 hover:border-blue-400'
+                        }`}
+                      >
+                        {label}
+                      </button>
                     ))}
                   </div>
 
-                  {/* Tappable dots */}
+                  {/* Preview row */}
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mb-1.5">Preview</p>
+                  <div className="flex justify-between mb-1">
+                    {DAY_LETTERS.map((l, i) => (
+                      <span key={i} className="text-[10px] font-bold text-muted-foreground w-7 text-center">{l}</span>
+                    ))}
+                  </div>
                   <div className="flex justify-between">
-                    {customSchedule.map((status, i) => {
+                    {previewSchedule.map((status, i) => {
                       const isGymDay = status === 1;
                       const isToday = i === todayMonSun;
                       return (
-                        <div key={i} className="flex items-center w-9 justify-center">
+                        <div key={i} className="flex items-center w-7 justify-center">
                           <div
-                            onClick={() => handleToggleDay(i)}
-                            className={`w-7 h-7 rounded-full flex items-center justify-center cursor-pointer transition-all duration-150 active:scale-90 ${
+                            className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150 ${
                               isGymDay
                                 ? 'bg-blue-500 shadow-md shadow-blue-500/30'
                                 : 'border-2 border-blue-300 dark:border-blue-700 bg-transparent'
-                            } ${
-                              isToday
-                                ? 'ring-[1.5px] ring-emerald-500 ring-offset-1 ring-offset-card'
-                                : ''
-                            }`}
+                            } ${isToday ? 'ring-[1.5px] ring-emerald-500 ring-offset-1' : ''}`}
                           >
-                            {isGymDay && (
-                              <Dumbbell className="w-3 h-3 text-white" strokeWidth={2.5} />
-                            )}
+                            {isGymDay && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
                           </div>
                         </div>
                       );
                     })}
                   </div>
 
-                  {/* Cycle label */}
-                  <p className="text-[10px] font-medium text-muted-foreground text-center mt-3 leading-relaxed">
-                    {cycleLabel}
-                  </p>
-
-                  {/* Frequency summary */}
-                  <p className="text-[11px] font-bold text-foreground text-center mt-1">
-                    {frequencyLabel}
+                  <p className="text-[10px] font-medium text-muted-foreground text-center mt-2 leading-relaxed">
+                    {previewSchedule.map(s => s === 0 ? 'Rest' : 'Train').join(' — ')}
                   </p>
 
                   {/* Done button */}
                   <button
-                    onClick={() => setEditing(false)}
-                    className="w-full mt-3 py-2 rounded-lg bg-blue-500 text-white text-xs font-bold hover:bg-blue-600 transition"
+                    onClick={() => {
+                      saveCycle(splitKey, { onDays, offDays, startDayIndex });
+                      setEditing(false);
+                    }}
+                    className="w-full mt-4 py-2 rounded-lg bg-blue-500 text-white text-xs font-bold hover:bg-blue-600 transition"
                   >
                     Done
                   </button>
                 </div>
               )}
 
-              {/* Workout cards */}
+              {/* Workout cards — drag to reorder */}
               <div className="flex-1 overflow-y-auto px-5 pt-4 pb-3">
-                <div className="flex flex-col gap-3">
-                  {split.workouts.map((workout, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => handleViewWorkout(workout)}
-                      className="relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 hover:shadow-xl hover:scale-[1.02] transition-all duration-150 cursor-pointer"
-                    >
-                      <h4 className="font-bold text-foreground pr-8">{workout.name}</h4>
-                      <div className="flex flex-wrap gap-1.5 my-3">
-                        {(workout.exercises || []).map((e, i) => (
-                          <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
-                            {e.name}
-                          </span>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="workout-list">
+                    {(provided) => (
+                      <div className="flex flex-col gap-3" ref={provided.innerRef} {...provided.droppableProps}>
+                        {orderedWorkouts.map((workout, idx) => (
+                          <Draggable key={workout.name + idx} draggableId={workout.name + idx} index={idx}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className={`relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 hover:shadow-xl transition-all duration-150 cursor-pointer ${
+                                  snapshot.isDragging ? 'shadow-2xl scale-[1.03] z-10' : ''
+                                }`}
+                              >
+                                {/* Drag handle */}
+                                <div
+                                  {...provided.dragHandleProps}
+                                  className="absolute top-3 left-3 w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing z-10"
+                                >
+                                  <GripVertical className="w-4 h-4" />
+                                </div>
+
+                                <div onClick={() => handleViewWorkout(workout)} className="pl-4">
+                                  <h4 className="font-bold text-foreground pr-8">{workout.name}</h4>
+                                  <div className="flex flex-wrap gap-1.5 my-3">
+                                    {(workout.exercises || []).map((e, i) => (
+                                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                                        {e.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                    ⏱ {workout.lastPerformed ? relativeTime(workout.lastPerformed) : 'Not yet performed'}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </Draggable>
                         ))}
+                        {provided.placeholder}
                       </div>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        ⏱ {workout.lastPerformed ? relativeTime(workout.lastPerformed) : 'Not yet performed'}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
               </div>
 
               {/* Make Current button */}

@@ -90,6 +90,19 @@ export default function Home() {
     const resolveSchedule = (key) => {
       const defaultSchedule = EXAMPLE_SPLITS_DATA[key]?.schedule;
       try {
+        // Check for new cycle-based format first
+        const cycleRaw = localStorage.getItem(`splitCycle_${key}`);
+        if (cycleRaw) {
+          const { onDays, offDays, startDayIndex } = JSON.parse(cycleRaw);
+          const cycleLength = onDays + offDays;
+          const schedule = [];
+          for (let i = 0; i < 7; i++) {
+            const pos = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
+            schedule.push(pos < onDays ? 1 : 0);
+          }
+          return schedule;
+        }
+        // Fall back to legacy schedule format
         const raw = localStorage.getItem(`splitSchedule_${key}`);
         if (raw) return JSON.parse(raw);
       } catch {}
