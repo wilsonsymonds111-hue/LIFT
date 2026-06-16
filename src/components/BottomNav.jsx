@@ -8,13 +8,21 @@ const tabs = [
 
 export default function BottomNav() {
   const location = useLocation();
+  const isWorkouts = location.pathname === '/';
+  const isSplits = location.pathname === '/splits';
 
   return (
     <div
       className="fixed bottom-0 left-0 z-50 flex pl-4"
       style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}
     >
-      <nav className="flex items-center gap-0.5 px-1.5 py-1.5 rounded-full bg-gray-200/90 dark:bg-gray-700/90 backdrop-blur-xl border border-gray-300/60 dark:border-gray-500/40 shadow-[0_4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+      <nav className={`flex items-center gap-0.5 px-1.5 py-1.5 rounded-full backdrop-blur-xl border shadow-lg transition-colors duration-300 ${
+        isWorkouts
+          ? 'bg-gray-300/95 dark:bg-gray-600/90 border-gray-400/50 dark:border-gray-500/40 shadow-[0_4px_20px_rgba(0,0,0,0.2)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)]'
+          : isSplits
+            ? 'bg-gray-200/90 dark:bg-gray-700/90 border-gray-300/50 dark:border-gray-500/30 shadow-[0_4px_16px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)]'
+            : 'bg-gray-200/90 dark:bg-gray-700/90 border-gray-300/50 dark:border-gray-500/30 shadow-[0_4px_16px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)]'
+      }`}>
         {tabs.map(({ path, label, Icon }) => {
           const active = location.pathname === path;
           return (
