@@ -89,7 +89,7 @@ export default function TemplateDetail() {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-border">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/')}
             className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-muted/70 transition"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
