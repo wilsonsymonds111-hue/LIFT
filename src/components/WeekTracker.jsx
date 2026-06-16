@@ -41,8 +41,8 @@ export default function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 })
           const isCompleted = status === 2;
           const isPast = i < todayMonSun;
           const beforeSplitStart = isPast && i < startDayIndex;
+          const noData = beforeSplitStart;
           const missed = isPast && isGymDay && !isCompleted && !beforeSplitStart;
-          const noData = isPast && isGymDay && !isCompleted && beforeSplitStart;
           const showCheck = isPast && isGymDay && isCompleted;
           const showDumbbell = isGymDay && !isPast;
 
@@ -84,7 +84,7 @@ export default function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 })
           </span>
         )}
         <span className="text-[11px] font-medium text-muted-foreground text-center min-h-[16px]">
-          {getTooltipText(schedule[activeDay], activeDay < todayMonSun, activeDay === todayMonSun, activeDay < todayMonSun && activeDay < startDayIndex && schedule[activeDay] >= 1)}
+          {getTooltipText(schedule[activeDay], activeDay < todayMonSun, activeDay === todayMonSun, activeDay < todayMonSun && activeDay < startDayIndex)}
         </span>
       </div>
     </div>
