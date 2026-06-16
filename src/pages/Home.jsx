@@ -32,7 +32,9 @@ export default function Home() {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(null);
+  const [splitMenuOpen, setSplitMenuOpen] = useState(false);
   const menuRef = useRef({});
+  const splitMenuBtnRef = useRef(null);
 
   const loadTemplates = useCallback(async () => {
     const data = await base44.entities.WorkoutTemplate.list('sort_order', 100);
@@ -46,19 +48,21 @@ export default function Home() {
     if (location.pathname === '/') loadTemplates();
   }, [location.pathname, loadTemplates]);
 
-  // Close menu on outside click
+  // Close menus on outside click
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen && !splitMenuOpen) return;
     const close = (e) => {
       if (menuRef.current[menuOpen]?.contains(e.target)) return;
+      if (splitMenuBtnRef.current?.contains(e.target)) return;
       setMenuOpen(null);
+      setSplitMenuOpen(false);
     };
     const timer = setTimeout(() => document.addEventListener('click', close), 0);
     return () => {
       clearTimeout(timer);
       document.removeEventListener('click', close);
     };
-  }, [menuOpen]);
+  }, [menuOpen, splitMenuOpen]);
 
   const { pullY, refreshing } = usePullToRefresh(loadTemplates);
 
@@ -74,6 +78,23 @@ export default function Home() {
       isActiveSplit: false,
       splitGroup: 'removed_' + Date.now(),
     });
+  };
+
+  const handleSyncToCalendar = () => {
+    setSplitMenuOpen(false);
+    const ics = generateWorkoutICS({
+      splitName: currentSplitName,
+      workouts: currentSplit.map(t => ({ name: t.name })),
+      schedule: splitDetection.schedule,
+      startDayIndex: splitDetection.startDayIndex,
+    });
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'lift-workouts.ics';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   // --- Split categorization ---
@@ -200,32 +221,7 @@ export default function Home() {
       {/* Weekly Tracker */}
       <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} />
 
-      {/* Calendar sync button */}
-      {currentSplit.length > 0 && (
-        <div className="px-4 -mt-1 mb-1 flex justify-end">
-          <button
-            onClick={() => {
-              const ics = generateWorkoutICS({
-                splitName: currentSplitName,
-                workouts: currentSplit.map(t => ({ name: t.name })),
-                schedule: splitDetection.schedule,
-                startDayIndex: splitDetection.startDayIndex,
-              });
-              const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `lift-workouts.ics`;
-              a.click();
-              URL.revokeObjectURL(url);
-            }}
-            className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-500 hover:text-blue-600 transition"
-          >
-            <CalendarPlus className="w-3.5 h-3.5" />
-            Sync to Calendar
-          </button>
-        </div>
-      )}
+
 
       {/* Quick Start */}
       <div className="px-4 py-4">
@@ -259,6 +255,15 @@ export default function Home() {
                 <h2 className="text-xl font-extrabold text-foreground tracking-tight">{currentSplitName}</h2>
               )}
             </div>
+            {currentSplit.length > 0 && (
+              <button
+                ref={splitMenuBtnRef}
+                onClick={(e) => { e.stopPropagation(); setSplitMenuOpen(!splitMenuOpen); setMenuOpen(null); }}
+                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted transition flex-shrink-0"
+              >
+                <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
           </div>
 
           {currentSplit.length > 0 ? (
@@ -328,6 +333,32 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Split header dropdown menu */}
+        {splitMenuOpen && createPortal(
+          (() => {
+            const btn = splitMenuBtnRef.current;
+            const rect = btn?.getBoundingClientRect();
+            const top = rect ? rect.bottom + 4 : 0;
+            const right = rect ? window.innerWidth - rect.right : 0;
+            return (
+              <div
+                onClick={e => e.stopPropagation()}
+                className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[220px]"
+                style={{ top: `${top}px`, right: `${right}px`, zIndex: 100 }}
+              >
+                <button
+                  onClick={handleSyncToCalendar}
+                  className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
+                >
+                  <CalendarPlus className="w-4 h-4 text-blue-500" />
+                  Sync to Calendar
+                </button>
+              </div>
+            );
+          })(),
+          document.body
+        )}
       </div>
 
 
