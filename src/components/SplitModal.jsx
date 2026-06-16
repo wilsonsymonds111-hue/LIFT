@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Dumbbell, Pencil } from 'lucide-react';
+import { ArrowLeft, Dumbbell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { base44 } from '@/api/base44Client';
@@ -68,6 +68,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
   const [customSplit, setCustomSplit] = useState(null);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const exampleSplit = EXAMPLE_SPLITS_DATA[splitKey];
   const defaultSchedule = exampleSplit?.schedule || [1, 0, 1, 0, 1, 0, 1];
@@ -246,16 +247,22 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                   <h2 className="text-lg font-extrabold text-foreground">{split.name}</h2>
                   <p className="text-xs text-muted-foreground mt-0.5">{split.description}</p>
                 </div>
-                <button
-                  onClick={() => setEditing(e => !e)}
-                  className={`w-11 h-11 flex items-center justify-center rounded-full transition group ${
-                    editing
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-muted hover:bg-blue-500 text-muted-foreground'
-                  }`}
-                >
-                  <Pencil className={`w-5 h-5 ${editing ? '' : 'group-hover:text-white'} transition`} />
-                </button>
+                <div className="relative group">
+                  <button
+                    onClick={() => setEditing(e => !e)}
+                    className={`w-11 h-11 flex items-center justify-center rounded-full transition text-lg ${
+                      editing
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-muted hover:bg-blue-500'
+                    }`}
+                  >
+                    😴
+                  </button>
+                  <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-gray-800 text-white text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none">
+                    Edit rest frequency
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800" />
+                  </div>
+                </div>
               </div>
 
               {/* Cycle editor */}
@@ -390,13 +397,82 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
               {/* Make Current button */}
               <div className="px-5 pb-4 pt-2">
                 <button
-                  onClick={handleMakeCurrent}
+                  onClick={() => setShowConfirm(true)}
                   disabled={applying}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60"
                 >
                   {applying ? 'Applying...' : 'Make This My Current Split'}
                 </button>
               </div>
+
+              {/* Rest frequency confirmation modal */}
+              {showConfirm && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 rounded-t-3xl sm:rounded-3xl" onClick={() => setShowConfirm(false)}>
+                  <div
+                    onClick={e => e.stopPropagation()}
+                    className="bg-card rounded-2xl p-6 mx-5 max-w-sm w-full shadow-2xl border border-border"
+                  >
+                    <h3 className="text-lg font-extrabold text-foreground text-center">Rest Frequency</h3>
+                    <p className="text-sm text-muted-foreground text-center mt-1 mb-5">
+                      Confirm your rest day cycle before applying
+                    </p>
+
+                    {/* Frequency summary */}
+                    <div className="bg-blue-50 dark:bg-blue-950/20 rounded-xl p-4 mb-4">
+                      <p className="text-sm font-bold text-foreground text-center">
+                        {frequencyLabel}
+                      </p>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mt-3 mb-2">
+                        Starting on
+                      </p>
+                      <div className="flex justify-center gap-1">
+                        {previewSchedule.map((status, i) => {
+                          const isGymDay = status === 1;
+                          const isStart = startDayIndex === i;
+                          const isToday = i === todayMonSun;
+                          return (
+                            <div
+                              key={i}
+                              className={`flex flex-col items-center py-1.5 px-2 rounded-lg text-xs font-bold ${
+                                isStart ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30' : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800'
+                              } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
+                            >
+                              <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{DAY_LABELS[i]}</span>
+                              <div
+                                className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
+                                  isGymDay
+                                    ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
+                                    : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
+                                }`}
+                              >
+                                {isGymDay && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowConfirm(false)}
+                        className="flex-1 py-2.5 rounded-xl bg-muted text-foreground font-semibold text-sm hover:bg-muted/70 transition"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowConfirm(false);
+                          handleMakeCurrent();
+                        }}
+                        className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white font-semibold text-sm hover:bg-emerald-600 transition"
+                      >
+                        Looks Good
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </motion.div>
