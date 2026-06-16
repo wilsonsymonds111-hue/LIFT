@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Dumbbell, Settings } from 'lucide-react';
+import { ArrowLeft, Dumbbell, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
@@ -197,7 +197,7 @@ export default function SplitModal({ splitKey, onClose }) {
                       : 'bg-muted hover:bg-muted/70 text-muted-foreground'
                   }`}
                 >
-                  <Settings className="w-5 h-5" />
+                  <Pencil className="w-5 h-5" />
                 </button>
               </div>
 
@@ -210,20 +210,18 @@ export default function SplitModal({ splitKey, onClose }) {
 
                   {/* Day letters */}
                   <div className="flex justify-between mb-1.5">
-                    {DAY_LETTERS.map((l, i) => {
-                      const isToday = i === todayMonSun;
-                      return (
-                        <span key={i} className={`text-[10px] font-bold w-9 text-center ${isToday ? 'text-emerald-500' : 'text-muted-foreground'}`}>
-                          {l}
-                        </span>
-                      );
-                    })}
+                    {DAY_LETTERS.map((l, i) => (
+                      <span key={i} className="text-[10px] font-bold text-muted-foreground w-9 text-center">
+                        {l}
+                      </span>
+                    ))}
                   </div>
 
                   {/* Tappable dots */}
                   <div className="flex justify-between">
                     {customSchedule.map((status, i) => {
                       const isGymDay = status === 1;
+                      const isToday = i === todayMonSun;
                       return (
                         <div key={i} className="flex items-center w-9 justify-center">
                           <div
@@ -232,6 +230,10 @@ export default function SplitModal({ splitKey, onClose }) {
                               isGymDay
                                 ? 'bg-blue-500 shadow-md shadow-blue-500/30'
                                 : 'border-2 border-blue-300 dark:border-blue-700 bg-transparent'
+                            } ${
+                              isToday
+                                ? 'ring-[1.5px] ring-emerald-500 ring-offset-1 ring-offset-card'
+                                : ''
                             }`}
                           >
                             {isGymDay && (
