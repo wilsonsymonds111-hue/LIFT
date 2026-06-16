@@ -13,6 +13,13 @@ import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 
+const SPLIT_ENDORSEMENTS = {
+  'upper-lower': "Mike Thurston's favorite split",
+  'push-pull-legs': "Sam Sulek's favorite split",
+  'full-body': "Lee Priest's favorite split",
+  'ul-ppl': "Jeff Nippard's favorite split",
+};
+
 
 
 export default function Splits() {
@@ -331,6 +338,7 @@ export default function Splits() {
                 splitKey={key}
                 name={split.name}
                 workouts={split.workouts}
+                endorsement={SPLIT_ENDORSEMENTS[key]}
                 onCardClick={() => setActiveSplit(key)}
                 onMenuToggle={() => setMenuOpen(menuOpen === key ? null : key)}
                 menuRef={el => menuRef.current[key] = el}
