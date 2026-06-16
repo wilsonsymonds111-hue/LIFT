@@ -174,6 +174,11 @@ export default function Home() {
     return { currentSplit: split, currentSplitName: splitName, splitDetection: detection };
   }, [templates]);
 
+  const isApple = useMemo(() => {
+    const ua = navigator.userAgent || '';
+    return /(iPhone|iPad|iPod|Macintosh|Mac OS X)/i.test(ua) && !/Android/i.test(ua);
+  }, []);
+
   const cycleLabel = useMemo(() => {
     const key = splitDetection.key;
     const defaultSchedule = EXAMPLE_SPLITS_DATA[key]?.schedule;
@@ -355,7 +360,7 @@ export default function Home() {
                   className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
                 >
                   <CalendarPlus className="w-4 h-4 text-blue-500" />
-                  Sync to Calendar
+                  {isApple ? 'Sync to Apple Calendar' : 'Sync to Android Calendar'}
                 </button>
               </div>
             );
