@@ -89,6 +89,8 @@ export default function Home() {
   const splitDetection = (() => {
     const resolveSchedule = (key) => {
       const defaultSchedule = EXAMPLE_SPLITS_DATA[key]?.schedule;
+      const todayIndex = new Date().getDay();
+      const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
       try {
         // Check for new cycle-based format first
         const cycleRaw = localStorage.getItem(`splitCycle_${key}`);
@@ -104,9 +106,9 @@ export default function Home() {
         }
         // Fall back to legacy schedule format
         const raw = localStorage.getItem(`splitSchedule_${key}`);
-        if (raw) return { schedule: JSON.parse(raw), startDayIndex: 0 };
+        if (raw) return { schedule: JSON.parse(raw), startDayIndex: todayMonSun };
       } catch {}
-      return { schedule: defaultSchedule, startDayIndex: 0 };
+      return { schedule: defaultSchedule, startDayIndex: todayMonSun };
     };
 
     if (currentSplit.length === 0) return { key: 'full-body', ...resolveSchedule('full-body') };

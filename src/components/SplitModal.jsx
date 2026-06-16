@@ -44,8 +44,10 @@ function loadCycle(splitKey, fallbackSchedule) {
   }
   if (curOn > maxOn) maxOn = curOn;
   if (curOff > maxOff) maxOff = curOff;
-  const startDayIndex = fallbackSchedule.findIndex(s => s === 1);
-  return { onDays: maxOn || 1, offDays: maxOff || 1, startDayIndex: startDayIndex >= 0 ? startDayIndex : 0 };
+  // Default start day to today — past days before today are "no data" not "missed"
+  const todayIndex = new Date().getDay();
+  const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
+  return { onDays: maxOn || 1, offDays: maxOff || 1, startDayIndex: todayMonSun };
 }
 
 function saveCycle(splitKey, cycle) {
@@ -455,7 +457,10 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
 
                     <div className="flex gap-3">
                       <button
-                        onClick={() => setShowConfirm(false)}
+                        onClick={() => {
+                          setShowConfirm(false);
+                          setEditing(true);
+                        }}
                         className="flex-1 py-2.5 rounded-xl bg-muted text-foreground font-semibold text-sm hover:bg-muted/70 transition"
                       >
                         Edit
