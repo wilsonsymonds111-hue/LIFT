@@ -23,10 +23,10 @@ export default function BottomNav() {
     >
       <nav className={`flex items-center gap-0.5 px-1.5 py-1.5 rounded-full backdrop-blur-2xl border border-white/30 dark:border-white/15 transition-colors duration-300 ${
         isWorkouts
-          ? 'bg-white/30 dark:bg-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.5)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+          ? 'bg-white/45 dark:bg-white/16 shadow-[0_4px_24px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)]'
           : isSplits
-            ? 'bg-white/20 dark:bg-white/8 shadow-[0_4px_20px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.08)]'
-            : 'bg-white/20 dark:bg-white/8 shadow-[0_4px_20px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.08)]'
+            ? 'bg-white/30 dark:bg-white/12 shadow-[0_4px_20px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.35)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.06)]'
+            : 'bg-white/30 dark:bg-white/12 shadow-[0_4px_20px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.35)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.06)]'
       }`}>
         {tabs.map(({ path, label, Icon }) => {
           const active = location.pathname === path;
