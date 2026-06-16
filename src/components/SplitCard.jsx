@@ -1,18 +1,11 @@
-import { Dumbbell, ChevronRight, MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import { memo } from 'react';
 
-const ACCENT = {
-  blue: { bg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-800' },
-  teal: { bg: 'bg-teal-50 dark:bg-teal-950/30', text: 'text-teal-600 dark:text-teal-400', border: 'border-teal-200 dark:border-teal-800' },
-  violet: { bg: 'bg-violet-50 dark:bg-violet-950/30', text: 'text-violet-600 dark:text-violet-400', border: 'border-violet-200 dark:border-violet-800' },
-  amber: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-200 dark:border-amber-800' },
-};
-
-const SPLIT_COLORS = {
-  'upper-lower': 'blue',
-  'push-pull-legs': 'teal',
-  'full-body': 'violet',
-  'ul-ppl': 'amber',
+const SPLIT_IMAGES = {
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/46c858303_generated_image.png',
+  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/442e6af33_generated_image.png',
+  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/512520a87_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/855dd0c0e_generated_image.png',
 };
 
 function detectSplitType(workoutNames) {
@@ -33,9 +26,9 @@ function detectSplitType(workoutNames) {
 }
 
 const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
-  const colorKey = SPLIT_COLORS[splitKey] || detectSplitType(workouts.map(w => w.name));
-  const accent = ACCENT[colorKey] || ACCENT.blue;
-  const subtitle = workouts.map(w => w.name).join(' | ');
+  const colorKey = SPLIT_IMAGES[splitKey] ? splitKey : detectSplitType(workouts.map(w => w.name));
+  const bgImage = SPLIT_IMAGES[colorKey] || SPLIT_IMAGES['upper-lower'];
+  const subtitle = workouts.map(w => w.name).join(' • ');
   const workoutCount = workouts.length;
   const displayName = name.replace(/ Workout$/, '');
 
@@ -43,48 +36,46 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
     <div ref={cardRef}>
       <div
         onClick={onCardClick}
-        className={`relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 bg-card border ${accent.border} shadow-sm hover:shadow-md hover:scale-[1.01] overflow-hidden`}
+        className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden min-h-[160px]"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
       >
-        {/* Subtle top accent bar */}
-        <div className={`h-1 w-full ${accent.text.replace('text-', 'bg-')}`} />
+        {/* Gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/20" />
+        {/* Subtle vignette */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-transparent" />
 
-        <div className="p-4">
-          {/* Top row: icon + title + menu */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className={`w-9 h-9 rounded-xl ${accent.bg} flex items-center justify-center`}>
-                <Dumbbell className={`w-4 h-4 ${accent.text}`} strokeWidth={1.8} />
-              </div>
-              <h4 className="font-bold text-foreground text-sm uppercase tracking-wide">
-                {displayName}
-              </h4>
-            </div>
+        {/* Content */}
+        <div className="relative p-5 flex flex-col justify-end h-full min-h-[160px]">
+          {/* Top row: menu */}
+          {onMenuToggle && (
+            <button
+              ref={menuRef}
+              onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 flex items-center justify-center transition"
+            >
+              <MoreHorizontal className="w-4 h-4 text-white/90" />
+            </button>
+          )}
 
-            {onMenuToggle && (
-              <button
-                ref={menuRef}
-                onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-                className="w-7 h-7 rounded-full hover:bg-muted flex items-center justify-center transition flex-shrink-0"
-              >
-                <MoreHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
-              </button>
-            )}
-          </div>
+          {/* Split name */}
+          <h4 className="font-extrabold text-white text-lg uppercase tracking-wider pr-6">
+            {displayName}
+          </h4>
 
-          {/* Subtitle */}
-          <p className="text-xs text-muted-foreground mt-2.5 leading-relaxed line-clamp-2">
+          {/* Workout names */}
+          <p className="text-sm text-white/75 mt-2 leading-relaxed line-clamp-2">
             {subtitle}
           </p>
 
-          {/* Bottom row: badge + chevron */}
-          <div className="flex items-center justify-between mt-3.5">
-            <span className={`inline-flex items-center px-2.5 py-1 rounded-full ${accent.bg} ${accent.text} text-[11px] font-semibold tracking-wide`}>
+          {/* Badge */}
+          <div className="mt-3">
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white text-xs font-semibold tracking-wide">
               {workoutCount} work{workoutCount !== 1 ? 'outs' : 'out'}
             </span>
-
-            <div className={`w-7 h-7 rounded-full ${accent.bg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-              <ChevronRight className={`w-4 h-4 ${accent.text}`} strokeWidth={2} />
-            </div>
           </div>
         </div>
       </div>
