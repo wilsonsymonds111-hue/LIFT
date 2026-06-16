@@ -156,9 +156,7 @@ const AnimatedRoutes = () => {
       {/* Sub-page routes with slide-in transitions */}
       {!isTabRoute && (
         <div className="w-full flex-1">
-          <Suspense fallback={
-            {LOADING_SPINNER}
-          }>
+          <Suspense fallback={LOADING_SPINNER}>
             <AnimatePresence mode="wait">
               <Routes location={location} key={location.pathname}>
                 <Route path="/template/new" element={<SlideIn><NewTemplate /></SlideIn>} />
@@ -182,9 +180,7 @@ const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
   if (isLoadingPublicSettings || isLoadingAuth) {
-    return (
-      {LOADING_SPINNER}
-    );
+    return LOADING_SPINNER;
   }
 
   if (authError) {
