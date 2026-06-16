@@ -54,7 +54,7 @@ export default function TemplateDetail() {
     return createPortal(
       <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-4 bg-black/60">
         <p className="text-white">Template not found</p>
-        <button onClick={() => navigate(-1)} className="text-blue-400 font-semibold">Go back</button>
+        <button onClick={() => navigate('/')} className="text-blue-400 font-semibold">Go back</button>
       </div>,
       document.body
     );
@@ -89,7 +89,7 @@ export default function TemplateDetail() {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-border">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/')}
             className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-muted/70 transition"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
