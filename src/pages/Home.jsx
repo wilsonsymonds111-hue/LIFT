@@ -60,6 +60,9 @@ const SPLIT_ACCENTS = {
   },
 };
 
+const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
+const GRID_CV = { contentVisibility: 'auto', containIntrinsicSize: 'auto 160px' };
+
 export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -204,6 +207,12 @@ export default function Home() {
 
   const accent = useMemo(() => SPLIT_ACCENTS[splitDetection.key] || SPLIT_ACCENTS['full-body'], [splitDetection.key]);
 
+  const glowStyles = useMemo(() => ({
+    outer: { background: `radial-gradient(ellipse at center, ${accent.hex}18 0%, ${accent.hex}0A 50%, transparent 70%)` },
+    middle: { background: `radial-gradient(ellipse at center, ${accent.hex}18 0%, transparent 60%)` },
+    inner: { background: `radial-gradient(ellipse at center, ${accent.hex}0C 0%, transparent 50%)` },
+  }), [accent.hex]);
+
   const isApple = useMemo(() => {
     const ua = navigator.userAgent || '';
     return /(iPhone|iPad|iPod|Macintosh|Mac OS X)/i.test(ua) && !/Android/i.test(ua);
@@ -251,7 +260,7 @@ export default function Home() {
       <PullToRefreshIndicator pullY={pullY} refreshing={refreshing} />
 
       {/* Page Title */}
-      <div className="px-4 pb-3 flex items-center justify-between" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
+      <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
         <div>
           <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
         </div>
@@ -274,9 +283,9 @@ export default function Home() {
       {/* ==================== CURRENT SPLIT (Spotlight) ==================== */}
       <div className="relative px-4 py-2">
         {/* Multi-layered glow for depth — dynamic hue based on split type */}
-        <div className="absolute -inset-12 rounded-[4rem] blur-3xl pointer-events-none" style={{ background: `radial-gradient(ellipse at center, ${accent.hex}18 0%, ${accent.hex}0A 50%, transparent 70%)` }} />
-        <div className="absolute -inset-4 rounded-[2.5rem] blur-2xl pointer-events-none" style={{ background: `radial-gradient(ellipse at center, ${accent.hex}18 0%, transparent 60%)` }} />
-        <div className="absolute inset-0 rounded-[2rem] blur-xl pointer-events-none" style={{ background: `radial-gradient(ellipse at center, ${accent.hex}0C 0%, transparent 50%)` }} />
+        <div className="absolute -inset-12 rounded-[4rem] blur-3xl pointer-events-none" style={glowStyles.outer} />
+        <div className="absolute -inset-4 rounded-[2.5rem] blur-2xl pointer-events-none" style={glowStyles.middle} />
+        <div className="absolute inset-0 rounded-[2rem] blur-xl pointer-events-none" style={glowStyles.inner} />
 
         <div className="relative">
           <div className="flex items-start justify-between mb-4">
@@ -305,7 +314,7 @@ export default function Home() {
           </div>
 
           {currentSplit.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 160px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={GRID_CV}>
               {currentSplit.map((template) => (
                 <div
                   key={template.id}

@@ -15,6 +15,11 @@ import { base44 } from '@/api/base44Client';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 
+const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
+const GRID_CV = { contentVisibility: 'auto', containIntrinsicSize: 'auto 200px' };
+const DIALOG_BG = { background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(18px)' };
+const SWAP_CARD_W = { width: 340 };
+
 export default function Splits() {
   const navigate = useNavigate();
   const { data: allTemplates = [], isLoading: loading } = useWorkoutTemplates();
@@ -301,7 +306,7 @@ export default function Splits() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="px-4 pb-3 flex items-center justify-between" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
+      <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
         <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workout Splits</h1>
         <ProfileButton />
       </div>
@@ -343,7 +348,7 @@ export default function Splits() {
             Create New Split
           </button>
           {mySplitGroups.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 200px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" style={GRID_CV}>
               {mySplitGroups.map((group) => (
                 <SplitCard
                   key={group.groupId}
@@ -363,7 +368,7 @@ export default function Splits() {
       {/* Example Splits Tab */}
       {activeTab === 'examples' && (
         <div className="px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 200px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={GRID_CV}>
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
               <SplitCard
                 key={key}
@@ -584,7 +589,7 @@ export default function Splits() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(18px)' }}
+            style={DIALOG_BG}
           >
             {/* ── Phase 1: Current (old) split appears at center ── */}
             {swapPhase === 'popup' && (
@@ -594,7 +599,7 @@ export default function Splits() {
                 transition={{ duration: 0.3, ease: [0.33, 1, 0.68, 1] }}
                 onAnimationComplete={() => setSwapPhase('swap')}
                 className="bg-card border border-border/50 rounded-2xl p-5 shadow-2xl ring-1 ring-black/5 dark:ring-white/5"
-                style={{ width: 340 }}
+                style={SWAP_CARD_W}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
@@ -618,7 +623,7 @@ export default function Splits() {
 
             {/* ── Phase 2: Old slides left, new stamps over it from right ── */}
             {(swapPhase === 'swap' || swapPhase === 'success') && (
-              <div className="relative pointer-events-none" style={{ width: 340 }}>
+              <div className="relative pointer-events-none" style={SWAP_CARD_W}>
                 {/* Old split slides out to the left */}
                 <motion.div
                   initial={{ x: 0, opacity: 1, scale: 1 }}

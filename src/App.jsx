@@ -26,7 +26,14 @@ const pageVariants = {
   exit: { x: '-30%', opacity: 0 },
 };
 
-const transition = { duration: 0.18, ease: [0.33, 1, 0.68, 1] };
+const PAGE_TRANSITION = { duration: 0.18, ease: [0.33, 1, 0.68, 1] };
+const SWIPE_TRANSITION = { duration: 0.08, ease: [0.33, 1, 0.68, 1] };
+const SUSPENSE_FALLBACK = <div className="w-full h-screen bg-background" />;
+const LOADING_SPINNER = (
+  <div className="fixed inset-0 flex items-center justify-center">
+    <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
+  </div>
+);
 
 const SlideIn = ({ children }) => (
   <motion.div
@@ -35,7 +42,7 @@ const SlideIn = ({ children }) => (
     initial="initial"
     animate="animate"
     exit="exit"
-    transition={transition}
+    transition={PAGE_TRANSITION}
   >
     {children}
   </motion.div>
@@ -100,17 +107,17 @@ const SwipeableTabs = () => {
           else if (info.offset.x > threshold) snapToTab(activeIndex - 1);
         }}
         animate={{ x: `calc(-1 * ${activeIndex} * var(--pw, 100vw))` }}
-        transition={{ duration: 0.08, ease: [0.33, 1, 0.68, 1] }}
+        transition={SWIPE_TRANSITION}
         className="flex"
         style={{ width: `calc(${TABS.length} * var(--pw, 100vw))`, willChange: 'transform' }}
       >
         <div className="flex-shrink-0 overflow-y-auto" style={{ width: 'var(--pw, 100vw)' }}>
-          <Suspense fallback={<div className="w-full h-screen bg-background" />}>
+          <Suspense fallback={SUSPENSE_FALLBACK}>
             <div style={{ display: activeIndex === 0 ? 'block' : 'none' }}><Home /></div>
           </Suspense>
         </div>
         <div className="flex-shrink-0 overflow-y-auto" style={{ width: 'var(--pw, 100vw)' }}>
-          <Suspense fallback={<div className="w-full h-screen bg-background" />}>
+          <Suspense fallback={SUSPENSE_FALLBACK}>
             <div style={{ display: activeIndex === 1 ? 'block' : 'none' }}><Splits /></div>
           </Suspense>
         </div>
@@ -150,9 +157,7 @@ const AnimatedRoutes = () => {
       {!isTabRoute && (
         <div className="w-full flex-1">
           <Suspense fallback={
-            <div className="fixed inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
-            </div>
+            {LOADING_SPINNER}
           }>
             <AnimatePresence mode="wait">
               <Routes location={location} key={location.pathname}>
@@ -178,9 +183,7 @@ const AuthenticatedApp = () => {
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
-      </div>
+      {LOADING_SPINNER}
     );
   }
 
