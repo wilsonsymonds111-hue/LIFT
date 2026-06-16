@@ -8,10 +8,10 @@ const SPLIT_BG_IMAGES = {
 };
 
 const ACCENT_COLORS = {
-  blue: { badge: 'bg-[#2A8FFF]', chevron: 'bg-gray-500', tint: 'rgba(30, 100, 220, 0.18)' },
-  green: { badge: 'bg-[#43A047]', chevron: 'bg-gray-500', tint: 'rgba(50, 140, 50, 0.18)' },
-  purple: { badge: 'bg-[#8E24AA]', chevron: 'bg-gray-500', tint: 'rgba(120, 30, 150, 0.18)' },
-  orange: { badge: 'bg-[#F57C00]', chevron: 'bg-gray-500', tint: 'rgba(220, 100, 0, 0.18)' },
+  blue: { badge: 'bg-[#2A8FFF]', chevron: 'bg-[#2A8FFF]', tint: 'rgba(30, 100, 220, 0.18)' },
+  green: { badge: 'bg-[#43A047]', chevron: 'bg-[#43A047]', tint: 'rgba(50, 140, 50, 0.18)' },
+  purple: { badge: 'bg-[#8E24AA]', chevron: 'bg-[#8E24AA]', tint: 'rgba(120, 30, 150, 0.18)' },
+  orange: { badge: 'bg-[#F57C00]', chevron: 'bg-[#F57C00]', tint: 'rgba(220, 100, 0, 0.18)' },
 };
 
 const SPLIT_COLORS = {
@@ -52,19 +52,12 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
         className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.35)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.65)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.8)] hover:scale-[1.02]"
         style={{
           height: 200,
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 50%',
           backgroundColor: '#0f0f1a',
         }}
       >
-        {/* Grayscale background image layer */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url(${bgImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center 50%',
-            filter: 'grayscale(100%)',
-          }}
-        />
         {/* Bottom gradient for text readability */}
         <div className="absolute inset-0" style={{
           background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.1) 100%)'
