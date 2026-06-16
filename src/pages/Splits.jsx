@@ -353,12 +353,7 @@ export default function Splits() {
           <button
             onClick={() => {
               setMenuOpen(null);
-              if (EXAMPLE_SPLITS_DATA[menuOpen]) {
-                handleMakeCurrentSplit(menuOpen);
-              } else {
-                const g = mySplitGroups.find(x => x.groupId === menuOpen);
-                if (g) handleMakeMySplitCurrent(g);
-              }
+              setActiveSplit(menuOpen);
             }}
             disabled={swapping}
             className="w-full text-left px-4 py-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 transition-colors"
