@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Dumbbell, X } from 'lucide-react';
+import { Check, Dumbbell, Minus } from 'lucide-react';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -67,7 +67,7 @@ export default function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 })
                 } ${bgClass}`}
               >
                 {showCheck && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
-                {missed && <X className="w-3 h-3 text-white" strokeWidth={3} />}
+                {missed && <Minus className="w-3 h-3 text-white" strokeWidth={3} />}
                 {noData && <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 leading-none">—</span>}
                 {showDumbbell && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
               </div>
