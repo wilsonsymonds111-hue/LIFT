@@ -4,7 +4,7 @@ const SPLIT_BG_IMAGES = {
   'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/839011abd_generated_image.png',
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/799340377_generated_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/8cc98624d_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/1149e87fc_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a1ee22d3a_generated_image.png',
 };
 
 const ACCENT_COLORS = {
@@ -54,13 +54,13 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
         height: 200,
         backgroundImage: `url(${bgImage})`,
         backgroundSize: 'cover',
-        backgroundPosition: 'center 30%',
-        backgroundColor: '#1a1a2e',
+        backgroundPosition: 'center',
+        backgroundColor: '#0f0f1a',
       }}
     >
       {/* Bottom gradient for text readability */}
       <div className="absolute inset-0" style={{
-        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.15) 70%, transparent 92%)'
+        background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.1) 100%)'
       }} />
 
       {/* Content layer */}
