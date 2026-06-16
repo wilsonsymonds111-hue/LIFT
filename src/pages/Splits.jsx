@@ -274,7 +274,7 @@ export default function Splits() {
             onClick={() => setActiveTab('mine')}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
               activeTab === 'mine'
-                ? 'bg-card text-foreground shadow-sm'
+                ? 'bg-blue-500 text-white shadow-md'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -284,7 +284,7 @@ export default function Splits() {
             onClick={() => setActiveTab('examples')}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
               activeTab === 'examples'
-                ? 'bg-card text-foreground shadow-sm'
+                ? 'bg-blue-500 text-white shadow-md'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
