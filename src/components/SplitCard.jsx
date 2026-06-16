@@ -1,10 +1,10 @@
 import { Dumbbell, ChevronRight, MoreHorizontal } from 'lucide-react';
 
 const SPLIT_BG_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/839011abd_generated_image.png',
-  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/799340377_generated_image.png',
-  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/8cc98624d_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/0d40836a8_generated_image.png',
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/fe300d6a5_generated_image.png',
+  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/646335504_generated_image.png',
+  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/83208f298_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/d757bff53_generated_image.png',
 };
 
 const ACCENT_COLORS = {
@@ -54,7 +54,7 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
           height: 200,
           backgroundImage: `url(${bgImage})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center 30%',
+          backgroundPosition: 'center 15%',
           backgroundColor: '#0f0f1a',
         }}
       >
