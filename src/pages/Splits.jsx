@@ -6,6 +6,7 @@ import ProfileButton from '../components/ProfileButton';
 import SplitBuilder from '../components/SplitBuilder';
 import SplitModal from '../components/SplitModal';
 import SplitCard from '../components/SplitCard';
+import RestFrequencyConfirmModal from '../components/RestFrequencyConfirmModal';
 
 
 import { useNavigate } from 'react-router-dom';
@@ -28,6 +29,8 @@ export default function Splits() {
   const [showBuilder, setShowBuilder] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null); // group to confirm deletion
   const [activeSplit, setActiveSplit] = useState(null);
+  const [frequencyConfirmSplit, setFrequencyConfirmSplit] = useState(null);
+  const [frequencyConfirmDefaults, setFrequencyConfirmDefaults] = useState(null);
   const menuRef = useRef({});
   const cardRefs = useRef({});
 
@@ -353,7 +356,12 @@ export default function Splits() {
           <button
             onClick={() => {
               setMenuOpen(null);
-              setActiveSplit(menuOpen);
+              const isExample = !!EXAMPLE_SPLITS_DATA[menuOpen];
+              setFrequencyConfirmDefaults({
+                splitKey: menuOpen,
+                defaultSchedule: isExample ? EXAMPLE_SPLITS_DATA[menuOpen].schedule : [1, 0, 1, 0, 1, 0, 1],
+              });
+              setFrequencyConfirmSplit(menuOpen);
             }}
             disabled={swapping}
             className="w-full text-left px-4 py-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 transition-colors"
@@ -410,6 +418,31 @@ export default function Splits() {
             loadTemplates();
             setActiveTab('mine');
             localStorage.setItem('splitsActiveTab', 'mine');
+          }}
+        />
+      )}
+
+      {/* Rest frequency confirm modal (from three-dot menu) */}
+      {frequencyConfirmSplit && frequencyConfirmDefaults && (
+        <RestFrequencyConfirmModal
+          splitKey={frequencyConfirmDefaults.splitKey}
+          defaultSchedule={frequencyConfirmDefaults.defaultSchedule}
+          onClose={() => { setFrequencyConfirmSplit(null); setFrequencyConfirmDefaults(null); }}
+          onConfirm={() => {
+            const splitKey = frequencyConfirmDefaults.splitKey;
+            setFrequencyConfirmSplit(null);
+            setFrequencyConfirmDefaults(null);
+            if (EXAMPLE_SPLITS_DATA[splitKey]) {
+              handleMakeCurrentSplit(splitKey);
+            } else {
+              const g = mySplitGroups.find(x => x.groupId === splitKey);
+              if (g) handleMakeMySplitCurrent(g);
+            }
+          }}
+          onEdit={(key) => {
+            setFrequencyConfirmSplit(null);
+            setFrequencyConfirmDefaults(null);
+            setActiveSplit(key);
           }}
         />
       )}
