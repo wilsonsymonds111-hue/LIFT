@@ -305,7 +305,7 @@ export default function Home() {
           </div>
 
           {currentSplit.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 160px' }}>
               {currentSplit.map((template) => (
                 <div
                   key={template.id}

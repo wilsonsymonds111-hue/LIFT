@@ -80,13 +80,14 @@ const SwipeableTabs = () => {
   };
 
   return (
-    <div className="relative overflow-hidden w-full flex-1" ref={constraintsRef} style={{ touchAction: 'pan-y' }}>
+    <div className="relative overflow-hidden w-full flex-1" ref={constraintsRef} style={{ touchAction: 'pan-y', contain: 'layout style' }}>
       <motion.div
         drag="x"
         dragDirectionLock
         dragConstraints={constraintsRef}
         dragElastic={0}
         dragMomentum={false}
+        style={{ willChange: 'transform' }}
         onDragEnd={(_, info) => {
           const threshold = 50;
           if (info.offset.x < -threshold) snapToTab(activeIndex + 1);

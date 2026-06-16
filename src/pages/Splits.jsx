@@ -75,14 +75,15 @@ export default function Splits() {
   }, [swapPhase, swapOriginRect, navigate]);
 
   // Group templates by splitGroup
-  const splitGroups = templates.reduce((acc, t) => {
-    const key = t.splitGroup || '__ungrouped__' + t.id;
-    if (!acc[key]) acc[key] = { groupId: key, templates: [] };
-    acc[key].templates.push(t);
-    return acc;
-  }, {});
-
-  const mySplitGroups = Object.values(splitGroups);
+  const { splitGroups, mySplitGroups } = useMemo(() => {
+    const groups = templates.reduce((acc, t) => {
+      const key = t.splitGroup || '__ungrouped__' + t.id;
+      if (!acc[key]) acc[key] = { groupId: key, templates: [] };
+      acc[key].templates.push(t);
+      return acc;
+    }, {});
+    return { splitGroups: groups, mySplitGroups: Object.values(groups) };
+  }, [templates]);
 
   // If user has no saved splits, auto-switch to examples tab (unless builder is open or user just chose "mine")
   useEffect(() => {
@@ -342,7 +343,7 @@ export default function Splits() {
             Create New Split
           </button>
           {mySplitGroups.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 200px' }}>
               {mySplitGroups.map((group) => (
                 <SplitCard
                   key={group.groupId}
@@ -362,7 +363,7 @@ export default function Splits() {
       {/* Example Splits Tab */}
       {activeTab === 'examples' && (
         <div className="px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 200px' }}>
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
               <SplitCard
                 key={key}
