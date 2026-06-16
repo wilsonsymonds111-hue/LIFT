@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
-import { useEffect, useRef, lazy, Suspense } from 'react';
+import { useEffect, useRef, useMemo, lazy, Suspense, memo } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -51,6 +51,8 @@ const SlideIn = ({ children }) => (
 const preloadMap = { '/splits': () => import('./pages/Splits'), '/': () => import('./pages/Home') };
 
 const TAB_STYLES = { touchAction: 'pan-y', contain: 'layout style' };
+const TAB_PANE_W = { width: 'var(--pw, 100vw)' };
+const SWIPE_W = { width: 'calc(2 * var(--pw, 100vw))', willChange: 'transform' };
 
 const SwipeableTabs = () => {
   const location = useLocation();
@@ -92,6 +94,9 @@ const SwipeableTabs = () => {
     }
   };
 
+  const tab0Display = useMemo(() => ({ display: activeIndex === 0 ? 'block' : 'none' }), [activeIndex]);
+  const tab1Display = useMemo(() => ({ display: activeIndex === 1 ? 'block' : 'none' }), [activeIndex]);
+
   return (
     <div className="relative overflow-hidden w-full flex-1" ref={constraintsRef} style={TAB_STYLES}>
       <motion.div
@@ -109,16 +114,16 @@ const SwipeableTabs = () => {
         animate={{ x: `calc(-1 * ${activeIndex} * var(--pw, 100vw))` }}
         transition={SWIPE_TRANSITION}
         className="flex"
-        style={{ width: `calc(${TABS.length} * var(--pw, 100vw))`, willChange: 'transform' }}
+        style={SWIPE_W}
       >
-        <div className="flex-shrink-0 overflow-y-auto" style={{ width: 'var(--pw, 100vw)' }}>
+        <div className="flex-shrink-0 overflow-y-auto" style={TAB_PANE_W}>
           <Suspense fallback={SUSPENSE_FALLBACK}>
-            <div style={{ display: activeIndex === 0 ? 'block' : 'none' }}><Home /></div>
+            <div style={tab0Display}><Home /></div>
           </Suspense>
         </div>
-        <div className="flex-shrink-0 overflow-y-auto" style={{ width: 'var(--pw, 100vw)' }}>
+        <div className="flex-shrink-0 overflow-y-auto" style={TAB_PANE_W}>
           <Suspense fallback={SUSPENSE_FALLBACK}>
-            <div style={{ display: activeIndex === 1 ? 'block' : 'none' }}><Splits /></div>
+            <div style={tab1Display}><Splits /></div>
           </Suspense>
         </div>
       </motion.div>
@@ -141,15 +146,16 @@ const usePreloadSubPages = () => {
   }, []);
 };
 
-const AnimatedRoutes = () => {
+const AnimatedRoutes = memo(() => {
   const location = useLocation();
   const isTabRoute = location.pathname === '/' || location.pathname === '/splits';
   usePreloadSubPages();
+  const tabDisplay = useMemo(() => ({ display: isTabRoute ? 'flex' : 'none' }), [isTabRoute]);
 
   return (
     <>
       {/* Always mount tabs to preserve scroll position — toggle visibility only */}
-      <div style={{ display: isTabRoute ? 'flex' : 'none' }} className="flex-1 flex-col">
+      <div style={tabDisplay} className="flex-1 flex-col">
         <SwipeableTabs />
       </div>
 
@@ -174,7 +180,7 @@ const AnimatedRoutes = () => {
       <BottomNav />
     </>
   );
-};
+});
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
