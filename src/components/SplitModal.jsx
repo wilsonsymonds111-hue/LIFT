@@ -147,10 +147,24 @@ export default function SplitModal({ splitKey, onClose }) {
   }, [customSchedule]);
 
   const frequencyLabel = useMemo(() => {
-    const onDays = customSchedule.filter(s => s === 1).length;
-    const offDays = customSchedule.filter(s => s === 0).length;
-    const onPart = `${onDays} day${onDays !== 1 ? 's' : ''} on`;
-    const offPart = `${offDays} day${offDays !== 1 ? 's' : ''} off`;
+    // Find longest consecutive run of each — avoids miscounting
+    // a past rest day and an upcoming rest day as "2 off"
+    let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
+    for (let i = 0; i < customSchedule.length; i++) {
+      if (customSchedule[i] === 1) {
+        curOn++;
+        if (curOff > maxOff) maxOff = curOff;
+        curOff = 0;
+      } else {
+        curOff++;
+        if (curOn > maxOn) maxOn = curOn;
+        curOn = 0;
+      }
+    }
+    if (curOn > maxOn) maxOn = curOn;
+    if (curOff > maxOff) maxOff = curOff;
+    const onPart = `${maxOn} day${maxOn !== 1 ? 's' : ''} on`;
+    const offPart = `${maxOff} day${maxOff !== 1 ? 's' : ''} off`;
     return `${onPart}, ${offPart}, repeat`;
   }, [customSchedule]);
 
