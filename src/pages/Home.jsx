@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, CalendarPlus } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import usePullToRefresh from '../hooks/usePullToRefresh';
@@ -9,6 +9,7 @@ import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
 import WeekTracker from '../components/WeekTracker';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
+import { generateWorkoutICS } from '../lib/icsGenerator';
 
 const relativeTime = (dateStr) => {
   if (!dateStr) return null;
@@ -198,6 +199,33 @@ export default function Home() {
 
       {/* Weekly Tracker */}
       <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} />
+
+      {/* Calendar sync button */}
+      {currentSplit.length > 0 && (
+        <div className="px-4 -mt-1 mb-1 flex justify-end">
+          <button
+            onClick={() => {
+              const ics = generateWorkoutICS({
+                splitName: currentSplitName,
+                workouts: currentSplit.map(t => ({ name: t.name })),
+                schedule: splitDetection.schedule,
+                startDayIndex: splitDetection.startDayIndex,
+              });
+              const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `lift-workouts.ics`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-500 hover:text-blue-600 transition"
+          >
+            <CalendarPlus className="w-3.5 h-3.5" />
+            Sync to Calendar
+          </button>
+        </div>
+      )}
 
       {/* Quick Start */}
       <div className="px-4 py-4">
