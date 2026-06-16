@@ -229,9 +229,9 @@ export default function SplitModal({ splitKey, onClose }) {
               <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-border">
                 <button
                   onClick={onClose}
-                  className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-muted/70 transition -ml-2"
+                  className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-blue-500 transition group -ml-2"
                 >
-                  <ArrowLeft className="w-5 h-5 text-foreground" />
+                  <ArrowLeft className="w-5 h-5 text-foreground group-hover:text-white transition" />
                 </button>
                 <div className="text-center">
                   <h2 className="text-lg font-extrabold text-foreground">{split.name}</h2>
@@ -239,13 +239,13 @@ export default function SplitModal({ splitKey, onClose }) {
                 </div>
                 <button
                   onClick={() => setEditing(e => !e)}
-                  className={`w-11 h-11 flex items-center justify-center rounded-full transition ${
+                  className={`w-11 h-11 flex items-center justify-center rounded-full transition group ${
                     editing
                       ? 'bg-blue-500 text-white'
-                      : 'bg-muted hover:bg-muted/70 text-muted-foreground'
+                      : 'bg-muted hover:bg-blue-500 text-muted-foreground'
                   }`}
                 >
-                  <Pencil className="w-5 h-5" />
+                  <Pencil className={`w-5 h-5 ${editing ? '' : 'group-hover:text-white'} transition`} />
                 </button>
               </div>
 
