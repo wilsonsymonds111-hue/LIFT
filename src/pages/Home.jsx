@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { MoreHorizontal } from 'lucide-react';
@@ -125,6 +125,20 @@ export default function Home() {
     return { key: 'full-body', schedule: resolveSchedule('full-body') };
   })();
 
+  const cycleLabel = useMemo(() => {
+    const key = splitDetection.key;
+    try {
+      const cycleRaw = localStorage.getItem(`splitCycle_${key}`);
+      if (cycleRaw) {
+        const { onDays, offDays } = JSON.parse(cycleRaw);
+        const onPart = `${onDays} day${onDays !== 1 ? 's' : ''} on`;
+        const offPart = `${offDays} day${offDays !== 1 ? 's' : ''} off`;
+        return `${onPart}, ${offPart}`;
+      }
+    } catch {}
+    return null;
+  }, [splitDetection.key]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -146,7 +160,7 @@ export default function Home() {
       </div>
 
       {/* Weekly Tracker */}
-      <WeekTracker schedule={splitDetection.schedule} />
+      <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} />
 
       {/* Quick Start */}
       <div className="px-4 py-4">

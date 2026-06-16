@@ -13,7 +13,7 @@ function getTooltipText(status, isPast, isToday) {
   return 'Workout day ahead 💪';
 }
 
-export default function WeekTracker({ schedule }) {
+export default function WeekTracker({ schedule, cycleLabel }) {
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
   const [activeDay, setActiveDay] = useState(todayMonSun);
@@ -72,7 +72,12 @@ export default function WeekTracker({ schedule }) {
       </div>
 
       {/* Tooltip */}
-      <div className="flex justify-center mt-2">
+      <div className="flex flex-col items-center mt-2">
+        {cycleLabel && (
+          <span className="text-[10px] font-semibold text-blue-500 dark:text-blue-400 text-center">
+            {cycleLabel}
+          </span>
+        )}
         <span className="text-[11px] font-medium text-muted-foreground text-center min-h-[16px]">
           {getTooltipText(schedule[activeDay], activeDay < todayMonSun, activeDay === todayMonSun)}
         </span>
