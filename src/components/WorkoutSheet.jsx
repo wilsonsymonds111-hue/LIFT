@@ -76,6 +76,27 @@ function playTick() {
   });
 }
 
+/* ─── Rest timer complete notification ────────────────────────── */
+function notifyRestComplete() {
+  // Sound alert
+  if (!_ctx) { try { _loadBuf(); } catch (_) {} }
+  playTick();
+  // Vibrate
+  if (navigator.vibrate) {
+    try { navigator.vibrate([200, 100, 200]); } catch (_) {}
+  }
+  // System notification (works when locked on most Android + installed PWA)
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      new Notification("Rest's up! 🏋️", {
+        body: 'Get back to work',
+        tag: 'rest-timer',
+        requireInteraction: true,
+      });
+    } catch (_) {}
+  }
+}
+
 // Run detection on first user interaction
 if (typeof window !== 'undefined') {
   const runDetection = () => {
@@ -286,7 +307,7 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
       setRestSeconds(restDuration);
       restRef.current = setInterval(() => {
         setRestSeconds(s => {
-          if (s <= 1) { clearInterval(restRef.current); return 0; }
+          if (s <= 1) { clearInterval(restRef.current); notifyRestComplete(); return 0; }
           return s - 1;
         });
       }, 1000);
@@ -884,7 +905,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     setRestMinimized(false);
     restIntervalRef.current = setInterval(() => {
       setRestSeconds(s => {
-        if (s <= 1) { clearInterval(restIntervalRef.current); setRestActive(false); return 0; }
+        if (s <= 1) { clearInterval(restIntervalRef.current); setRestActive(false); notifyRestComplete(); return 0; }
         return s - 1;
       });
     }, 1000);
@@ -902,6 +923,13 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   };
 
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  // Request notification permission for rest timer alerts
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
 
   if (!template) return null;
 
