@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Moon, Sun, Trash2, AlertTriangle, Camera } from 'lucide-react';
+import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import FeedbackModal from './FeedbackModal';
 
 export default function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange }) {
+  const [showFeedback, setShowFeedback] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
@@ -90,6 +92,20 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark, profileP
           />
         </div>
 
+        {/* Feedback & Support */}
+        <button
+          onClick={() => setShowFeedback(true)}
+          className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+        >
+          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+            <MessageSquare className="w-4 h-4 text-blue-500" />
+          </div>
+          <div className="text-left">
+            <p className="font-semibold text-foreground text-sm">Feedback & Support</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Chat with AI or message the developer</p>
+          </div>
+        </button>
+
         {/* Dark mode toggle */}
         <div className="flex items-center justify-between bg-muted rounded-2xl px-4 py-3.5">
           <div className="flex items-center gap-3">
@@ -149,6 +165,10 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark, profileP
               </button>
             </div>
           </div>
+        )}
+
+        {showFeedback && (
+          <FeedbackModal onClose={() => setShowFeedback(false)} />
         )}
       </div>
     </div>,
