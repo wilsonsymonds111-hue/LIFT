@@ -38,7 +38,9 @@ function detectSplitType(workoutNames) {
   return 'upper-lower';
 }
 
-export default function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
+import { memo } from 'react';
+
+const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
   const colorKey = SPLIT_COLORS[splitKey] || detectSplitType(workouts.map(w => w.name));
   const accent = ACCENT_COLORS[colorKey] || ACCENT_COLORS.blue;
   const bgImage = SPLIT_BG_IMAGES[splitKey] || SPLIT_BG_IMAGES[colorKey] || SPLIT_BG_IMAGES['upper-lower'];
@@ -113,4 +115,6 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
       </div>
     </div>
   );
-}
+});
+
+export default SplitCard;

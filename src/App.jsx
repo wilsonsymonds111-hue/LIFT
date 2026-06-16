@@ -47,9 +47,16 @@ const SwipeableTabs = () => {
   const [pageWidth, setPageWidth] = useState(window.innerWidth);
 
   useEffect(() => {
-    const handleResize = () => setPageWidth(window.innerWidth);
+    let id;
+    const handleResize = () => {
+      clearTimeout(id);
+      id = setTimeout(() => setPageWidth(window.innerWidth), 150);
+    };
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(id);
+    };
   }, []);
 
   const snapToTab = (index) => {
@@ -77,10 +84,14 @@ const SwipeableTabs = () => {
         style={{ width: TABS.length * pageWidth }}
       >
         <div className="flex-shrink-0 overflow-y-auto" style={{ width: pageWidth }}>
-          <Home />
+          <Suspense fallback={<div className="w-full h-screen bg-background" />}>
+            {activeIndex === 0 ? <Home /> : <div className="w-full h-screen bg-background" />}
+          </Suspense>
         </div>
         <div className="flex-shrink-0 overflow-y-auto" style={{ width: pageWidth }}>
-          <Splits />
+          <Suspense fallback={<div className="w-full h-screen bg-background" />}>
+            {activeIndex === 1 ? <Splits /> : <div className="w-full h-screen bg-background" />}
+          </Suspense>
         </div>
       </motion.div>
     </div>
