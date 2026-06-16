@@ -15,7 +15,7 @@ import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 
 const SPLIT_ENDORSEMENTS = {
   'upper-lower': "Mike Thurston's favorite split",
-  'push-pull-legs': "Sam Sulek's favorite split",
+  'push-pull-legs': "Chris Bumstead's favorite split",
   'full-body': "Lee Priest's favorite split",
   'ul-ppl': "Jeff Nippard's favorite split",
 };

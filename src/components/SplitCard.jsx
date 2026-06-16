@@ -94,24 +94,24 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
 
         </div>
 
-        {/* Bottom row: badge + endorsement + chevron */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
-            {/* Workout count badge */}
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white text-black text-[11px] font-bold tracking-wide flex-shrink-0">
-              {workoutCount} WORKOUT{workoutCount !== 1 ? 'S' : ''}
+        {/* Endorsement sticker — overlaps top-right edge */}
+        {endorsement && (
+          <div className="absolute -top-1 -right-2 z-10">
+            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-yellow-400 text-black text-[10px] font-bold leading-none whitespace-nowrap shadow-lg shadow-yellow-400/30">
+              ⭐ {endorsement}
             </span>
-
-            {/* Endorsement pill */}
-            {endorsement && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full bg-yellow-400/90 text-black text-[10px] font-bold leading-none whitespace-nowrap overflow-hidden text-ellipsis backdrop-blur-sm shadow-sm">
-                ⭐ {endorsement}
-              </span>
-            )}
           </div>
+        )}
+
+        {/* Bottom row: badge + chevron */}
+        <div className="flex items-center justify-between">
+          {/* Workout count badge */}
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white text-black text-[11px] font-bold tracking-wide">
+            {workoutCount} WORKOUT{workoutCount !== 1 ? 'S' : ''}
+          </span>
 
           {/* Chevron button */}
-          <div className={`w-7 h-7 rounded-full ${accent.chevron} flex items-center justify-center flex-shrink-0`}>
+          <div className={`w-7 h-7 rounded-full ${accent.chevron} flex items-center justify-center`}>
             <ChevronRight className="w-4 h-4 text-white" strokeWidth={2.5} />
           </div>
         </div>
