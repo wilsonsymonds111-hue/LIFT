@@ -58,6 +58,9 @@ export default function SplitCard({ splitKey, name, workouts, onCardClick, onMen
           backgroundColor: '#0f0f1a',
         }}
       >
+        {/* Color tint overlay */}
+        <div className="absolute inset-0" style={{ backgroundColor: accent.tint, mixBlendMode: 'color' }} />
+
         {/* Bottom gradient for text readability */}
         <div className="absolute inset-0" style={{
           background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.1) 100%)'
