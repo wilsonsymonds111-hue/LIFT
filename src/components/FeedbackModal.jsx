@@ -7,6 +7,7 @@ import { base44 } from '@/api/base44Client';
 export default function FeedbackModal({ onClose }) {
   const [view, setView] = useState('options');
   const [message, setMessage] = useState('');
+  const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [creatingChat, setCreatingChat] = useState(false);
@@ -27,10 +28,10 @@ export default function FeedbackModal({ onClose }) {
   };
 
   const handleSendMessage = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() || !email.trim()) return;
     setSending(true);
     try {
-      await base44.functions.invoke('sendFeedback', { message: message.trim() });
+      await base44.functions.invoke('sendFeedback', { message: message.trim(), email: email.trim() });
       setSent(true);
     } catch {}
     setSending(false);
@@ -103,6 +104,14 @@ export default function FeedbackModal({ onClose }) {
               This message will be sent directly to <span className="font-semibold text-foreground">Christian</span>, the developer of LIFT. He'll get back to you as soon as possible with any feedback, questions, or feature requests.
             </p>
 
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Your email address"
+              className="w-full border border-border rounded-xl px-4 py-3 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+
             <textarea
               value={message}
               onChange={e => setMessage(e.target.value)}
@@ -113,7 +122,7 @@ export default function FeedbackModal({ onClose }) {
 
             <button
               onClick={handleSendMessage}
-              disabled={!message.trim() || sending}
+              disabled={!message.trim() || !email.trim() || sending}
               className="w-full py-3 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold rounded-xl transition flex items-center justify-center gap-2"
             >
               {sending ? (

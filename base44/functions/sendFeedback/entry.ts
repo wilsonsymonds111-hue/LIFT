@@ -6,16 +6,17 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { message } = await req.json();
+    const { message, email } = await req.json();
     if (!message) return Response.json({ error: 'Message is required' }, { status: 400 });
+    if (!email) return Response.json({ error: 'Email is required' }, { status: 400 });
 
     const developerEmail = Deno.env.get("DEVELOPER_EMAIL");
     if (!developerEmail) return Response.json({ error: 'Developer email not configured' }, { status: 500 });
 
     await base44.integrations.Core.SendEmail({
       to: developerEmail,
-      subject: `LIFT Feedback from ${user.full_name || user.email}`,
-      body: `From: ${user.full_name || 'Anonymous'} (${user.email})\n\n${message}`
+      subject: `LIFT Feedback from ${user.full_name || 'Anonymous'}`,
+      body: `From: ${user.full_name || 'Anonymous'}\nReply to: ${email}\n\n${message}`
     });
 
     return Response.json({ success: true });
