@@ -287,56 +287,39 @@ export default function SplitModal({ splitKey, onClose }) {
                     {frequencyLabel}
                   </p>
 
-                  {/* Start day selector */}
+                  {/* Combined start-day selector + preview */}
                   <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mb-2">
-                    Cycle starts on
+                    Tap a day to set cycle start
                   </p>
-                  <div className="flex justify-between gap-1 mb-4">
-                    {DAY_LABELS.map((label, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setStartDayIndex(i)}
-                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 ${
-                          startDayIndex === i
-                            ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30'
-                            : 'bg-white dark:bg-gray-900 text-muted-foreground border border-blue-200 dark:border-blue-800 hover:border-blue-400'
-                        } ${i === todayMonSun ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Preview row */}
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mb-1.5">Preview</p>
-                  <div className="flex justify-between mb-1">
-                    {DAY_LETTERS.map((l, i) => (
-                      <span key={i} className="text-[10px] font-bold text-muted-foreground w-7 text-center">{l}</span>
-                    ))}
-                  </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-1 mb-3">
                     {previewSchedule.map((status, i) => {
                       const isGymDay = status === 1;
                       const isToday = i === todayMonSun;
+                      const isStart = startDayIndex === i;
                       return (
-                        <div key={i} className="flex items-center w-7 justify-center">
+                        <button
+                          key={i}
+                          onClick={() => setStartDayIndex(i)}
+                          className={`flex flex-col items-center flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-150 ${
+                            isStart
+                              ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30'
+                              : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 hover:border-blue-400'
+                          } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
+                        >
+                          <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{DAY_LABELS[i]}</span>
                           <div
-                            className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150 ${
+                            className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
                               isGymDay
-                                ? 'bg-blue-500 shadow-md shadow-blue-500/30'
-                                : 'border-2 border-blue-300 dark:border-blue-700 bg-transparent'
-                            } ${isToday ? 'ring-[1.5px] ring-emerald-500 ring-offset-1' : ''}`}
+                                ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
+                                : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
+                            } ${isToday && !isStart ? 'ring-[1.5px] ring-emerald-500 ring-offset-1' : ''}`}
                           >
-                            {isGymDay && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
+                            {isGymDay && <Dumbbell className={`w-2.5 h-2.5 ${isStart ? 'text-white' : 'text-white'}`} strokeWidth={2.5} />}
                           </div>
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
-
-                  <p className="text-[10px] font-medium text-muted-foreground text-center mt-2 leading-relaxed">
-                    {previewSchedule.map(s => s === 0 ? 'Rest' : 'Train').join(' — ')}
-                  </p>
 
                   {/* Done button */}
                   <button
