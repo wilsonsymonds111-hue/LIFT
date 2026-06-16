@@ -47,7 +47,7 @@ export default function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 })
           const showDumbbell = isGymDay && !isPast;
 
           let bgClass = '';
-          if (missed) bgClass = 'bg-red-500';
+          if (missed) bgClass = 'border border-gray-300 dark:border-gray-600 bg-transparent';
           else if (noData) bgClass = 'border border-gray-300 dark:border-gray-600 bg-transparent';
           else if (isGymDay) bgClass = 'bg-blue-500';
           else bgClass = 'border border-blue-300 dark:border-blue-700 bg-transparent';
@@ -67,7 +67,7 @@ export default function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 })
                 } ${bgClass}`}
               >
                 {showCheck && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
-                {missed && <Minus className="w-3 h-3 text-white" strokeWidth={3} />}
+                {missed && <Minus className="w-3 h-3 text-gray-400 dark:text-gray-500" strokeWidth={3} />}
                 {noData && <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 leading-none">—</span>}
                 {showDumbbell && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
               </div>
