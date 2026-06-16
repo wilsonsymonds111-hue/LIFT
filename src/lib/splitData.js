@@ -39,7 +39,7 @@ export const EXAMPLE_SPLITS_DATA = {
     name: 'Push-Pull-Legs',
     description: 'Push day, pull day, legs day — 3-day rotation',
     label: 'Push • Pull • Legs',
-    schedule: [1, 1, 1, 0, 1, 1, 0], // M:Push, T:Pull, W:Legs, T:Rest, F:Push, S:Pull, S:Rest
+    schedule: [1, 1, 1, 0, 1, 1, 1], // Push, Pull, Legs, Rest, repeat
     workouts: [
       {
         name: 'Push Workout',
@@ -115,7 +115,7 @@ export const EXAMPLE_SPLITS_DATA = {
     name: 'U L P P L',
     description: 'Upper-Lower then Push-Pull-Legs — 5-day rotation',
     label: 'Upper • Lower • Push • Pull • Legs',
-    schedule: [1, 1, 1, 1, 1, 0, 0], // M:Upper, T:Lower, W:Push, T:Pull, F:Legs, S:Rest, S:Rest
+    schedule: [1, 1, 1, 1, 1, 0, 1], // Upper, Lower, Push, Pull, Legs, Rest, repeat
     workouts: [
       {
         name: 'Upper Body Workout',

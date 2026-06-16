@@ -85,9 +85,9 @@ export default function Home() {
     ? currentSplit.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ').toUpperCase()
     : '';
 
-  // Detect which schedule to use based on the active split's workout names
-  const splitSchedule = (() => {
-    if (currentSplit.length === 0) return EXAMPLE_SPLITS_DATA['full-body'].schedule;
+  // Detect which schedule/split key to use based on the active split's workout names
+  const splitDetection = (() => {
+    if (currentSplit.length === 0) return { key: 'full-body', schedule: EXAMPLE_SPLITS_DATA['full-body'].schedule };
     const names = currentSplit.map(t => (t.name || '').toLowerCase());
     const hasUpper = names.some(n => n.includes('upper'));
     const hasLower = names.some(n => n.includes('lower'));
@@ -96,11 +96,11 @@ export default function Home() {
     const hasLegs  = names.some(n => n.includes('legs'));
     const hasFull  = names.some(n => n.includes('full'));
 
-    if (hasFull && !hasUpper && !hasLower) return EXAMPLE_SPLITS_DATA['full-body'].schedule;
-    if (hasUpper && hasLower && hasPush && hasPull && hasLegs) return EXAMPLE_SPLITS_DATA['ul-ppl'].schedule;
-    if (hasPush && hasPull && hasLegs) return EXAMPLE_SPLITS_DATA['push-pull-legs'].schedule;
-    if (hasUpper && hasLower) return EXAMPLE_SPLITS_DATA['upper-lower'].schedule;
-    return EXAMPLE_SPLITS_DATA['full-body'].schedule;
+    if (hasFull && !hasUpper && !hasLower) return { key: 'full-body', schedule: EXAMPLE_SPLITS_DATA['full-body'].schedule };
+    if (hasUpper && hasLower && hasPush && hasPull && hasLegs) return { key: 'ul-ppl', schedule: EXAMPLE_SPLITS_DATA['ul-ppl'].schedule };
+    if (hasPush && hasPull && hasLegs) return { key: 'push-pull-legs', schedule: EXAMPLE_SPLITS_DATA['push-pull-legs'].schedule };
+    if (hasUpper && hasLower) return { key: 'upper-lower', schedule: EXAMPLE_SPLITS_DATA['upper-lower'].schedule };
+    return { key: 'full-body', schedule: EXAMPLE_SPLITS_DATA['full-body'].schedule };
   })();
 
   if (loading) {
@@ -124,7 +124,7 @@ export default function Home() {
       </div>
 
       {/* Weekly Tracker */}
-      <WeekTracker schedule={splitSchedule} />
+      <WeekTracker schedule={splitDetection.schedule} splitKey={splitDetection.key} />
 
       {/* Quick Start */}
       <div className="px-4 py-4">
