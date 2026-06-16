@@ -146,6 +146,14 @@ export default function SplitModal({ splitKey, onClose }) {
     return days;
   }, [customSchedule]);
 
+  const frequencyLabel = useMemo(() => {
+    const onDays = customSchedule.filter(s => s === 1).length;
+    const offDays = customSchedule.filter(s => s === 0).length;
+    const onPart = `${onDays} day${onDays !== 1 ? 's' : ''} on`;
+    const offPart = `${offDays} day${offDays !== 1 ? 's' : ''} off`;
+    return `${onPart}, ${offPart}, repeat`;
+  }, [customSchedule]);
+
   return createPortal(
     <AnimatePresence>
       <motion.div
@@ -248,6 +256,11 @@ export default function SplitModal({ splitKey, onClose }) {
                   {/* Cycle label */}
                   <p className="text-[10px] font-medium text-muted-foreground text-center mt-3 leading-relaxed">
                     {cycleLabel}
+                  </p>
+
+                  {/* Frequency summary */}
+                  <p className="text-[11px] font-bold text-foreground text-center mt-1">
+                    {frequencyLabel}
                   </p>
 
                   {/* Done button */}

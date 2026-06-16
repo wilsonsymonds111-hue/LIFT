@@ -87,7 +87,16 @@ export default function Home() {
 
   // Detect which schedule/split key to use based on the active split's workout names
   const splitDetection = (() => {
-    if (currentSplit.length === 0) return { key: 'full-body', schedule: EXAMPLE_SPLITS_DATA['full-body'].schedule };
+    const resolveSchedule = (key) => {
+      const defaultSchedule = EXAMPLE_SPLITS_DATA[key]?.schedule;
+      try {
+        const raw = localStorage.getItem(`splitSchedule_${key}`);
+        if (raw) return JSON.parse(raw);
+      } catch {}
+      return defaultSchedule;
+    };
+
+    if (currentSplit.length === 0) return { key: 'full-body', schedule: resolveSchedule('full-body') };
     const names = currentSplit.map(t => (t.name || '').toLowerCase());
     const hasUpper = names.some(n => n.includes('upper'));
     const hasLower = names.some(n => n.includes('lower'));
@@ -96,11 +105,11 @@ export default function Home() {
     const hasLegs  = names.some(n => n.includes('legs'));
     const hasFull  = names.some(n => n.includes('full'));
 
-    if (hasFull && !hasUpper && !hasLower) return { key: 'full-body', schedule: EXAMPLE_SPLITS_DATA['full-body'].schedule };
-    if (hasUpper && hasLower && hasPush && hasPull && hasLegs) return { key: 'ul-ppl', schedule: EXAMPLE_SPLITS_DATA['ul-ppl'].schedule };
-    if (hasPush && hasPull && hasLegs) return { key: 'push-pull-legs', schedule: EXAMPLE_SPLITS_DATA['push-pull-legs'].schedule };
-    if (hasUpper && hasLower) return { key: 'upper-lower', schedule: EXAMPLE_SPLITS_DATA['upper-lower'].schedule };
-    return { key: 'full-body', schedule: EXAMPLE_SPLITS_DATA['full-body'].schedule };
+    if (hasFull && !hasUpper && !hasLower) return { key: 'full-body', schedule: resolveSchedule('full-body') };
+    if (hasUpper && hasLower && hasPush && hasPull && hasLegs) return { key: 'ul-ppl', schedule: resolveSchedule('ul-ppl') };
+    if (hasPush && hasPull && hasLegs) return { key: 'push-pull-legs', schedule: resolveSchedule('push-pull-legs') };
+    if (hasUpper && hasLower) return { key: 'upper-lower', schedule: resolveSchedule('upper-lower') };
+    return { key: 'full-body', schedule: resolveSchedule('full-body') };
   })();
 
   if (loading) {
