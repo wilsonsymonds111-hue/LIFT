@@ -8,6 +8,7 @@ import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
 import WeekTracker from '../components/WeekTracker';
+import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 
 const relativeTime = (dateStr) => {
   if (!dateStr) return null;
@@ -84,6 +85,24 @@ export default function Home() {
     ? currentSplit.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ').toUpperCase()
     : '';
 
+  // Detect which schedule to use based on the active split's workout names
+  const splitSchedule = (() => {
+    if (currentSplit.length === 0) return EXAMPLE_SPLITS_DATA['full-body'].schedule;
+    const names = currentSplit.map(t => (t.name || '').toLowerCase());
+    const hasUpper = names.some(n => n.includes('upper'));
+    const hasLower = names.some(n => n.includes('lower'));
+    const hasPush  = names.some(n => n.includes('push'));
+    const hasPull  = names.some(n => n.includes('pull'));
+    const hasLegs  = names.some(n => n.includes('legs'));
+    const hasFull  = names.some(n => n.includes('full'));
+
+    if (hasFull && !hasUpper && !hasLower) return EXAMPLE_SPLITS_DATA['full-body'].schedule;
+    if (hasUpper && hasLower && hasPush && hasPull && hasLegs) return EXAMPLE_SPLITS_DATA['ul-ppl'].schedule;
+    if (hasPush && hasPull && hasLegs) return EXAMPLE_SPLITS_DATA['push-pull-legs'].schedule;
+    if (hasUpper && hasLower) return EXAMPLE_SPLITS_DATA['upper-lower'].schedule;
+    return EXAMPLE_SPLITS_DATA['full-body'].schedule;
+  })();
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -105,7 +124,7 @@ export default function Home() {
       </div>
 
       {/* Weekly Tracker */}
-      <WeekTracker />
+      <WeekTracker schedule={splitSchedule} />
 
       {/* Quick Start */}
       <div className="px-4 py-4">
