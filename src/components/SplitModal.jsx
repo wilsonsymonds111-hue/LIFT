@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Dumbbell, Pencil, GripVertical } from 'lucide-react';
+import { ArrowLeft, Dumbbell, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { base44 } from '@/api/base44Client';
@@ -300,7 +300,7 @@ export default function SplitModal({ splitKey, onClose }) {
                           startDayIndex === i
                             ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30'
                             : 'bg-white dark:bg-gray-900 text-muted-foreground border border-blue-200 dark:border-blue-800 hover:border-blue-400'
-                        }`}
+                        } ${i === todayMonSun ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
                       >
                         {label}
                       </button>
@@ -367,15 +367,11 @@ export default function SplitModal({ splitKey, onClose }) {
                                   snapshot.isDragging ? 'shadow-2xl scale-[1.03] z-10' : ''
                                 }`}
                               >
-                                {/* Drag handle */}
                                 <div
+                                  onClick={() => handleViewWorkout(workout)}
                                   {...provided.dragHandleProps}
-                                  className="absolute top-3 left-3 w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing z-10"
+                                  className="cursor-grab active:cursor-grabbing"
                                 >
-                                  <GripVertical className="w-4 h-4" />
-                                </div>
-
-                                <div onClick={() => handleViewWorkout(workout)} className="pl-4">
                                   <h4 className="font-bold text-foreground pr-8">{workout.name}</h4>
                                   <div className="flex flex-wrap gap-1.5 my-3">
                                     {(workout.exercises || []).map((e, i) => (
