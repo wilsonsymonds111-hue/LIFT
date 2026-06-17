@@ -141,7 +141,7 @@ const punchDotStyle = `
   @keyframes segmentFadeIn  { from { opacity: 0; } to { opacity: 1; } }
   @keyframes segmentFadeOut { from { opacity: 1; } to { opacity: 0; } }
   .snap-dot    { transform-box: fill-box; transform-origin: center; animation: dotSnapIn  0.4s cubic-bezier(0.34,1.56,0.64,1) forwards !important; animation-iteration-count: 1 !important; }
-  .ripple-ring { animation: dotRipple  0.65s ease-out forwards !important; animation-iteration-count: 1 !important; fill: none; stroke: #c5a059; }
+  .ripple-ring { animation: dotRipple  0.65s ease-out forwards !important; animation-iteration-count: 1 !important; fill: none; stroke: #3b82f6; }
   .retract-dot { transform-box: fill-box; transform-origin: center; animation: dotRetract 0.35s cubic-bezier(0.55,0,1,0.45) forwards !important; animation-iteration-count: 1 !important; }
   .new-seg-in  { animation: segmentFadeIn  0.5s ease forwards; }
   .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
@@ -195,7 +195,7 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
   const StaticDot = (props) => {
     const { cx, cy, value } = props;
     if (value == null) return <g />;
-    return <circle cx={cx} cy={cy} r={4} fill="#c5a059" stroke="white" strokeWidth={2} />;
+    return <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
   };
 
   const NewDot = (props) => {
@@ -206,19 +206,19 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
       if (freshAnim && animDir === 'remove') {
         return (
           <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4}
-            fill="#c5a059" stroke="white" strokeWidth={2}
+            fill="#3b82f6" stroke="white" strokeWidth={2}
             className="retract-dot" />
         );
       }
       if (freshAnim && animDir === 'add') {
         return (
           <g key={`dot-${animKey}`}>
-            <circle cx={cx} cy={cy} r={4} fill="#c5a059" stroke="white" strokeWidth={2} className="snap-dot" />
+            <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} className="snap-dot" />
             <circle cx={cx} cy={cy} r={4} className="ripple-ring" />
           </g>
         );
       }
-      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#c5a059" stroke="white" strokeWidth={2} />;
+      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
     }
     // bridge dot — already drawn by static line, hide
     return <g />;
@@ -250,7 +250,7 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
   return (
     <div className={`mb-2 rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
       <style>{punchDotStyle}</style>
-      <p className="text-[10px] font-bold text-primary uppercase tracking-widest text-center mb-1">
+      <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">
         {isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)'}
       </p>
       <ResponsiveContainer width="100%" height={64}>
@@ -260,7 +260,7 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
           {/* Static line — all historical segments, no animation */}
           <Line
             type="monotone" dataKey="valStatic"
-            stroke="#c5a059" strokeWidth={2}
+            stroke="#3b82f6" strokeWidth={2}
             dot={<StaticDot />} activeDot={false}
             connectNulls={false}
             isAnimationActive={false}
@@ -269,7 +269,7 @@ function ProgressGraph({ history, animKey, animDir, isBodyweight }) {
           <Line
             key={animKey}
             type="monotone" dataKey="valNew"
-            stroke="#c5a059" strokeWidth={2}
+            stroke="#3b82f6" strokeWidth={2}
             dot={<NewDot />} activeDot={false}
             connectNulls={true}
             isAnimationActive={true}
@@ -378,13 +378,13 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
             type="number" value={kg}
             onChange={e => { hasEdited.current = true; setKg(e.target.value); }}
             placeholder="—"
-            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-primary ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
+            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
           />
           <input
             type="number" value={reps}
             onChange={e => { hasEdited.current = true; setReps(e.target.value); }}
             placeholder="—"
-            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-primary ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
+            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
           />
           <button
             onClick={handleToggle}
@@ -396,7 +396,7 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
       </div>
       {done && restSeconds !== null && restSeconds > 0 && (
         <div
-          className="w-full bg-primary text-white font-bold text-center py-1.5 rounded-xl mt-2 text-base tracking-wider cursor-pointer select-none"
+          className="w-full bg-blue-500 text-white font-bold text-center py-1.5 rounded-xl mt-2 text-base tracking-wider cursor-pointer select-none"
           onClick={() => { clearInterval(restRef.current); setRestSeconds(0); }}
         >
           {String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')}
@@ -444,7 +444,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
     <style>{graphFadeStyle}</style>
     <div className="mb-4">
       <div className="flex items-center justify-between mb-1 relative">
-        <h3 className="text-primary font-semibold text-base select-none cursor-grab active:cursor-grabbing" {...dragHandleProps}>{exercise.name}</h3>
+        <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing" {...dragHandleProps}>{exercise.name}</h3>
         <div className="flex items-center gap-3 relative">
           <button onClick={() => setShowMenu(m => !m)} className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-gray-100 transition">
             <MoreHorizontal className="w-4 h-4 text-gray-400" />
@@ -465,13 +465,13 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
                 <p className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rest Timer</p>
                 <button
                   onClick={() => { setRestEnabled(true); setRestDuration(getDefaultRestDuration(exercise.name)); setShowCustomRest(false); setShowMenu(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration === getDefaultRestDuration(exercise.name) ? 'text-primary' : 'text-gray-700'}`}
+                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration === getDefaultRestDuration(exercise.name) ? 'text-blue-500' : 'text-gray-700'}`}
                 >
                   Default ({getDefaultRestDuration(exercise.name) / 60} min)
                 </button>
                 <button
                   onClick={() => setShowCustomRest(c => !c)}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration !== getDefaultRestDuration(exercise.name) ? 'text-primary' : 'text-gray-700'}`}
+                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration !== getDefaultRestDuration(exercise.name) ? 'text-blue-500' : 'text-gray-700'}`}
                 >
                   Custom…
                 </button>
@@ -482,7 +482,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
                       value={customRestInput}
                       onChange={e => setCustomRestInput(e.target.value)}
                       placeholder="sec"
-                      className="w-16 text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="w-16 text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                     <button
                       onClick={() => {
@@ -490,13 +490,13 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
                         if (s > 0) { setRestDuration(s); setRestEnabled(true); }
                         setShowCustomRest(false); setShowMenu(false);
                       }}
-                      className="text-xs bg-primary text-white px-2 py-1 rounded-lg font-semibold"
+                      className="text-xs bg-blue-500 text-white px-2 py-1 rounded-lg font-semibold"
                     >Set</button>
                   </div>
                 )}
                 <button
                   onClick={() => { setRestEnabled(false); setShowMenu(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${!restEnabled ? 'text-primary' : 'text-gray-700'}`}
+                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${!restEnabled ? 'text-blue-500' : 'text-gray-700'}`}
                 >
                   Off
                 </button>
@@ -518,7 +518,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
           onChange={e => setNote(e.target.value)}
           placeholder="Add a note…"
           rows={2}
-          className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+          className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
         />
       )}
       <ProgressGraph history={graphHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={isBodyweight} />
@@ -994,7 +994,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
           onClick={() => setMinimized(false)}
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
               <span className="text-white text-xs font-bold">{template.name.slice(0, 2)}</span>
             </div>
             <div className="min-w-0">
@@ -1074,7 +1074,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
             <div className="flex-1 overflow-y-auto px-4 pt-2 pb-24">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{template.name}</h1>
-                <MoreHorizontal className="w-5 h-5 text-primary" />
+                <MoreHorizontal className="w-5 h-5 text-blue-400" />
               </div>
               <p className="text-sm text-gray-500 mb-0.5">📅 {today}</p>
               <p className="text-sm text-gray-500 mb-4">🕐 {timer}</p>
@@ -1109,7 +1109,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               <div className="mt-6 flex flex-col gap-2">
                 <button
                   onClick={() => setShowExercisePicker(true)}
-                  className="w-full py-3.5 bg-primary/10 hover:bg-primary/20 text-primary font-semibold rounded-xl text-base transition"
+                  className="w-full py-3.5 bg-blue-50 hover:bg-blue-100 text-blue-500 font-semibold rounded-xl text-base transition"
                 >
                   Add Exercises
                 </button>

@@ -107,7 +107,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', damping: 10, stiffness: 200, delay: 0.1 }}
-              className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/30"
+              className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30"
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -124,9 +124,9 @@ export default function SplitBuilder({ onClose, onSaved }) {
               className="text-center"
             >
               <div className="flex items-center gap-1.5 justify-center mb-1">
-                <Sparkles className="w-4 h-4 text-primary" />
+                <Sparkles className="w-4 h-4 text-blue-500" />
                 <h3 className="text-lg font-extrabold text-foreground">{splitName || 'Split Created!'}</h3>
-                <Sparkles className="w-4 h-4 text-primary" />
+                <Sparkles className="w-4 h-4 text-blue-500" />
               </div>
               <p className="text-sm text-muted-foreground">
                 {workoutCount} workout{workoutCount > 1 ? 's' : ''} saved — find it in My Splits
@@ -159,7 +159,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
               <button
                 onClick={handleSave}
                 disabled={!allWorkoutsNamed || !allWorkoutsHaveExercises || saving || saved}
-                className="px-4 py-1.5 bg-primary hover:bg-primary/85 disabled:opacity-40 text-primary-foreground font-bold rounded-xl text-sm transition"
+                className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition"
               >
                 {saving ? 'Saving…' : 'Save'}
               </button>
@@ -182,8 +182,8 @@ export default function SplitBuilder({ onClose, onSaved }) {
                     onClick={() => handlePickCount(count)}
                     className={`relative py-5 rounded-2xl border-2 font-bold text-lg transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] ${
                       workoutCount === count
-                        ? 'border-primary bg-primary/10 text-primary shadow-md shadow-primary/10'
-                        : 'border-border bg-card text-foreground hover:border-primary hover:shadow-md'
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/40 text-blue-600 shadow-md shadow-blue-500/10'
+                        : 'border-border bg-card text-foreground hover:border-blue-400 hover:shadow-md'
                     }`}
                   >
                     <span className="text-2xl block mb-1">{count}</span>
@@ -211,7 +211,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
                   key={idx}
                   className={`rounded-2xl border-2 transition-all duration-150 overflow-hidden ${
                     workout.exercises.length > 0
-                      ? 'border-primary/50 bg-primary/5'
+                      ? 'border-blue-400/50 bg-blue-50/30 dark:bg-blue-950/20'
                       : 'border-dashed border-border bg-muted/30'
                   }`}
                 >
@@ -219,7 +219,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
                   <div className="flex items-center gap-3 p-4">
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-extrabold flex-shrink-0 ${
                       workout.exercises.length > 0
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'bg-blue-500 text-white'
                         : 'bg-muted text-muted-foreground'
                     }`}>
                       {idx + 1}
@@ -230,7 +230,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
                           value={workout.name}
                           onChange={e => handleNameChange(idx, e.target.value)}
                           placeholder={`Workout ${idx + 1}`}
-                          className="w-full bg-transparent font-bold text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/60 border-b border-dashed border-muted-foreground/20 focus:border-primary pb-0.5 pr-5"
+                          className="w-full bg-transparent font-bold text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/60 border-b border-dashed border-muted-foreground/20 focus:border-blue-500 pb-0.5 pr-5"
                         />
                         <Pencil className="absolute right-0 top-0 w-3.5 h-3.5 text-muted-foreground/40 pointer-events-none" />
                       </div>
@@ -242,7 +242,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
                     </div>
                     <button
                       onClick={() => setEditingWorkoutIdx(idx)}
-                      className="flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary/85 text-primary-foreground transition active:scale-95"
+                      className="flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-500 hover:bg-blue-600 text-white transition active:scale-95"
                     >
                       {workout.exercises.length > 0 ? 'Edit' : 'Build'}
                     </button>
@@ -257,7 +257,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
                             key={exIdx}
                             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white dark:bg-black/20 text-xs font-medium text-foreground border border-border"
                           >
-                            <Dumbbell className="w-3 h-3 text-primary" />
+                            <Dumbbell className="w-3 h-3 text-blue-500" />
                             {ex.name}
                             <button
                               onClick={() => handleRemoveExercise(idx, exIdx)}
