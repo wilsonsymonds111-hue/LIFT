@@ -2,8 +2,8 @@ import { MoreHorizontal } from 'lucide-react';
 import { memo } from 'react';
 
 const SPLIT_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5bc190219_image.png',
-  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5bc190219_image.png',
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/60f426734_image.png',
+  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e9b1aea0d_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/2b264bebb_generated_image.png',
   'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/ac60aca39_generated_image.png',
 };
@@ -66,14 +66,10 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             {displayName}
           </h4>
 
-          {/* Workout names as mini rectangle pills */}
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {workouts.map((w, i) => (
-              <span key={i} className="px-2.5 py-0.5 rounded-md bg-white/10 backdrop-blur-sm text-white/80 text-[11px] font-medium border border-white/[0.07]">
-                {w.name}
-              </span>
-            ))}
-          </div>
+          {/* Workout names */}
+          <p className="text-sm text-white/75 mt-2 leading-relaxed line-clamp-2">
+            {subtitle}
+          </p>
 
           {/* Badge */}
           <div className="mt-3">
