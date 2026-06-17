@@ -5,7 +5,7 @@ const SPLIT_IMAGES = {
   'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/60f426734_image.png',
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e9b1aea0d_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/2b264bebb_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/ac60aca39_generated_image.png',
+  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5bc190219_image.png',
 };
 
 function detectSplitType(workoutNames) {
@@ -28,7 +28,6 @@ function detectSplitType(workoutNames) {
 const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
   const colorKey = SPLIT_IMAGES[splitKey] ? splitKey : detectSplitType(workouts.map(w => w.name));
   const bgImage = SPLIT_IMAGES[colorKey] || SPLIT_IMAGES['upper-lower'];
-  const subtitle = workouts.map(w => w.name).join(' • ');
   const workoutCount = workouts.length;
   const displayName = name.replace(/ Workout$/, '');
 
@@ -66,10 +65,14 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             {displayName}
           </h4>
 
-          {/* Workout names */}
-          <p className="text-sm text-white/75 mt-2 leading-relaxed line-clamp-2">
-            {subtitle}
-          </p>
+          {/* Workout name pills */}
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {workouts.map((w, i) => (
+              <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/12 backdrop-blur-sm text-white/85 text-[11px] font-medium tracking-wide">
+                {w.name}
+              </span>
+            ))}
+          </div>
 
           {/* Badge */}
           <div className="mt-3">
