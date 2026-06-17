@@ -339,34 +339,15 @@ export default function Home() {
 
                   <div onClick={() => navigate(`/template/${template.id}`)} className="cursor-pointer">
                     <h4 className="font-bold text-foreground pr-8">{template.name}</h4>
-                    {(() => {
-                      const exercises = template.exerciseList?.length > 0
-                        ? template.exerciseList.map(e => e.name)
-                        : (template.exercises || '').split(',').map(s => s.trim()).filter(Boolean);
-                      const visible = exercises.slice(0, 3);
-                      const overflow = exercises.length - 3;
-                      return (
-                        <>
-                          <div className="flex flex-wrap gap-1 my-2.5">
-                            {visible.map((name, i) => (
-                              <span key={i} className="text-[11px] px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-600/60 dark:text-blue-400/60 font-medium">
-                                {name}
-                              </span>
-                            ))}
-                            {overflow > 0 && (
-                              <span className="text-[11px] px-2 py-0.5 rounded-full text-blue-400/50 dark:text-blue-400/40 font-medium">
-                                +{overflow} more
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs text-muted-foreground flex items-center gap-2">
-                            <span>{estimateDuration(exercises.length)}</span>
-                            <span>·</span>
-                            <span>{template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}</span>
-                          </p>
-                        </>
-                      );
-                    })()}
+                    <p className="text-xs text-muted-foreground mt-1.5 line-clamp-1">
+                      {(template.exerciseList?.length > 0
+                        ? template.exerciseList.map(e => e.name).join(', ')
+                        : (template.exercises || '').split(',').map(s => s.trim()).filter(Boolean).join(', ')
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
+                      ⏱ {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
+                    </p>
                   </div>
 
                   {/* Dropdown menu */}
