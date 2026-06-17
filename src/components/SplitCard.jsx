@@ -68,7 +68,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           {/* Workout name pills */}
           <div className="flex flex-wrap gap-1.5 mt-3">
             {workouts.map((w, i) => (
-              <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/12 backdrop-blur-sm text-white/85 text-[11px] font-medium tracking-wide">
+              <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-[6px] bg-white/18 backdrop-blur-sm text-white/90 text-xs font-semibold tracking-wide">
                 {w.name}
               </span>
             ))}
