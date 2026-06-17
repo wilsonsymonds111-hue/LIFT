@@ -33,28 +33,28 @@ const SPLIT_ACCENTS = {
   'upper-lower': {
     hex: '#2A8FFF',
     tint: 'rgba(30, 100, 220, 0.18)',
-    cardClasses: 'border-blue-400/30 hover:border-blue-400/60 shadow-blue-500/10 ring-blue-400/10',
+    cardClasses: 'border border-blue-400/30 hover:border-blue-500 shadow-blue-500/10 ring-blue-400/10',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-blue-500',
   },
   'push-pull-legs': {
     hex: '#43A047',
     tint: 'rgba(50, 140, 50, 0.18)',
-    cardClasses: 'border-emerald-400/30 hover:border-emerald-400/60 shadow-emerald-500/10 ring-emerald-400/10',
+    cardClasses: 'border border-emerald-400/30 hover:border-emerald-500 shadow-emerald-500/10 ring-emerald-400/10',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-emerald-500',
   },
   'full-body': {
     hex: '#8E24AA',
     tint: 'rgba(120, 30, 150, 0.18)',
-    cardClasses: 'border-purple-400/30 hover:border-purple-400/60 shadow-purple-500/10 ring-purple-400/10',
+    cardClasses: 'border border-purple-400/30 hover:border-purple-500 shadow-purple-500/10 ring-purple-400/10',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-purple-500',
   },
   'ul-ppl': {
     hex: '#F57C00',
     tint: 'rgba(220, 100, 0, 0.18)',
-    cardClasses: 'border-amber-400/30 hover:border-amber-400/60 shadow-amber-500/10 ring-amber-400/10',
+    cardClasses: 'border border-amber-400/30 hover:border-amber-500 shadow-amber-500/10 ring-amber-400/10',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-amber-500',
   },
@@ -318,7 +318,7 @@ export default function Home() {
               {currentSplit.map((template) => (
                 <div
                   key={template.id}
-                  className={`relative bg-card border rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses}`}
+                  className={`relative bg-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses}`}
                 >
                   {/* Three-dot menu button */}
                   <button
