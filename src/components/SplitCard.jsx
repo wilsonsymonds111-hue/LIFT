@@ -36,12 +36,17 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
       <div
         onClick={onCardClick}
         className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden min-h-[160px]"
-        style={{
-          backgroundImage: `url(${bgImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
       >
+        {/* Black & white background image layer */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'grayscale(1)',
+          }}
+        />
         {/* Gradient overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/20" />
         {/* Subtle vignette */}
