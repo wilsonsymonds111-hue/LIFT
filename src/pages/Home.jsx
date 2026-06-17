@@ -29,6 +29,14 @@ const relativeTime = (dateStr) => {
   return `${Math.floor(diffDays / 30)}mo ago`;
 };
 
+const estimateDuration = (exerciseCount) => {
+  const mins = Math.round((exerciseCount * 8) / 5) * 5;
+  if (mins < 60) return `~${mins} min`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m > 0 ? `~${h}h ${m}m` : `~${h}h`;
+};
+
 const SPLIT_ACCENTS = {
   'upper-lower': {
     hex: '#2A8FFF',
@@ -331,17 +339,13 @@ export default function Home() {
 
                   <div onClick={() => navigate(`/template/${template.id}`)} className="cursor-pointer">
                     <h4 className="font-bold text-foreground pr-8">{template.name}</h4>
-                    <div className="flex flex-wrap gap-1.5 my-3">
-                      {(template.exerciseList?.length > 0
-                        ? template.exerciseList.map(e => e.name)
-                        : (template.exercises || '').split(',').map(s => s.trim()).filter(Boolean)
-                      ).map((name, i) => (
-                        <span key={i} className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${accent.tagClasses}`}>
-                          {name}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {(() => {
+                        const count = template.exerciseList?.length || (template.exercises || '').split(',').filter(Boolean).length;
+                        return estimateDuration(count);
+                      })()}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
                       ⏱ {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
                     </p>
                   </div>
