@@ -84,8 +84,9 @@ const SwipeableTabs = () => {
     const otherPath = activeIndex === 0 ? '/splits' : '/';
     const preload = preloadMap[otherPath];
     if (preload) {
-      const id = requestIdleCallback ? requestIdleCallback(preload, { timeout: 2000 }) : setTimeout(preload, 200);
-      return () => (requestIdleCallback ? cancelIdleCallback(id) : clearTimeout(id));
+      const hasRIC = typeof requestIdleCallback === 'function';
+      const id = hasRIC ? requestIdleCallback(preload, { timeout: 2000 }) : setTimeout(preload, 200);
+      return () => (hasRIC ? cancelIdleCallback(id) : clearTimeout(id));
     }
   }, [activeIndex]);
 
@@ -142,8 +143,9 @@ const usePreloadSubPages = () => {
       import('./pages/SplitDetail');
       import('./pages/SupportChat');
     };
-    const id = requestIdleCallback ? requestIdleCallback(preload, { timeout: 5000 }) : setTimeout(preload, 3000);
-    return () => (requestIdleCallback ? cancelIdleCallback(id) : clearTimeout(id));
+    const hasRIC = typeof requestIdleCallback === 'function';
+    const id = hasRIC ? requestIdleCallback(preload, { timeout: 5000 }) : setTimeout(preload, 3000);
+    return () => (hasRIC ? cancelIdleCallback(id) : clearTimeout(id));
   }, []);
 };
 
