@@ -47,10 +47,10 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
           const showDumbbell = isGymDay && !isPast;
 
           let bgClass = '';
-          if (missed) bgClass = 'border border-gray-300 dark:border-gray-600 bg-transparent';
-          else if (noData) bgClass = 'border border-gray-300 dark:border-gray-600 bg-transparent';
-          else if (isGymDay) bgClass = 'bg-blue-500';
-          else bgClass = 'border border-blue-300 dark:border-blue-700 bg-transparent';
+          if (missed) bgClass = 'border border-muted-foreground/30 dark:border-muted-foreground/30 bg-transparent';
+          else if (noData) bgClass = 'border border-muted-foreground/30 dark:border-muted-foreground/30 bg-transparent';
+          else if (isGymDay) bgClass = 'bg-primary';
+          else bgClass = 'border border-primary/30 dark:border-primary/40 bg-transparent';
 
           return (
             <div
@@ -62,7 +62,7 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
               <div
                 className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-150 cursor-pointer ${
                   isToday
-                    ? 'ring-[1.5px] ring-emerald-500 ring-offset-1 ring-offset-background'
+                    ? 'ring-[1.5px] ring-primary ring-offset-1 ring-offset-background'
                     : ''
                 } ${bgClass}`}
               >
@@ -79,7 +79,7 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
       {/* Tooltip */}
       <div className="flex flex-col items-center mt-2">
         {cycleLabel && (
-          <span className="text-[10px] font-semibold text-blue-500 dark:text-blue-400 text-center">
+          <span className="text-[10px] font-semibold text-primary text-center">
             {cycleLabel}
           </span>
         )}

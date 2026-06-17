@@ -301,7 +301,7 @@ export default function Splits() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -321,7 +321,7 @@ export default function Splits() {
             onClick={() => setActiveTab('mine')}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
               activeTab === 'mine'
-                ? 'bg-blue-500 text-white shadow-md'
+                ? 'bg-primary text-primary-foreground shadow-md'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -331,7 +331,7 @@ export default function Splits() {
             onClick={() => setActiveTab('examples')}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
               activeTab === 'examples'
-                ? 'bg-blue-500 text-white shadow-md'
+                ? 'bg-primary text-primary-foreground shadow-md'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -345,7 +345,7 @@ export default function Splits() {
         <div className="px-4">
           <button
             onClick={() => setShowBuilder(true)}
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+            className="w-full bg-primary hover:bg-primary/85 text-primary-foreground font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Create New Split
@@ -410,7 +410,7 @@ export default function Splits() {
               setFrequencyConfirmSplit(menuOpen);
             }}
             disabled={swapping}
-            className="w-full text-left px-4 py-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 transition-colors"
+            className="w-full text-left px-4 py-2 text-sm font-semibold text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
           >
             Make this my current split
           </button>
@@ -616,7 +616,7 @@ export default function Splits() {
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-4">
                   {swapRef.current.oldData?.workouts?.map((w, i) => (
-                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
                       {w.name}
                     </span>
                   ))}
@@ -646,7 +646,7 @@ export default function Splits() {
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-4">
                     {swapRef.current.oldData?.workouts?.map((w, i) => (
-                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
                         {w.name}
                       </span>
                     ))}
@@ -668,7 +668,7 @@ export default function Splits() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 0.25 }}
                       transition={{ duration: 0.6 }}
-                      className="absolute inset-0 bg-emerald-400 rounded-2xl pointer-events-none"
+                      className="absolute inset-0 bg-primary/25 rounded-2xl pointer-events-none"
                     />
                   )}
                   <div className="flex items-start justify-between relative z-10">
@@ -682,7 +682,7 @@ export default function Splits() {
                             initial={{ scale: 0, rotate: -90 }}
                             animate={{ scale: 1, rotate: 0 }}
                             transition={{ type: 'spring', stiffness: 220, damping: 18, delay: 0.1 }}
-                            className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0"
+                            className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0"
                           >
                             <Check className="w-3 h-3 text-white" strokeWidth={3} />
                           </motion.div>
@@ -696,7 +696,7 @@ export default function Splits() {
                           initial={{ opacity: 0, y: 4 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.35, delay: 0.4 }}
-                          className="text-xs font-semibold text-emerald-500 mt-1 relative z-10"
+                          className="text-xs font-semibold text-primary mt-1 relative z-10"
                         >
                           Now your current split
                         </motion.p>
@@ -705,7 +705,7 @@ export default function Splits() {
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-4 relative z-10">
                     {swapRef.current.newData?.workouts?.map((w, i) => (
-                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
                         {w.name}
                       </span>
                     ))}

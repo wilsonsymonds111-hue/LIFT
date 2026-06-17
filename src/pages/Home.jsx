@@ -31,32 +31,32 @@ const relativeTime = (dateStr) => {
 
 const SPLIT_ACCENTS = {
   'upper-lower': {
-    hex: '#2A8FFF',
-    tint: 'rgba(30, 100, 220, 0.18)',
-    cardClasses: 'border border-blue-400/30 hover:border-blue-500 shadow-blue-500/10 ring-blue-400/10',
-    tagClasses: 'bg-muted text-muted-foreground',
-    dotClass: 'bg-blue-500',
+    hex: '#C5A059',
+    tint: 'rgba(197, 160, 89, 0.18)',
+    cardClasses: 'border border-primary/20',
+    tagClasses: 'bg-primary/10 text-primary',
+    dotClass: 'bg-primary',
   },
   'push-pull-legs': {
-    hex: '#43A047',
-    tint: 'rgba(50, 140, 50, 0.18)',
-    cardClasses: 'border border-emerald-400/30 hover:border-emerald-500 shadow-emerald-500/10 ring-emerald-400/10',
-    tagClasses: 'bg-muted text-muted-foreground',
-    dotClass: 'bg-emerald-500',
+    hex: '#C5A059',
+    tint: 'rgba(197, 160, 89, 0.18)',
+    cardClasses: 'border border-primary/20',
+    tagClasses: 'bg-primary/10 text-primary',
+    dotClass: 'bg-primary',
   },
   'full-body': {
-    hex: '#8E24AA',
-    tint: 'rgba(120, 30, 150, 0.18)',
-    cardClasses: 'border border-purple-400/30 hover:border-purple-500 shadow-purple-500/10 ring-purple-400/10',
-    tagClasses: 'bg-muted text-muted-foreground',
-    dotClass: 'bg-purple-500',
+    hex: '#C5A059',
+    tint: 'rgba(197, 160, 89, 0.18)',
+    cardClasses: 'border border-primary/20',
+    tagClasses: 'bg-primary/10 text-primary',
+    dotClass: 'bg-primary',
   },
   'ul-ppl': {
-    hex: '#F57C00',
-    tint: 'rgba(220, 100, 0, 0.18)',
-    cardClasses: 'border border-amber-400/30 hover:border-amber-500 shadow-amber-500/10 ring-amber-400/10',
-    tagClasses: 'bg-muted text-muted-foreground',
-    dotClass: 'bg-amber-500',
+    hex: '#C5A059',
+    tint: 'rgba(197, 160, 89, 0.18)',
+    cardClasses: 'border border-primary/20',
+    tagClasses: 'bg-primary/10 text-primary',
+    dotClass: 'bg-primary',
   },
 };
 
@@ -250,7 +250,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -274,7 +274,7 @@ export default function Home() {
       <div className="px-4 py-4">
         <button
           onClick={() => navigate('/active-workout/empty-' + Date.now())}
-          className="w-full py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200 text-sm"
+          className="w-full py-2 bg-primary hover:bg-primary/85 text-primary-foreground font-semibold rounded-lg transition-all duration-200 text-sm"
         >
           Start an Empty Workout
         </button>
@@ -294,7 +294,7 @@ export default function Home() {
                 <motion.div
                   animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
                   transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-                  className={`w-2 h-2 rounded-full ${accent.dotClass}`}
+                  className="w-2 h-2 rounded-full bg-primary"
                 />
                 <h3 className="font-semibold text-foreground text-sm">Current Split</h3>
               </div>
@@ -318,7 +318,7 @@ export default function Home() {
               {currentSplit.map((template) => (
                 <div
                   key={template.id}
-                  className={`relative bg-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses}`}
+                  className={`workout-card relative bg-card rounded-xl p-4 ${accent.cardClasses}`} style={{ '--hover-accent': accent.hex }}
                 >
                   {/* Three-dot menu button */}
                   <button
@@ -398,7 +398,7 @@ export default function Home() {
                   onClick={handleSyncToCalendar}
                   className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
                 >
-                  <CalendarPlus className={`w-4 h-4 ${accent.dotClass.replace('bg-', 'text-')}`} />
+                  <CalendarPlus className="w-4 h-4 text-primary" />
                   {isApple ? 'Sync to Apple Calendar' : 'Sync to Android Calendar'}
                 </button>
               </div>

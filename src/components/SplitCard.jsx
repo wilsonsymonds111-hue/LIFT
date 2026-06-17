@@ -68,7 +68,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           {/* Workout name pills */}
           <div className="flex flex-wrap gap-1.5 mt-3">
             {workouts.map((w, i) => (
-              <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-[6px] bg-blue-400/25 backdrop-blur-sm text-blue-100 text-xs font-semibold tracking-wide">
+              <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-[6px] bg-primary/30 backdrop-blur-sm text-primary-foreground text-xs font-semibold tracking-wide">
                 {w.name}
               </span>
             ))}
@@ -76,7 +76,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
 
           {/* Badge */}
           <div className="mt-3">
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white text-xs font-semibold tracking-wide">
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/25 backdrop-blur-sm text-white text-xs font-semibold tracking-wide">
               {workoutCount} work{workoutCount !== 1 ? 'outs' : 'out'}
             </span>
           </div>

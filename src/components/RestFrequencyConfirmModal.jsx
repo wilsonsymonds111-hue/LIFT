@@ -92,7 +92,7 @@ export default function RestFrequencyConfirmModal({ splitKey, defaultSchedule, o
             Confirm your rest day cycle before applying
           </p>
 
-          <div className="bg-blue-50 dark:bg-blue-950/20 rounded-xl p-4 mb-4">
+          <div className="bg-primary/10 rounded-xl p-4 mb-4">
             <p className="text-sm font-bold text-foreground text-center">{frequencyLabel}</p>
             <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mt-3 mb-2">Starting on</p>
             <div className="flex justify-center gap-1">
@@ -104,13 +104,13 @@ export default function RestFrequencyConfirmModal({ splitKey, defaultSchedule, o
                   <div
                     key={i}
                     className={`flex flex-col items-center py-1.5 px-2 rounded-lg text-xs font-bold ${
-                      isStart ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30' : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800'
-                    } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
+                      isStart ? 'bg-primary text-white shadow-md shadow-primary/30' : 'bg-white dark:bg-gray-900 border border-primary/20 dark:border-primary/30'
+                    } ${isToday && !isStart ? 'ring-[2px] ring-primary ring-offset-1' : ''}`}
                   >
                     <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{DAY_LABELS[i]}</span>
                     <div className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
                       isGymDay
-                        ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
+                        ? isStart ? 'bg-white/30' : 'bg-primary shadow-sm shadow-primary/30'
                         : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
                     }`}>
                       {isGymDay && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
@@ -130,7 +130,7 @@ export default function RestFrequencyConfirmModal({ splitKey, defaultSchedule, o
             </button>
             <button
               onClick={handleLooksGood}
-              className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white font-semibold text-sm hover:bg-emerald-600 transition"
+              className="flex-1 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary/85 transition"
             >
               Looks Good
             </button>

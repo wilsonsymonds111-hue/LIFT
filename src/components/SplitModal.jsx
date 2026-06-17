@@ -233,7 +233,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
 
           {loading || !split ? (
             <div className="flex items-center justify-center py-20">
-              <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+              <div className="w-8 h-8 border-4 border-gray-200 border-t-primary rounded-full animate-spin" />
             </div>
           ) : (
             <>
@@ -241,7 +241,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
               <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-border">
                 <button
                   onClick={onClose}
-                  className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-blue-500 transition group -ml-2"
+                  className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-primary transition group -ml-2"
                 >
                   <ArrowLeft className="w-5 h-5 text-foreground group-hover:text-white transition" />
                 </button>
@@ -254,8 +254,8 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                     onClick={() => setEditing(e => !e)}
                     className={`w-11 h-11 flex items-center justify-center rounded-full transition text-lg ${
                       editing
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-muted hover:bg-blue-500'
+                        ? 'bg-primary text-white'
+                        : 'bg-muted hover:bg-primary'
                     }`}
                   >
                     😴
@@ -269,7 +269,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
 
               {/* Cycle editor */}
               {editing && (
-                <div className="px-5 py-4 border-b border-border bg-blue-50/50 dark:bg-blue-950/10">
+                <div className="px-5 py-4 border-b border-border bg-primary/5">
                   <p className="text-xs font-semibold text-muted-foreground mb-4 text-center uppercase tracking-wider">
                     Cycle Settings
                   </p>
@@ -284,7 +284,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                         max={6}
                         value={onDays}
                         onChange={(e) => setOnDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
-                        className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full bg-white dark:bg-gray-900 border border-primary/20 dark:border-primary/30 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                     <div className="flex-1">
@@ -295,7 +295,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                         max={6}
                         value={offDays}
                         onChange={(e) => setOffDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
-                        className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full bg-white dark:bg-gray-900 border border-primary/20 dark:border-primary/30 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                   </div>
@@ -320,17 +320,17 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                           onClick={() => setStartDayIndex(i)}
                           className={`flex flex-col items-center flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-150 ${
                             isStart
-                              ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30'
-                              : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 hover:border-blue-400'
-                          } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
+                              ? 'bg-primary text-white shadow-md shadow-primary/30'
+                              : 'bg-white dark:bg-gray-900 border border-primary/20 dark:border-primary/30 hover:border-primary'
+                          } ${isToday && !isStart ? 'ring-[2px] ring-primary ring-offset-1' : ''}`}
                         >
                           <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{DAY_LABELS[i]}</span>
                           <div
                             className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
                               isGymDay
-                                ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
-                                : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
-                            } ${isToday && !isStart ? 'ring-[1.5px] ring-emerald-500 ring-offset-1' : ''}`}
+                                ? isStart ? 'bg-white/30' : 'bg-primary shadow-sm shadow-primary/30'
+                                : isStart ? 'border-2 border-white/40' : 'border-2 border-primary/30 dark:border-primary/30'
+                            } ${isToday && !isStart ? 'ring-[1.5px] ring-primary ring-offset-1' : ''}`}
                           >
                             {isGymDay && <Dumbbell className={`w-2.5 h-2.5 ${isStart ? 'text-white' : 'text-white'}`} strokeWidth={2.5} />}
                           </div>
@@ -345,7 +345,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                       saveCycle(splitKey, { onDays, offDays, startDayIndex });
                       setEditing(false);
                     }}
-                    className="w-full mt-4 py-2 rounded-lg bg-blue-500 text-white text-xs font-bold hover:bg-blue-600 transition"
+                    className="w-full mt-4 py-2 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary/85 transition"
                   >
                     Done
                   </button>
@@ -364,7 +364,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
-                                className={`relative bg-card border border-blue-400/30 rounded-xl p-4 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/10 hover:shadow-xl transition-all duration-150 cursor-pointer ${
+                                className={`relative bg-card border border-primary/20 rounded-xl p-4 shadow-lg shadow-primary/10 ring-1 ring-primary/10 hover:shadow-xl transition-all duration-150 cursor-pointer ${
                                   snapshot.isDragging ? 'shadow-2xl scale-[1.03] z-10' : ''
                                 }`}
                               >
@@ -376,7 +376,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                                   <h4 className="font-bold text-foreground pr-8">{workout.name}</h4>
                                   <div className="flex flex-wrap gap-1.5 my-3">
                                     {(workout.exercises || []).map((e, i) => (
-                                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
+                                      <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
                                         {e.name}
                                       </span>
                                     ))}
@@ -401,7 +401,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                 <button
                   onClick={() => setShowConfirm(true)}
                   disabled={applying}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60"
+                  className="w-full bg-primary hover:bg-primary/85 text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60"
                 >
                   {applying ? 'Applying...' : 'Make This My Current Split'}
                 </button>
@@ -436,15 +436,15 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                             <div
                               key={i}
                               className={`flex flex-col items-center py-1.5 px-2 rounded-lg text-xs font-bold ${
-                                isStart ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30' : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800'
-                              } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
+                                isStart ? 'bg-primary text-white shadow-md shadow-primary/30' : 'bg-white dark:bg-gray-900 border border-primary/20 dark:border-primary/30'
+                              } ${isToday && !isStart ? 'ring-[2px] ring-primary ring-offset-1' : ''}`}
                             >
                               <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{DAY_LABELS[i]}</span>
                               <div
                                 className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
                                   isGymDay
-                                    ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
-                                    : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
+                                    ? isStart ? 'bg-white/30' : 'bg-primary shadow-sm shadow-primary/30'
+                                    : isStart ? 'border-2 border-white/40' : 'border-2 border-primary/30 dark:border-primary/30'
                                 }`}
                               >
                                 {isGymDay && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
@@ -470,7 +470,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                           setShowConfirm(false);
                           handleMakeCurrent();
                         }}
-                        className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white font-semibold text-sm hover:bg-emerald-600 transition"
+                        className="flex-1 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary/85 transition"
                       >
                         Looks Good
                       </button>

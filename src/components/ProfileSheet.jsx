@@ -79,7 +79,7 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark, profileP
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="absolute bottom-0 right-0 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md transition active:scale-95"
+              className="absolute bottom-0 right-0 w-8 h-8 bg-primary hover:bg-primary/85 text-primary-foreground rounded-full flex items-center justify-center shadow-md transition active:scale-95"
             >
               {uploading ? (
                 <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -105,8 +105,8 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark, profileP
           onClick={() => setShowFeedback(true)}
           className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
         >
-          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
-            <MessageSquare className="w-4 h-4 text-blue-500" />
+          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+            <MessageSquare className="w-4 h-4 text-primary" />
           </div>
           <div className="text-left">
             <p className="font-semibold text-foreground text-sm">Feedback & Support</p>
@@ -122,7 +122,7 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark, profileP
           </div>
           <button
             onClick={onToggleDark}
-            className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${darkMode ? 'bg-blue-500' : 'bg-gray-300'}`}
+            className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${darkMode ? 'bg-primary' : 'bg-muted-foreground/30'}`}
           >
             <span
               className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${darkMode ? 'translate-x-6' : 'translate-x-0'}`}

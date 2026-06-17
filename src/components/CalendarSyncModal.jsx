@@ -83,7 +83,7 @@ function CustomTimePicker({ hour, min, onChange }) {
                 onClick={() => handleHourChange(h)}
                 className={`w-full py-2.5 text-center text-lg font-bold snap-center transition-colors ${
                   isSelected
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-primary text-white'
                     : 'text-foreground hover:bg-muted'
                 }`}
               >
@@ -111,7 +111,7 @@ function CustomTimePicker({ hour, min, onChange }) {
                 onClick={() => handleMinChange(m)}
                 className={`w-full py-2.5 text-center text-lg font-bold snap-center transition-colors ${
                   isSelected
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-primary text-white'
                     : 'text-foreground hover:bg-muted'
                 }`}
               >
@@ -130,7 +130,7 @@ function CustomTimePicker({ hour, min, onChange }) {
             onClick={() => handlePeriodToggle(p)}
             className={`px-3 py-3 rounded-xl text-sm font-bold transition-all ${
               period === p
-                ? 'bg-blue-500 text-white shadow-md shadow-blue-500/25'
+                ? 'bg-primary text-white shadow-md shadow-primary/25'
                 : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/70'
             }`}
           >
@@ -188,7 +188,7 @@ export default function CalendarSyncModal({ onClose, onSync }) {
           <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-border">
             <button
               onClick={onClose}
-              className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-blue-500 transition group -ml-2"
+              className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-primary transition group -ml-2"
             >
               <ArrowLeft className="w-5 h-5 text-foreground group-hover:text-white transition" />
             </button>
@@ -213,7 +213,7 @@ export default function CalendarSyncModal({ onClose, onSync }) {
                     onClick={() => { setSelectedHour(preset.hour); setIsCustom(false); }}
                     className={`py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-150 ${
                       isActive
-                        ? 'bg-blue-500 text-white shadow-md shadow-blue-500/25'
+                        ? 'bg-primary text-white shadow-md shadow-primary/25'
                         : 'bg-muted text-foreground hover:bg-muted/70'
                     }`}
                   >
@@ -231,7 +231,7 @@ export default function CalendarSyncModal({ onClose, onSync }) {
               onClick={() => { setIsCustom(!isCustom); setSelectedHour(null); }}
               className={`w-full py-3 rounded-xl text-sm font-semibold transition-all duration-150 mb-3 ${
                 isCustom
-                  ? 'bg-blue-500 text-white shadow-md shadow-blue-500/25'
+                  ? 'bg-primary text-white shadow-md shadow-primary/25'
                   : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/70'
               }`}
             >
@@ -252,7 +252,7 @@ export default function CalendarSyncModal({ onClose, onSync }) {
             <button
               onClick={handleConfirm}
               disabled={selectedHour == null && !isCustom}
-              className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl text-sm transition flex items-center justify-center gap-2"
+              className="w-full bg-primary hover:bg-primary/85 disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl text-sm transition flex items-center justify-center gap-2"
             >
               <Clock className="w-4 h-4" />
               Sync to Calendar
