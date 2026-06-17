@@ -17,16 +17,21 @@ function getTooltipText(status, isPast, isToday, isNoData) {
 function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
-  const [activeDay, setActiveDay] = useState(todayMonSun);
+
+  // Rotate so today is first
+  const rotatedSchedule = [...schedule.slice(todayMonSun), ...schedule.slice(0, todayMonSun)];
+  const rotatedLabels = [...DAY_LETTERS.slice(todayMonSun), ...DAY_LETTERS.slice(0, todayMonSun)];
+
+  const [activeDay, setActiveDay] = useState(0);
 
   return (
     <div className="px-4 pb-2">
       {/* Day labels */}
       <div className="flex justify-between mb-1 px-0.5">
-        {DAY_LETTERS.map((letter, i) => (
+        {rotatedLabels.map((letter, i) => (
           <span
             key={i}
-            className="text-[10px] font-semibold w-5 text-center text-muted-foreground"
+            className={`text-[10px] font-semibold w-5 text-center ${i === 0 ? 'text-foreground' : 'text-muted-foreground'}`}
           >
             {letter}
           </span>
@@ -35,15 +40,16 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
 
       {/* Circles row */}
       <div className="flex justify-between px-0.5">
-        {schedule.map((status, i) => {
-          const isToday = i === todayMonSun;
+        {rotatedSchedule.map((status, i) => {
+          const origIdx = (todayMonSun + i) % 7;
+          const isToday = i === 0;
           const isGymDay = status >= 1;
           const isCompleted = status === 2;
-          const isPast = i < todayMonSun;
-          const beforeSplitStart = isPast && i < startDayIndex;
-          const noData = beforeSplitStart;
-          const missed = isPast && isGymDay && !isCompleted && !beforeSplitStart;
-          const showCheck = isPast && isGymDay && isCompleted;
+          const isPast = i < 0; // no past days in rotated view — today is always first
+          const beforeSplitStart = origIdx < startDayIndex && origIdx < todayMonSun;
+          const noData = false;
+          const missed = false;
+          const showCheck = false;
           const showDumbbell = isGymDay && !isPast;
 
           let bgClass = '';
@@ -57,7 +63,7 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
               key={i}
               className="flex items-center w-5 justify-center"
               onMouseEnter={() => setActiveDay(i)}
-              onMouseLeave={() => setActiveDay(todayMonSun)}
+              onMouseLeave={() => setActiveDay(0)}
             >
               <div
                 className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-150 cursor-pointer ${
@@ -84,7 +90,14 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
           </span>
         )}
         <span className="text-[11px] font-medium text-muted-foreground text-center min-h-[16px]">
-          {getTooltipText(schedule[activeDay], activeDay < todayMonSun, activeDay === todayMonSun, activeDay < todayMonSun && activeDay < startDayIndex)}
+          {(() => {
+            const origIdx = (todayMonSun + activeDay) % 7;
+            const s = schedule[origIdx];
+            const isPast = activeDay < 0;
+            const isToday = activeDay === 0;
+            const noData = origIdx < startDayIndex && origIdx < todayMonSun;
+            return getTooltipText(s, isPast, isToday, noData);
+          })()}
         </span>
       </div>
     </div>
