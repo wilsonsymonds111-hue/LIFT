@@ -326,7 +326,7 @@ export default function Home() {
               {currentSplit.map((template) => (
                 <div
                   key={template.id}
-                  className={`relative bg-card rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-150 ${accent.cardClasses}`}
+                  className={`relative bg-card rounded-xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses}`}
                 >
                   {/* Three-dot menu button */}
                   <button
