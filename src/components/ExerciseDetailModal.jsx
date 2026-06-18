@@ -76,6 +76,22 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
   const maxKg = history.length > 0 ? Math.max(...history.map(h => h.kg || 0)) : 0;
   const isPR = latest && (latest.kg > 0) && (latest.kg >= maxKg);
 
+  // Compute stats
+  const stats = history.length > 0
+    ? (() => {
+        const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
+        const reps = history.map(h => h.reps || 0);
+        return {
+          sessions: history.length,
+          best: isBodyweight ? Math.max(...reps) + ' reps' : Math.max(...kgs) + ' kg',
+          avg: isBodyweight
+            ? Math.round(reps.reduce((a, b) => a + b, 0) / reps.length) + ' reps'
+            : Math.round(kgs.reduce((a, b) => a + b, 0) / kgs.length) + ' kg',
+          totalSets: history.length,
+        };
+      })()
+    : null;
+
   const tabs = ['Charts', 'About'];
 
   const parseInstructions = (text) => {
@@ -180,6 +196,20 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                     </p>
                   )}
                   <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} />
+                  {stats && (
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { label: 'Sessions', value: stats.sessions },
+                        { label: 'Best', value: stats.best },
+                        { label: isBodyweight ? 'Avg Reps' : 'Avg Weight', value: stats.avg },
+                      ].map(s => (
+                        <div key={s.label} className="bg-muted/60 rounded-xl px-3 py-3 text-center">
+                          <p className="text-xl font-extrabold text-foreground">{s.value}</p>
+                          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-0.5">{s.label}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </>
               ) : (
                 <p className="text-center text-muted-foreground py-12">No workout history yet. Start a workout to see your progress!</p>
