@@ -37,8 +37,8 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     }
   }, [animKey]);
 
-  const { data, yTicks, yMin, yMax, yStep, lastRealIdx } = useMemo(() => {
-    if (!history || history.length === 0) return null;
+  const result = useMemo(() => {
+    if (!history || history.length === 0) return { empty: true };
     const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
     const realPoints = history.map(toPoint);
     const lastPoint = realPoints[realPoints.length - 1];
@@ -112,7 +112,8 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     return { data: d, yTicks: ticks, yMin: tMin, yMax: tMax, yStep: tStep, lastRealIdx: idx };
   }, [history, isBodyweight]);
 
-  if (!data) return null;
+  if (result.empty) return null;
+  const { data, yTicks, yMin, yMax, yStep, lastRealIdx } = result;
 
   const StaticDot = (props) => {
     const { cx, cy, value } = props;
