@@ -55,7 +55,7 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
   const formatDateShort = (dateStr) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
-    return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { month: 'short' });
   };
 
   const data = realPoints.map((p, i) => ({
@@ -65,8 +65,9 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
     valStatic: i < lastRealIdx ? getValue(p) : null,
     valNew: i >= lastRealIdx - 1 ? getValue(p) : null,
     projVal: i === lastRealIdx ? getValue(p) : null,
+    kg: p.kg,
+    reps: p.reps,
   }));
-  const nextSeshLabel = formatDateShort(realPoints[lastRealIdx]?.date);
   data.push({
     session: realPoints.length + 1,
     date: null,
@@ -110,28 +111,20 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
     return <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.6} stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.7} />;
   };
 
-  const PRCallout = (props) => {
-    const { viewBox, index } = props;
-    if (index !== lastRealIdx) return null;
-    const pt = realPoints[lastRealIdx];
-    const label = isBodyweight ? `${pt.reps} reps` : `${pt.kg} kg × ${pt.reps} reps`;
-    return (
-      <g transform={`translate(${viewBox.x}, ${viewBox.y})`}>
-        <rect x={-30} y={-32} width={60} height={24} rx={8} fill="#1e40af" />
-        <text x={0} y={-15} textAnchor="middle" fill="#fff" fontSize={10} fontWeight={700}>{label}</text>
-      </g>
-    );
-  };
+
 
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload;
-    const val = d?.projected ? d.projVal : (d?.valNew ?? d?.valStatic);
+    if (d?.projected) return null;
+    const val = d?.valNew ?? d?.valStatic;
     if (val == null) return null;
+    const label = isBodyweight
+      ? `${d.reps} reps`
+      : `${d.kg} kg × ${d.reps} reps`;
     return (
-      <div className={`text-xs px-2 py-1.5 rounded-lg shadow font-semibold flex flex-col gap-0.5 ${d?.projected ? 'bg-purple-50 text-purple-400 border border-purple-100' : 'bg-white text-gray-700 border border-gray-100'}`}>
-        <span>{d?.projected ? 'Next: ' : ''}{isBodyweight ? `${val} reps` : `${val} kg`}</span>
-        {d?.dateShort && <span className="text-[10px] font-normal text-gray-400">{d.dateShort}</span>}
+      <div className="bg-white text-gray-800 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold whitespace-nowrap">
+        {label}
       </div>
     );
   };
@@ -150,7 +143,7 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
-          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={false} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" label={<PRCallout />} />
+          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
           <Line type="monotone" dataKey="projVal" stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={<GhostDot />} activeDot={false} connectNulls={true} isAnimationActive={false} />
         </LineChart>
       </ResponsiveContainer>
