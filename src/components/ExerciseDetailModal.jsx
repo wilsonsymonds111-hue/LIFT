@@ -275,12 +275,13 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                       </button>
                     </div>
                   </div>
-                  {chartView === 'reps' && repsWeightLevel && repsHistory.length > 0 && (
-                    <p className="text-center text-xs font-medium text-muted-foreground">
-                      Progressing reps at <span className="font-bold text-foreground">{repsWeightLevel} kg</span>
-                    </p>
-                  )}
-                  <ProgressGraph history={chartData} animKey={`${chartView}-${history.length}`} animDir="add" isBodyweight={chartIsBodyweight} />
+                  <ProgressGraph
+                    history={chartData}
+                    animKey={`${chartView}-${history.length}`}
+                    animDir="add"
+                    isBodyweight={chartIsBodyweight}
+                    labelOverride={chartView === 'reps' && repsWeightLevel ? `Reps Progress within ${repsWeightLevel} kg` : null}
+                  />
                   {stats && (
                     <div className="grid grid-cols-4 gap-1.5">
                       {[

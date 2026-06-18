@@ -25,7 +25,7 @@ const punchDotStyle = `
   .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
 `;
 
-export default function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel }) {
+export default function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride }) {
   const [freshAnim, setFreshAnim] = useState(false);
   const prevAnimKeyRef = useRef(animKey);
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
       <style>{punchDotStyle}</style>
       {!hideLabel && (
         <p className="text-xs font-bold text-blue-500 uppercase tracking-wider text-center mb-2">
-          {isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)'}
+          {labelOverride || (isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)')}
         </p>
       )}
       <ResponsiveContainer width="100%" height={200}>
