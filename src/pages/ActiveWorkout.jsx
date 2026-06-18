@@ -31,10 +31,14 @@ export default function ActiveWorkout() {
       if (!best) return ex;
       return { ...ex, history: [...(ex.history || []), { kg: best.kg, reps: best.reps, date: today }] };
     });
-    await base44.entities.WorkoutTemplate.update(templateId, {
-      exerciseList: newList,
-      lastPerformed: new Date().toISOString(),
-    });
+    try {
+      await base44.entities.WorkoutTemplate.update(templateId, {
+        exerciseList: newList,
+        lastPerformed: new Date().toISOString(),
+      });
+    } catch (e) {
+      console.error('Failed to save workout:', e);
+    }
   };
 
   if (loading) {

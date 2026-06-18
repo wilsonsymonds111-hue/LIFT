@@ -101,11 +101,11 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   const handleToggle = () => {
     const next = !done;
     setDone(next);
-    if (next && reps) {
+    if (next) {
       if (navigator.vibrate) navigator.vibrate(15);
       playTick();
-      onComplete?.({ kg: kg !== '' ? parseFloat(kg) : 0, reps: parseInt(reps) });
-    } else if (!next) {
+      onComplete?.({ kg: kg !== '' ? parseFloat(kg) : 0, reps: reps !== '' ? parseInt(reps) : 0 });
+    } else {
       onComplete?.(null);
     }
   };
@@ -774,7 +774,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     setBestSets(snapshot);
     setPrs(computedPrs);
     setFinishTimer(timer);
-    await onSaveHistory?.(template.id, snapshot, exercises);
+    try {
+      await onSaveHistory?.(template.id, snapshot, exercises);
+    } catch (e) {
+      console.error('Save failed:', e);
+    }
     setShowSummary(true);
   };
 
