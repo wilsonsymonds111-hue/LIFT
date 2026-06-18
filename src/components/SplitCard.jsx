@@ -66,7 +66,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           )}
 
           {/* Split name */}
-          <h4 className="font-extrabold text-white text-lg uppercase tracking-wider pr-6">
+          <h4 className="font-extrabold text-white text-sm uppercase tracking-wider pr-6 leading-tight">
             {displayName}
           </h4>
 
