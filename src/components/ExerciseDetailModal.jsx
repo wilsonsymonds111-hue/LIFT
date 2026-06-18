@@ -191,9 +191,15 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                         { label: 'Sessions', value: stats.sessions },
                         { label: 'Best', value: stats.best },
                       ].map(s => (
-                        <div key={s.label} className="bg-muted/60 rounded-xl px-3 py-2.5 text-center">
-                          <p className="text-sm font-semibold text-foreground">{s.value}</p>
-                          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">{s.label}</p>
+                        <div
+                          key={s.label}
+                          className={s.label === 'Best'
+                            ? 'rounded-xl px-3 py-2.5 text-center bg-gradient-to-br from-amber-400 to-amber-500 shadow-md'
+                            : 'bg-muted/60 rounded-xl px-3 py-2.5 text-center'
+                          }
+                        >
+                          <p className={`text-sm font-semibold ${s.label === 'Best' ? 'text-white' : 'text-foreground'}`}>{s.value}</p>
+                          <p className={`text-[10px] font-medium uppercase tracking-wider mt-0.5 ${s.label === 'Best' ? 'text-amber-100' : 'text-muted-foreground'}`}>{s.label}</p>
                         </div>
                       ))}
                     </div>
