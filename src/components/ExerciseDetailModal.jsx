@@ -97,6 +97,10 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
   const chartData = chartView === 'reps' ? repsHistory : history;
   const chartIsBodyweight = chartView === 'reps' ? true : isBodyweight;
 
+  // Current weight level for the reps chart
+  const kgVals = history.map(h => h.kg || 0).filter(k => k > 0);
+  const repsWeightLevel = kgVals.length > 0 ? Math.max(...kgVals) : null;
+
   // Compute stats
   const stats = history.length > 0
     ? (() => {
@@ -271,6 +275,11 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                       </button>
                     </div>
                   </div>
+                  {chartView === 'reps' && repsWeightLevel && repsHistory.length > 0 && (
+                    <p className="text-center text-xs font-medium text-muted-foreground">
+                      Progressing reps at <span className="font-bold text-foreground">{repsWeightLevel} kg</span>
+                    </p>
+                  )}
                   <ProgressGraph history={chartData} animKey={`${chartView}-${history.length}`} animDir="add" isBodyweight={chartIsBodyweight} />
                   {stats && (
                     <div className="grid grid-cols-4 gap-1.5">
