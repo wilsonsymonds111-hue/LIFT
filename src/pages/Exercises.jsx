@@ -1,6 +1,7 @@
-import { useState, useMemo, useRef, useCallback } from 'react';
-import { Search } from 'lucide-react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import { Search, GripVertical } from 'lucide-react';
 import { ALL_EXERCISES, MUSCLES, MUSCLE_COLORS } from '../lib/exercises';
+import { base44 } from '@/api/base44Client';
 import ProfileButton from '../components/ProfileButton';
 import ExerciseDetailModal from '../components/ExerciseDetailModal';
 
@@ -12,7 +13,20 @@ export default function Exercises() {
   const [search, setSearch] = useState('');
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selectedExercise, setSelectedExercise] = useState(null);
+  const [usedExercises, setUsedExercises] = useState(new Set());
   const sectionRefs = useRef({});
+
+  useEffect(() => {
+    base44.entities.WorkoutTemplate.list('sort_order', 200).then(results => {
+      const used = new Set();
+      (results || []).forEach(t => {
+        (t.exerciseList || []).forEach(e => {
+          if (e.history?.length > 0) used.add(e.name);
+        });
+      });
+      setUsedExercises(used);
+    });
+  }, []);
 
   const filtered = useMemo(() => {
     return ALL_EXERCISES.filter(ex => {
@@ -104,7 +118,12 @@ export default function Exercises() {
 
                     {/* Name + muscle */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground">{ex.name}</p>
+                      <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                        {ex.name}
+                        {usedExercises.has(ex.name) && (
+                          <GripVertical className="w-3 h-3 text-blue-400 flex-shrink-0" />
+                        )}
+                      </p>
                       <p className="text-xs text-muted-foreground mt-0.5">{ex.muscle}</p>
                     </div>
                   </div>
