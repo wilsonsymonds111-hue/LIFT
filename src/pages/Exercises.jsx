@@ -129,7 +129,7 @@ export default function Exercises() {
                   <div
                     key={ex.name}
                     onClick={() => setSelectedExercise(ex)}
-                    className="flex items-center gap-3 py-2.5 border-b border-border/50 cursor-pointer active:bg-muted/50 transition"
+                    className="flex items-center gap-3 py-2.5 border-b border-border/50 cursor-pointer active:bg-muted/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
                   >
                     {/* Letter avatar */}
                     <div className={`w-9 h-9 rounded-lg ${colors.bg} flex items-center justify-center flex-shrink-0`}>
