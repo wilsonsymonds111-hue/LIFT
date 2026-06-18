@@ -81,16 +81,28 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
     }
   });
 
+  // Calculate weight progression rate for projections
+  const kgValues = realPoints.map(p => p.kg || 0).filter(k => k > 0);
+  let weightRate = 2.5; // default: 2.5 kg/session
+  if (kgValues.length >= 2) {
+    const rawRate = (kgValues[kgValues.length - 1] - kgValues[0]) / (kgValues.length - 1);
+    weightRate = rawRate > 0 ? rawRate : 2.5;
+  }
+  const snapTo2_5 = (v) => Math.round(v / 2.5) * 2.5;
+
   // Generate 6 AI-projected future data points
   const projectionCount = 6;
   for (let i = 1; i <= projectionCount; i++) {
+    const projVal = isBodyweight
+      ? lastPoint.reps + i
+      : snapTo2_5(lastPoint.kg + weightRate * i);
     data.push({
       session: realPoints.length + i,
       date: null,
       dateShort: '',
       valStatic: null,
       valNew: null,
-      projVal: isBodyweight ? lastPoint.reps + i : lastPoint.kg,
+      projVal,
       projected: true,
     });
   }
