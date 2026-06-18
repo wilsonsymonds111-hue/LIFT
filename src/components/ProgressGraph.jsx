@@ -137,7 +137,7 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
           {isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)'}
         </p>
       )}
-      <ResponsiveContainer width="100%" height={280}>
+      <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
           <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
