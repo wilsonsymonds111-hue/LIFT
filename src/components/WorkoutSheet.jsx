@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { History, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -188,7 +188,32 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
 const graphFadeStyle = `@keyframes graphFadeIn { from { opacity: 0.3; transform: scaleY(0.96); } to { opacity: 1; transform: scaleY(1); } }`;
 
 const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise }) {
-  const [sets, setSets] = useState([{ id: 1 }]);
+  // Compute PR from exercise history for progression targets
+  const pr = useMemo(() => {
+    const history = exercise.history || [];
+    if (history.length === 0) return null;
+    const toKg = (h) => typeof h === 'object' ? (h.kg || 0) : (h || 0);
+    const toReps = (h) => typeof h === 'object' ? (h.reps || 8) : 8;
+    const isBodyweight = history.every(h => toKg(h) === 0);
+    if (isBodyweight) {
+      const maxReps = Math.max(...history.map(toReps));
+      return { kg: 0, reps: maxReps, bodyweight: true };
+    }
+    const maxKg = Math.max(...history.map(toKg));
+    const entriesAtMaxKg = history.filter(h => toKg(h) === maxKg);
+    const maxReps = Math.max(...entriesAtMaxKg.map(toReps));
+    return { kg: maxKg, reps: maxReps, bodyweight: false };
+  }, [exercise.history]);
+
+  const [sets, setSets] = useState(() => {
+    const setCount = Math.max(1, exercise.sets || 1);
+    if (!pr) return Array.from({ length: setCount }, (_, i) => ({ id: i + 1, suggestedKg: null, suggestedReps: null }));
+    return Array.from({ length: setCount }, (_, i) => ({
+      id: i + 1,
+      suggestedKg: pr.bodyweight ? null : pr.kg,
+      suggestedReps: pr.reps + i + 1,
+    }));
+  });
   const [completedSets, setCompletedSets] = useState({});
   const [showMenu, setShowMenu] = useState(false);
   const [note, setNote] = useState('');
@@ -343,8 +368,21 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
         <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg ?? (i === 0 && prev ? prev.kg : null)} initialReps={s.suggestedReps ?? (i === 0 && prev ? prev.reps + 1 : null)} restDuration={restEnabled ? restDuration : 0}
           onComplete={(result) => {
+            const setIndex = sets.findIndex(r => r.id === s.id);
             setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
-            if (result) onBestSet?.(exercise.name, result.kg, result.reps);
+            if (result) {
+              onBestSet?.(exercise.name, result.kg, result.reps);
+              // Dynamic progression: if current set failed its target, adjust the next set
+              const currentSet = sets[setIndex];
+              const targetReps = currentSet.suggestedReps;
+              const achieved = targetReps != null && result.reps >= targetReps;
+              if (!achieved && setIndex < sets.length - 1 && targetReps != null) {
+                setSets(prev => prev.map((r, i) => {
+                  if (i <= setIndex) return r;
+                  return { ...r, suggestedReps: targetReps };
+                }));
+              }
+            }
           }}
           onDelete={() => {
             setSets(p => p.filter(r => r.id !== s.id));
@@ -354,21 +392,23 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       ))}
       <button
         onClick={() => {
-          // Prefer last completed set in this session, then fall back to history
           const sessionCompleted = Object.values(completedSets).filter(Boolean);
           let suggestedKg = null, suggestedReps = null;
           if (sessionCompleted.length > 0) {
             const last = sessionCompleted[sessionCompleted.length - 1];
             suggestedKg = last.kg;
-            suggestedReps = last.reps;
+            suggestedReps = last.reps + 1;
+          } else if (pr) {
+            suggestedKg = pr.bodyweight ? null : pr.kg;
+            suggestedReps = pr.reps + sets.length + 1;
           } else {
             const lastEntry = exercise.history?.[exercise.history.length - 1];
             if (lastEntry) {
               suggestedKg = typeof lastEntry === 'object' ? lastEntry.kg : lastEntry;
-              suggestedReps = typeof lastEntry === 'object' ? lastEntry.reps : 8;
+              suggestedReps = (typeof lastEntry === 'object' ? lastEntry.reps : 8) + 1;
             }
           }
-          setSets(p => [...p, { id: Date.now(), suggestedKg, suggestedReps: suggestedReps != null ? suggestedReps + 1 : null }]);
+          setSets(p => [...p, { id: Date.now(), suggestedKg, suggestedReps }]);
         }}
         className="mt-2 w-full py-1.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
       >
@@ -929,7 +969,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                         <Draggable key={exercise.name + idx} draggableId={exercise.name + idx} index={idx}>
                           {(p) => (
                             <div ref={p.innerRef} {...p.draggableProps}>
-                              <ExerciseSection exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} onDeleteExercise={() => setExercises(prev => prev.filter((_, i) => i !== idx))} />
+                              <ExerciseSection key={`${exercise.name}-${(exercise.history || []).length}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} onDeleteExercise={() => setExercises(prev => prev.filter((_, i) => i !== idx))} />
                             </div>
                           )}
                         </Draggable>
