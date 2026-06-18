@@ -116,7 +116,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
               onClick={() => setTab(t)}
               className={`flex-1 pb-3 pt-1 text-sm font-semibold transition-colors ${
                 tab === t
-                  ? 'text-foreground border-b-2 border-amber-500 -mb-[1px]'
+                  ? 'text-foreground border-b-2 border-blue-500 -mb-[1px]'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -133,7 +133,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
               {/* Image */}
               {loadingDetail ? (
                 <div className="w-full aspect-video bg-muted rounded-2xl flex items-center justify-center">
-                  <div className="w-8 h-8 border-4 border-gray-200 border-t-amber-500 rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
                 </div>
               ) : detail?.image_url ? (
                 <div className="relative w-full aspect-video bg-muted rounded-2xl overflow-hidden">
@@ -180,7 +180,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
             <div className="space-y-4">
               {loadingHistory ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="w-8 h-8 border-4 border-gray-200 border-t-amber-500 rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
                 </div>
               ) : history.length > 0 ? (
                 <>
