@@ -14,13 +14,17 @@ function getTooltipText(status, isPast, isToday, isNoData) {
   return 'Workout day ahead 💪';
 }
 
-function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
+function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [] }) {
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
 
   // Rotate so today is first
   const rotatedSchedule = [...schedule.slice(todayMonSun), ...schedule.slice(0, todayMonSun)];
   const rotatedLabels = [...DAY_LETTERS.slice(todayMonSun), ...DAY_LETTERS.slice(0, todayMonSun)];
+  const rawWorkoutNames = workoutNames || [];
+  const rotatedNames = rawWorkoutNames.length > 0
+    ? [...rawWorkoutNames.slice(todayMonSun), ...rawWorkoutNames.slice(0, todayMonSun)]
+    : [];
 
   const [activeDay, setActiveDay] = useState(0);
 
@@ -44,13 +48,11 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
           const origIdx = (todayMonSun + i) % 7;
           const isToday = i === 0;
           const isGymDay = status >= 1;
-          const isCompleted = status === 2;
-          const isPast = i < 0; // no past days in rotated view — today is always first
           const beforeSplitStart = origIdx < startDayIndex && origIdx < todayMonSun;
           const noData = false;
           const missed = false;
           const showCheck = false;
-          const showDumbbell = isGymDay && !isPast;
+          const showDumbbell = isGymDay;
 
           let bgClass = '';
           if (missed) bgClass = 'border border-gray-300 dark:border-gray-600 bg-transparent';
@@ -61,7 +63,7 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
           return (
             <div
               key={i}
-              className="flex items-center w-5 justify-center"
+              className="flex flex-col items-center w-5"
               onMouseEnter={() => setActiveDay(i)}
               onMouseLeave={() => setActiveDay(0)}
             >
@@ -77,6 +79,14 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0 }) {
                 {noData && <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 leading-none">—</span>}
                 {showDumbbell && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
               </div>
+              {/* Workout name beneath */}
+              <span
+                className={`text-[9px] font-semibold mt-1 leading-tight text-center whitespace-nowrap max-w-[48px] truncate ${
+                  isToday ? 'text-blue-500 dark:text-blue-400' : 'text-muted-foreground'
+                }`}
+              >
+                {rotatedNames[i] || (isGymDay ? '' : 'Rest')}
+              </span>
             </div>
           );
         })}

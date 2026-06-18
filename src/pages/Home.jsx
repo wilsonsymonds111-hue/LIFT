@@ -140,7 +140,7 @@ export default function Home() {
   };
 
   // --- Split categorization ---
-  const { currentSplit, currentSplitName, splitDetection } = useMemo(() => {
+  const { currentSplit, currentSplitName, splitDetection, dayWorkoutNames, todayWorkoutIndex } = useMemo(() => {
     const hasActive = templates.some(t => t.isActiveSplit === true);
     const split = hasActive
       ? templates.filter(t => t.isActiveSplit === true)
@@ -150,50 +150,43 @@ export default function Home() {
       ? [...new Set(split.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')))].join(' / ').toUpperCase()
       : '';
 
-    const resolveSchedule = (key) => {
-      const defaultSchedule = EXAMPLE_SPLITS_DATA[key]?.schedule;
+    const resolveSchedule = (key, workoutCount) => {
       const todayIndex = new Date().getDay();
       const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
+      let onDays, offDays, startDayIndex;
       try {
         const cycleRaw = localStorage.getItem(`splitCycle_${key}`);
         if (cycleRaw) {
-          const { onDays, offDays, startDayIndex } = JSON.parse(cycleRaw);
-          const cycleLength = onDays + offDays;
-          const schedule = [];
-          for (let i = 0; i < 7; i++) {
-            const pos = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
-            schedule.push(pos < onDays ? 1 : 0);
+          const parsed = JSON.parse(cycleRaw);
+          onDays = parsed.onDays;
+          offDays = parsed.offDays;
+          startDayIndex = parsed.startDayIndex;
+        } else {
+          const raw = localStorage.getItem(`splitSchedule_${key}`);
+          if (raw) {
+            const schedule = JSON.parse(raw);
+            return { schedule, startDayIndex: todayMonSun, onDays: null, offDays: null };
           }
-          return { schedule, startDayIndex };
         }
-        const raw = localStorage.getItem(`splitSchedule_${key}`);
-        if (raw) return { schedule: JSON.parse(raw), startDayIndex: todayMonSun };
       } catch {}
-      if (defaultSchedule) {
-        let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
-        for (let i = 0; i < defaultSchedule.length; i++) {
-          if (defaultSchedule[i] >= 1) { curOn++; if (curOff > maxOff) maxOff = curOff; curOff = 0; }
-          else { curOff++; if (curOn > maxOn) maxOn = curOn; curOn = 0; }
-        }
-        if (curOn > maxOn) maxOn = curOn;
-        if (curOff > maxOff) maxOff = curOff;
-        const onDays = maxOn || 1;
-        const offDays = maxOff || 1;
-        const startDayIndex = todayMonSun;
-        const cycleLength = onDays + offDays;
-        const schedule = [];
-        for (let i = 0; i < 7; i++) {
-          const pos = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
-          schedule.push(pos < onDays ? 1 : 0);
-        }
-        return { schedule, startDayIndex };
+      // Use the actual workout count to determine training days
+      onDays = onDays || Math.max(workoutCount, 1);
+      offDays = offDays || 1;
+      startDayIndex = startDayIndex || todayMonSun;
+      const cycleLength = onDays + offDays;
+      const schedule = [];
+      for (let i = 0; i < 7; i++) {
+        const pos = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
+        schedule.push(pos < onDays ? 1 : 0);
       }
-      return { schedule: defaultSchedule || [], startDayIndex: todayMonSun };
+      return { schedule, startDayIndex, onDays, offDays };
     };
+
+    const sorted = [...split].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
     let detection;
     if (split.length === 0) {
-      detection = { key: 'full-body', ...resolveSchedule('full-body') };
+      detection = { key: 'full-body', ...resolveSchedule('full-body', 0) };
     } else {
       const names = split.map(t => (t.name || '').toLowerCase());
       const hasUpper = names.some(n => n.includes('upper'));
@@ -203,14 +196,33 @@ export default function Home() {
       const hasLegs  = names.some(n => n.includes('legs'));
       const hasFull  = names.some(n => n.includes('full'));
 
-      if (hasFull && !hasUpper && !hasLower) detection = { key: 'full-body', ...resolveSchedule('full-body') };
-      else if (hasUpper && hasLower && hasPush && hasPull && hasLegs) detection = { key: 'ul-ppl', ...resolveSchedule('ul-ppl') };
-      else if (hasPush && hasPull && hasLegs) detection = { key: 'push-pull-legs', ...resolveSchedule('push-pull-legs') };
-      else if (hasUpper && hasLower) detection = { key: 'upper-lower', ...resolveSchedule('upper-lower') };
-      else detection = { key: 'full-body', ...resolveSchedule('full-body') };
+      if (hasFull && !hasUpper && !hasLower) detection = { key: 'full-body', ...resolveSchedule('full-body', split.length) };
+      else if (hasUpper && hasLower && hasPush && hasPull && hasLegs) detection = { key: 'ul-ppl', ...resolveSchedule('ul-ppl', split.length) };
+      else if (hasPush && hasPull && hasLegs) detection = { key: 'push-pull-legs', ...resolveSchedule('push-pull-legs', split.length) };
+      else if (hasUpper && hasLower) detection = { key: 'upper-lower', ...resolveSchedule('upper-lower', split.length) };
+      else detection = { key: 'full-body', ...resolveSchedule('full-body', split.length) };
     }
 
-    return { currentSplit: split, currentSplitName: splitName, splitDetection: detection };
+    // Map workout names to each day of the week (Mon=0 ... Sun=6)
+    const { schedule, startDayIndex, onDays, offDays } = detection;
+    const cycleLength = (onDays || 1) + (offDays || 1);
+    const dayWorkoutNames = schedule.map((on, i) => {
+      if (on && sorted.length > 0) {
+        const dayInCycle = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
+        const workoutIdx = dayInCycle % sorted.length;
+        return sorted[workoutIdx]?.name?.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '') || '';
+      }
+      return null;
+    });
+
+    // Which workout card (by sort_order index) is today's
+    const todayMonSun = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+    const todayInCycle = ((todayMonSun - startDayIndex) % cycleLength + cycleLength) % cycleLength;
+    const todayWorkoutIndex = schedule[todayMonSun] >= 1 && sorted.length > 0
+      ? (todayInCycle % sorted.length)
+      : -1;
+
+    return { currentSplit: sorted, currentSplitName: splitName, splitDetection: detection, dayWorkoutNames, todayWorkoutIndex };
   }, [templates]);
 
   const accent = useMemo(() => SPLIT_ACCENTS[splitDetection.key] || SPLIT_ACCENTS['full-body'], [splitDetection.key]);
@@ -227,33 +239,14 @@ export default function Home() {
   }, []);
 
   const cycleLabel = useMemo(() => {
-    const key = splitDetection.key;
-    const defaultSchedule = EXAMPLE_SPLITS_DATA[key]?.schedule;
-    try {
-      const cycleRaw = localStorage.getItem(`splitCycle_${key}`);
-      if (cycleRaw) {
-        const { onDays, offDays } = JSON.parse(cycleRaw);
-        const onPart = `${onDays} day${onDays !== 1 ? 's' : ''} on`;
-        const offPart = `${offDays} day${offDays !== 1 ? 's' : ''} off`;
-        return `${onPart}, ${offPart}`;
-      }
-    } catch {}
-    if (defaultSchedule) {
-      let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
-      for (let i = 0; i < defaultSchedule.length; i++) {
-        if (defaultSchedule[i] >= 1) { curOn++; if (curOff > maxOff) maxOff = curOff; curOff = 0; }
-        else { curOff++; if (curOn > maxOn) maxOn = curOn; curOn = 0; }
-      }
-      if (curOn > maxOn) maxOn = curOn;
-      if (curOff > maxOff) maxOff = curOff;
-      const onDays = maxOn || 1;
-      const offDays = maxOff || 1;
+    const { onDays, offDays } = splitDetection;
+    if (onDays != null && offDays != null) {
       const onPart = `${onDays} day${onDays !== 1 ? 's' : ''} on`;
       const offPart = `${offDays} day${offDays !== 1 ? 's' : ''} off`;
       return `${onPart}, ${offPart}`;
     }
     return null;
-  }, [splitDetection.key]);
+  }, [splitDetection]);
 
   if (loading) {
     return (
@@ -276,7 +269,7 @@ export default function Home() {
       </div>
 
       {/* Weekly Tracker */}
-      <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} />
+      <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
 
       {/* Quick Start */}
       <div className="px-4 py-4">
@@ -323,10 +316,14 @@ export default function Home() {
 
           {currentSplit.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={GRID_CV}>
-              {currentSplit.map((template) => (
+              {currentSplit.map((template, idx) => {
+                const isTodayCard = idx === todayWorkoutIndex;
+                return (
                 <div
                   key={template.id}
-                  className={`relative bg-card rounded-xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses}`}
+                  className={`relative bg-card rounded-xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses} ${
+                    isTodayCard ? 'ring-2 ring-blue-400/60 shadow-[0_0_16px_rgba(59,130,246,0.35)]' : ''
+                  }`}
                 >
                   {/* Three-dot menu button */}
                   <button
@@ -373,9 +370,10 @@ export default function Home() {
                       );
                     })(),
                     document.body
-                  )}
+                    )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-12 text-muted-foreground">
