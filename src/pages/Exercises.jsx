@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import { ALL_EXERCISES, MUSCLES, MUSCLE_COLORS } from '../lib/exercises';
 import ProfileButton from '../components/ProfileButton';
+import ExerciseDetailModal from '../components/ExerciseDetailModal';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -10,6 +11,7 @@ const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
 export default function Exercises() {
   const [search, setSearch] = useState('');
   const [muscleFilter, setMuscleFilter] = useState('All');
+  const [selectedExercise, setSelectedExercise] = useState(null);
   const sectionRefs = useRef({});
 
   const filtered = useMemo(() => {
@@ -92,7 +94,8 @@ export default function Exercises() {
                 return (
                   <div
                     key={ex.name}
-                    className="flex items-center gap-3 py-2.5 border-b border-border/50"
+                    onClick={() => setSelectedExercise(ex)}
+                    className="flex items-center gap-3 py-2.5 border-b border-border/50 cursor-pointer active:bg-muted/50 transition"
                   >
                     {/* Letter avatar */}
                     <div className={`w-9 h-9 rounded-lg ${colors.bg} flex items-center justify-center flex-shrink-0`}>
@@ -135,7 +138,14 @@ export default function Exercises() {
             })}
           </div>
         )}
-      </div>
-    </div>
-  );
-}
+        </div>
+
+        {selectedExercise && (
+        <ExerciseDetailModal
+        exercise={selectedExercise}
+        onClose={() => setSelectedExercise(null)}
+        />
+        )}
+        </div>
+        );
+        }
