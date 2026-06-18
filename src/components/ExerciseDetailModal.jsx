@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { base44 } from '@/api/base44Client';
 import ProgressGraph from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
@@ -69,13 +68,6 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
   const isBodyweight = allEntries.length > 0
     ? allEntries.every(h => { const kg = h.kg ?? 0; return kg === 0 || kg == null; })
     : false;
-
-  // Volume chart data (kg × reps per session)
-  const volumeData = history.map((h, i) => ({
-    session: i + 1,
-    volume: (h.kg || 0) * (h.reps || 0),
-    date: h.date ? new Date(h.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : null,
-  }));
 
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
 
@@ -188,19 +180,6 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                     </p>
                   )}
                   <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} />
-                  {volumeData.length > 0 && (
-                    <div>
-                      <p className="text-[10px] font-bold text-purple-400 uppercase tracking-widest text-center mb-2">Volume (kg × reps)</p>
-                      <ResponsiveContainer width="100%" height={160}>
-                        <LineChart data={volumeData} margin={{ top: 8, right: 16, left: -20, bottom: 8 }}>
-                          <XAxis dataKey="session" tick={{ fontSize: 9, fill: '#9ca3af' }} />
-                          <YAxis tick={{ fontSize: 9, fill: '#9ca3af' }} />
-                          <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} formatter={(v) => [`${v}`, 'Volume']} />
-                          <Line type="monotone" dataKey="volume" stroke="#8b5cf6" strokeWidth={2} dot={{ r: 3, fill: '#8b5cf6' }} />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                  )}
                 </>
               ) : (
                 <p className="text-center text-muted-foreground py-12">No workout history yet. Start a workout to see your progress!</p>
