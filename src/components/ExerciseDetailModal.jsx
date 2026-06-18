@@ -248,7 +248,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                             ? 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-white overflow-hidden relative border-2 border-dashed border-purple-300'
                             : s.label === 'Best'
                             ? `rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-gradient-to-br from-amber-200/60 to-amber-100/30 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
-                            : 'bg-muted rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center'
+                            : 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-blue-50'
                           }
                         >
                           <p className="text-xs font-semibold relative z-10 text-foreground">{s.value}</p>
