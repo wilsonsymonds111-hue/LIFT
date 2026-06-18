@@ -163,7 +163,16 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload;
-    if (d?.projected) return null;
+    if (d.projected) {
+      const label = isBodyweight
+        ? `Aim for: ${d.projVal} reps`
+        : `Aim for: ${d.projVal} kg`;
+      return (
+        <div className="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold whitespace-nowrap">
+          {label}
+        </div>
+      );
+    }
     const val = d?.valNew ?? d?.valStatic;
     if (val == null) return null;
     const label = isBodyweight
@@ -191,7 +200,7 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
           <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
-          <Line type="monotone" dataKey="projVal" stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={<GhostDot />} activeDot={false} connectNulls={true} isAnimationActive={false} />
+          <Line type="monotone" dataKey="projVal" stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={<GhostDot />} activeDot={{ r: 5, fill: '#a78bfa', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>
