@@ -19,7 +19,7 @@ const SplitDetail = lazy(() => import('./pages/SplitDetail'));
 const SupportChat = lazy(() => import('./pages/SupportChat'));
 const Exercises = lazy(() => import('./pages/Exercises'));
 
-const TABS = ['/', '/splits'];
+const TABS = ['/', '/splits', '/exercises'];
 
 const pageVariants = {
   initial: { x: '100%', opacity: 0 },
@@ -49,7 +49,7 @@ const SlideIn = ({ children }) => (
   </motion.div>
 );
 
-const preloadMap = { '/splits': () => import('./pages/Splits'), '/': () => import('./pages/Home') };
+const preloadMap = { '/splits': () => import('./pages/Splits'), '/': () => import('./pages/Home'), '/exercises': () => import('./pages/Exercises') };
 
 const TAB_STYLES = { touchAction: 'pan-y', contain: 'layout style' };
 
@@ -60,15 +60,15 @@ const SwipeableTabs = () => {
   const constraintsRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Preload the other tab's chunk after initial render
+  // Preload the other tabs' chunks after initial render
   useEffect(() => {
-    const otherPath = activeIndex === 0 ? '/splits' : '/';
-    const preload = preloadMap[otherPath];
-    if (preload) {
-      const hasRIC = typeof requestIdleCallback === 'function';
-      const id = hasRIC ? requestIdleCallback(preload, { timeout: 2000 }) : setTimeout(preload, 200);
-      return () => (hasRIC ? cancelIdleCallback(id) : clearTimeout(id));
-    }
+    const others = TABS.filter((_, i) => i !== activeIndex).map(p => preloadMap[p]).filter(Boolean);
+    if (others.length === 0) return;
+    const hasRIC = typeof requestIdleCallback === 'function';
+    const ids = others.map(preload =>
+      hasRIC ? requestIdleCallback(preload, { timeout: 2000 }) : setTimeout(preload, 200)
+    );
+    return () => ids.forEach(id => hasRIC ? cancelIdleCallback(id) : clearTimeout(id));
   }, [activeIndex]);
 
   const snapToTab = (index) => {
@@ -97,7 +97,7 @@ const SwipeableTabs = () => {
       >
         <div className="flex-shrink-0 w-full overflow-y-auto">
           <Suspense fallback={SUSPENSE_FALLBACK}>
-            {activeIndex === 0 ? <Home key="home" /> : <Splits key="splits" />}
+            {activeIndex === 0 ? <Home key="home" /> : activeIndex === 1 ? <Splits key="splits" /> : <Exercises key="exercises" />}
           </Suspense>
         </div>
       </motion.div>
@@ -123,7 +123,7 @@ const usePreloadSubPages = () => {
 
 const AnimatedRoutes = memo(() => {
   const location = useLocation();
-  const isTabRoute = location.pathname === '/' || location.pathname === '/splits';
+  const isTabRoute = TABS.includes(location.pathname);
   usePreloadSubPages();
   const tabDisplay = useMemo(() => ({ display: isTabRoute ? 'flex' : 'none' }), [isTabRoute]);
 
@@ -145,7 +145,7 @@ const AnimatedRoutes = memo(() => {
                 <Route path="/split/:key" element={<SlideIn><SplitDetail /></SlideIn>} />
                 <Route path="/active-workout/:id" element={<SlideIn><ActiveWorkout /></SlideIn>} />
                 <Route path="/support-chat/:id" element={<SlideIn><SupportChat /></SlideIn>} />
-                <Route path="/exercises" element={<SlideIn><Exercises /></SlideIn>} />
+
                 <Route path="*" element={<SlideIn><PageNotFound /></SlideIn>} />
               </Routes>
             </AnimatePresence>
