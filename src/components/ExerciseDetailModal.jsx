@@ -71,11 +71,6 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
 
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
 
-  // Latest set & PR
-  const latest = history.length > 0 ? history[history.length - 1] : null;
-  const maxKg = history.length > 0 ? Math.max(...history.map(h => h.kg || 0)) : 0;
-  const isPR = latest && (latest.kg > 0) && (latest.kg >= maxKg);
-
   const tabs = ['Charts', 'About'];
 
   const parseInstructions = (text) => {
@@ -116,7 +111,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
         </div>
 
         {/* Tab Content */}
-        <div className="overflow-y-auto px-5 py-4" style={{ minHeight: '320px' }}>
+        <div className="overflow-y-auto px-5 py-4" style={{ minHeight: '380px' }}>
           {/* About Tab */}
           {tab === 'About' && (
             <div className="space-y-4">
@@ -169,20 +164,13 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
           {tab === 'Charts' && (
             <div className="space-y-4">
               {loadingHistory ? (
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-16">
                   <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
                 </div>
               ) : history.length > 0 ? (
-                <>
-                  {latest && (
-                    <p className="text-xs font-semibold text-muted-foreground text-center">
-                      Latest set: {isBodyweight ? '' : `${latest.kg} kg × `}{latest.reps} reps{isPR && !isBodyweight ? <span className="text-yellow-500 ml-1">🏆 PR</span> : ''}
-                    </p>
-                  )}
-                  <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} />
-                </>
+                <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} />
               ) : (
-                <p className="text-center text-muted-foreground py-12">No workout history yet. Start a workout to see your progress!</p>
+                <p className="text-center text-muted-foreground py-16">No workout history yet. Start a workout to see your progress!</p>
               )}
             </div>
           )}
