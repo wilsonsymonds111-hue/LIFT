@@ -237,7 +237,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                   {stats && (
                     <div className="grid grid-cols-4 gap-1.5">
                       {[
-                        { label: 'Start', value: stats.start },
+                        { label: 'Starting Weight', value: stats.start },
                         { label: 'Increase', value: stats.increase },
                         { label: 'Best', value: stats.best },
                         { label: 'AI Target', value: stats.suggestion, isAI: true },
@@ -245,14 +245,14 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                         <div
                           key={s.label}
                           className={s.isAI
-                            ? 'rounded-xl px-1.5 py-2.5 text-center bg-gradient-to-br from-purple-100/70 to-blue-100/50 overflow-hidden relative'
+                            ? 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-gradient-to-br from-purple-100/70 to-blue-100/50 overflow-hidden relative border-2 border-dashed border-purple-300'
                             : s.label === 'Best'
-                            ? `rounded-xl px-1.5 py-2.5 text-center bg-gradient-to-br from-amber-200/60 to-amber-100/30 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
-                            : 'bg-muted rounded-xl px-1.5 py-2.5 text-center'
+                            ? `rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-gradient-to-br from-amber-200/60 to-amber-100/30 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
+                            : 'bg-muted rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center'
                           }
                         >
                           <p className="text-xs font-semibold relative z-10 text-foreground">{s.value}</p>
-                          <p className="text-[9px] font-medium uppercase tracking-wider mt-0.5 relative z-10 text-muted-foreground">{s.label}</p>
+                          <p className="text-[9px] font-medium uppercase tracking-wider mt-0.5 relative z-10 text-muted-foreground text-center">{s.label}</p>
                         </div>
                       ))}
                     </div>
