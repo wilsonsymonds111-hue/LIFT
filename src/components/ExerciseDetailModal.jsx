@@ -174,7 +174,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                 </div>
               ) : detail?.image_url ? (
                 <div className="relative w-full aspect-video bg-muted rounded-2xl overflow-hidden">
-                  <img src={detail.image_url} alt={exercise.name} className="w-full h-full object-cover" />
+                  <img src={detail.image_url} alt={exercise.name} className="w-full h-full object-contain" />
                 </div>
               ) : (
                 <div className={`w-full aspect-video rounded-2xl flex items-center justify-center ${colors.bg}`}>
