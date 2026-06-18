@@ -79,6 +79,11 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
 
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
 
+  // Latest set & PR
+  const latest = history.length > 0 ? history[history.length - 1] : null;
+  const maxKg = history.length > 0 ? Math.max(...history.map(h => h.kg || 0)) : 0;
+  const isPR = latest && (latest.kg > 0) && (latest.kg >= maxKg);
+
   const tabs = ['Charts', 'About'];
 
   const parseInstructions = (text) => {
@@ -177,7 +182,12 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                 </div>
               ) : history.length > 0 ? (
                 <>
-                  <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} hideLabel />
+                  {latest && (
+                    <p className="text-xs font-semibold text-muted-foreground text-center">
+                      Latest set: {isBodyweight ? '' : `${latest.kg} kg × `}{latest.reps} reps{isPR && !isBodyweight ? <span className="text-yellow-500 ml-1">🏆 PR</span> : ''}
+                    </p>
+                  )}
+                  <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} />
                   {volumeData.length > 0 && (
                     <div>
                       <p className="text-[10px] font-bold text-purple-400 uppercase tracking-widest text-center mb-2">Volume (kg × reps)</p>
