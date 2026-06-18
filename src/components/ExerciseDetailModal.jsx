@@ -216,7 +216,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                         <div
                           key={s.label}
                           className={s.label === 'Best'
-                            ? `rounded-xl px-3 py-2.5 text-center bg-muted overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
+                            ? `rounded-xl px-3 py-2.5 text-center bg-gradient-to-br from-amber-200/60 to-amber-100/30 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
                             : 'bg-muted rounded-xl px-3 py-2.5 text-center'
                           }
                         >
