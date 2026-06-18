@@ -107,7 +107,9 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
         const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
         const reps = history.map(h => h.reps || 0);
         const bestKg = Math.max(...kgs);
-        const bestEntry = history.find(h => (h.kg || 0) === bestKg);
+        const bestEntry = history
+          .filter(h => (h.kg || 0) === bestKg)
+          .sort((a, b) => (b.reps || 0) - (a.reps || 0))[0];
         const bestReps = bestEntry?.reps || 0;
         const firstKg = history[0]?.kg || 0;
         const firstReps = history[0]?.reps || 0;
