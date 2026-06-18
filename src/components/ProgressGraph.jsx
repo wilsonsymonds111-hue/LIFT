@@ -72,7 +72,7 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
   // Deduplicate repeated month labels — show each month only once
   let lastShort = null;
   data.forEach(d => {
-    if (d.dateShort && d.dateShort !== 'Next') {
+    if (d.dateShort) {
       if (d.dateShort === lastShort) {
         d.dateShort = '';
       } else {
@@ -81,23 +81,28 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
     }
   });
 
-  data.push({
-    session: realPoints.length + 1,
-    date: null,
-    dateShort: 'Next',
-    valStatic: null,
-    valNew: null,
-    projVal: isBodyweight ? lastPoint.reps + 1 : lastPoint.kg,
-    projected: true,
-  });
+  // Generate 6 AI-projected future data points
+  const projectionCount = 6;
+  for (let i = 1; i <= projectionCount; i++) {
+    data.push({
+      session: realPoints.length + i,
+      date: null,
+      dateShort: '',
+      valStatic: null,
+      valNew: null,
+      projVal: isBodyweight ? lastPoint.reps + i : lastPoint.kg,
+      projected: true,
+    });
+  }
 
   // Compute nice evenly-spaced Y-axis ticks
   const allVals = data
     .filter(d => !d.projected)
     .map(d => d.valNew ?? d.valStatic)
     .filter(v => v != null);
-  const projV = data.find(d => d.projected)?.projVal;
-  if (projV != null) allVals.push(projV);
+  data.filter(d => d.projected).forEach(d => {
+    if (d.projVal != null) allVals.push(d.projVal);
+  });
   const yMin = Math.floor(Math.min(...allVals));
   const yMax = Math.ceil(Math.max(...allVals));
   const yRange = yMax - yMin || 1;
