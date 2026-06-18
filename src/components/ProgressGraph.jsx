@@ -103,10 +103,24 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
   data.filter(d => d.projected).forEach(d => {
     if (d.projVal != null) allVals.push(d.projVal);
   });
-  const yMin = Math.floor(Math.min(...allVals));
-  const yMax = Math.ceil(Math.max(...allVals));
-  const yRange = yMax - yMin || 1;
-  const yStep = Math.max(1, Math.round(yRange / 4));
+  const rawMin = Math.min(...allVals);
+  const rawMax = Math.max(...allVals);
+  let yMin, yMax, yStep;
+
+  if (isBodyweight) {
+    // Reps chart: use integer increments
+    yMin = Math.floor(rawMin);
+    yMax = Math.ceil(rawMax);
+    const yRange = yMax - yMin || 1;
+    yStep = Math.max(1, Math.round(yRange / 4));
+  } else {
+    // Weight chart: snap to 5, 10, or 20 kg increments
+    const roughStep = (rawMax - rawMin) / 4;
+    yStep = [5, 10, 20].reduce((best, s) => Math.abs(s - roughStep) < Math.abs(best - roughStep) ? s : best, 5);
+    yMin = Math.floor(rawMin / yStep) * yStep;
+    yMax = Math.ceil(rawMax / yStep) * yStep;
+  }
+
   const yTicks = [];
   for (let i = yMin; i <= yMax; i += yStep) yTicks.push(i);
   if (yTicks[yTicks.length - 1] < yMax) yTicks.push(yMax);
