@@ -12,25 +12,26 @@ import confetti from 'canvas-confetti';
 /* ─── Sound Effect ──────────────────────────────────────────── */
 const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/ecebf8262_ScreenRecording_06-16-202607-45-53_12.mp3';
 
-// Fetch + decode once. Playing a decoded AudioBuffer bypasses seek latency.
+// Lazy-init — create AudioContext on first user interaction to avoid suspended state
 let _decodedBufPromise = null;
 let _ctx = null;
 let _soundEnabled = true;        // gate: respects hardware silent switch
 let _silentDetected = false;     // cache detection result
 let _detectionRan = false;
 
-function _loadBuf() {
-  try {
-    _ctx = new (window.AudioContext || window.webkitAudioContext)();
-    _decodedBufPromise = fetch(SET_COMPLETE_SOUND)
-      .then(r => r.arrayBuffer())
-      .then(buf => _ctx.decodeAudioData(buf))
-      .catch(() => null);
-  } catch (_) {
-    _decodedBufPromise = Promise.resolve(null);
+function _ensureCtx() {
+  if (!_ctx) {
+    try {
+      _ctx = new (window.AudioContext || window.webkitAudioContext)();
+      _decodedBufPromise = fetch(SET_COMPLETE_SOUND)
+        .then(r => r.arrayBuffer())
+        .then(buf => _ctx.decodeAudioData(buf))
+        .catch(() => null);
+    } catch (_) {
+      _decodedBufPromise = Promise.resolve(null);
+    }
   }
 }
-_loadBuf();
 
 async function detectSilentMode() {
   if (_detectionRan) return _silentDetected;
@@ -62,24 +63,27 @@ async function detectSilentMode() {
   return _silentDetected;
 }
 
-function playTick() {
-  if (!_ctx || !_soundEnabled) return;
-  _decodedBufPromise.then(buf => {
-    if (!buf) return;
-    try {
-      if (_ctx.state === 'suspended') _ctx.resume();
-      const src = _ctx.createBufferSource();
-      src.buffer = buf;
-      src.connect(_ctx.destination);
-      src.start(0);
-    } catch (_) {}
-  });
+async function playTick() {
+  if (!_soundEnabled) return;
+  _ensureCtx();
+  if (!_ctx) return;
+  try {
+    if (_ctx.state === 'suspended') await _ctx.resume();
+  } catch (_) {}
+  const buf = await _decodedBufPromise;
+  if (!buf) return;
+  try {
+    const src = _ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(_ctx.destination);
+    src.start(0);
+  } catch (_) {}
 }
 
 /* ─── Rest timer complete notification ────────────────────────── */
 function notifyRestComplete() {
   // Sound alert
-  if (!_ctx) { try { _loadBuf(); } catch (_) {} }
+  _ensureCtx();
   playTick();
   // Vibrate
   if (navigator.vibrate) {
