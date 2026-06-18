@@ -71,11 +71,6 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
 
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
 
-  // Latest set & PR
-  const latest = history.length > 0 ? history[history.length - 1] : null;
-  const maxKg = history.length > 0 ? Math.max(...history.map(h => h.kg || 0)) : 0;
-  const isPR = latest && (latest.kg > 0) && (latest.kg >= maxKg);
-
   // Compute stats
   const stats = history.length > 0
     ? (() => {
@@ -84,10 +79,6 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
         return {
           sessions: history.length,
           best: isBodyweight ? Math.max(...reps) + ' reps' : Math.max(...kgs) + ' kg',
-          avg: isBodyweight
-            ? Math.round(reps.reduce((a, b) => a + b, 0) / reps.length) + ' reps'
-            : Math.round(kgs.reduce((a, b) => a + b, 0) / kgs.length) + ' kg',
-          totalSets: history.length,
         };
       })()
     : null;
@@ -190,22 +181,16 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                 </div>
               ) : history.length > 0 ? (
                 <>
-                  {latest && (
-                    <p className="text-xs font-semibold text-muted-foreground text-center">
-                      Latest set: {isBodyweight ? '' : `${latest.kg} kg × `}{latest.reps} reps{isPR && !isBodyweight ? <span className="text-yellow-500 ml-1">🏆 PR</span> : ''}
-                    </p>
-                  )}
                   <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} />
                   {stats && (
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {[
                         { label: 'Sessions', value: stats.sessions },
                         { label: 'Best', value: stats.best },
-                        { label: isBodyweight ? 'Avg Reps' : 'Avg Weight', value: stats.avg },
                       ].map(s => (
-                        <div key={s.label} className="bg-muted/60 rounded-xl px-3 py-3 text-center">
-                          <p className="text-xl font-extrabold text-foreground">{s.value}</p>
-                          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-0.5">{s.label}</p>
+                        <div key={s.label} className="bg-muted/60 rounded-xl px-3 py-2.5 text-center">
+                          <p className="text-sm font-semibold text-foreground">{s.value}</p>
+                          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">{s.label}</p>
                         </div>
                       ))}
                     </div>
