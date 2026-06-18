@@ -94,7 +94,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
         const increase = bestKg - firstKg;
         const suggestion = isBodyweight
           ? (Math.max(...reps) + 1) + ' reps'
-          : `${bestKg} kg × ${bestReps + 1} reps`;
+          : `${bestKg} kg × ${bestReps + 1}`;
         return {
           start: isBodyweight ? firstReps + ' reps' : firstKg + ' kg',
           best: isBodyweight ? Math.max(...reps) + ' reps' : `${bestKg} kg × ${bestReps}`,
@@ -240,7 +240,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                         { label: 'Starting Weight', value: stats.start },
                         { label: 'Increase', value: stats.increase },
                         { label: 'Best', value: stats.best },
-                        { label: 'AI Target', value: stats.suggestion, isAI: true },
+                        { label: 'Next Goal', value: stats.suggestion, isAI: true },
                       ].map(s => (
                         <div
                           key={s.label}
