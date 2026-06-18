@@ -115,16 +115,17 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
   };
 
   return (
-    <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '8px 4px 4px' }}>
+    <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{       background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '12px 4px 8px' }}>
       <style>{punchDotStyle}</style>
       {!hideLabel && (
-        <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-1">
+        <p className="text-xs font-bold text-blue-500 uppercase tracking-wider text-center mb-2">
           {isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)'}
         </p>
       )}
-      <ResponsiveContainer width="100%" height={64}>
-        <LineChart data={data} margin={{ top: 12, right: 16, left: -28, bottom: 4 }}>
-          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 9, fill: '#9ca3af' }} />
+      <ResponsiveContainer width="100%" height={140}>
+        <LineChart data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
+          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 10, fill: '#9ca3af' }} />
+          <XAxis dataKey="session" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
           <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={false} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />

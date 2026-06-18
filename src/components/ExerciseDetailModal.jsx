@@ -86,7 +86,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>
       <div
-        className="relative bg-card rounded-3xl w-[92%] max-w-sm max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
+        className="relative bg-card rounded-3xl w-[92%] max-w-md max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -115,8 +115,8 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
           ))}
         </div>
 
-        {/* Tab Content — fixed height keeps modal same size for both tabs */}
-        <div className="overflow-y-auto px-5 py-4" style={{ minHeight: '280px', maxHeight: '340px' }}>
+        {/* Tab Content */}
+        <div className="overflow-y-auto px-5 py-4" style={{ minHeight: '320px' }}>
           {/* About Tab */}
           {tab === 'About' && (
             <div className="space-y-4">
