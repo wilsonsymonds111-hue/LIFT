@@ -97,7 +97,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
           : `${bestKg} kg × ${bestReps + 1} reps`;
         return {
           start: isBodyweight ? firstReps + ' reps' : firstKg + ' kg',
-          best: isBodyweight ? Math.max(...reps) + ' reps' : `${bestKg} kg × ${bestReps} reps`,
+          best: isBodyweight ? Math.max(...reps) + ' reps' : `${bestKg} kg × ${bestReps}`,
           increase: isBodyweight ? (Math.max(...reps) - firstReps) + ' reps' : `+${increase} kg`,
           suggestion,
         };
