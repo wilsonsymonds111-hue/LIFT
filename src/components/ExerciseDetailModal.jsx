@@ -12,6 +12,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [shimmer, setShimmer] = useState(false);
+  const [chartView, setChartView] = useState('weight');
 
   useEffect(() => { setTimeout(() => setShimmer(true), 200); }, []);
 
@@ -80,6 +81,21 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
     : false;
 
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
+
+  // Reps chart: filter to current max weight level, showing rep progression within that weight plateau
+  const repsHistory = history.length > 0
+    ? (() => {
+        const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
+        const maxKg = kgs.length > 0 ? Math.max(...kgs) : 0;
+        const filtered = maxKg > 0
+          ? history.filter(h => (h.kg || 0) === maxKg)
+          : history;
+        return filtered.map(h => ({ kg: 0, reps: h.reps || 0, date: h.date }));
+      })()
+    : [];
+
+  const chartData = chartView === 'reps' ? repsHistory : history;
+  const chartIsBodyweight = chartView === 'reps' ? true : isBodyweight;
 
   // Compute stats
   const stats = history.length > 0
@@ -230,7 +246,32 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                 </div>
               ) : history.length > 0 ? (
                 <>
-                  <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} />
+                  {/* Segmented chart switcher */}
+                  <div className="flex justify-center">
+                    <div className="inline-flex bg-muted rounded-full p-0.5">
+                      <button
+                        onClick={() => setChartView('weight')}
+                        className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                          chartView === 'weight'
+                            ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Weight
+                      </button>
+                      <button
+                        onClick={() => setChartView('reps')}
+                        className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                          chartView === 'reps'
+                            ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Reps
+                      </button>
+                    </div>
+                  </div>
+                  <ProgressGraph history={chartData} animKey={`${chartView}-${history.length}`} animDir="add" isBodyweight={chartIsBodyweight} />
                   {stats && (
                     <div className="grid grid-cols-4 gap-1.5">
                       {[
