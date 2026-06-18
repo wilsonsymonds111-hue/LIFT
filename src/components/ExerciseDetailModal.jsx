@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Play } from 'lucide-react';
+import { X } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { base44 } from '@/api/base44Client';
 import ProgressGraph from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
 
 export default function ExerciseDetailModal({ exercise, onClose }) {
-  const [tab, setTab] = useState('About');
+  const [tab, setTab] = useState('Charts');
   const [history, setHistory] = useState([]);
   const [detail, setDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -77,15 +77,9 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
     date: h.date ? new Date(h.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : null,
   }));
 
-  // Records
-  const bestWeight = history.length > 0 ? Math.max(...history.map(h => h.kg || 0)) : null;
-  const bestReps = history.length > 0 ? Math.max(...history.map(h => h.reps || 0)) : null;
-  const bestVolume = history.length > 0 ? Math.max(...history.map(h => (h.kg || 0) * (h.reps || 0))) : null;
-  const bestVolumeEntry = history.find(h => (h.kg || 0) * (h.reps || 0) === bestVolume);
-
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
 
-  const tabs = ['About', 'History', 'Charts', 'Records'];
+  const tabs = ['Charts', 'About'];
 
   const parseInstructions = (text) => {
     if (!text) return [];
@@ -137,9 +131,6 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
               ) : detail?.image_url ? (
                 <div className="relative w-full aspect-video bg-muted rounded-2xl overflow-hidden">
                   <img src={detail.image_url} alt={exercise.name} className="w-full h-full object-cover" />
-                  <div className="absolute bottom-3 right-3 w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                    <Play className="w-4 h-4 text-white ml-0.5" />
-                  </div>
                 </div>
               ) : (
                 <div className={`w-full aspect-video rounded-2xl flex items-center justify-center ${colors.bg}`}>
@@ -177,70 +168,36 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
             </div>
           )}
 
-          {/* History Tab */}
-          {tab === 'History' && (
-            <div>
+          {/* Charts Tab */}
+          {tab === 'Charts' && (
+            <div className="space-y-4">
               {loadingHistory ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
                 </div>
               ) : history.length > 0 ? (
-                <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} hideLabel />
+                <>
+                  <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} hideLabel />
+                  {volumeData.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-bold text-purple-400 uppercase tracking-widest text-center mb-2">Volume (kg × reps)</p>
+                      <ResponsiveContainer width="100%" height={160}>
+                        <LineChart data={volumeData} margin={{ top: 8, right: 16, left: -20, bottom: 8 }}>
+                          <XAxis dataKey="session" tick={{ fontSize: 9, fill: '#9ca3af' }} />
+                          <YAxis tick={{ fontSize: 9, fill: '#9ca3af' }} />
+                          <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} formatter={(v) => [`${v}`, 'Volume']} />
+                          <Line type="monotone" dataKey="volume" stroke="#8b5cf6" strokeWidth={2} dot={{ r: 3, fill: '#8b5cf6' }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </>
               ) : (
                 <p className="text-center text-muted-foreground py-12">No workout history yet. Start a workout to see your progress!</p>
               )}
             </div>
           )}
 
-          {/* Charts Tab */}
-          {tab === 'Charts' && (
-            <div>
-              {volumeData.length > 0 ? (
-                <div>
-                  <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest text-center mb-2">Volume (kg × reps)</p>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={volumeData} margin={{ top: 8, right: 16, left: -20, bottom: 8 }}>
-                      <XAxis dataKey="session" tick={{ fontSize: 9, fill: '#9ca3af' }} />
-                      <YAxis tick={{ fontSize: 9, fill: '#9ca3af' }} />
-                      <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} formatter={(v) => [`${v}`, 'Volume']} />
-                      <Line type="monotone" dataKey="volume" stroke="#8b5cf6" strokeWidth={2} dot={{ r: 3, fill: '#8b5cf6' }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-12">No data to chart yet.</p>
-              )}
-            </div>
-          )}
-
-          {/* Records Tab */}
-          {tab === 'Records' && (
-            <div className="space-y-3">
-              {history.length === 0 ? (
-                <p className="text-center text-muted-foreground py-12">No records yet. Complete a workout to set your first record!</p>
-              ) : (
-                <>
-                  {bestWeight > 0 && (
-                    <div className="bg-blue-50 dark:bg-blue-950/30 rounded-xl p-4">
-                      <p className="text-xs text-blue-500 font-semibold uppercase tracking-wide">Heaviest Weight</p>
-                      <p className="text-2xl font-extrabold text-blue-600">{bestWeight} kg</p>
-                    </div>
-                  )}
-                  <div className={`rounded-xl p-4 ${bestReps ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-muted'}`}>
-                    <p className="text-xs text-emerald-500 font-semibold uppercase tracking-wide">Most Reps</p>
-                    <p className="text-2xl font-extrabold text-emerald-600">{bestReps || '—'} {bestReps ? 'reps' : ''}</p>
-                  </div>
-                  {bestVolume > 0 && bestVolumeEntry && (
-                    <div className="bg-violet-50 dark:bg-violet-950/30 rounded-xl p-4">
-                      <p className="text-xs text-violet-500 font-semibold uppercase tracking-wide">Best Volume</p>
-                      <p className="text-2xl font-extrabold text-violet-600">{bestVolume}</p>
-                      <p className="text-xs text-violet-400 mt-1">{bestVolumeEntry.kg} kg × {bestVolumeEntry.reps} reps</p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>,
