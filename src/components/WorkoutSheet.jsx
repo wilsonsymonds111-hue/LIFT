@@ -10,80 +10,30 @@ import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 
 /* ─── Sound Effect ──────────────────────────────────────────── */
-const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/ecebf8262_ScreenRecording_06-16-202607-45-53_12.mp3';
+const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/87d1fec3a_ScreenRecording_06-16-202607-45-53_12.mp3';
 
-// Lazy-init — create AudioContext on first user interaction to avoid suspended state
-let _decodedBufPromise = null;
-let _ctx = null;
-let _soundEnabled = true;        // gate: respects hardware silent switch
-let _silentDetected = false;     // cache detection result
-let _detectionRan = false;
+// Preload the audio clip so it plays instantly with zero latency
+let _audioEl = null;
 
-function _ensureCtx() {
-  if (!_ctx) {
-    try {
-      _ctx = new (window.AudioContext || window.webkitAudioContext)();
-      _decodedBufPromise = fetch(SET_COMPLETE_SOUND)
-        .then(r => r.arrayBuffer())
-        .then(buf => _ctx.decodeAudioData(buf))
-        .catch(() => null);
-    } catch (_) {
-      _decodedBufPromise = Promise.resolve(null);
-    }
+function _ensureAudio() {
+  if (!_audioEl) {
+    _audioEl = new Audio(SET_COMPLETE_SOUND);
+    _audioEl.preload = 'auto';
+    _audioEl.load();
   }
 }
+// Start preloading immediately
+_ensureAudio();
 
-async function detectSilentMode() {
-  if (_detectionRan) return _silentDetected;
-  _detectionRan = true;
-  try {
-    const testCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (testCtx.state === 'suspended') await testCtx.resume();
-    const osc = testCtx.createOscillator();
-    const gain = testCtx.createGain();
-    const analyser = testCtx.createAnalyser();
-    analyser.fftSize = 256;
-    osc.type = 'sine';
-    osc.frequency.value = 660;
-    gain.gain.value = 0.05;
-    osc.connect(gain);
-    gain.connect(analyser);
-    osc.start();
-    await new Promise(r => setTimeout(r, 80));
-    const data = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteTimeDomainData(data);
-    osc.stop();
-    testCtx.close();
-    // On iOS with silent switch on, all samples stay at centre (128)
-    _silentDetected = data.every(v => v === 128);
-    _soundEnabled = !_silentDetected;
-  } catch {
-    _silentDetected = false;
-  }
-  return _silentDetected;
-}
-
-async function playTick() {
-  if (!_soundEnabled) return;
-  _ensureCtx();
-  if (!_ctx) return;
-  try {
-    if (_ctx.state === 'suspended') await _ctx.resume();
-  } catch (_) {}
-  const buf = await _decodedBufPromise;
-  if (!buf) return;
-  try {
-    const src = _ctx.createBufferSource();
-    src.buffer = buf;
-    src.connect(_ctx.destination);
-    src.start(0);
-  } catch (_) {}
+function playTick() {
+  if (!_audioEl) _ensureAudio();
+  if (!_audioEl) return;
+  _audioEl.currentTime = 0;
+  _audioEl.play().catch(() => {});
 }
 
 /* ─── Rest timer complete notification ────────────────────────── */
 function notifyRestComplete() {
-  // Sound alert
-  _ensureCtx();
   playTick();
   // Vibrate
   if (navigator.vibrate) {
@@ -99,17 +49,6 @@ function notifyRestComplete() {
       });
     } catch (_) {}
   }
-}
-
-// Run detection on first user interaction
-if (typeof window !== 'undefined') {
-  const runDetection = () => {
-    detectSilentMode();
-    document.removeEventListener('pointerdown', runDetection);
-    document.removeEventListener('keydown', runDetection);
-  };
-  document.addEventListener('pointerdown', runDetection, { once: true });
-  document.addEventListener('keydown', runDetection, { once: true });
 }
 
 /* ─── Timer ──────────────────────────────────────────────────── */
