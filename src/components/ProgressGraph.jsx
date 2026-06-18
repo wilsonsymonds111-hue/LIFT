@@ -68,6 +68,19 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
     kg: p.kg,
     reps: p.reps,
   }));
+
+  // Deduplicate repeated month labels — show each month only once
+  let lastShort = null;
+  data.forEach(d => {
+    if (d.dateShort && d.dateShort !== 'Next') {
+      if (d.dateShort === lastShort) {
+        d.dateShort = '';
+      } else {
+        lastShort = d.dateShort;
+      }
+    }
+  });
+
   data.push({
     session: realPoints.length + 1,
     date: null,
@@ -77,6 +90,21 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
     projVal: isBodyweight ? lastPoint.reps + 1 : lastPoint.kg,
     projected: true,
   });
+
+  // Compute nice evenly-spaced Y-axis ticks
+  const allVals = data
+    .filter(d => !d.projected)
+    .map(d => d.valNew ?? d.valStatic)
+    .filter(v => v != null);
+  const projV = data.find(d => d.projected)?.projVal;
+  if (projV != null) allVals.push(projV);
+  const yMin = Math.floor(Math.min(...allVals));
+  const yMax = Math.ceil(Math.max(...allVals));
+  const yRange = yMax - yMin || 1;
+  const yStep = Math.max(1, Math.round(yRange / 4));
+  const yTicks = [];
+  for (let i = yMin; i <= yMax; i += yStep) yTicks.push(i);
+  if (yTicks[yTicks.length - 1] < yMax) yTicks.push(yMax);
 
   const StaticDot = (props) => {
     const { cx, cy, value } = props;
@@ -139,7 +167,7 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
       )}
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
-          <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 10, fill: '#9ca3af' }} />
+          <YAxis domain={[yMin - yStep, yMax + yStep]} ticks={yTicks} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
