@@ -123,7 +123,7 @@ export const MUSCLES = ['All', 'Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Le
 export const MUSCLE_COLORS = {
   'Arms': { bg: 'bg-rose-50 dark:bg-rose-950/30', text: 'text-rose-600 dark:text-rose-400' },
   'Back': { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-600 dark:text-amber-400' },
-  'Chest': { bg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-600 dark:text-blue-400' },
+  'Chest': { bg: 'bg-blue-100 dark:bg-blue-950/30', text: 'text-blue-500 dark:text-blue-400' },
   'Core': { bg: 'bg-emerald-50 dark:bg-emerald-950/30', text: 'text-emerald-600 dark:text-emerald-400' },
   'Full Body': { bg: 'bg-violet-50 dark:bg-violet-950/30', text: 'text-violet-600 dark:text-violet-400' },
   'Legs': { bg: 'bg-orange-50 dark:bg-orange-950/30', text: 'text-orange-600 dark:text-orange-400' },

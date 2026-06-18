@@ -185,9 +185,6 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
               {/* Muscle info */}
               <div className="space-y-2.5">
                 <p className="text-xs font-bold text-foreground">Muscles Worked</p>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Understanding which muscles are activated during this exercise helps you focus on proper form and mind-muscle connection.
-                </p>
                 {detail?.muscles_worked && (
                   <div className="flex flex-wrap gap-1.5">
                     {detail.muscles_worked.split(',').map(m => (
@@ -248,11 +245,11 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                             ? 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-white overflow-hidden relative border-2 border-dashed border-purple-300'
                             : s.label === 'Best'
                             ? `rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-gradient-to-br from-amber-200/60 to-amber-100/30 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
-                            : 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-blue-500'
+                            : 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-blue-400'
                           }
                         >
                           <p className={`text-xs font-semibold relative z-10 ${s.isAI ? 'text-foreground' : s.label === 'Best' ? 'text-foreground' : 'text-white'}`}>{s.value}</p>
-                          <p className={`text-[9px] font-medium uppercase tracking-wider mt-0.5 relative z-10 text-center ${s.isAI ? 'text-muted-foreground' : s.label === 'Best' ? 'text-muted-foreground' : 'text-blue-100'}`}>{s.label}</p>
+                          <p className={`text-[9px] font-medium uppercase tracking-wider mt-0.5 relative z-10 text-center ${s.isAI ? 'text-muted-foreground' : s.label === 'Best' ? 'text-muted-foreground' : 'text-blue-50'}`}>{s.label}</p>
                         </div>
                       ))}
                     </div>
