@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const punchDotStyle = `
@@ -25,7 +25,7 @@ const punchDotStyle = `
   .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
 `;
 
-export default function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride }) {
+const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride }) {
   const [freshAnim, setFreshAnim] = useState(false);
   const prevAnimKeyRef = useRef(animKey);
   useEffect(() => {
@@ -37,105 +37,82 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
     }
   }, [animKey]);
 
-  if (!history || history.length === 0) return null;
+  const { data, yTicks, yMin, yMax, yStep, lastRealIdx } = useMemo(() => {
+    if (!history || history.length === 0) return null;
+    const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
+    const realPoints = history.map(toPoint);
+    const lastPoint = realPoints[realPoints.length - 1];
+    const idx = realPoints.length - 1;
 
-  const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
-  const realPoints = history.map(toPoint);
-  const lastPoint = realPoints[realPoints.length - 1];
-  const lastRealIdx = realPoints.length - 1;
+    const getValue = (p) => isBodyweight ? p.reps : p.kg;
 
-  const getValue = (p) => isBodyweight ? p.reps : p.kg;
+    const formatDateShort = (dateStr) => {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { month: 'short' });
+    };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return null;
-    const d = new Date(dateStr);
-    return isNaN(d) ? null : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  };
+    const d = realPoints.map((p, i) => ({
+      session: i + 1,
+      date: p.date ? (() => { const dt = new Date(p.date); return isNaN(dt) ? null : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); })() : null,
+      dateShort: formatDateShort(p.date),
+      valStatic: i < idx ? getValue(p) : null,
+      valNew: i >= idx - 1 ? getValue(p) : null,
+      projVal: i === idx ? getValue(p) : null,
+      kg: p.kg,
+      reps: p.reps,
+    }));
 
-  const formatDateShort = (dateStr) => {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { month: 'short' });
-  };
-
-  const data = realPoints.map((p, i) => ({
-    session: i + 1,
-    date: p.date ? formatDate(p.date) : null,
-    dateShort: formatDateShort(p.date),
-    valStatic: i < lastRealIdx ? getValue(p) : null,
-    valNew: i >= lastRealIdx - 1 ? getValue(p) : null,
-    projVal: i === lastRealIdx ? getValue(p) : null,
-    kg: p.kg,
-    reps: p.reps,
-  }));
-
-  // Deduplicate repeated month labels — show each month only once
-  let lastShort = null;
-  data.forEach(d => {
-    if (d.dateShort) {
-      if (d.dateShort === lastShort) {
-        d.dateShort = '';
-      } else {
-        lastShort = d.dateShort;
+    // Deduplicate repeated month labels
+    let lastShort = null;
+    d.forEach(item => {
+      if (item.dateShort) {
+        if (item.dateShort === lastShort) { item.dateShort = ''; }
+        else { lastShort = item.dateShort; }
       }
-    }
-  });
-
-  // Calculate weight progression rate for projections
-  const kgValues = realPoints.map(p => p.kg || 0).filter(k => k > 0);
-  let weightRate = 2.5; // default: 2.5 kg/session
-  if (kgValues.length >= 2) {
-    const rawRate = (kgValues[kgValues.length - 1] - kgValues[0]) / (kgValues.length - 1);
-    weightRate = rawRate > 0 ? rawRate : 2.5;
-  }
-  const snapTo2_5 = (v) => Math.round(v / 2.5) * 2.5;
-
-  // Generate 6 AI-projected future data points
-  const projectionCount = 6;
-  for (let i = 1; i <= projectionCount; i++) {
-    const projVal = isBodyweight
-      ? lastPoint.reps + i
-      : snapTo2_5(lastPoint.kg + weightRate * i);
-    data.push({
-      session: realPoints.length + i,
-      date: null,
-      dateShort: '',
-      valStatic: null,
-      valNew: null,
-      projVal,
-      projected: true,
     });
-  }
 
-  // Compute nice evenly-spaced Y-axis ticks
-  const allVals = data
-    .filter(d => !d.projected)
-    .map(d => d.valNew ?? d.valStatic)
-    .filter(v => v != null);
-  data.filter(d => d.projected).forEach(d => {
-    if (d.projVal != null) allVals.push(d.projVal);
-  });
-  const rawMin = Math.min(...allVals);
-  const rawMax = Math.max(...allVals);
-  let yMin, yMax, yStep;
+    // Weight progression rate for projections
+    const kgs = realPoints.map(p => p.kg || 0).filter(k => k > 0);
+    let rate = 2.5;
+    if (kgs.length >= 2) {
+      const rawRate = (kgs[kgs.length - 1] - kgs[0]) / (kgs.length - 1);
+      rate = rawRate > 0 ? rawRate : 2.5;
+    }
+    const snap = (v) => Math.round(v / 2.5) * 2.5;
 
-  if (isBodyweight) {
-    // Reps chart: use integer increments
-    yMin = Math.floor(rawMin);
-    yMax = Math.ceil(rawMax);
-    const yRange = yMax - yMin || 1;
-    yStep = Math.max(1, Math.round(yRange / 4));
-  } else {
-    // Weight chart: snap to 5, 10, or 20 kg increments
-    const roughStep = (rawMax - rawMin) / 4;
-    yStep = [5, 10, 20].reduce((best, s) => Math.abs(s - roughStep) < Math.abs(best - roughStep) ? s : best, 5);
-    yMin = Math.floor(rawMin / yStep) * yStep;
-    yMax = Math.ceil(rawMax / yStep) * yStep;
-  }
+    for (let i = 1; i <= 6; i++) {
+      d.push({
+        session: realPoints.length + i,
+        date: null, dateShort: '',
+        valStatic: null, valNew: null,
+        projVal: isBodyweight ? lastPoint.reps + i : snap(lastPoint.kg + rate * i),
+        projected: true,
+      });
+    }
 
-  const yTicks = [];
-  for (let i = yMin; i <= yMax; i += yStep) yTicks.push(i);
-  if (yTicks[yTicks.length - 1] < yMax) yTicks.push(yMax);
+    // Y-axis ticks
+    const vals = d.filter(x => !x.projected).map(x => x.valNew ?? x.valStatic).filter(v => v != null);
+    d.filter(x => x.projected).forEach(x => { if (x.projVal != null) vals.push(x.projVal); });
+    const rMin = Math.min(...vals), rMax = Math.max(...vals);
+    let tMin, tMax, tStep;
+    if (isBodyweight) {
+      tMin = Math.floor(rMin); tMax = Math.ceil(rMax);
+      tStep = Math.max(1, Math.round((tMax - tMin || 1) / 4));
+    } else {
+      const rough = (rMax - rMin) / 4;
+      tStep = [5, 10, 20].reduce((best, s) => Math.abs(s - rough) < Math.abs(best - rough) ? s : best, 5);
+      tMin = Math.floor(rMin / tStep) * tStep;
+      tMax = Math.ceil(rMax / tStep) * tStep;
+    }
+    const ticks = [];
+    for (let i = tMin; i <= tMax; i += tStep) ticks.push(i);
+    if (ticks[ticks.length - 1] < tMax) ticks.push(tMax);
+
+    return { data: d, yTicks: ticks, yMin: tMin, yMax: tMax, yStep: tStep, lastRealIdx: idx };
+  }, [history, isBodyweight]);
+
+  if (!data) return null;
 
   const StaticDot = (props) => {
     const { cx, cy, value } = props;
@@ -197,8 +174,10 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
     );
   };
 
+  const yDomain = [yMin - yStep, yMax + yStep];
+
   return (
-    <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{       background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '12px 4px 8px' }}>
+    <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '12px 4px 8px' }}>
       <style>{punchDotStyle}</style>
       {!hideLabel && (
         <p className="text-xs font-bold text-blue-500 uppercase tracking-wider text-center mb-2">
@@ -207,7 +186,7 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
       )}
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
-          <YAxis domain={[yMin - yStep, yMax + yStep]} ticks={yTicks} tick={{ fontSize: 10, fill: '#9ca3af' }} />
+          <YAxis domain={yDomain} ticks={yTicks} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
@@ -217,4 +196,6 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
       </ResponsiveContainer>
     </div>
   );
-}
+});
+
+export default ProgressGraph;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { History, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
 import ExercisePicker from './ExercisePicker';
@@ -68,7 +68,7 @@ function useTimer() {
 
 
 /* ─── SetRow ─────────────────────────────────────────────────── */
-function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete, restDuration = 120 }) {
+const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete, restDuration = 120 }) {
   const [kg, setKg] = useState(initialKg ?? previous?.kg ?? '');
   const [reps, setReps] = useState(initialReps ?? previous?.reps ?? '');
   const [done, setDone] = useState(false);
@@ -181,12 +181,12 @@ function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete
       )}
     </div>
   );
-}
+});
 
 /* ─── ExerciseSection ────────────────────────────────────────── */
 const graphFadeStyle = `@keyframes graphFadeIn { from { opacity: 0.3; transform: scaleY(0.96); } to { opacity: 1; transform: scaleY(1); } }`;
 
-function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise }) {
+const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise }) {
   const [sets, setSets] = useState([{ id: 1 }]);
   const [completedSets, setCompletedSets] = useState({});
   const [showMenu, setShowMenu] = useState(false);
@@ -344,7 +344,7 @@ function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercis
     </div>
     </>
   );
-}
+});
 
 /* ─── Icons ──────────────────────────────────────────────────── */
 function InstagramIcon({ size = 20 }) {
