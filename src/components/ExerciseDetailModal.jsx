@@ -245,7 +245,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                         <div
                           key={s.label}
                           className={s.isAI
-                            ? 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-gradient-to-br from-purple-100/70 to-blue-100/50 overflow-hidden relative border-2 border-dashed border-purple-300'
+                            ? 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-white overflow-hidden relative border-2 border-dashed border-purple-300'
                             : s.label === 'Best'
                             ? `rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-gradient-to-br from-amber-200/60 to-amber-100/30 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
                             : 'bg-muted rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center'
