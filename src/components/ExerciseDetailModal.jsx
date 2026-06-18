@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ProgressGraph from './ProgressGraph';
@@ -13,6 +14,20 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [shimmer, setShimmer] = useState(false);
   const [chartView, setChartView] = useState('weight');
+  const [swipeDir, setSwipeDir] = useState(0);
+
+  const switchView = useCallback((view) => {
+    setSwipeDir(view === 'reps' ? 1 : -1);
+    setChartView(view);
+  }, []);
+
+  const handleDragEnd = useCallback((_, info) => {
+    if (info.offset.x < -50 && chartView === 'weight') {
+      switchView('reps');
+    } else if (info.offset.x > 50 && chartView === 'reps') {
+      switchView('weight');
+    }
+  }, [chartView, switchView]);
 
   useEffect(() => { setTimeout(() => setShimmer(true), 200); }, []);
 
@@ -256,7 +271,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                   <div className="flex justify-center">
                     <div className="inline-flex bg-muted rounded-full p-0.5">
                       <button
-                        onClick={() => setChartView('weight')}
+                        onClick={() => switchView('weight')}
                         className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                           chartView === 'weight'
                             ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm'
@@ -266,7 +281,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                         Weight
                       </button>
                       <button
-                        onClick={() => setChartView('reps')}
+                        onClick={() => switchView('reps')}
                         className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                           chartView === 'reps'
                             ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm'
@@ -277,13 +292,27 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                       </button>
                     </div>
                   </div>
-                  <ProgressGraph
-                    history={chartData}
-                    animKey={`${chartView}-${history.length}`}
-                    animDir="add"
-                    isBodyweight={chartIsBodyweight}
-                    labelOverride={chartView === 'reps' && repsWeightLevel ? `Reps Progress of ${repsWeightLevel} kg` : null}
-                  />
+                  <div className="overflow-hidden touch-pan-y" style={{ touchAction: 'pan-y' }}>
+                    <motion.div
+                      key={chartView}
+                      initial={{ x: swipeDir * 80, opacity: 0.6 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ type: 'spring', stiffness: 350, damping: 30, mass: 0.8 }}
+                      drag="x"
+                      dragConstraints={{ left: 0, right: 0 }}
+                      dragElastic={0.15}
+                      onDragEnd={handleDragEnd}
+                      style={{ touchAction: 'pan-y' }}
+                    >
+                      <ProgressGraph
+                        history={chartData}
+                        animKey={`${chartView}-${history.length}`}
+                        animDir="add"
+                        isBodyweight={chartIsBodyweight}
+                        labelOverride={chartView === 'reps' && repsWeightLevel ? `Reps Progress of ${repsWeightLevel} kg` : null}
+                      />
+                    </motion.div>
+                  </div>
                   {stats && (
                     <div className="grid grid-cols-4 gap-1.5">
                       {[
