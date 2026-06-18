@@ -173,11 +173,10 @@ export default function Home() {
       onDays = onDays || Math.max(workoutCount, 1);
       offDays = offDays || 1;
       startDayIndex = startDayIndex || todayMonSun;
-      const cycleLength = onDays + offDays;
       const schedule = [];
       for (let i = 0; i < 7; i++) {
-        const pos = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
-        schedule.push(pos < onDays ? 1 : 0);
+        const relPos = (i - startDayIndex + 7) % 7;
+        schedule.push(relPos < onDays ? 1 : 0);
       }
       return { schedule, startDayIndex, onDays, offDays };
     };
@@ -204,12 +203,11 @@ export default function Home() {
     }
 
     // Map workout names to each day of the week (Mon=0 ... Sun=6)
-    const { schedule, startDayIndex, onDays, offDays } = detection;
-    const cycleLength = (onDays || 1) + (offDays || 1);
+    const { schedule, startDayIndex } = detection;
     const dayWorkoutNames = schedule.map((on, i) => {
       if (on && sorted.length > 0) {
-        const dayInCycle = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
-        const workoutIdx = dayInCycle % sorted.length;
+        const relPos = (i - startDayIndex + 7) % 7;
+        const workoutIdx = relPos % sorted.length;
         return sorted[workoutIdx]?.name?.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '') || '';
       }
       return null;
@@ -217,9 +215,9 @@ export default function Home() {
 
     // Which workout card (by sort_order index) is today's
     const todayMonSun = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-    const todayInCycle = ((todayMonSun - startDayIndex) % cycleLength + cycleLength) % cycleLength;
+    const todayRelPos = (todayMonSun - startDayIndex + 7) % 7;
     const todayWorkoutIndex = schedule[todayMonSun] >= 1 && sorted.length > 0
-      ? (todayInCycle % sorted.length)
+      ? (todayRelPos % sorted.length)
       : -1;
 
     return { currentSplit: sorted, currentSplitName: splitName, splitDetection: detection, dayWorkoutNames, todayWorkoutIndex };
