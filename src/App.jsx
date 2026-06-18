@@ -52,8 +52,6 @@ const SlideIn = ({ children }) => (
 const preloadMap = { '/splits': () => import('./pages/Splits'), '/': () => import('./pages/Home') };
 
 const TAB_STYLES = { touchAction: 'pan-y', contain: 'layout style' };
-const TAB_PANE_W = { width: 'var(--pw, 100vw)' };
-const SWIPE_W = { width: 'calc(2 * var(--pw, 100vw))', willChange: 'transform' };
 
 const SwipeableTabs = () => {
   const location = useLocation();
@@ -61,23 +59,6 @@ const SwipeableTabs = () => {
   const activeIndex = TABS.indexOf(location.pathname);
   const constraintsRef = useRef(null);
   const containerRef = useRef(null);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const setVar = () => el.style.setProperty('--pw', `${window.innerWidth}px`);
-    setVar();
-    let id;
-    const handleResize = () => {
-      clearTimeout(id);
-      id = setTimeout(setVar, 150);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(id);
-    };
-  }, []);
 
   // Preload the other tab's chunk after initial render
   useEffect(() => {
@@ -96,9 +77,6 @@ const SwipeableTabs = () => {
     }
   };
 
-  const tab0Display = useMemo(() => ({ display: activeIndex === 0 ? 'block' : 'none' }), [activeIndex]);
-  const tab1Display = useMemo(() => ({ display: activeIndex === 1 ? 'block' : 'none' }), [activeIndex]);
-
   return (
     <div className="relative overflow-hidden w-full flex-1" ref={constraintsRef} style={TAB_STYLES}>
       <motion.div
@@ -113,19 +91,13 @@ const SwipeableTabs = () => {
           if (info.offset.x < -threshold) snapToTab(activeIndex + 1);
           else if (info.offset.x > threshold) snapToTab(activeIndex - 1);
         }}
-        animate={{ x: `calc(-1 * ${activeIndex} * var(--pw, 100vw))` }}
+        animate={{ x: 0 }}
         transition={SWIPE_TRANSITION}
-        className="flex"
-        style={SWIPE_W}
+        className="flex w-full"
       >
-        <div className="flex-shrink-0 overflow-y-auto" style={TAB_PANE_W}>
+        <div className="flex-shrink-0 w-full overflow-y-auto">
           <Suspense fallback={SUSPENSE_FALLBACK}>
-            <div style={tab0Display}><Home /></div>
-          </Suspense>
-        </div>
-        <div className="flex-shrink-0 overflow-y-auto" style={TAB_PANE_W}>
-          <Suspense fallback={SUSPENSE_FALLBACK}>
-            <div style={tab1Display}><Splits /></div>
+            {activeIndex === 0 ? <Home key="home" /> : <Splits key="splits" />}
           </Suspense>
         </div>
       </motion.div>
@@ -157,7 +129,7 @@ const AnimatedRoutes = memo(() => {
 
   return (
     <>
-      {/* Always mount tabs to preserve scroll position — toggle visibility only */}
+      {/* Only render active tab for performance */}
       <div style={tabDisplay} className="flex-1 flex-col">
         <SwipeableTabs />
       </div>
