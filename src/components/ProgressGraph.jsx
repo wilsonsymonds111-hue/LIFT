@@ -25,7 +25,7 @@ const punchDotStyle = `
   .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
 `;
 
-const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride }) {
+const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact }) {
   const [freshAnim, setFreshAnim] = useState(false);
   const prevAnimKeyRef = useRef(animKey);
   useEffect(() => {
@@ -185,7 +185,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           {labelOverride || (isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)')}
         </p>
       )}
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={compact ? 130 : 200}>
         <LineChart data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
           <YAxis domain={yDomain} ticks={yTicks} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />

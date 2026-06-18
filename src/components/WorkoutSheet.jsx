@@ -196,6 +196,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [restEnabled, setRestEnabled] = useState(true);
   const [showCustomRest, setShowCustomRest] = useState(false);
   const [customRestInput, setCustomRestInput] = useState('');
+  const [chartView, setChartView] = useState('weight');
   const lastEntry = exercise.history?.[exercise.history.length - 1];
   const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
   const sessionResults = Object.values(completedSets).filter(Boolean);
@@ -215,6 +216,21 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         const kg = typeof h === 'object' ? (h.kg ?? 0) : (h ?? 0);
         return kg === 0 || kg == null;
       });
+
+  // Reps chart: filter to current max weight level
+  const repsHistory = (() => {
+    const fullHistory = exercise.history || [];
+    if (fullHistory.length === 0) return fullHistory;
+    const kgs = fullHistory.map(h => (typeof h === 'object' ? h.kg || 0 : h || 0)).filter(k => k > 0);
+    const maxKg = kgs.length > 0 ? Math.max(...kgs) : 0;
+    const filtered = maxKg > 0
+      ? fullHistory.filter(h => ((typeof h === 'object' ? h.kg || 0 : h || 0)) === maxKg)
+      : fullHistory;
+    return filtered.map(h => (typeof h === 'object' ? { ...h, kg: 0 } : { kg: 0, reps: h, date: null }));
+  })();
+
+  const displayHistory = chartView === 'reps' ? (sessionResults.length > 0 ? [...repsHistory, ...sessionResults.map(s => ({ ...s, kg: 0 }))] : repsHistory) : graphHistory;
+  const displayBodyweight = chartView === 'reps' ? true : isBodyweight;
 
   return (
     <>
@@ -298,7 +314,23 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
         />
       )}
-      <ProgressGraph history={graphHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={isBodyweight} />
+      <div className="flex justify-center mb-2">
+        <div className="inline-flex bg-muted rounded-full p-0.5">
+          <button
+            onClick={() => setChartView('weight')}
+            className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${chartView === 'weight' ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            Weight
+          </button>
+          <button
+            onClick={() => setChartView('reps')}
+            className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${chartView === 'reps' ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            Reps
+          </button>
+        </div>
+      </div>
+      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact />
       <div className="grid grid-cols-[40px_1fr_80px_80px_44px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
