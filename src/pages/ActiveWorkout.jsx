@@ -26,19 +26,47 @@ export default function ActiveWorkout() {
   const handleSaveHistory = async (templateId, snapshot, exerciseList) => {
     if (templateId.startsWith('empty-')) return;
     const today = new Date().toISOString().slice(0, 10);
-    const newList = exerciseList.map(ex => {
-      const best = snapshot[ex.name];
-      if (!best) return ex;
-      return { ...ex, history: [...(ex.history || []), { kg: best.kg, reps: best.reps, date: today }] };
-    });
+
+    // Build map of existing Exercise entities
+    const allExercises = await base44.entities.Exercise.list('name', 500);
+    const exerciseMap = {};
+    (allExercises || []).forEach(ex => { exerciseMap[ex.name] = ex; });
+
+    // Save history to the Exercise entity (shared across all splits)
+    const exerciseSaves = exerciseList
+      .filter(ex => snapshot[ex.name])
+      .map(async (ex) => {
+        const best = snapshot[ex.name];
+        const entry = { kg: best.kg, reps: best.reps, date: today };
+        try {
+          const existing = exerciseMap[ex.name];
+          if (existing) {
+            await base44.entities.Exercise.update(existing.id, {
+              history: [...(existing.history || []), entry],
+              muscle: ex.muscle || existing.muscle,
+            });
+          } else {
+            await base44.entities.Exercise.create({
+              name: ex.name,
+              muscle: ex.muscle || '',
+              history: [entry],
+            });
+          }
+        } catch (e) {
+          console.error('Failed to save exercise history:', ex.name, e);
+        }
+      });
+
+    // Update template lastPerformed
     try {
       await base44.entities.WorkoutTemplate.update(templateId, {
-        exerciseList: newList,
         lastPerformed: new Date().toISOString(),
       });
     } catch (e) {
       console.error('Failed to save workout:', e);
     }
+
+    await Promise.all(exerciseSaves);
   };
 
   if (loading) {

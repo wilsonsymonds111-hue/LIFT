@@ -31,20 +31,14 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
 
   useEffect(() => { setTimeout(() => setShimmer(true), 200); }, []);
 
-  // Fetch workout history for this exercise across all templates
+  // Fetch workout history from the Exercise entity (shared across all splits)
   useEffect(() => {
-    base44.entities.WorkoutTemplate.list('sort_order', 200).then(results => {
-      const allHistory = [];
-      (results || []).forEach(t => {
-        const exData = (t.exerciseList || []).find(e => e.name === exercise.name);
-        if (exData?.history?.length) {
-          exData.history.forEach(h => {
-            allHistory.push(typeof h === 'object' ? { ...h } : { kg: h, reps: 8 });
-          });
-        }
-      });
-      allHistory.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
-      setHistory(allHistory);
+    base44.entities.Exercise.filter({ name: exercise.name }).then(results => {
+      if (results.length > 0) {
+        setHistory(results[0].history || []);
+      } else {
+        setHistory([]);
+      }
       setLoadingHistory(false);
     });
   }, [exercise.name]);

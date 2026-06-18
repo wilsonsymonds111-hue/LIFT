@@ -30,13 +30,22 @@ export default function TemplateDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [template, setTemplate] = useState(null);
+  const [exerciseData, setExerciseData] = useState({});
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
 
   useEffect(() => {
-    base44.entities.WorkoutTemplate.list('sort_order', 200).then(results => {
-      const found = results?.find(t => t.id === id);
+    Promise.all([
+      base44.entities.WorkoutTemplate.list('sort_order', 200).then(results => results?.find(t => t.id === id)),
+      base44.entities.Exercise.list('name', 500),
+    ]).then(([found, exercises]) => {
       if (found) setTemplate(found);
+      // Build a map of exercise name → history
+      const map = {};
+      (exercises || []).forEach(ex => {
+        map[ex.name] = ex.history || [];
+      });
+      setExerciseData(map);
       setLoading(false);
     });
   }, [id]);
@@ -106,23 +115,26 @@ export default function TemplateDetail() {
         <p className="px-5 pt-3 pb-1 text-sm text-muted-foreground">{lastPerformed}</p>
 
         <div className="px-5 py-3 space-y-3 overflow-y-auto flex-1">
-          {template.exerciseList?.map((exercise, idx) => (
-            <div key={idx} className="flex items-center gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-foreground text-sm leading-snug">{exercise.sets} × {exercise.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
-              </div>
-              {exercise.history && exercise.history.length > 0 && (
-                <div className="w-16 h-8 flex-shrink-0">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={exercise.history.slice(-6).map(h => ({ v: typeof h === 'object' ? h.kg : h }))}>
-                      <Line type="monotone" dataKey="v" stroke="#3b82b6" strokeWidth={2} dot={<HollowDot />} animationDuration={300} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
+          {template.exerciseList?.map((exercise, idx) => {
+            const history = exerciseData[exercise.name] || exercise.history || [];
+            return (
+          <div key={idx} className="flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-foreground text-sm leading-snug">{exercise.sets} × {exercise.name}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
             </div>
-          ))}
+            {history.length > 0 && (
+              <div className="w-16 h-8 flex-shrink-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={history.slice(-6).map(h => ({ v: typeof h === 'object' ? h.kg : h }))}>
+                    <Line type="monotone" dataKey="v" stroke="#3b82b6" strokeWidth={2} dot={<HollowDot />} animationDuration={300} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+            );
+          })}
         </div>
 
         <div className="px-5 py-5">

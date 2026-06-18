@@ -23,24 +23,14 @@ export default function Exercises() {
   const sectionRefs = useRef({});
 
   useEffect(() => {
-    base44.entities.WorkoutTemplate.list('sort_order', 500).then(results => {
+    base44.entities.Exercise.list('name', 500).then(results => {
       const map = {};
-      (results || []).forEach(t => {
-        (t.exerciseList || []).forEach(e => {
-          if (e.history?.length > 0) {
-            const name = e.name;
-            if (!map[name]) map[name] = [];
-            e.history.forEach(h => {
-              const kg = typeof h === 'object' ? (h.kg || 0) : (h || 0);
-              const date = typeof h === 'object' && h.date ? new Date(h.date) : null;
-              map[name].push({ v: kg, date });
-            });
-          }
-        });
-      });
-      // Sort each exercise's history by date
-      Object.keys(map).forEach(name => {
-        map[name].sort((a, b) => (a.date || 0) - (b.date || 0));
+      (results || []).forEach(ex => {
+        if (ex.history?.length > 0) {
+          map[ex.name] = ex.history
+            .map(h => ({ v: h.kg || 0, date: h.date ? new Date(h.date) : null }))
+            .sort((a, b) => (a.date || 0) - (b.date || 0));
+        }
       });
       setExerciseHistory(map);
     });

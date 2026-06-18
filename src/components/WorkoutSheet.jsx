@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, memo } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { History, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
@@ -693,6 +694,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [showSummary, setShowSummary] = useState(false);
   const [finishTimer, setFinishTimer] = useState('00:00');
   const [exercises, setExercises] = useState(() => [...(template?.exerciseList || [])]);
+  const [exerciseHistory, setExerciseHistory] = useState({});
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [showRestTimerPicker, setShowRestTimerPicker] = useState(false);
   const [globalRestDuration, setGlobalRestDuration] = useState(120);
@@ -739,6 +741,26 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
       Notification.requestPermission();
     }
   }, []);
+
+  // Load Exercise entity history (shared across all splits)
+  useEffect(() => {
+    base44.entities.Exercise.list('name', 500).then(results => {
+      const map = {};
+      (results || []).forEach(ex => {
+        map[ex.name] = ex.history || [];
+      });
+      setExerciseHistory(map);
+    });
+  }, []);
+
+  // Merge Exercise entity history into exercises
+  useEffect(() => {
+    if (Object.keys(exerciseHistory).length === 0) return;
+    setExercises(prev => prev.map(ex => ({
+      ...ex,
+      history: exerciseHistory[ex.name] || ex.history || [],
+    })));
+  }, [exerciseHistory]);
 
   if (!template) return null;
 
