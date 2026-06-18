@@ -216,12 +216,12 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                         <div
                           key={s.label}
                           className={s.label === 'Best'
-                            ? `rounded-xl px-3 py-2.5 text-center bg-gradient-to-br from-amber-600 to-amber-600 shadow-md overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
+                            ? `rounded-xl px-3 py-2.5 text-center bg-muted/60 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
                             : 'bg-muted/60 rounded-xl px-3 py-2.5 text-center'
                           }
                         >
-                          <p className={`text-sm font-semibold relative z-10 ${s.label === 'Best' ? 'text-white' : 'text-foreground'}`}>{s.value}</p>
-                          <p className={`text-[10px] font-medium uppercase tracking-wider mt-0.5 relative z-10 ${s.label === 'Best' ? 'text-amber-200' : 'text-muted-foreground'}`}>{s.label}</p>
+                          <p className="text-sm font-semibold relative z-10 text-foreground">{s.value}</p>
+                          <p className="text-[10px] font-medium uppercase tracking-wider mt-0.5 relative z-10 text-muted-foreground">{s.label}</p>
                         </div>
                       ))}
                     </div>
