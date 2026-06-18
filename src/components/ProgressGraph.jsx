@@ -19,7 +19,7 @@ const punchDotStyle = `
   @keyframes segmentFadeIn  { from { opacity: 0; } to { opacity: 1; } }
   @keyframes segmentFadeOut { from { opacity: 1; } to { opacity: 0; } }
   .snap-dot    { transform-box: fill-box; transform-origin: center; animation: dotSnapIn  0.4s cubic-bezier(0.34,1.56,0.64,1) forwards !important; animation-iteration-count: 1 !important; }
-  .ripple-ring { animation: dotRipple  0.65s ease-out forwards !important; animation-iteration-count: 1 !important; fill: none; stroke: #3b82f6; }
+  .ripple-ring { animation: dotRipple  0.65s ease-out forwards !important; animation-iteration-count: 1 !important; fill: none; stroke: #d4a017; }
   .retract-dot { transform-box: fill-box; transform-origin: center; animation: dotRetract 0.35s cubic-bezier(0.55,0,1,0.45) forwards !important; animation-iteration-count: 1 !important; }
   .new-seg-in  { animation: segmentFadeIn  0.5s ease forwards; }
   .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
@@ -81,7 +81,7 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
   const StaticDot = (props) => {
     const { cx, cy, value } = props;
     if (value == null) return <g />;
-    return <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
+    return <circle cx={cx} cy={cy} r={4} fill="#d4a017" stroke="white" strokeWidth={2} />;
   };
 
   const NewDot = (props) => {
@@ -90,17 +90,17 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
     const isNewest = index === lastRealIdx;
     if (isNewest) {
       if (freshAnim && animDir === 'remove') {
-        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} className="retract-dot" />;
+        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4} fill="#d4a017" stroke="white" strokeWidth={2} className="retract-dot" />;
       }
       if (freshAnim && animDir === 'add') {
         return (
           <g key={`dot-${animKey}`}>
-            <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} className="snap-dot" />
+            <circle cx={cx} cy={cy} r={4} fill="#d4a017" stroke="white" strokeWidth={2} className="snap-dot" />
             <circle cx={cx} cy={cy} r={4} className="ripple-ring" />
           </g>
         );
       }
-      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
+      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#d4a017" stroke="white" strokeWidth={2} />;
     }
     return <g />;
   };
@@ -108,7 +108,7 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
   const GhostDot = (props) => {
     const { cx, cy, payload } = props;
     if (!payload?.projected) return <g />;
-    return <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.6} stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.7} />;
+    return <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.6} stroke="#f0d060" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.7} />;
   };
 
 
@@ -130,10 +130,10 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
   };
 
   return (
-    <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{       background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '12px 4px 8px' }}>
+    <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{       background: 'linear-gradient(135deg, #fefce8 0%, #fef3c7 100%)', padding: '12px 4px 8px' }}>
       <style>{punchDotStyle}</style>
       {!hideLabel && (
-        <p className="text-xs font-bold text-blue-500 uppercase tracking-wider text-center mb-2">
+        <p className="text-xs font-bold text-amber-600 uppercase tracking-wider text-center mb-2">
           {isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)'}
         </p>
       )}
@@ -142,9 +142,9 @@ export default function ProgressGraph({ history, animKey, animDir, isBodyweight,
           <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
           <Tooltip content={<CustomTooltip />} />
-          <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
-          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
-          <Line type="monotone" dataKey="projVal" stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={<GhostDot />} activeDot={false} connectNulls={true} isAnimationActive={false} />
+          <Line type="monotone" dataKey="valStatic" stroke="#d4a017" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
+          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#d4a017" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
+          <Line type="monotone" dataKey="projVal" stroke="#f0d060" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={<GhostDot />} activeDot={false} connectNulls={true} isAnimationActive={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>
