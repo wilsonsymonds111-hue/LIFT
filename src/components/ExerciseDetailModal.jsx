@@ -115,8 +115,8 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
           ))}
         </div>
 
-        {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+        {/* Tab Content — fixed height keeps modal same size for both tabs */}
+        <div className="overflow-y-auto px-5 py-4" style={{ minHeight: '280px', maxHeight: '340px' }}>
           {/* About Tab */}
           {tab === 'About' && (
             <div className="space-y-4">

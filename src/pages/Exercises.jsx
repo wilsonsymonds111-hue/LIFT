@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { Search, GripVertical } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { LineChart, Line, XAxis, ResponsiveContainer } from 'recharts';
 import { ALL_EXERCISES, MUSCLES, MUSCLE_COLORS } from '../lib/exercises';
 import { base44 } from '@/api/base44Client';
 import ProfileButton from '../components/ProfileButton';
@@ -13,18 +14,30 @@ export default function Exercises() {
   const [search, setSearch] = useState('');
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selectedExercise, setSelectedExercise] = useState(null);
-  const [usedExercises, setUsedExercises] = useState(new Set());
+  const [exerciseHistory, setExerciseHistory] = useState({});
   const sectionRefs = useRef({});
 
   useEffect(() => {
     base44.entities.WorkoutTemplate.list('sort_order', 200).then(results => {
-      const used = new Set();
+      const map = {};
       (results || []).forEach(t => {
         (t.exerciseList || []).forEach(e => {
-          if (e.history?.length > 0) used.add(e.name);
+          if (e.history?.length > 0) {
+            const name = e.name;
+            if (!map[name]) map[name] = [];
+            e.history.forEach(h => {
+              const kg = typeof h === 'object' ? (h.kg || 0) : (h || 0);
+              const date = typeof h === 'object' && h.date ? new Date(h.date) : null;
+              map[name].push({ v: kg, date });
+            });
+          }
         });
       });
-      setUsedExercises(used);
+      // Sort each exercise's history by date
+      Object.keys(map).forEach(name => {
+        map[name].sort((a, b) => (a.date || 0) - (b.date || 0));
+      });
+      setExerciseHistory(map);
     });
   }, []);
 
@@ -77,7 +90,6 @@ export default function Exercises() {
       {/* Muscle filter pills */}
       <div className="pl-4 pr-10 pb-3 flex gap-2 overflow-x-auto">
         {MUSCLES.map(m => {
-          const colors = MUSCLE_COLORS[m];
           const active = muscleFilter === m;
           return (
             <button
@@ -105,6 +117,13 @@ export default function Exercises() {
               </div>
               {exs.map(ex => {
                 const colors = MUSCLE_COLORS[ex.muscle] || MUSCLE_COLORS['Full Body'];
+                const historyData = exerciseHistory[ex.name];
+                // Format dates for x-axis labels
+                const chartData = historyData?.slice(-12).map((h, i) => ({
+                  v: h.v,
+                  label: h.date ? h.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : i + 1,
+                })) || [];
+
                 return (
                   <div
                     key={ex.name}
@@ -118,14 +137,29 @@ export default function Exercises() {
 
                     {/* Name + muscle */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                        {ex.name}
-                        {usedExercises.has(ex.name) && (
-                          <GripVertical className="w-3 h-3 text-blue-400 flex-shrink-0" />
-                        )}
-                      </p>
+                      <p className="text-sm font-semibold text-foreground">{ex.name}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">{ex.muscle}</p>
                     </div>
+
+                    {/* Mini sparkline for exercises with history */}
+                    {chartData.length > 0 && (
+                      <div className="w-20 h-10 ml-auto flex-shrink-0">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={chartData} margin={{ top: 2, right: 0, bottom: 2, left: 0 }}>
+                            <XAxis dataKey="label" hide />
+                            <Line
+                              type="monotone"
+                              dataKey="v"
+                              stroke="#3b82b6"
+                              strokeWidth={1.5}
+                              dot={{ r: 2, fill: '#3b82b6', strokeWidth: 0 }}
+                              activeDot={{ r: 3, fill: '#3b82b6' }}
+                              animationDuration={400}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -157,14 +191,14 @@ export default function Exercises() {
             })}
           </div>
         )}
-        </div>
+      </div>
 
-        {selectedExercise && (
+      {selectedExercise && (
         <ExerciseDetailModal
-        exercise={selectedExercise}
-        onClose={() => setSelectedExercise(null)}
+          exercise={selectedExercise}
+          onClose={() => setSelectedExercise(null)}
         />
-        )}
-        </div>
-        );
-        }
+      )}
+    </div>
+  );
+}
