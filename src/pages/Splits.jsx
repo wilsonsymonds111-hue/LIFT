@@ -122,7 +122,7 @@ export default function Splits() {
 
     let allTemplates;
     try {
-      allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+      allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
     } catch (_) {
       setSwapping(false);
       return;
@@ -207,7 +207,7 @@ export default function Splits() {
     // Fetch once, store in ref (immune to React batching) for the animation
     let allTemplates;
     try {
-      allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+      allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
     } catch (_) {
       setSwapping(false);
       return;
@@ -506,7 +506,7 @@ export default function Splits() {
 
             let allTemplates;
             try {
-              allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+              allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
             } catch (_) {
               setSwapping(false);
               return;

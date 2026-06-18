@@ -204,7 +204,7 @@ export default function SplitDetailModal({ splitKey, onClose }) {
     const newGroupId = Date.now().toString();
     const oldGroupId = Date.now().toString() + '_old';
     try {
-      const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+      const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
       const currentActive = allTemplates.filter(
         t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
       );

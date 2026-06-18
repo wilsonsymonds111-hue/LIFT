@@ -23,7 +23,7 @@ export default function Exercises() {
   const sectionRefs = useRef({});
 
   useEffect(() => {
-    base44.entities.WorkoutTemplate.list('sort_order', 100).then(results => {
+    base44.entities.WorkoutTemplate.list('sort_order', 500).then(results => {
       const map = {};
       (results || []).forEach(t => {
         (t.exerciseList || []).forEach(e => {

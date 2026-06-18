@@ -97,7 +97,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
   useEffect(() => {
     if (!exampleSplit && splitKey) {
       setLoading(true);
-      base44.entities.WorkoutTemplate.list('sort_order', 100).then(data => {
+      base44.entities.WorkoutTemplate.list('sort_order', 500).then(data => {
         const templates = (data || []).filter(t => t.splitGroup === splitKey);
         if (templates.length > 0) {
           setCustomSplit({
@@ -151,7 +151,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
       try {
         const newGroupId = Date.now().toString();
         const oldGroupId = Date.now().toString() + '_old';
-        const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+        const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
         const currentActive = allTemplates.filter(
           t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
         );

@@ -32,7 +32,7 @@ export default function SplitDetail() {
   useEffect(() => {
     if (!exampleSplit && key) {
       setLoading(true);
-      base44.entities.WorkoutTemplate.list('sort_order', 100).then(data => {
+      base44.entities.WorkoutTemplate.list('sort_order', 500).then(data => {
         const templates = (data || []).filter(t => t.splitGroup === key);
         if (templates.length > 0) {
           setCustomSplit({
@@ -81,7 +81,7 @@ export default function SplitDetail() {
     const newGroupId = Date.now().toString();
     const oldGroupId = Date.now().toString() + '_old';
     try {
-      const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 100);
+      const allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
       const currentActive = allTemplates.filter(
         t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
       );
