@@ -747,7 +747,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     bestSetsRef.current[name] = { kg, reps, date: today };
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     const snapshot = { ...bestSetsRef.current };
     const toKg = (h) => typeof h === 'object' ? h.kg : h;
     const toReps = (h) => typeof h === 'object' ? (h.reps ?? 8) : 8;
@@ -774,7 +774,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     setBestSets(snapshot);
     setPrs(computedPrs);
     setFinishTimer(timer);
-    onSaveHistory?.(template.id, snapshot, exercises);
+    await onSaveHistory?.(template.id, snapshot, exercises);
     setShowSummary(true);
   };
 
