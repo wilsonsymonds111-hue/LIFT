@@ -11,6 +11,9 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
   const [detail, setDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [shimmer, setShimmer] = useState(false);
+
+  useEffect(() => { setTimeout(() => setShimmer(true), 200); }, []);
 
   // Fetch workout history for this exercise across all templates
   useEffect(() => {
@@ -93,8 +96,27 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
     return text.split('\n').filter(line => /^\d+\./.test(line.trim()));
   };
 
+  const shimmerCSS = `
+    @keyframes goldShimmer {
+      0% { transform: translateX(-100%) skewX(-15deg); }
+      100% { transform: translateX(300%) skewX(-15deg); }
+    }
+    .gold-shimmer::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,215,0,0.6) 40%, rgba(255,255,255,0.5) 50%, rgba(255,215,0,0.6) 60%, transparent 100%);
+      transform: translateX(-100%) skewX(-15deg);
+      animation: goldShimmer 2s ease-in-out 0.3s forwards;
+      pointer-events: none;
+      border-radius: inherit;
+      z-index: 1;
+    }
+  `;
+
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>
+      <style>{shimmerCSS}</style>
       <div
         className="relative bg-card rounded-3xl w-[92%] max-w-md max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
         onClick={e => e.stopPropagation()}
@@ -194,12 +216,12 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                         <div
                           key={s.label}
                           className={s.label === 'Best'
-                            ? 'rounded-xl px-3 py-2.5 text-center bg-gradient-to-br from-amber-400 to-amber-500 shadow-md'
+                            ? `rounded-xl px-3 py-2.5 text-center bg-gradient-to-br from-amber-400 to-amber-500 shadow-md overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
                             : 'bg-muted/60 rounded-xl px-3 py-2.5 text-center'
                           }
                         >
-                          <p className={`text-sm font-semibold ${s.label === 'Best' ? 'text-white' : 'text-foreground'}`}>{s.value}</p>
-                          <p className={`text-[10px] font-medium uppercase tracking-wider mt-0.5 ${s.label === 'Best' ? 'text-amber-100' : 'text-muted-foreground'}`}>{s.label}</p>
+                          <p className={`text-sm font-semibold relative z-10 ${s.label === 'Best' ? 'text-white' : 'text-foreground'}`}>{s.value}</p>
+                          <p className={`text-[10px] font-medium uppercase tracking-wider mt-0.5 relative z-10 ${s.label === 'Best' ? 'text-amber-100' : 'text-muted-foreground'}`}>{s.label}</p>
                         </div>
                       ))}
                     </div>
