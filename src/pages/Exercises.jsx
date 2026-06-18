@@ -61,7 +61,7 @@ export default function Exercises() {
       </div>
 
       {/* Muscle filter pills */}
-      <div className="px-4 pb-3 flex gap-2 overflow-x-auto">
+      <div className="pl-4 pr-10 pb-3 flex gap-2 overflow-x-auto">
         {MUSCLES.map(m => {
           const colors = MUSCLE_COLORS[m];
           const active = muscleFilter === m;
@@ -83,7 +83,7 @@ export default function Exercises() {
 
       {/* Exercise list with side index */}
       <div className="relative">
-        <div className="px-4">
+        <div className="pl-4 pr-10">
           {grouped.map(([letter, exs]) => (
             <div key={letter} ref={el => sectionRefs.current[letter] = el}>
               <div className="py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest bg-background sticky top-0">
