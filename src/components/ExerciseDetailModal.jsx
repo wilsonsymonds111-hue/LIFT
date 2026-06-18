@@ -280,7 +280,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                     animKey={`${chartView}-${history.length}`}
                     animDir="add"
                     isBodyweight={chartIsBodyweight}
-                    labelOverride={chartView === 'reps' && repsWeightLevel ? `Reps Progress within ${repsWeightLevel} kg` : null}
+                    labelOverride={chartView === 'reps' && repsWeightLevel ? `Reps Progress of ${repsWeightLevel} kg` : null}
                   />
                   {stats && (
                     <div className="grid grid-cols-4 gap-1.5">
