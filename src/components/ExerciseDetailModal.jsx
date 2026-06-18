@@ -173,8 +173,8 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                   <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
                 </div>
               ) : detail?.image_url ? (
-                <div className="relative w-full aspect-video bg-muted rounded-2xl overflow-hidden">
-                  <img src={detail.image_url} alt={exercise.name} className="w-full h-full object-contain" />
+                <div className="relative w-full bg-muted rounded-2xl overflow-hidden">
+                  <img src={detail.image_url} alt={exercise.name} className="w-full block" />
                 </div>
               ) : (
                 <div className={`w-full aspect-video rounded-2xl flex items-center justify-center ${colors.bg}`}>
@@ -183,12 +183,19 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
               )}
 
               {/* Muscle info */}
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${colors.bg} ${colors.text}`}>{exercise.muscle}</span>
-                </div>
+              <div className="space-y-2.5">
+                <p className="text-xs font-bold text-foreground">Muscles Worked</p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Understanding which muscles are activated during this exercise helps you focus on proper form and mind-muscle connection.
+                </p>
                 {detail?.muscles_worked && (
-                  <p className="text-xs text-muted-foreground leading-relaxed">{detail.muscles_worked}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {detail.muscles_worked.split(',').map(m => (
+                      <span key={m.trim()} className={`text-xs font-semibold px-2.5 py-1 rounded-full ${colors.bg} ${colors.text}`}>
+                        {m.trim()}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
 
