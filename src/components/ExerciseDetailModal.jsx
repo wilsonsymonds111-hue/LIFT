@@ -82,9 +82,13 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
         const bestKg = Math.max(...kgs);
         const bestEntry = history.find(h => (h.kg || 0) === bestKg);
         const bestReps = bestEntry?.reps || 0;
+        const firstKg = history[0]?.kg || 0;
+        const firstReps = history[0]?.reps || 0;
+        const increase = bestKg - firstKg;
         return {
-          sessions: history.length,
+          start: isBodyweight ? firstReps + ' reps' : firstKg + ' kg',
           best: isBodyweight ? Math.max(...reps) + ' reps' : `${bestKg} kg × ${bestReps} reps`,
+          increase: isBodyweight ? (Math.max(...reps) - firstReps) + ' reps' : `+${increase} kg`,
         };
       })()
     : null;
@@ -208,16 +212,17 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                 <>
                   <ProgressGraph history={history} animKey={history.length} animDir="add" isBodyweight={isBodyweight} />
                   {stats && (
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       {[
-                        { label: 'Sessions', value: stats.sessions },
+                        { label: 'Start', value: stats.start },
+                        { label: 'Increase', value: stats.increase },
                         { label: 'Best', value: stats.best },
                       ].map(s => (
                         <div
                           key={s.label}
                           className={s.label === 'Best'
-                            ? `rounded-xl px-3 py-2.5 text-center bg-gradient-to-br from-amber-200/60 to-amber-100/30 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
-                            : 'bg-muted rounded-xl px-3 py-2.5 text-center'
+                            ? `rounded-xl px-2 py-2.5 text-center bg-gradient-to-br from-amber-200/60 to-amber-100/30 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
+                            : 'bg-muted rounded-xl px-2 py-2.5 text-center'
                           }
                         >
                           <p className="text-sm font-semibold relative z-10 text-foreground">{s.value}</p>
