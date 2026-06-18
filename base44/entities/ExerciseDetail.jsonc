@@ -10,6 +10,9 @@
     },
     "image_url": {
       "type": "string"
+    },
+    "muscles_worked": {
+      "type": "string"
     }
   },
   "required": [
