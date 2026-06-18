@@ -41,12 +41,18 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
         setDetail(results[0]);
         setLoadingDetail(false);
       } else {
-        // Generate instructions via LLM
+        // Generate details via LLM
         try {
-          const llmRes = await base44.integrations.Core.InvokeLLM({
-            prompt: `Write 4 short, numbered step-by-step instructions for how to perform the "${exercise.name}" exercise at the gym. Keep each step to 1-2 sentences. Be clear and concise. Output format: plain text with each step on a new line starting with the number and a period.`,
-          });
+          const [llmRes, musclesRes] = await Promise.all([
+            base44.integrations.Core.InvokeLLM({
+              prompt: `Write 4 short, numbered step-by-step instructions for how to perform the "${exercise.name}" exercise at the gym. Keep each step to 1-2 sentences. Be clear and concise. Output format: plain text with each step on a new line starting with the number and a period.`,
+            }),
+            base44.integrations.Core.InvokeLLM({
+              prompt: `List the primary and secondary muscle groups worked by the "${exercise.name}" exercise. Output as a short comma-separated list only, e.g. "Chest, Front Delts, Triceps". Keep it to 3-5 muscles max.`,
+            }),
+          ]);
           const instructions = llmRes?.data || llmRes || '';
+          const muscles_worked = musclesRes?.data || musclesRes || exercise.muscle;
           // Generate an image
           let image_url = '';
           try {
@@ -59,6 +65,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
             name: exercise.name,
             instructions,
             image_url,
+            muscles_worked,
           });
           setDetail(newDetail);
         } catch (_) {}
@@ -175,9 +182,14 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                 </div>
               )}
 
-              {/* Muscle badge */}
-              <div className="flex items-center gap-2">
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${colors.bg} ${colors.text}`}>{exercise.muscle}</span>
+              {/* Muscle info */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${colors.bg} ${colors.text}`}>{exercise.muscle}</span>
+                </div>
+                {detail?.muscles_worked && (
+                  <p className="text-xs text-muted-foreground leading-relaxed">{detail.muscles_worked}</p>
+                )}
               </div>
 
               {/* Instructions */}
