@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import ProfileButton from '../components/ProfileButton';
-import SplitBuilder from '../components/SplitBuilder';
-import SplitModal from '../components/SplitModal';
 import SplitCard from '../components/SplitCard';
 import RestFrequencyConfirmModal from '../components/RestFrequencyConfirmModal';
+
+const SplitBuilder = lazy(() => import('../components/SplitBuilder'));
+const SplitModal = lazy(() => import('../components/SplitModal'));
 
 
 import { useNavigate } from 'react-router-dom';
@@ -457,15 +458,17 @@ export default function Splits() {
 
       {/* Split builder */}
       {showBuilder && (
-        <SplitBuilder
-          onClose={() => setShowBuilder(false)}
-          onSaved={() => {
-            setShowBuilder(false);
-            invalidateWorkoutTemplates(queryClient);
-            setActiveTab('mine');
-            localStorage.setItem('splitsActiveTab', 'mine');
-          }}
-        />
+        <Suspense fallback={null}>
+          <SplitBuilder
+            onClose={() => setShowBuilder(false)}
+            onSaved={() => {
+              setShowBuilder(false);
+              invalidateWorkoutTemplates(queryClient);
+              setActiveTab('mine');
+              localStorage.setItem('splitsActiveTab', 'mine');
+            }}
+          />
+        </Suspense>
       )}
 
       {/* Rest frequency confirm modal (from three-dot menu) */}
@@ -495,10 +498,11 @@ export default function Splits() {
 
       {/* Split detail modal */}
       {activeSplit && (
-        <SplitModal
-          splitKey={activeSplit}
-          onClose={() => setActiveSplit(null)}
-          onMakeCurrent={async (splitKey, workouts, splitData) => {
+        <Suspense fallback={null}>
+          <SplitModal
+            splitKey={activeSplit}
+            onClose={() => setActiveSplit(null)}
+            onMakeCurrent={async (splitKey, workouts, splitData) => {
             // Trigger swap animation from inside the modal
             setSwapping(true);
             setSwappingSplitName(splitData.name);
@@ -579,7 +583,8 @@ export default function Splits() {
               setSwapPhase(null);
             }
           }}
-        />
+          />
+        </Suspense>
       )}
 
       {/* Split swap animation overlay — portaled to body to escape SwipeableTabs transform context */}

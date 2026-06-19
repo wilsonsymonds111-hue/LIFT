@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
-import { useEffect, useRef, useMemo, lazy, Suspense, memo } from 'react';
+import { useEffect, useRef, useMemo, useCallback, lazy, Suspense, memo } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -27,7 +27,7 @@ const pageVariants = {
   exit: { x: '-30%', opacity: 0 },
 };
 
-const PAGE_TRANSITION = { duration: 0.18, ease: [0.33, 1, 0.68, 1] };
+const PAGE_TRANSITION = { duration: 0.15, ease: [0.33, 1, 0.68, 1] };
 const SWIPE_TRANSITION = { duration: 0.08, ease: [0.33, 1, 0.68, 1] };
 const SUSPENSE_FALLBACK = <div className="w-full h-screen bg-background" />;
 const LOADING_SPINNER = (
@@ -51,7 +51,8 @@ const SlideIn = ({ children }) => (
 
 const preloadMap = { '/splits': () => import('./pages/Splits'), '/': () => import('./pages/Home'), '/exercises': () => import('./pages/Exercises') };
 
-const TAB_STYLES = { touchAction: 'pan-y', contain: 'layout style' };
+const TAB_STYLES = { touchAction: 'pan-y', contain: 'layout style paint' };
+const DRAG_STYLES = { willChange: 'transform', contain: 'layout style paint' };
 
 const SwipeableTabs = () => {
   const location = useLocation();
@@ -71,11 +72,11 @@ const SwipeableTabs = () => {
     return () => ids.forEach(id => hasRIC ? cancelIdleCallback(id) : clearTimeout(id));
   }, [activeIndex]);
 
-  const snapToTab = (index) => {
+  const snapToTab = useCallback((index) => {
     if (index >= 0 && index < TABS.length && index !== activeIndex) {
       navigate(TABS[index]);
     }
-  };
+  }, [activeIndex, navigate]);
 
   return (
     <div className="relative overflow-hidden w-full flex-1" ref={constraintsRef} style={TAB_STYLES}>
@@ -94,6 +95,7 @@ const SwipeableTabs = () => {
         animate={{ x: 0 }}
         transition={SWIPE_TRANSITION}
         className="flex w-full"
+        style={DRAG_STYLES}
       >
         <div className="flex-shrink-0 w-full overflow-y-auto">
           <Suspense fallback={SUSPENSE_FALLBACK}>
