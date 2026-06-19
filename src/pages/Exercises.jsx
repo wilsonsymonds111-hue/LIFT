@@ -1,10 +1,11 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
 import { Search } from 'lucide-react';
 import { ALL_EXERCISES, MUSCLES } from '../lib/exercises';
 import { base44 } from '@/api/base44Client';
 import ProfileButton from '../components/ProfileButton';
-import ExerciseDetailModal from '../components/ExerciseDetailModal';
 import ExerciseList from '../components/ExerciseList';
+
+const ExerciseDetailModal = lazy(() => import('../components/ExerciseDetailModal'));
 
 const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
 
@@ -96,10 +97,12 @@ export default function Exercises() {
       <ExerciseList grouped={grouped} exerciseHistory={exerciseHistory} onSelectExercise={handleSelectExercise} />
 
       {selectedExercise && (
-        <ExerciseDetailModal
-          exercise={selectedExercise}
-          onClose={() => setSelectedExercise(null)}
-        />
+        <Suspense fallback={null}>
+          <ExerciseDetailModal
+            exercise={selectedExercise}
+            onClose={() => setSelectedExercise(null)}
+          />
+        </Suspense>
       )}
     </div>
   );

@@ -2,14 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { ArrowLeft } from 'lucide-react';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { base44 } from '@/api/base44Client';
+import Sparkline from '../components/Sparkline';
 import EditTemplateModal from '../components/EditTemplateModal';
-
-const HollowDot = (props) => {
-  const { cx, cy } = props;
-  return <circle cx={cx} cy={cy} r={3} fill="white" stroke="#3b82b6" strokeWidth={1.5} />;
-};
 
 function relativeTime(dateStr) {
   if (!dateStr) return null;
@@ -124,12 +119,8 @@ export default function TemplateDetail() {
               <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
             </div>
             {history.length > 0 && (
-              <div className="w-16 h-8 flex-shrink-0">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={history.slice(-6).map(h => ({ v: typeof h === 'object' ? h.kg : h }))}>
-                    <Line type="monotone" dataKey="v" stroke="#3b82b6" strokeWidth={2} dot={<HollowDot />} animationDuration={300} />
-                  </LineChart>
-                </ResponsiveContainer>
+              <div className="w-16 h-8 flex-shrink-0 flex items-center justify-center">
+                <Sparkline data={history.slice(-6).map(h => ({ v: typeof h === 'object' ? h.kg : h }))} width={64} height={32} />
               </div>
             )}
           </div>

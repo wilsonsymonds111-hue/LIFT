@@ -1,11 +1,6 @@
 import { memo } from 'react';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { MUSCLE_COLORS } from '../lib/exercises';
-
-const HollowDot = (props) => {
-  const { cx, cy } = props;
-  return <circle cx={cx} cy={cy} r={3} fill="white" stroke="#3b82b6" strokeWidth={1.5} />;
-};
+import Sparkline from './Sparkline';
 
 const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, onClick }) {
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
@@ -30,12 +25,8 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, onCli
 
       {/* Mini sparkline */}
       {chartData.length > 0 && (
-        <div className="w-16 h-8 ml-auto flex-shrink-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <Line type="monotone" dataKey="v" stroke="#3b82b6" strokeWidth={2} dot={<HollowDot />} animationDuration={300} />
-            </LineChart>
-          </ResponsiveContainer>
+        <div className="w-16 h-8 ml-auto flex-shrink-0 flex items-center justify-center">
+          <Sparkline data={chartData} width={64} height={32} />
         </div>
       )}
     </div>
