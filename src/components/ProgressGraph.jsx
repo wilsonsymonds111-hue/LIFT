@@ -169,8 +169,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       ? `${d.reps} reps`
       : `${d.kg} kg × ${d.reps} reps`;
     return (
-      <div className="bg-white text-gray-800 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold whitespace-nowrap">
-        {label}
+      <div className="bg-white text-gray-800 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold whitespace-nowrap text-center">
+        <div>{label}</div>
+        {d.date && <div className="text-[10px] font-normal text-gray-500 mt-0.5">{d.date}</div>}
       </div>
     );
   };
