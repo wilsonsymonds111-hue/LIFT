@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import ProgressGraph from './ProgressGraph';
+import ProgressGraph, { getNextGoal } from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
 
 export default function ExerciseDetailModal({ exercise, onClose }) {
@@ -123,9 +123,9 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
         const firstKg = history[0]?.kg || 0;
         const firstReps = history[0]?.reps || 0;
         const increase = bestKg - firstKg;
-        const suggestion = isBodyweight
+        const suggestion = getNextGoal(exercise.name, history) || (isBodyweight
           ? (Math.max(...reps) + 1) + ' reps'
-          : `${bestKg} kg × ${bestReps + 1}`;
+          : `${bestKg} kg × ${bestReps + 1}`);
         return {
           start: isBodyweight ? firstReps + ' reps' : firstKg + ' kg',
           best: isBodyweight ? Math.max(...reps) + ' reps' : `${bestKg} kg × ${bestReps}`,
@@ -303,6 +303,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
                         animKey={`${chartView}-${history.length}`}
                         animDir="add"
                         isBodyweight={chartIsBodyweight}
+                        exerciseName={exercise.name}
                         labelOverride={chartView === 'reps' && repsWeightLevel ? `Reps Progress of ${repsWeightLevel} kg` : null}
                       />
                     </motion.div>

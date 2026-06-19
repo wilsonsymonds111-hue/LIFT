@@ -25,7 +25,69 @@ const punchDotStyle = `
   .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
 `;
 
-const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact }) {
+// Exercise classification helpers — exported for use in ExerciseDetailModal
+const ISOLATION_KEYWORDS = ['leg extension', 'hamstring curl', 'calf raise', 'lateral raise', 'bicep curl', 'tricep extension', 'pec deck', 'cable fly', 'rear delt fly'];
+
+export function getRepCap(exerciseName) {
+  if (!exerciseName) return 12;
+  const lower = exerciseName.toLowerCase();
+  if (ISOLATION_KEYWORDS.some(k => lower.includes(k))) return 15;
+  return 12;
+}
+
+export function getWeightIncrement(history) {
+  const weights = [...new Set((history || []).map(h => h.kg || 0).filter(k => k > 0))].sort((a, b) => a - b);
+  if (weights.length < 2) return 2.5;
+  const diffs = [];
+  for (let i = 1; i < weights.length; i++) diffs.push(weights[i] - weights[i - 1]);
+  const counts = {};
+  diffs.forEach(d => counts[d] = (counts[d] || 0) + 1);
+  return Number(Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]) || 2.5;
+}
+
+export function getNextGoal(exerciseName, history) {
+  if (!history || history.length === 0) return null;
+  const repCap = getRepCap(exerciseName);
+  const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
+  const isBw = kgs.length === 0;
+
+  if (isBw) {
+    const maxReps = Math.max(...history.map(h => h.reps || 0));
+    if (maxReps >= repCap) return `${repCap} reps (max)`;
+    return `${maxReps + 1} reps`;
+  }
+
+  const maxKg = Math.max(...kgs);
+  const entriesAtMax = history.filter(h => (h.kg || 0) === maxKg).sort((a, b) => (b.reps || 0) - (a.reps || 0));
+  const bestReps = entriesAtMax[0]?.reps || 0;
+
+  if (bestReps >= repCap) {
+    const inc = getWeightIncrement(history);
+    const snap = (v) => Math.round(v / 2.5) * 2.5;
+    const newKg = snap(maxKg + inc);
+
+    // Determine starting reps after weight increase from history transitions
+    const byWeight = {};
+    history.forEach(h => { const kg = h.kg || 0; if (!byWeight[kg]) byWeight[kg] = []; byWeight[kg].push(h.reps || 0); });
+    const weights = Object.keys(byWeight).map(Number).sort((a, b) => a - b);
+    let startingReps = Math.max(5, Math.floor(bestReps * 0.65));
+    if (weights.length >= 2) {
+      const transitions = [];
+      for (let i = 1; i < weights.length; i++) {
+        transitions.push(Math.max(...byWeight[weights[i]]));
+      }
+      if (transitions.length > 0) {
+        startingReps = Math.round(transitions.reduce((s, r) => s + r, 0) / transitions.length);
+      }
+    }
+    startingReps = Math.max(5, Math.min(startingReps, bestReps - 1));
+    return `${newKg} kg × ${startingReps}`;
+  }
+
+  return `${maxKg} kg × ${bestReps + 1}`;
+}
+
+const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact, exerciseName }) {
   const [freshAnim, setFreshAnim] = useState(false);
   const prevAnimKeyRef = useRef(animKey);
   useEffect(() => {
@@ -81,12 +143,41 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     }
     const snap = (v) => Math.round(v / 2.5) * 2.5;
 
+    const repCap = exerciseName ? getRepCap(exerciseName) : 0;
+    const hasWeights = kgs.length > 0;
+
     for (let i = 1; i <= 6; i++) {
+      let projVal, projKg, projReps;
+      if (isBodyweight) {
+        if (hasWeights && repCap > 0) {
+          // Reps chart for a weighted exercise — cap at repCap
+          const nextRep = lastPoint.reps + i;
+          projVal = Math.min(nextRep, repCap);
+          if (nextRep > repCap) {
+            // After cap: project weight increase
+            const inc = getWeightIncrement(realPoints);
+            const newKg = snap((lastPoint.kg || kgs[kgs.length - 1] || 0) + inc * Math.ceil((nextRep - repCap) / (repCap - lastPoint.reps + 1)));
+            projKg = snap(newKg);
+          } else {
+            projKg = kgs.length > 0 ? Math.max(...kgs) : 0;
+          }
+          projReps = projVal;
+        } else {
+          // True bodyweight or no rep cap — just increase reps
+          projVal = lastPoint.reps + i;
+          if (repCap > 0) projVal = Math.min(projVal, repCap);
+        }
+      } else {
+        projVal = snap(lastPoint.kg + rate * i);
+        projKg = projVal;
+      }
       d.push({
         session: realPoints.length + i,
         date: null, dateShort: '',
         valStatic: null, valNew: null,
-        projVal: isBodyweight ? lastPoint.reps + i : snap(lastPoint.kg + rate * i),
+        projVal,
+        ...(projKg != null ? { projKg } : {}),
+        ...(projReps != null ? { projReps } : {}),
         projected: true,
       });
     }
@@ -110,7 +201,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     if (ticks[ticks.length - 1] < tMax) ticks.push(tMax);
 
     return { data: d, yTicks: ticks, yMin: tMin, yMax: tMax, yStep: tStep, lastRealIdx: idx };
-  }, [history, isBodyweight]);
+  }, [history, isBodyweight, exerciseName]);
 
   if (result.empty) return null;
   const { data, yTicks, yMin, yMax, yStep, lastRealIdx } = result;
@@ -154,9 +245,14 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload;
     if (d.projected) {
-      const label = isBodyweight
-        ? `Aim for: ${d.projVal} reps`
-        : `Aim for: ${d.projVal} kg`;
+      let label;
+      if (d.projKg != null && d.projReps != null) {
+        label = `Aim for: ${d.projKg} kg × ${d.projReps} reps`;
+      } else if (d.projKg != null) {
+        label = `Aim for: ${d.projKg} kg`;
+      } else {
+        label = `Aim for: ${d.projVal} reps`;
+      }
       return (
         <div className="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold whitespace-nowrap">
           {label}
