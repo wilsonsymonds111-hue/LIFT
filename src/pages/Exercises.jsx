@@ -1,15 +1,10 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
-import { ALL_EXERCISES, MUSCLES, MUSCLE_COLORS } from '../lib/exercises';
+import { ALL_EXERCISES, MUSCLES } from '../lib/exercises';
 import { base44 } from '@/api/base44Client';
 import ProfileButton from '../components/ProfileButton';
 import ExerciseDetailModal from '../components/ExerciseDetailModal';
-
-const HollowDot = (props) => {
-  const { cx, cy } = props;
-  return <circle cx={cx} cy={cy} r={3} fill="white" stroke="#3b82b6" strokeWidth={1.5} />;
-};
+import ExerciseRow from '../components/ExerciseRow';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -110,41 +105,14 @@ export default function Exercises() {
               <div className="py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest bg-background sticky top-0">
                 {letter}
               </div>
-              {exs.map(ex => {
-                const colors = MUSCLE_COLORS[ex.muscle] || MUSCLE_COLORS['Full Body'];
-                const historyData = exerciseHistory[ex.name];
-                const chartData = historyData?.slice(-6).map(h => ({ v: h.v })) || [];
-
-                return (
-                  <div
-                    key={ex.name}
-                    onClick={() => setSelectedExercise(ex)}
-                    className="flex items-center gap-3 py-2.5 border-b border-border/50 cursor-pointer active:bg-muted/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
-                  >
-                    {/* Letter avatar */}
-                    <div className={`w-9 h-9 rounded-lg ${colors.bg} flex items-center justify-center flex-shrink-0`}>
-                      <span className={`text-sm font-bold ${colors.text}`}>{ex.name[0]}</span>
-                    </div>
-
-                    {/* Name + muscle */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground">{ex.name}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{ex.muscle}</p>
-                    </div>
-
-                    {/* Mini sparkline — matches workout modal style */}
-                    {chartData.length > 0 && (
-                      <div className="w-16 h-8 ml-auto flex-shrink-0">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={chartData}>
-                            <Line type="monotone" dataKey="v" stroke="#3b82b6" strokeWidth={2} dot={<HollowDot />} animationDuration={300} />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {exs.map(ex => (
+                <ExerciseRow
+                  key={ex.name}
+                  exercise={ex}
+                  exerciseHistory={exerciseHistory}
+                  onClick={() => setSelectedExercise(ex)}
+                />
+              ))}
             </div>
           ))}
           {grouped.length === 0 && (

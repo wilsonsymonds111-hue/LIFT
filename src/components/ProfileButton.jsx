@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { UserCircle } from 'lucide-react';
 import ProfileSheet from './ProfileSheet';
 
-export default function ProfileButton() {
+const ProfileButton = memo(function ProfileButton() {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
@@ -44,4 +44,6 @@ export default function ProfileButton() {
       )}
     </>
   );
-}
+});
+
+export default ProfileButton;
