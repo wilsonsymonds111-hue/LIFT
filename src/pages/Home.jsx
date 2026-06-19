@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { MoreHorizontal, CalendarPlus } from 'lucide-react';
+import { MoreHorizontal, CalendarPlus, Plus } from 'lucide-react';
 import CalendarSyncModal from '../components/CalendarSyncModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -268,21 +268,20 @@ export default function Home() {
         <div>
           <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
         </div>
-        <ProfileButton />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/active-workout/empty-' + Date.now())}
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted hover:bg-muted/70 transition"
+            aria-label="Start an Empty Workout"
+          >
+            <Plus className="w-5 h-5 text-muted-foreground" />
+          </button>
+          <ProfileButton />
+        </div>
       </div>
 
       {/* Weekly Tracker */}
       <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
-
-      {/* Quick Start */}
-      <div className="px-4 py-4">
-        <button
-          onClick={() => navigate('/active-workout/empty-' + Date.now())}
-          className="w-full py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200 text-sm"
-        >
-          Start an Empty Workout
-        </button>
-      </div>
 
       {/* ==================== CURRENT SPLIT (Spotlight) ==================== */}
       <div className="relative px-4 py-2">
