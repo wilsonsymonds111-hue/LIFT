@@ -325,7 +325,7 @@ export default function Home() {
                 <div
                   key={template.id}
                   className={`relative bg-card rounded-xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses} ${
-                    isTodayCard ? 'ring-2 ring-emerald-400/60 shadow-[0_0_16px_rgba(16,185,129,0.35)]' : ''
+                    isTodayCard ? 'ring-2 ring-emerald-400/60' : ''
                   }`}
                 >
                   {/* Three-dot menu button */}
