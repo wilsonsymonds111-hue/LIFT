@@ -10,6 +10,7 @@ import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
 import WeekTracker from '../components/WeekTracker';
+import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 import { generateWorkoutICS } from '../lib/icsGenerator';
@@ -27,14 +28,6 @@ const relativeTime = (dateStr) => {
   if (diffDays < 7) return `${diffDays} days ago`;
   if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
   return `${Math.floor(diffDays / 30)}mo ago`;
-};
-
-const estimateDuration = (exerciseCount) => {
-  const mins = Math.round((exerciseCount * 8) / 5) * 5;
-  if (mins < 60) return `~${mins} min`;
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return m > 0 ? `~${h}h ${m}m` : `~${h}h`;
 };
 
 const SPLIT_ACCENTS = {
@@ -69,7 +62,7 @@ const SPLIT_ACCENTS = {
 };
 
 const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
-const GRID_CV = {};
+const GRID_CV = { contentVisibility: 'auto', containIntrinsicSize: 'auto 200px' };
 
 export default function Home() {
   const navigate = useNavigate();
@@ -306,64 +299,18 @@ export default function Home() {
 
           {currentSplit.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={GRID_CV}>
-              {currentSplit.map((template, idx) => {
-                const isTodayCard = idx === todayWorkoutIndex;
-                return (
-                <div
+              {currentSplit.map((template, idx) => (
+                <TemplateCard
                   key={template.id}
-                  className={`relative bg-card rounded-xl p-4 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses} ${
-                    isTodayCard ? 'ring-2 ring-emerald-400/60' : ''
-                  }`}
-                >
-                  {/* Three-dot menu button */}
-                  <button
-                    ref={el => menuRef.current[template.id] = el}
-                    onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === template.id ? null : template.id); }}
-                    className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition z-10"
-                  >
-                    <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
-                  </button>
-
-                  <div onClick={() => navigate(`/template/${template.id}`)} className="cursor-pointer">
-                    <h4 className="font-bold text-foreground pr-8">{template.name}</h4>
-                    <p className="text-xs text-muted-foreground mt-1.5 line-clamp-1">
-                      {(template.exerciseList?.length > 0
-                        ? template.exerciseList.map(e => e.name).join(', ')
-                        : (template.exercises || '').split(',').map(s => s.trim()).filter(Boolean).join(', ')
-                      )}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
-                      ⏱ {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
-                    </p>
-                  </div>
-
-                  {/* Dropdown menu */}
-                  {menuOpen === template.id && createPortal(
-                    (() => {
-                      const btn = menuRef.current[template.id];
-                      const rect = btn?.getBoundingClientRect();
-                      const top = rect ? rect.bottom + 4 : 0;
-                      const right = rect ? window.innerWidth - rect.right : 0;
-                      return (
-                        <div
-                          onClick={e => e.stopPropagation()}
-                          className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[220px]"
-                          style={{ top: `${top}px`, right: `${right}px`, zIndex: 100 }}
-                        >
-                          <button
-                            onClick={() => handleRemoveFromSplit(template)}
-                            className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-muted transition rounded-xl"
-                          >
-                            Remove from current split
-                          </button>
-                        </div>
-                      );
-                    })(),
-                    document.body
-                    )}
-                </div>
-                );
-              })}
+                  template={template}
+                  isTodayCard={idx === todayWorkoutIndex}
+                  accent={accent}
+                  menuOpen={menuOpen === template.id}
+                  onToggleMenu={() => setMenuOpen(menuOpen === template.id ? null : template.id)}
+                  menuRef={el => { menuRef.current[template.id] = el; }}
+                  onRemove={() => handleRemoveFromSplit(template)}
+                />
+              ))}
             </div>
           ) : (
             <div className="text-center py-12 text-muted-foreground">
