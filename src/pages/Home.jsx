@@ -41,28 +41,28 @@ const SPLIT_ACCENTS = {
   'upper-lower': {
     hex: '#2A8FFF',
     tint: 'rgba(30, 100, 220, 0.18)',
-    cardClasses: 'border-2 border-border hover:border-blue-500 shadow-sm hover:shadow-md',
+    cardClasses: 'border-2 border-border hover:border-blue-500 shadow-md hover:shadow-lg',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-blue-500',
   },
   'push-pull-legs': {
     hex: '#43A047',
     tint: 'rgba(50, 140, 50, 0.18)',
-    cardClasses: 'border-2 border-border hover:border-emerald-500 shadow-sm hover:shadow-md',
+    cardClasses: 'border-2 border-border hover:border-emerald-500 shadow-md hover:shadow-lg',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-emerald-500',
   },
   'full-body': {
     hex: '#8E24AA',
     tint: 'rgba(120, 30, 150, 0.18)',
-    cardClasses: 'border-2 border-border hover:border-purple-500 shadow-sm hover:shadow-md',
+    cardClasses: 'border-2 border-border hover:border-purple-500 shadow-md hover:shadow-lg',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-purple-500',
   },
   'ul-ppl': {
     hex: '#F57C00',
     tint: 'rgba(220, 100, 0, 0.18)',
-    cardClasses: 'border-2 border-border hover:border-amber-500 shadow-sm hover:shadow-md',
+    cardClasses: 'border-2 border-border hover:border-amber-500 shadow-md hover:shadow-lg',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-amber-500',
   },
@@ -230,12 +230,6 @@ export default function Home() {
 
   const accent = useMemo(() => SPLIT_ACCENTS[splitDetection.key] || SPLIT_ACCENTS['full-body'], [splitDetection.key]);
 
-  const glowStyles = useMemo(() => ({
-    outer: { background: `radial-gradient(ellipse at center, ${accent.hex}18 0%, ${accent.hex}0A 50%, transparent 70%)` },
-    middle: { background: `radial-gradient(ellipse at center, ${accent.hex}18 0%, transparent 60%)` },
-    inner: { background: `radial-gradient(ellipse at center, ${accent.hex}0C 0%, transparent 50%)` },
-  }), [accent.hex]);
-
   const isApple = useMemo(() => {
     const ua = navigator.userAgent || '';
     return /(iPhone|iPad|iPod|Macintosh|Mac OS X)/i.test(ua) && !/Android/i.test(ua);
@@ -271,10 +265,10 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/active-workout/empty-' + Date.now())}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted hover:bg-muted/70 transition"
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-500 hover:bg-blue-600 text-white transition"
             aria-label="Start an Empty Workout"
           >
-            <Plus className="w-5 h-5 text-muted-foreground" />
+            <Plus className="w-5 h-5" />
           </button>
           <ProfileButton />
         </div>
@@ -283,14 +277,9 @@ export default function Home() {
       {/* Weekly Tracker */}
       <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
 
-      {/* ==================== CURRENT SPLIT (Spotlight) ==================== */}
-      <div className="relative px-4 py-2">
-        {/* Multi-layered glow for depth — dynamic hue based on split type */}
-        <div className="absolute -inset-12 rounded-[4rem] blur-3xl pointer-events-none" style={glowStyles.outer} />
-        <div className="absolute -inset-4 rounded-[2.5rem] blur-2xl pointer-events-none" style={glowStyles.middle} />
-        <div className="absolute inset-0 rounded-[2rem] blur-xl pointer-events-none" style={glowStyles.inner} />
-
-        <div className="relative">
+      {/* ==================== CURRENT SPLIT ==================== */}
+      <div className="px-4 py-2">
+        <div>
           <div className="flex items-start justify-between mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -323,7 +312,7 @@ export default function Home() {
                 return (
                 <div
                   key={template.id}
-                  className={`relative bg-card rounded-xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses} ${
+                  className={`relative bg-card rounded-xl p-4 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-150 ${accent.cardClasses} ${
                     isTodayCard ? 'ring-2 ring-emerald-400/60' : ''
                   }`}
                 >
