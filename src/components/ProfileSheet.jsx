@@ -5,7 +5,9 @@ import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
 import { useNavVisibility } from '@/lib/NavContext';
 
-export default function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange }) {
+import { memo } from 'react';
+
+const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange }) {
   const [showFeedback, setShowFeedback] = useState(false);
   const { setHideNav } = useNavVisibility();
 
@@ -182,4 +184,6 @@ export default function ProfileSheet({ onClose, darkMode, onToggleDark, profileP
     </div>,
     document.body
   );
-}
+});
+
+export default ProfileSheet;

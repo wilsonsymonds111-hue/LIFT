@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { MoreHorizontal, CalendarPlus, Plus } from 'lucide-react';
@@ -105,23 +105,22 @@ export default function Home() {
 
   const { pullY, refreshing } = usePullToRefresh(() => invalidateWorkoutTemplates(queryClient));
 
-  const handleRemoveFromSplit = async (template) => {
+  const handleRemoveFromSplit = useCallback(async (template) => {
     setMenuOpen(null);
-    // Optimistically update cache
     queryClient.setQueryData(['workoutTemplates'], (prev) => prev?.filter(t => t.id !== template.id));
     await base44.entities.WorkoutTemplate.update(template.id, {
       isActiveSplit: false,
       splitGroup: 'removed_' + Date.now(),
     });
     invalidateWorkoutTemplates(queryClient);
-  };
+  }, [queryClient]);
 
-  const handleSyncToCalendar = () => {
+  const handleSyncToCalendar = useCallback(() => {
     setSplitMenuOpen(false);
     setShowCalendarSync(true);
-  };
+  }, []);
 
-  const handleCalendarSyncConfirm = (hour) => {
+  const handleCalendarSyncConfirm = useCallback((hour) => {
     setShowCalendarSync(false);
     const ics = generateWorkoutICS({
       splitName: currentSplitName,
@@ -137,7 +136,7 @@ export default function Home() {
     a.download = 'lift-workouts.ics';
     a.click();
     URL.revokeObjectURL(url);
-  };
+  }, [currentSplitName, currentSplit, splitDetection]);
 
   // --- Split categorization ---
   const { currentSplit, currentSplitName, splitDetection, dayWorkoutNames, todayWorkoutIndex } = useMemo(() => {

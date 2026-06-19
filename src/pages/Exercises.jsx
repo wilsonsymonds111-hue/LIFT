@@ -1,12 +1,10 @@
-import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { ALL_EXERCISES, MUSCLES } from '../lib/exercises';
 import { base44 } from '@/api/base44Client';
 import ProfileButton from '../components/ProfileButton';
 import ExerciseDetailModal from '../components/ExerciseDetailModal';
-import ExerciseRow from '../components/ExerciseRow';
-
-const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+import ExerciseList from '../components/ExerciseList';
 
 const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
 
@@ -15,7 +13,10 @@ export default function Exercises() {
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [exerciseHistory, setExerciseHistory] = useState({});
-  const sectionRefs = useRef({});
+
+  const handleSelectExercise = useCallback((ex) => {
+    setSelectedExercise(ex);
+  }, []);
 
   useEffect(() => {
     base44.entities.Exercise.list('name', 500).then(results => {
@@ -49,12 +50,7 @@ export default function Exercises() {
     return Object.entries(map).sort(([a], [b]) => a.localeCompare(b));
   }, [filtered]);
 
-  const availableLetters = useMemo(() => grouped.map(([l]) => l), [grouped]);
 
-  const scrollToLetter = useCallback((letter) => {
-    const el = sectionRefs.current[letter];
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  }, []);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -97,51 +93,7 @@ export default function Exercises() {
         })}
       </div>
 
-      {/* Exercise list with side index */}
-      <div className="relative">
-        <div className="pl-4 pr-10">
-          {grouped.map(([letter, exs]) => (
-            <div key={letter} ref={el => sectionRefs.current[letter] = el}>
-              <div className="py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest bg-background sticky top-0">
-                {letter}
-              </div>
-              {exs.map(ex => (
-                <ExerciseRow
-                  key={ex.name}
-                  exercise={ex}
-                  exerciseHistory={exerciseHistory}
-                  onClick={() => setSelectedExercise(ex)}
-                />
-              ))}
-            </div>
-          ))}
-          {grouped.length === 0 && (
-            <p className="text-center text-muted-foreground text-sm mt-10">No exercises found</p>
-          )}
-        </div>
-
-        {/* Alphabetical side index */}
-        {availableLetters.length > 0 && (
-          <div className="fixed right-1 top-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 z-30">
-            {LETTERS.map(l => {
-              const exists = availableLetters.includes(l);
-              return (
-                <button
-                  key={l}
-                  onClick={() => exists && scrollToLetter(l)}
-                  className={`text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-sm transition ${
-                    exists
-                      ? 'text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950'
-                      : 'text-muted-foreground/30'
-                  }`}
-                >
-                  {l}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
+      <ExerciseList grouped={grouped} exerciseHistory={exerciseHistory} onSelectExercise={handleSelectExercise} />
 
       {selectedExercise && (
         <ExerciseDetailModal
