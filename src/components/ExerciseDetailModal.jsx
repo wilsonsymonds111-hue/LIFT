@@ -110,9 +110,25 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
   const kgVals = history.map(h => h.kg || 0).filter(k => k > 0);
   const repsWeightLevel = kgVals.length > 0 ? Math.max(...kgVals) : null;
 
-  // Compute stats
+  // Compute stats from the active chart data so they always match the graph
   const stats = history.length > 0
     ? (() => {
+        const isRepsView = chartView === 'reps' && !isBodyweight;
+        if (isRepsView) {
+          // Reps chart for weighted exercise — stats reflect rep progression at current max weight
+          const entries = repsHistory;
+          const allReps = entries.map(h => h.reps || 0);
+          const firstReps = entries[0]?.reps || 0;
+          const bestReps = Math.max(...allReps);
+          const suggestion = getNextGoal(exercise.name, history) || `${bestReps + 1} reps`;
+          return {
+            start: firstReps + ' reps',
+            best: bestReps + ' reps',
+            increase: `+${bestReps - firstReps} reps`,
+            suggestion,
+          };
+        }
+        // Weight chart (or true bodyweight) — full history stats
         const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
         const reps = history.map(h => h.reps || 0);
         const bestKg = Math.max(...kgs);
