@@ -11,6 +11,7 @@ const SPLIT_IMAGES = {
 const DEFAULT_IMAGES = [
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9024d2186_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6b7b7dcad_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/fb7125a5d_image.png',
 ];
 
 function detectSplitType(workoutNames) {

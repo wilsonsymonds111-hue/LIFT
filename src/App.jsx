@@ -84,7 +84,7 @@ const SwipeableTabs = () => {
   }
 
   return (
-    <div ref={containerRef} className="relative overflow-y-auto overflow-x-hidden w-full flex-1" style={TAB_STYLES}>
+    <div ref={containerRef} className="relative overflow-hidden w-full flex-1" style={TAB_STYLES}>
       <motion.div
         drag="x"
         dragDirectionLock
@@ -94,26 +94,15 @@ const SwipeableTabs = () => {
         animate={{ x: -activeIndex * width }}
         transition={{ type: 'spring', stiffness: 400, damping: 26, mass: 0.18 }}
         className="flex"
-        style={{ width: TABS.length * width, willChange: 'transform' }}
+        style={{ width: TABS.length * width, height: '100%', willChange: 'transform' }}
       >
-        {TAB_CONTENT.map((Component, i) => {
-          const isActive = i === activeIndex;
-          return (
-            <div key={TABS[i]}
-              className="flex-shrink-0"
-              style={{
-                width,
-                overflow: isActive ? 'visible' : 'hidden',
-                height: isActive ? 'auto' : 0,
-                contain: isActive ? undefined : 'strict',
-              }}
-            >
-              <Suspense fallback={SUSPENSE_FALLBACK}>
-                <Component />
-              </Suspense>
-            </div>
-          );
-        })}
+        {TAB_CONTENT.map((Component, i) => (
+          <div key={TABS[i]} className="flex-shrink-0 overflow-y-auto" style={{ width, height: '100%' }}>
+            <Suspense fallback={SUSPENSE_FALLBACK}>
+              <Component />
+            </Suspense>
+          </div>
+        ))}
       </motion.div>
     </div>
   );
