@@ -53,13 +53,7 @@ export default function Splits() {
     localStorage.setItem('splitsActiveTab', activeTab);
   }, [activeTab]);
 
-  // Track tab switch direction for slide animation: 1 = right (to examples), -1 = left (to mine)
-  const tabDirectionRef = useRef(0);
 
-  const handleTabSwitch = (tab) => {
-    tabDirectionRef.current = tab === 'examples' ? 1 : -1;
-    setActiveTab(tab);
-  };
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -119,7 +113,7 @@ export default function Splits() {
   // If user has no saved splits, auto-switch to examples tab (unless builder is open or user just chose "mine")
   useEffect(() => {
     if (!loading && mySplitGroups.length === 0 && !showBuilder && activeTab !== 'mine') {
-      handleTabSwitch('examples');
+      setActiveTab('examples');
     }
   }, [loading, mySplitGroups.length, showBuilder, activeTab]);
 
@@ -340,7 +334,7 @@ export default function Splits() {
       <div className="px-4 mb-5">
         <div className="flex bg-muted rounded-xl p-1 gap-1">
           <button
-            onClick={() => handleTabSwitch('mine')}
+            onClick={() => setActiveTab('mine')}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
               activeTab === 'mine'
                 ? 'bg-blue-500 text-white shadow-md'
@@ -350,7 +344,7 @@ export default function Splits() {
             My Splits
           </button>
           <button
-            onClick={() => handleTabSwitch('examples')}
+            onClick={() => setActiveTab('examples')}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
               activeTab === 'examples'
                 ? 'bg-blue-500 text-white shadow-md'
@@ -362,65 +356,66 @@ export default function Splits() {
         </div>
       </div>
 
-      {/* Sub-tab content — side-by-side slide transition */}
+      {/* Sub-tab content — side-by-side slide (both panels rendered, animated as a strip) */}
       <div className="relative w-full overflow-hidden">
-        <AnimatePresence initial={false}>
-          <motion.div
-            key={activeTab}
-            initial={{ x: tabDirectionRef.current > 0 ? '100%' : '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: tabDirectionRef.current > 0 ? '-100%' : '100%' }}
-            transition={{ duration: 0.25, ease: [0.33, 1, 0.68, 1] }}
-          >
-            {activeTab === 'mine' ? (
-              <div className="px-4">
-                <button
-                  onClick={() => setShowBuilder(true)}
-                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Create New Split
-                </button>
-                {mySplitGroups.length > 0 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    {mySplitGroups.map((group, idx) => {
-                      const isActive = group.templates.some(t => t.isActiveSplit);
-                      return (
-                      <SplitCard
-                        key={group.groupId}
-                        splitKey={group.groupId}
-                        name={group.templates[0]?.splitName || group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
-                        workouts={group.templates.map(t => ({ name: t.name }))}
-                        isActive={isActive}
-                        imageIndex={idx}
-                        onCardClick={() => setActiveSplit(group.groupId)}
-                        onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
-                        menuRef={el => menuRef.current[group.groupId] = el}
-                      />
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
+        <motion.div
+          animate={{ x: activeTab === 'mine' ? 0 : '-100%' }}
+          transition={{ duration: 0.25, ease: [0.33, 1, 0.68, 1] }}
+          className="flex"
+          style={{ width: '200%' }}
+        >
+          {/* My Splits panel */}
+          <div className="w-1/2 flex-shrink-0">
+            <div className="px-4">
+              <button
+                onClick={() => setShowBuilder(true)}
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Create New Split
+              </button>
+              {mySplitGroups.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  {mySplitGroups.map((group, idx) => {
+                    const isActive = group.templates.some(t => t.isActiveSplit);
+                    return (
                     <SplitCard
-                      key={key}
-                      splitKey={key}
-                      name={split.name}
-                      workouts={split.workouts}
-                      isActive={activeExampleSplits[key] || false}
-                      onCardClick={() => setActiveSplit(key)}
-                      cardRef={el => cardRefs.current[key] = el}
+                      key={group.groupId}
+                      splitKey={group.groupId}
+                      name={group.templates[0]?.splitName || group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
+                      workouts={group.templates.map(t => ({ name: t.name }))}
+                      isActive={isActive}
+                      imageIndex={idx}
+                      onCardClick={() => setActiveSplit(group.groupId)}
+                      onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
+                      menuRef={el => menuRef.current[group.groupId] = el}
                     />
-                  ))}
+                    );
+                  })}
                 </div>
+              )}
+            </div>
+          </div>
+
+          {/* Example Splits panel */}
+          <div className="w-1/2 flex-shrink-0">
+            <div className="px-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
+                  <SplitCard
+                    key={key}
+                    splitKey={key}
+                    name={split.name}
+                    workouts={split.workouts}
+                    isActive={activeExampleSplits[key] || false}
+                    onCardClick={() => setActiveSplit(key)}
+                    cardRef={el => cardRefs.current[key] = el}
+                  />
+                ))}
               </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+            </div>
+          </div>
+        </motion.div>
       </div>
 
 
@@ -499,7 +494,7 @@ export default function Splits() {
             onSaved={() => {
               setShowBuilder(false);
               invalidateWorkoutTemplates(queryClient);
-              handleTabSwitch('mine');
+              setActiveTab('mine');
               localStorage.setItem('splitsActiveTab', 'mine');
             }}
           />
