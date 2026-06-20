@@ -152,19 +152,27 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Account section */}
         {isGuest && (
           <>
+            <div className="bg-muted rounded-2xl px-4 py-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-4 h-4 text-muted-foreground" />
+                </div>
+                <div className="text-left flex-1">
+                  <p className="font-semibold text-foreground text-sm">You are in guest mode</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Create an account to access your data on other devices</p>
+                </div>
+              </div>
+            </div>
             <button
               onClick={() => setShowCreateAccount(true)}
-              className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70 hover:ring-2 hover:ring-blue-400/50"
+              className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <Shield className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <UserPlus className="w-4 h-4 text-white" />
               </div>
               <div className="text-left flex-1">
-                <p className="font-semibold text-foreground text-sm">Data stored on this device</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Create an account to save your data to the cloud and sync across devices</p>
-              </div>
-              <div className="flex-shrink-0">
-                <UserPlus className="w-4 h-4 text-blue-500" />
+                <p className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">Create Account</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Save your data to the cloud and sync across devices</p>
               </div>
             </button>
 
@@ -185,19 +193,27 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
 
         {isAuthenticated && (
           <>
+            <div className="bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-4 h-4 text-blue-500" />
+                </div>
+                <div className="text-left flex-1">
+                  <p className="font-semibold text-foreground text-sm">Data stored on this device</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Create an account to save a copy to the cloud and sync across devices</p>
+                </div>
+              </div>
+            </div>
             <button
               onClick={() => setShowCreateAccount(true)}
-              className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70 hover:ring-2 hover:ring-blue-400/50"
+              className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <Shield className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <UserPlus className="w-4 h-4 text-white" />
               </div>
               <div className="text-left flex-1">
-                <p className="font-semibold text-foreground text-sm">Data stored on this device</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Create an account to save your data to the cloud and sync across devices</p>
-              </div>
-              <div className="flex-shrink-0">
-                <UserPlus className="w-4 h-4 text-blue-500" />
+                <p className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">Create Account</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Set a username and password to sync your data to the cloud</p>
               </div>
             </button>
           </>
