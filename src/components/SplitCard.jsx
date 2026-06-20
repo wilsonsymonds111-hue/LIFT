@@ -65,7 +65,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           {/* Active badge */}
           {isActive && (
             <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-emerald-500/80 backdrop-blur-sm text-white text-[10px] font-extrabold uppercase tracking-wider">
-              Active
+              Current Split
             </div>
           )}
 
