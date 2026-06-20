@@ -359,13 +359,13 @@ export default function Splits() {
       {/* Sub-tab content — side-by-side slide (both panels rendered, animated as a strip) */}
       <div className="relative w-full overflow-hidden">
         <motion.div
-          animate={{ x: activeTab === 'mine' ? 0 : '-100%' }}
+          animate={{ x: activeTab === 'mine' ? 0 : '-50%' }}
           transition={{ duration: 0.25, ease: [0.33, 1, 0.68, 1] }}
           className="flex"
           style={{ width: '200%' }}
         >
           {/* My Splits panel */}
-          <div className="w-1/2 flex-shrink-0">
+          <div style={{ width: '50%', flexShrink: 0 }}>
             <div className="px-4">
               <button
                 onClick={() => setShowBuilder(true)}
@@ -398,7 +398,7 @@ export default function Splits() {
           </div>
 
           {/* Example Splits panel */}
-          <div className="w-1/2 flex-shrink-0">
+          <div style={{ width: '50%', flexShrink: 0 }}>
             <div className="px-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
