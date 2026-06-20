@@ -44,13 +44,18 @@ function resolveSchedule(key, workoutCount, groupId) {
   let onDays = defaultCycle ? defaultCycle.onDays : null;
   let offDays = defaultCycle ? defaultCycle.offDays : null;
 
-  // Check localStorage for user customizations — overrides defaults even for known types
+  // Check localStorage for user customizations — overrides defaults even for known types.
+  // Try both the split key (stored by RestFrequencyConfirmModal) and the group ID.
   try {
-    const cycleRaw = localStorage.getItem(`splitCycle_${groupId}`);
-    if (cycleRaw) {
-      const parsed = JSON.parse(cycleRaw);
-      onDays = Number(parsed.onDays) || onDays;
-      offDays = Number(parsed.offDays) || offDays;
+    const keysToTry = [key, groupId].filter(Boolean);
+    for (const k of keysToTry) {
+      const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
+      if (cycleRaw) {
+        const parsed = JSON.parse(cycleRaw);
+        onDays = Number(parsed.onDays) || onDays;
+        offDays = Number(parsed.offDays) || offDays;
+        break;
+      }
     }
   } catch {}
 
