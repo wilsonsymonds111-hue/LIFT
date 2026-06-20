@@ -6,7 +6,7 @@ export async function ensureExerciseDetail(exerciseName) {
   try {
     const results = await base44.entities.ExerciseDetail.filter({ name: exerciseName });
     if (results?.length > 0 && results[0].image_url) {
-      return { image_url: results[0].image_url, existed: true };
+      return { image_url: results[0].image_url, muscles_worked: results[0].muscles_worked, existed: true };
     }
 
     // Generate — first get muscles, then image
@@ -34,8 +34,8 @@ export async function ensureExerciseDetail(exerciseName) {
       image_url,
       muscles_worked,
     });
-    return { image_url, existed: false };
+    return { image_url, muscles_worked, existed: false };
   } catch {
-    return { image_url: '', existed: false };
+    return { image_url: '', muscles_worked: '', existed: false };
   }
 }

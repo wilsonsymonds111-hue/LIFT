@@ -988,12 +988,22 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
               {showExercisePicker && (
                 <ExercisePicker
                   onClose={() => setShowExercisePicker(false)}
-                  onAdd={(picked) => {
+                  onAdd={async (picked) => {
                     setExercises(prev => {
                       const existing = new Set(prev.map(e => e.name));
                       const newOnes = picked.filter(e => !existing.has(e.name)).map(e => ({ ...e, sets: 1, history: [] }));
                       return [...prev, ...newOnes];
                     });
+                    // Generate images for newly added exercises
+                    const newNames = picked.filter(e => !exerciseImages[e.name]).map(e => e.name);
+                    if (newNames.length > 0) {
+                      const generated = {};
+                      for (const name of newNames) {
+                        const result = await ensureExerciseDetail(name);
+                        if (result.image_url) generated[name] = result.image_url;
+                      }
+                      setExerciseImages(prev => ({ ...prev, ...generated }));
+                    }
                     setShowExercisePicker(false);
                   }}
                 />

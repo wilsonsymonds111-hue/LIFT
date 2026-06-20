@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import ProgressGraph, { getNextGoal } from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
 
@@ -47,36 +48,31 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab }) {
   useEffect(() => {
     setLoadingDetail(true);
     base44.entities.ExerciseDetail.filter({ name: exercise.name }).then(async (results) => {
-      if (results?.length > 0) {
+      if (results?.length > 0 && results[0].instructions) {
         setDetail(results[0]);
         setLoadingDetail(false);
       } else {
-        // Generate details via LLM: first determine muscles, then image + instructions
+        // Generate via shared utility (image + muscles), then add instructions
         try {
-          // Step 1: get the muscles worked
-          const musclesRes = await base44.integrations.Core.InvokeLLM({
-            prompt: `List the primary and secondary muscle groups worked by the "${exercise.name}" exercise. Output ONLY a comma-separated list, e.g. "Chest, Front Delts, Triceps". Keep it to 3-5 muscles max. No other text.`,
-          });
-          const muscles_worked = (musclesRes?.data || musclesRes || exercise.muscle).trim();
+          const generated = await ensureExerciseDetail(exercise.name);
 
-          // Step 2: generate image (with specific muscles) and instructions in parallel
-          const [imgRes, llmRes] = await Promise.all([
-            base44.integrations.Core.GenerateImage({
-              prompt: `Two side-by-side anatomical figures showing the "${exercise.name}" exercise: the left figure shows the starting position, the right figure shows the finishing position. Both figures are identical in size, proportions, camera angle, body composition, and anatomical detail. Clean white background. Grayscale anatomical style with visible musculature, no skin texture, like a fitness anatomy reference diagram. ONLY the following muscles must be highlighted in red: ${muscles_worked}. No other muscles should be red. No text, labels, arrows, numbers, logos, watermarks, or annotations. Exercise equipment accurately represented for each phase. Professional museum-quality medical illustration style.`,
-            }).catch(() => ({ url: '' })),
-            base44.integrations.Core.InvokeLLM({
-              prompt: `Write 4 short, numbered step-by-step instructions for how to perform the "${exercise.name}" exercise at the gym. Keep each step to 1-2 sentences. Be clear and concise. Output format: plain text with each step on a new line starting with the number and a period.`,
-            }),
-          ]);
-          const image_url = imgRes?.url || '';
-          const instructions = llmRes?.data || llmRes || '';
-          const newDetail = await base44.entities.ExerciseDetail.create({
-            name: exercise.name,
-            instructions,
-            image_url,
-            muscles_worked,
+          // Generate instructions
+          const llmRes = await base44.integrations.Core.InvokeLLM({
+            prompt: `Write 4 short, numbered step-by-step instructions for how to perform the "${exercise.name}" exercise at the gym. Keep each step to 1-2 sentences. Be clear and concise. Output format: plain text with each step on a new line starting with the number and a period.`,
           });
-          setDetail(newDetail);
+          const instructions = llmRes?.data || llmRes || '';
+
+          if (results?.length > 0) {
+            await base44.entities.ExerciseDetail.update(results[0].id, { instructions });
+            setDetail({ ...results[0], image_url: generated.image_url, instructions, muscles_worked: generated.muscles_worked || results[0].muscles_worked });
+          } else {
+            // ensureExerciseDetail already created the record; now update with instructions
+            const fresh = await base44.entities.ExerciseDetail.filter({ name: exercise.name });
+            if (fresh?.length > 0) {
+              await base44.entities.ExerciseDetail.update(fresh[0].id, { instructions });
+              setDetail({ ...fresh[0], instructions });
+            }
+          }
         } catch (_) {}
         setLoadingDetail(false);
       }
