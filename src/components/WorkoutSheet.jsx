@@ -188,7 +188,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
 /* ─── ExerciseSection ────────────────────────────────────────── */
 const graphFadeStyle = `@keyframes graphFadeIn { from { opacity: 0.3; transform: scaleY(0.96); } to { opacity: 1; transform: scaleY(1); } }`;
 
-const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise }) {
+const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage }) {
   // Compute PR from exercise history for progression targets
   const pr = useMemo(() => {
     const history = exercise.history || [];
@@ -265,11 +265,20 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     <style>{graphFadeStyle}</style>
     <div className="mb-4">
       <div className="flex items-center justify-between mb-1 relative">
-        <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing" {...dragHandleProps}>{exercise.name}</h3>
-        <div className="flex items-center gap-3 relative">
-          <button onClick={() => setShowMenu(m => !m)} className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-gray-100 transition">
-            <MoreHorizontal className="w-4 h-4 text-gray-400" />
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing truncate" {...dragHandleProps}>{exercise.name}</h3>
+          <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 transition flex-shrink-0">
+            <MoreHorizontal className="w-3.5 h-3.5 text-gray-400" />
           </button>
+        </div>
+        <div className="flex items-center gap-3 relative flex-shrink-0">
+          {exerciseImage ? (
+            <img src={exerciseImage} alt={exercise.name} className="w-11 h-9 rounded-lg object-contain" />
+          ) : (
+            <div className="w-11 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
+              <span className="text-[10px] font-bold text-gray-400">{exercise.name[0]}</span>
+            </div>
+          )}
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
@@ -807,6 +816,18 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     });
   }, []);
 
+  // Load exercise images from ExerciseDetail
+  const [exerciseImages, setExerciseImages] = useState({});
+  useEffect(() => {
+    base44.entities.ExerciseDetail.list('name', 500).then(results => {
+      const map = {};
+      (results || []).forEach(d => {
+        if (d.image_url) map[d.name] = d.image_url;
+      });
+      setExerciseImages(map);
+    });
+  }, []);
+
   // Merge Exercise entity history into exercises
   useEffect(() => {
     if (Object.keys(exerciseHistory).length === 0) return;
@@ -983,7 +1004,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                         <Draggable key={exercise.name + idx} draggableId={exercise.name + idx} index={idx}>
                           {(p) => (
                             <div ref={p.innerRef} {...p.draggableProps}>
-                              <ExerciseSection key={`${exercise.name}-${(exercise.history || []).length}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} onDeleteExercise={() => setExercises(prev => prev.filter((_, i) => i !== idx))} />
+                              <ExerciseSection key={`${exercise.name}-${(exercise.history || []).length}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name]} onDeleteExercise={() => setExercises(prev => prev.filter((_, i) => i !== idx))} />
                             </div>
                           )}
                         </Draggable>
