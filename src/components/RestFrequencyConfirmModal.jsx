@@ -53,6 +53,17 @@ export default function RestFrequencyConfirmModal({ splitKey, defaultSchedule, o
     [onDays, offDays, startDayIndex]
   );
 
+  // Shift the week to start from today so the user sees the next 7 days
+  const shiftedDayLabels = useMemo(
+    () => [...DAY_LABELS.slice(todayMonSun), ...DAY_LABELS.slice(0, todayMonSun)],
+    [todayMonSun]
+  );
+  const shiftedSchedule = useMemo(
+    () => [...previewSchedule.slice(todayMonSun), ...previewSchedule.slice(0, todayMonSun)],
+    [previewSchedule, todayMonSun]
+  );
+  const shiftedStartDayIndex = (startDayIndex - todayMonSun + 7) % 7;
+
   const frequencyLabel = useMemo(() => {
     const onPart = `${onDays} day${onDays !== 1 ? 's' : ''} on`;
     const offPart = `${offDays} day${offDays !== 1 ? 's' : ''} off`;
@@ -96,10 +107,10 @@ export default function RestFrequencyConfirmModal({ splitKey, defaultSchedule, o
             <p className="text-sm font-bold text-foreground text-center">{frequencyLabel}</p>
             <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mt-3 mb-2">Starting on</p>
             <div className="flex justify-center gap-1">
-              {previewSchedule.map((status, i) => {
+              {shiftedSchedule.map((status, i) => {
                 const isGymDay = status === 1;
-                const isStart = startDayIndex === i;
-                const isToday = i === todayMonSun;
+                const isStart = shiftedStartDayIndex === i;
+                const isToday = i === 0;
                 return (
                   <div
                     key={i}
@@ -107,7 +118,7 @@ export default function RestFrequencyConfirmModal({ splitKey, defaultSchedule, o
                       isStart ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30' : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800'
                     } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
                   >
-                    <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{DAY_LABELS[i]}</span>
+                    <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{shiftedDayLabels[i]}</span>
                     <div className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
                       isGymDay
                         ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
