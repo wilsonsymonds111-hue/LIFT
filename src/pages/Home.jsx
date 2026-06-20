@@ -57,18 +57,10 @@ function resolveSchedule(key, workoutCount, groupId) {
     offDays = offDays || 1;
   }
 
-  let startDayIndex;
-  try {
-    const keysToTry = [groupId, key].filter(Boolean);
-    for (const k of keysToTry) {
-      const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
-      if (cycleRaw) {
-        startDayIndex = Number(JSON.parse(cycleRaw).startDayIndex);
-        break;
-      }
-    }
-  } catch {}
-  startDayIndex = startDayIndex != null ? startDayIndex : todayMonSun;
+  // Always start the cycle from today so the display makes intuitive sense.
+  // A stale startDayIndex from localStorage would make the 7-day window
+  // cut across the cycle boundary, showing a misleading number of consecutive on-days.
+  const startDayIndex = todayMonSun;
 
   const schedule = cycleToSchedule(onDays, offDays, startDayIndex);
   return { schedule, startDayIndex, onDays, offDays };
