@@ -3,6 +3,7 @@ import { Search } from 'lucide-react';
 import { MUSCLES } from '../lib/exercises';
 import { getAllExercises } from '../lib/customExercises';
 import { base44 } from '@/api/base44Client';
+import { getExerciseDetailList } from '../lib/exerciseCache';
 import ProfileButton from '../components/ProfileButton';
 import ExerciseList from '../components/ExerciseList';
 
@@ -24,7 +25,7 @@ export default function Exercises() {
   useEffect(() => {
     Promise.all([
       base44.entities.Exercise.list('name', 200),
-      base44.entities.ExerciseDetail.list('name', 200),
+      getExerciseDetailList(),
     ]).then(([exerciseResults, detailResults]) => {
       const historyMap = {};
       (exerciseResults || []).forEach(ex => {

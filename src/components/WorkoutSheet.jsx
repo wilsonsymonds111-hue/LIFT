@@ -8,6 +8,7 @@ import { RestTimerModal, RestTimerPill } from './RestTimerModal';
 import ExerciseDetailModal from './ExerciseDetailModal';
 import { getDefaultRestDuration } from '../lib/exerciseDefaults';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
+import { getExerciseDetailList } from '../lib/exerciseCache';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 import ProgressGraph from './ProgressGraph';
@@ -820,6 +821,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
 
   // Load Exercise entity history (shared across all splits)
   useEffect(() => {
+    getExerciseDetailList().then(() => {}); // warm cache on mount for dual-purpose
     base44.entities.Exercise.list('name', 200).then(results => {
       const map = {};
       (results || []).forEach(ex => {
@@ -832,7 +834,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   // Load exercise images from ExerciseDetail, generating missing ones on the fly
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
-    base44.entities.ExerciseDetail.list('name', 200).then(async (results) => {
+    getExerciseDetailList().then(async (results) => {
       // Case-insensitive map — template exercises may use different casing than ExerciseDetail
       const detailByName = {};
       (results || []).forEach(d => {
