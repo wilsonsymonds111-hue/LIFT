@@ -764,7 +764,12 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [bestSets, setBestSets] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [finishTimer, setFinishTimer] = useState('00:00');
-  const [exercises, setExercises] = useState(() => [...(template?.exerciseList || [])]);
+  const [exercises, setExercises] = useState(() =>
+    (template?.exerciseList || []).map(ex => ({
+      ...ex,
+      name: ex.name.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()),
+    }))
+  );
   const [exerciseHistory, setExerciseHistory] = useState({});
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [showRestTimerPicker, setShowRestTimerPicker] = useState(false);
