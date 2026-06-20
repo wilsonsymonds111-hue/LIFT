@@ -77,7 +77,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Guest mode badge */}
         {isAuthenticated && (
           <div className="flex justify-center">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-semibold">
               <AlertTriangle className="w-3 h-3" />
               You are in guest mode
             </span>
@@ -153,10 +153,10 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Account section */}
         {isGuest && (
           <>
-            <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl px-4 py-3.5">
+            <div className="bg-muted rounded-2xl px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-4 h-4 text-amber-500" />
+                <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-4 h-4 text-muted-foreground" />
                 </div>
                 <div className="text-left flex-1">
                   <p className="font-semibold text-foreground text-sm">You are in guest mode</p>
@@ -166,13 +166,13 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             </div>
             <button
               onClick={() => setShowCreateAccount(true)}
-              className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+              className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <UserPlus className="w-4 h-4 text-white" />
               </div>
               <div className="text-left flex-1">
-                <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Create Account</p>
+                <p className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">Create Account</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Save your data to the cloud and sync across devices</p>
               </div>
             </button>
@@ -194,10 +194,10 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
 
         {isAuthenticated && (
           <>
-            <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl px-4 py-3.5">
+            <div className="bg-muted rounded-2xl px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-4 h-4 text-amber-500" />
+                <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-4 h-4 text-muted-foreground" />
                 </div>
                 <div className="text-left flex-1">
                   <p className="font-semibold text-foreground text-sm">Data stored on this device</p>
@@ -207,13 +207,13 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             </div>
             <button
               onClick={() => setShowCreateAccount(true)}
-              className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+              className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <UserPlus className="w-4 h-4 text-white" />
               </div>
               <div className="text-left flex-1">
-                <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Create Account</p>
+                <p className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">Create Account</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Set a username and password to sync your data to the cloud</p>
               </div>
             </button>
