@@ -4,6 +4,19 @@ import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
 
 const MUSCLES = ['All', 'Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders', 'Other'];
 
+// Auto-detect muscle from exercise name via keyword matching
+function detectMuscle(name) {
+  const lower = name.toLowerCase();
+  if (/\b(chest|pec|fly|press)(?=\b|$)/.test(lower)) return 'Chest';
+  if (/\b(back|row|lats?|pulldown|pull.?up|chin.?up|deadlift|good.?morning)\b/.test(lower)) return 'Back';
+  if (/\b(shoulder|delt|raise|upright|arnold|face.?pull)\b/.test(lower)) return 'Shoulders';
+  if (/\b(leg|squat|lunge|curl|extension|calf|glute|hip|step.?up|sissy)\b/.test(lower)) return 'Legs';
+  if (/\b(bicep|tricep|curl|arm|skull|crusher|dip|pushdown|hammer|wrist|zottman|jm.?press)\b/.test(lower)) return 'Arms';
+  if (/\b(core|ab|cruch|plank|sit.?up|leg.?raise|dead.?bug|hollow|pallof|russian|v.?up)\b/.test(lower)) return 'Core';
+  if (/\b(burpee|clean|snatch|thruster|swing|sled|battle|farmer|turkish)\b/.test(lower)) return 'Full Body';
+  return 'Other';
+}
+
 export default function ExercisePicker({ onClose, onAdd }) {
   const [search, setSearch] = useState('');
   const [muscleFilter, setMuscleFilter] = useState('All');
@@ -120,7 +133,7 @@ export default function ExercisePicker({ onClose, onAdd }) {
               <p className="text-sm text-gray-400 text-center mb-3">No results for "{search}"</p>
               <button
                 onClick={() => {
-                  const newEx = { name: search.trim(), muscle: 'Other' };
+                  const newEx = { name: search.trim(), muscle: detectMuscle(search.trim()) };
                   saveCustomExercise(newEx);
                   setExercises(getAllExercises());
                   onAdd([newEx]);
