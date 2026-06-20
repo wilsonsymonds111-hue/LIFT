@@ -22,23 +22,25 @@ export default function Exercises() {
   }, []);
 
   useEffect(() => {
-    base44.entities.Exercise.list('name', 500).then(results => {
-      const map = {};
-      (results || []).forEach(ex => {
+    Promise.all([
+      base44.entities.Exercise.list('name', 200),
+      base44.entities.ExerciseDetail.list('name', 200),
+    ]).then(([exerciseResults, detailResults]) => {
+      const historyMap = {};
+      (exerciseResults || []).forEach(ex => {
         if (ex.history?.length > 0) {
-          map[ex.name] = ex.history
+          historyMap[ex.name] = ex.history
             .map(h => ({ v: h.reps || 0, date: h.date ? new Date(h.date) : null }))
             .sort((a, b) => (a.date || 0) - (b.date || 0));
         }
       });
-      setExerciseHistory(map);
-    });
-    base44.entities.ExerciseDetail.list('name', 500).then(results => {
-      const map = {};
-      (results || []).forEach(d => {
-        if (d.image_url) map[d.name] = d.image_url;
+      setExerciseHistory(historyMap);
+
+      const imageMap = {};
+      (detailResults || []).forEach(d => {
+        if (d.image_url) imageMap[d.name] = d.image_url;
       });
-      setExerciseImages(map);
+      setExerciseImages(imageMap);
     });
   }, []);
 

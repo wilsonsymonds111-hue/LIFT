@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, memo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { History, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -815,7 +815,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
 
   // Load Exercise entity history (shared across all splits)
   useEffect(() => {
-    base44.entities.Exercise.list('name', 500).then(results => {
+    base44.entities.Exercise.list('name', 200).then(results => {
       const map = {};
       (results || []).forEach(ex => {
         map[ex.name] = ex.history || [];
@@ -827,7 +827,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   // Load exercise images from ExerciseDetail, generating missing ones on the fly
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
-    base44.entities.ExerciseDetail.list('name', 500).then(async (results) => {
+    base44.entities.ExerciseDetail.list('name', 200).then(async (results) => {
       const map = {};
       (results || []).forEach(d => {
         if (d.image_url) map[d.name] = d.image_url;
@@ -837,12 +837,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
       const templateExercises = template?.exerciseList || [];
       const missing = templateExercises.filter(e => !map[e.name]);
       if (missing.length > 0) {
-        const generated = {};
-        for (const ex of missing) {
-          const result = await ensureExerciseDetail(ex.name);
-          if (result.image_url) generated[ex.name] = result.image_url;
-        }
-        Object.assign(map, generated);
+        // Generate all missing images in parallel
+        const results = await Promise.all(missing.map(ex => ensureExerciseDetail(ex.name)));
+        missing.forEach((ex, i) => {
+          if (results[i]?.image_url) map[ex.name] = results[i].image_url;
+        });
       }
 
       setExerciseImages(map);
@@ -858,14 +857,16 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     })));
   }, [exerciseHistory]);
 
-  if (!template) return null;
-
-  const handleBestSet = (name, kg, reps) => {
+  const handleBestSet = useCallback((name, kg, reps) => {
     const today = new Date().toISOString().slice(0, 10);
     bestSetsRef.current[name] = { kg, reps, date: today };
-  };
+  }, []);
 
-  const handleFinish = async () => {
+  const handleDeleteExercise = useCallback((idx) => {
+    setExercises(prev => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const handleFinish = useCallback(async () => {
     const snapshot = { ...bestSetsRef.current };
     const toKg = (h) => typeof h === 'object' ? h.kg : h;
     const toReps = (h) => typeof h === 'object' ? (h.reps ?? 8) : 8;
@@ -898,7 +899,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
       console.error('Save failed:', e);
     }
     setShowSummary(true);
-  };
+  }, [exercises, timer, onSaveHistory, template?.id]);
+
+  if (!template) return null;
 
   if (showSummary) {
     return (
@@ -994,14 +997,14 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                       const newOnes = picked.filter(e => !existing.has(e.name)).map(e => ({ ...e, sets: 1, history: [] }));
                       return [...prev, ...newOnes];
                     });
-                    // Generate images for newly added exercises
+                    // Generate images for newly added exercises in parallel
                     const newNames = picked.filter(e => !exerciseImages[e.name]).map(e => e.name);
                     if (newNames.length > 0) {
+                      const results = await Promise.all(newNames.map(name => ensureExerciseDetail(name)));
                       const generated = {};
-                      for (const name of newNames) {
-                        const result = await ensureExerciseDetail(name);
-                        if (result.image_url) generated[name] = result.image_url;
-                      }
+                      newNames.forEach((name, i) => {
+                        if (results[i]?.image_url) generated[name] = results[i].image_url;
+                      });
                       setExerciseImages(prev => ({ ...prev, ...generated }));
                     }
                     setShowExercisePicker(false);
@@ -1035,7 +1038,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                         <Draggable key={exercise.name + idx} draggableId={exercise.name + idx} index={idx}>
                           {(p) => (
                             <div ref={p.innerRef} {...p.draggableProps}>
-                              <ExerciseSection key={`${exercise.name}-${(exercise.history || []).length}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name]} onDeleteExercise={() => setExercises(prev => prev.filter((_, i) => i !== idx))} />
+                              <ExerciseSection key={`${exercise.name}-${(exercise.history || []).length}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name]} onDeleteExercise={() => handleDeleteExercise(idx)} />
                             </div>
                           )}
                         </Draggable>

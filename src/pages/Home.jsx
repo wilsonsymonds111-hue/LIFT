@@ -204,18 +204,19 @@ export default function Home() {
     workoutCount = currentSplit.length;
   }
 
-  const splitDetection = { key: splitKey, ...resolveSchedule(splitKey, workoutCount, groupId) };
+  const splitDetection = useMemo(
+    () => ({ key: splitKey, ...resolveSchedule(splitKey, workoutCount, groupId) }),
+    [splitKey, workoutCount, groupId]
+  );
 
   const { schedule, startDayIndex, onDays, offDays } = splitDetection;
   const sorted = currentSplit;
 
   // Map each on-day to a workout by counting only ON days (skip rest days in modulo).
-  // This fixes the bug where off-days were eating workout slots in the modulo calculation.
-  const dayWorkoutNames = (() => {
+  const dayWorkoutNames = useMemo(() => {
     const names = [];
     for (let i = 0; i < 7; i++) {
       if (schedule[i] && sorted.length > 0) {
-        // Count how many on-days from startDayIndex up to (and including) day i
         let onDayCount = 0;
         for (let j = startDayIndex; ; j++) {
           const idx = j % 7;
@@ -229,21 +230,20 @@ export default function Home() {
       }
     }
     return names;
-  })();
+  }, [schedule, startDayIndex, sorted]);
 
-  const todayMonSun = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+  const todayMonSun = useMemo(() => new Date().getDay() === 0 ? 6 : new Date().getDay() - 1, []);
   // Which on-day index is today (0-based)
-  const todayWorkoutIndex = schedule[todayMonSun] >= 1 && sorted.length > 0
-    ? (() => {
-        let onDayCount = 0;
-        for (let j = startDayIndex; ; j++) {
-          const idx = j % 7;
-          if (schedule[idx]) onDayCount++;
-          if (idx === todayMonSun) break;
-        }
-        return (onDayCount - 1) % sorted.length;
-      })()
-    : -1;
+  const todayWorkoutIndex = useMemo(() => {
+    if (schedule[todayMonSun] < 1 || sorted.length === 0) return -1;
+    let onDayCount = 0;
+    for (let j = startDayIndex; ; j++) {
+      const idx = j % 7;
+      if (schedule[idx]) onDayCount++;
+      if (idx === todayMonSun) break;
+    }
+    return (onDayCount - 1) % sorted.length;
+  }, [schedule, todayMonSun, sorted, startDayIndex]);
 
   const handleCalendarSyncConfirm = useCallback((hour) => {
     setShowCalendarSync(false);
