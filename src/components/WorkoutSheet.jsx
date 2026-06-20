@@ -29,17 +29,66 @@ function _ensureAudio() {
 // Start preloading immediately
 _ensureAudio();
 
-const WORKOUT_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/ef07423c3_speech.mp3';
-let _completeAudio = null;
+let _completeSound = null;
 function _ensureComplete() {
-  if (!_completeAudio) { _completeAudio = new Audio(WORKOUT_COMPLETE_SOUND); _completeAudio.preload = 'auto'; _completeAudio.load(); }
+  if (!_completeSound) {
+    _completeSound = new Audio();
+    // Generate a short percussive "ding" as a data URL
+    const sampleRate = 44100;
+    const duration = 0.15; // seconds
+    const freq = 1760; // A6 — bright bell
+    const samples = Math.floor(sampleRate * duration);
+    const buffer = new Float32Array(samples);
+    for (let i = 0; i < samples; i++) {
+      const t = i / sampleRate;
+      const envelope = Math.exp(-t * 30); // quick decay
+      // Mix fundamental + slight harmonic for bell character
+      const wave = Math.sin(2 * Math.PI * freq * t) + 0.3 * Math.sin(2 * Math.PI * freq * 2.1 * t);
+      buffer[i] = wave * envelope * 0.6;
+    }
+    const wav = encodeWAV(buffer, sampleRate);
+    _completeSound.src = URL.createObjectURL(new Blob([wav], { type: 'audio/wav' }));
+    _completeSound.load();
+  }
+}
+function encodeWAV(samples, sampleRate) {
+  const numChannels = 1;
+  const bytesPerSample = 2;
+  const blockAlign = numChannels * bytesPerSample;
+  const byteRate = sampleRate * blockAlign;
+  const dataSize = samples.length * bytesPerSample;
+  const buffer = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(buffer);
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeString(view, 8, 'WAVE');
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, byteRate, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bytesPerSample * 8, true);
+  writeString(view, 36, 'data');
+  view.setUint32(40, dataSize, true);
+  let offset = 44;
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    offset += 2;
+  }
+  return buffer;
+}
+function writeString(view, offset, string) {
+  for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
 }
 _ensureComplete();
 function playCompleteSound() {
-  if (!_completeAudio) _ensureComplete();
-  if (!_completeAudio) return;
-  _completeAudio.currentTime = 0;
-  _completeAudio.play().catch(() => {});
+  if (!_completeSound) _ensureComplete();
+  if (!_completeSound) return;
+  _completeSound.currentTime = 0;
+  _completeSound.play().catch(() => {});
 }
 
 function playTick() {
