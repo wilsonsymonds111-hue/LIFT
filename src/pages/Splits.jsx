@@ -27,8 +27,7 @@ export default function Splits() {
   const queryClient = useQueryClient();
   const templates = useMemo(() => allTemplates.filter(t =>
     t.splitGroup &&
-    t.splitGroup.startsWith('custom_') &&
-    !t.splitGroup.endsWith('_old')
+    t.splitGroup.startsWith('custom_')
   ), [allTemplates]);
   const [menuOpen, setMenuOpen] = useState(null);
   const [swapping, setSwapping] = useState(false);
@@ -150,12 +149,11 @@ export default function Splits() {
 
     // Optimistic cache update — UI reflects the change immediately
     const newGroupId = 'custom_' + Date.now().toString();
-    const oldGroupId = (group.templates[0]?.splitGroup || '') + '_old';
     const groupIds = new Set(group.templates.map(t => t.id));
     queryClient.setQueryData(['workoutTemplates'], (prev) =>
       prev?.map(t => {
         if (groupIds.has(t.id)) return { ...t, isActiveSplit: true, splitGroup: newGroupId };
-        if (t.isActiveSplit) return { ...t, isActiveSplit: false, splitGroup: oldGroupId };
+        if (t.isActiveSplit) return { ...t, isActiveSplit: false };
         return t;
       })
     );
@@ -163,7 +161,7 @@ export default function Splits() {
     // DB migration in background
     try {
       await Promise.all(currentActive.map(t =>
-        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: (t.splitGroup || '') + '_old' })
+        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false })
       ));
       await Promise.all(group.templates.map((t, i) =>
         base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: true, splitGroup: newGroupId, sort_order: i })
@@ -235,8 +233,7 @@ export default function Splits() {
     setSwapPhase('popup');
 
     // Optimistic cache update — UI reflects the change immediately
-    const newGroupId = 'custom_' + Date.now().toString();
-    const oldGroupId = (currentActive[0]?.splitGroup || '') + '_old';
+    const newGroupId = 'active_example_' + Date.now().toString();
     const fakeId = `temp_${newGroupId}`;
     const fakeTemplates = splitData.workouts.map((w, i) => ({
       id: `${fakeId}_${i}`,
@@ -252,7 +249,7 @@ export default function Splits() {
     }));
     queryClient.setQueryData(['workoutTemplates'], (prev) => [
       ...(prev || []).map(t => {
-        if (t.isActiveSplit) return { ...t, isActiveSplit: false, splitGroup: oldGroupId };
+        if (t.isActiveSplit) return { ...t, isActiveSplit: false };
         return t;
       }),
       ...fakeTemplates,
@@ -261,7 +258,7 @@ export default function Splits() {
     // Run DB migration in background while animation plays
     try {
       await Promise.all(currentActive.map(t =>
-        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: (t.splitGroup || '') + '_old' })
+        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false })
       ));
       const newTemplates = splitData.workouts.map((w, i) => ({
         name: w.name,
@@ -545,8 +542,7 @@ export default function Splits() {
             setSwapPhase('popup');
 
             // Optimistic cache update — UI reflects the change immediately
-            const newGroupId = 'custom_' + Date.now().toString();
-            const oldGroupId = (currentActive[0]?.splitGroup || '') + '_old';
+            const newGroupId = 'active_example_' + Date.now().toString();
             const fakeId = `temp_${newGroupId}`;
             const fakeTemplates = workouts.map((w, i) => ({
               id: `${fakeId}_${i}`,
@@ -562,7 +558,7 @@ export default function Splits() {
             }));
             queryClient.setQueryData(['workoutTemplates'], (prev) => [
               ...(prev || []).map(t => {
-                if (t.isActiveSplit) return { ...t, isActiveSplit: false, splitGroup: oldGroupId };
+                if (t.isActiveSplit) return { ...t, isActiveSplit: false };
                 return t;
               }),
               ...fakeTemplates,
@@ -571,7 +567,7 @@ export default function Splits() {
             // DB migration in background
             try {
               await Promise.all(currentActive.map(t =>
-                base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: (t.splitGroup || '') + '_old' })
+                base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false })
               ));
               const newTemplates = workouts.map((w, i) => ({
                 name: w.name,
