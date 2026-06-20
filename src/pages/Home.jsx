@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
 import { MoreHorizontal, CalendarPlus, Plus } from 'lucide-react';
 import CalendarSyncModal from '../components/CalendarSyncModal';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -320,11 +319,7 @@ export default function Home() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <motion.div
-                  animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
-                  transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-                  className={`w-2 h-2 rounded-full ${accent.dotClass}`}
-                />
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
                 <h3 className="font-semibold text-foreground text-sm">Current Split</h3>
               </div>
               {currentSplitName && (
