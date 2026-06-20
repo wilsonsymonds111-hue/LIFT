@@ -1,11 +1,11 @@
 import { MoreHorizontal } from 'lucide-react';
 import { memo } from 'react';
 
-const SPLIT_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/60f426734_image.png',
-  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e9b1aea0d_image.png',
-  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/2b264bebb_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5bc190219_image.png',
+const SPLIT_COLORS = {
+  'upper-lower': { light: 'from-blue-500/20 to-blue-600/10', pill: 'bg-blue-500/20 text-blue-700 dark:text-blue-300' },
+  'push-pull-legs': { light: 'from-emerald-500/20 to-emerald-600/10', pill: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' },
+  'full-body': { light: 'from-purple-500/20 to-purple-600/10', pill: 'bg-purple-500/20 text-purple-700 dark:text-purple-300' },
+  'ul-ppl': { light: 'from-amber-500/20 to-amber-600/10', pill: 'bg-amber-500/20 text-amber-700 dark:text-amber-300' },
 };
 
 function detectSplitType(workoutNames) {
@@ -26,8 +26,8 @@ function detectSplitType(workoutNames) {
 }
 
 const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
-  const colorKey = SPLIT_IMAGES[splitKey] ? splitKey : detectSplitType(workouts.map(w => w.name));
-  const bgImage = SPLIT_IMAGES[colorKey] || SPLIT_IMAGES['upper-lower'];
+  const colorKey = SPLIT_COLORS[splitKey] ? splitKey : detectSplitType(workouts.map(w => w.name));
+  const colors = SPLIT_COLORS[colorKey] || SPLIT_COLORS['upper-lower'];
   const workoutCount = workouts.length;
   const displayName = name.replace(/ Workout$/, '');
 
@@ -37,20 +37,12 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
         onClick={onCardClick}
         className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden min-h-[160px]"
       >
-        {/* Black & white background image layer */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url(${bgImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            filter: 'grayscale(1)',
-          }}
-        />
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/20" />
-        {/* Subtle vignette */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-transparent" />
+        {/* Glassy background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/20 dark:from-white/[0.06] dark:to-white/[0.02] backdrop-blur-xl" />
+        {/* Subtle inner ring */}
+        <div className="absolute inset-0 rounded-2xl ring-1 ring-white/30 dark:ring-white/[0.06]" />
+        {/* Shadow */}
+        <div className="absolute inset-0 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.25)]" />
 
         {/* Content */}
         <div className="relative p-5 flex flex-col justify-end h-full min-h-[160px]">
@@ -59,21 +51,21 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             <button
               ref={menuRef}
               onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 flex items-center justify-center transition"
+              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/[0.06] dark:bg-white/[0.08] backdrop-blur-sm hover:bg-black/[0.12] dark:hover:bg-white/[0.15] flex items-center justify-center transition"
             >
-              <MoreHorizontal className="w-4 h-4 text-white/90" />
+              <MoreHorizontal className="w-4 h-4 text-foreground/70" />
             </button>
           )}
 
           {/* Split name */}
-          <h4 className="font-extrabold text-white text-sm uppercase tracking-wider pr-6 leading-tight">
+          <h4 className="font-extrabold text-foreground text-sm uppercase tracking-wider pr-6 leading-tight">
             {displayName}
           </h4>
 
           {/* Workout name pills */}
           <div className="flex flex-wrap gap-1.5 mt-3">
             {workouts.map((w, i) => (
-              <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-[6px] bg-blue-400/25 backdrop-blur-sm text-blue-100 text-xs font-semibold tracking-wide">
+              <span key={i} className={`inline-flex items-center px-3 py-1.5 rounded-[6px] backdrop-blur-sm text-xs font-semibold tracking-wide ${colors.pill}`}>
                 {w.name}
               </span>
             ))}
@@ -81,7 +73,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
 
           {/* Badge */}
           <div className="mt-3">
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white text-xs font-semibold tracking-wide">
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-foreground/[0.06] dark:bg-white/[0.08] backdrop-blur-sm text-foreground/70 text-xs font-semibold tracking-wide">
               {workoutCount} work{workoutCount !== 1 ? 'outs' : 'out'}
             </span>
           </div>
