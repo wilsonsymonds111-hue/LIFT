@@ -44,18 +44,18 @@ function resolveSchedule(key, workoutCount, groupId) {
   let onDays = defaultCycle ? defaultCycle.onDays : null;
   let offDays = defaultCycle ? defaultCycle.offDays : null;
 
-  if (!defaultCycle) {
-    try {
-      const cycleRaw = localStorage.getItem(`splitCycle_${groupId}`);
-      if (cycleRaw) {
-        const parsed = JSON.parse(cycleRaw);
-        onDays = Number(parsed.onDays);
-        offDays = Number(parsed.offDays);
-      }
-    } catch {}
-    onDays = onDays || Math.max(workoutCount, 1);
-    offDays = offDays || 1;
-  }
+  // Check localStorage for user customizations — overrides defaults even for known types
+  try {
+    const cycleRaw = localStorage.getItem(`splitCycle_${groupId}`);
+    if (cycleRaw) {
+      const parsed = JSON.parse(cycleRaw);
+      onDays = Number(parsed.onDays) || onDays;
+      offDays = Number(parsed.offDays) || offDays;
+    }
+  } catch {}
+
+  if (!onDays) onDays = Math.max(workoutCount, 1);
+  if (!offDays) offDays = 1;
 
   // Always start the cycle from today so the display makes intuitive sense.
   // A stale startDayIndex from localStorage would make the 7-day window
