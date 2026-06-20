@@ -5,7 +5,6 @@ import { X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ProgressGraph, { getNextGoal } from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
-import AIBadge from './AIBadge';
 
 export default function ExerciseDetailModal({ exercise, onClose }) {
   const [tab, setTab] = useState('Charts');
@@ -222,9 +221,6 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
               ) : detail?.image_url ? (
                 <div className="relative w-full bg-muted rounded-2xl overflow-hidden">
                   <img src={detail.image_url} alt={exercise.name} className="w-full block" />
-                  <div className="absolute top-2 right-2">
-                    <AIBadge />
-                  </div>
                 </div>
               ) : (
                 <div className={`w-full aspect-video rounded-2xl flex items-center justify-center ${colors.bg}`}>
@@ -249,10 +245,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
               {/* Instructions */}
               {loadingDetail ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <p className="font-bold text-foreground">Instructions</p>
-                    <AIBadge />
-                  </div>
+                  <p className="font-bold text-foreground">Instructions</p>
                   <div className="space-y-2">
                     {[1,2,3,4].map(i => <div key={i} className="h-4 bg-muted rounded animate-pulse" />)}
                   </div>
