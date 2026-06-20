@@ -62,12 +62,18 @@ function wrapEntity(name, rawEntity) {
 }
 
 export const base44 = {
-  ...rawClient,
+  auth: rawClient.auth,
+  integrations: rawClient.integrations,
+  agents: rawClient.agents,
+  analytics: rawClient.analytics,
+  users: rawClient.users,
+  functions: rawClient.functions,
   entities: {
     WorkoutTemplate: wrapEntity('WorkoutTemplate', rawClient.entities.WorkoutTemplate),
     Exercise: wrapEntity('Exercise', rawClient.entities.Exercise),
     ExerciseDetail: wrapEntity('ExerciseDetail', rawClient.entities.ExerciseDetail),
     User: rawClient.entities.User,
   },
+  // asServiceRole intentionally excluded — requires a service token
   _rawClient: rawClient,
 };
