@@ -34,11 +34,12 @@ function playCompleteChime() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const now = ctx.currentTime;
 
-    // Three-tone ascending arpeggio with gentle bell-like attack
+    // Four-tone triumphant arpeggio with a big finish
     const notes = [
-      { freq: 523,  start: 0,     peak: 0.07,  end: 0.20 },  // C5
-      { freq: 659,  start: 0.07,  peak: 0.14,  end: 0.28 },  // E5
-      { freq: 784,  start: 0.14,  peak: 0.22,  end: 0.42 },  // G5
+      { freq: 523,  start: 0,     peak: 0.06,  end: 0.18 },  // C5
+      { freq: 659,  start: 0.06,  peak: 0.12,  end: 0.24 },  // E5
+      { freq: 784,  start: 0.12,  peak: 0.18,  end: 0.30 },  // G5
+      { freq: 1047, start: 0.18,  peak: 0.25,  end: 0.65 },  // C6 (octave)
     ];
 
     notes.forEach(({ freq, start, peak, end }) => {
