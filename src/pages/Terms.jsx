@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Terms() {
   const navigate = useNavigate();
@@ -157,6 +157,12 @@ export default function Terms() {
           <p>
             For questions about these Terms, legal notices, DMCA claims, or other inquiries, please use the Feedback & Support feature within the application.
           </p>
+        </div>
+
+        <div className="border-t border-border pt-5 mt-6">
+          <Link to="/privacy" className="text-blue-500 font-semibold hover:underline text-sm">
+            View Privacy Policy →
+          </Link>
         </div>
       </div>
     </div>

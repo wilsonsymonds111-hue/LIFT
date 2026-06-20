@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Privacy() {
   const navigate = useNavigate();
@@ -143,6 +143,12 @@ export default function Privacy() {
           <p>
             For privacy-related inquiries, data requests, or concerns, please use the Feedback & Support feature within the application.
           </p>
+        </div>
+
+        <div className="border-t border-border pt-5 mt-6">
+          <Link to="/terms" className="text-blue-500 font-semibold hover:underline text-sm">
+            View Terms of Service →
+          </Link>
         </div>
 
         {/* Privacy Nutrition Label */}

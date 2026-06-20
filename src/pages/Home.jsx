@@ -120,30 +120,27 @@ export default function Home() {
       const keysToTry = [groupId, key].filter(Boolean);
       try {
         for (const k of keysToTry) {
+          // Clear any stale splitSchedule that could override the cycle
+          localStorage.removeItem(`splitSchedule_${k}`);
           const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
           if (cycleRaw) {
             const parsed = JSON.parse(cycleRaw);
-            onDays = parsed.onDays;
-            offDays = parsed.offDays;
-            startDayIndex = parsed.startDayIndex;
+            onDays = Number(parsed.onDays);
+            offDays = Number(parsed.offDays);
+            startDayIndex = Number(parsed.startDayIndex);
             break;
-          }
-          const raw = localStorage.getItem(`splitSchedule_${k}`);
-          if (raw) {
-            const schedule = JSON.parse(raw);
-            return { schedule, startDayIndex: todayMonSun, onDays: null, offDays: null };
           }
         }
       } catch {}
       // Use the actual workout count to determine training days
       onDays = onDays || Math.max(workoutCount, 1);
       offDays = offDays || 1;
-      startDayIndex = startDayIndex || todayMonSun;
+      startDayIndex = startDayIndex != null ? startDayIndex : todayMonSun;
       const cycleLength = onDays + offDays;
       const schedule = [];
       for (let i = 0; i < 7; i++) {
-        const weekPos = (i - startDayIndex + 7) % 7;
-        const pos = weekPos % cycleLength;
+        const daysFromStart = i >= startDayIndex ? i - startDayIndex : i + 7 - startDayIndex;
+        const pos = daysFromStart % cycleLength;
         schedule.push(pos < onDays ? 1 : 0);
       }
       return { schedule, startDayIndex, onDays, offDays };
@@ -177,8 +174,8 @@ export default function Home() {
     const cycleLength = (onDays || 1) + (offDays || 1);
     const dayWorkoutNames = schedule.map((on, i) => {
       if (on && sorted.length > 0) {
-        const weekPos = (i - startDayIndex + 7) % 7;
-        const dayInCycle = weekPos % cycleLength;
+        const daysFromStart = i >= startDayIndex ? i - startDayIndex : i + 7 - startDayIndex;
+        const dayInCycle = daysFromStart % cycleLength;
         const workoutIdx = dayInCycle % sorted.length;
         return sorted[workoutIdx]?.name?.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '') || '';
       }
@@ -187,8 +184,8 @@ export default function Home() {
 
     // Which workout card (by sort_order index) is today's
     const todayMonSun = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-    const todayWeekPos = (todayMonSun - startDayIndex + 7) % 7;
-    const todayInCycle = todayWeekPos % cycleLength;
+    const todayDaysFromStart = todayMonSun >= startDayIndex ? todayMonSun - startDayIndex : todayMonSun + 7 - startDayIndex;
+    const todayInCycle = todayDaysFromStart % cycleLength;
     const todayWorkoutIndex = schedule[todayMonSun] >= 1 && sorted.length > 0
       ? (todayInCycle % sorted.length)
       : -1;
