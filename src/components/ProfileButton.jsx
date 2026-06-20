@@ -30,6 +30,7 @@ const ProfileButton = memo(function ProfileButton() {
 
   const handlePhotoChange = (url) => {
     setProfilePhoto(url);
+    localStorage.setItem('profilePhoto', url);
   };
 
   return (

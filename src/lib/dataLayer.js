@@ -208,9 +208,8 @@ export async function migrateLocalToCloud(rawClient) {
     await rawClient.auth.updateMe({ profilePhoto: photo });
   }
 
-  // Clear local store after successful migration
+  // Clear local store after successful migration (keep profilePhoto as fallback)
   localStorage.removeItem(STORE_KEY);
-  localStorage.removeItem('profilePhoto');
 }
 
 // ── Has any local data? Used for second-device detection ──
