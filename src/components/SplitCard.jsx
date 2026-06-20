@@ -30,7 +30,7 @@ function detectSplitType(workoutNames) {
   return 'upper-lower';
 }
 
-const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
+const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef, isActive }) {
   const isExampleSplit = !!SPLIT_IMAGES[splitKey];
   const colorKey = isExampleSplit ? splitKey : detectSplitType(workouts.map(w => w.name));
   // For custom splits, cycle through default images based on split key
@@ -62,6 +62,13 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
 
         {/* Content */}
         <div className="relative p-5 flex flex-col justify-center h-full min-h-[160px]">
+          {/* Active badge */}
+          {isActive && (
+            <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-emerald-500/80 backdrop-blur-sm text-white text-[10px] font-extrabold uppercase tracking-wider">
+              Active
+            </div>
+          )}
+
           {/* Top row: menu */}
           {onMenuToggle && (
             <button

@@ -28,8 +28,7 @@ export default function Splits() {
   const templates = useMemo(() => allTemplates.filter(t =>
     t.splitGroup &&
     t.splitGroup.startsWith('custom_') &&
-    !t.splitGroup.endsWith('_old') &&
-    !t.isActiveSplit
+    !t.splitGroup.endsWith('_old')
   ), [allTemplates]);
   const [menuOpen, setMenuOpen] = useState(null);
   const [swapping, setSwapping] = useState(false);
@@ -351,17 +350,21 @@ export default function Splits() {
           </button>
           {mySplitGroups.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" style={GRID_CV}>
-              {mySplitGroups.map((group) => (
+              {mySplitGroups.map((group) => {
+                const isActive = group.templates.some(t => t.isActiveSplit);
+                return (
                 <SplitCard
                   key={group.groupId}
                   splitKey={group.groupId}
                   name={group.templates[0]?.splitName || group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
                   workouts={group.templates.map(t => ({ name: t.name }))}
+                  isActive={isActive}
                   onCardClick={() => setActiveSplit(group.groupId)}
                   onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
                   menuRef={el => menuRef.current[group.groupId] = el}
                 />
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
