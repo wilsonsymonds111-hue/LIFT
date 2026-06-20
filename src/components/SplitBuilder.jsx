@@ -63,6 +63,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
     setSaving(true);
     const groupId = 'custom_' + Date.now().toString();
     try {
+      const splitDisplayName = splitName.trim() || workouts.map(w => w.name.trim()).join(' / ');
       const templates = workouts.map((w, i) => ({
         name: w.name.trim(),
         exercises: w.exercises.map(e => e.name).join(', '),
@@ -71,6 +72,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
         sort_order: i,
         isActiveSplit: false,
         splitGroup: groupId,
+        splitName: splitDisplayName,
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(templates);
       setSaved(true);

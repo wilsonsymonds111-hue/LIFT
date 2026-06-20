@@ -354,7 +354,7 @@ export default function Splits() {
                 <SplitCard
                   key={group.groupId}
                   splitKey={group.groupId}
-                  name={group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
+                  name={group.templates[0]?.splitName || group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
                   workouts={group.templates.map(t => ({ name: t.name }))}
                   onCardClick={() => setActiveSplit(group.groupId)}
                   onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}

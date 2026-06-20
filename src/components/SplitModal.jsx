@@ -101,7 +101,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
         const templates = (data || []).filter(t => t.splitGroup === splitKey);
         if (templates.length > 0) {
           setCustomSplit({
-            name: templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ').toUpperCase(),
+            name: templates[0]?.splitName || templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ').toUpperCase(),
             description: `${templates.length} workout${templates.length > 1 ? 's' : ''}`,
             workouts: templates.map(t => ({
               name: t.name,
@@ -166,6 +166,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
           sort_order: i,
           isActiveSplit: true,
           splitGroup: newGroupId,
+          splitName: split.name,
         }));
         await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
       } catch (_) {}

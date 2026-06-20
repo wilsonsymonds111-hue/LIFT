@@ -40,6 +40,9 @@
     "splitGroup": {
       "type": "string"
     },
+    "splitName": {
+      "type": "string"
+    },
     "isActiveSplit": {
       "type": "boolean"
     }
