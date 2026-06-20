@@ -289,7 +289,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="bg-background pb-28">
       <PullToRefreshIndicator pullY={pullY} refreshing={refreshing} />
 
       {/* Page Title */}

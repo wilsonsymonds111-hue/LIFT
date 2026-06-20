@@ -78,6 +78,15 @@
 
 
 @layer base {
+  html, body, #root {
+    height: 100%;
+    overflow: hidden;
+  }
+  #root {
+    display: flex;
+    flex-direction: column;
+  }
+
   * {
     @apply border-border outline-ring/50;
     font-family: inherit;

@@ -96,13 +96,24 @@ const SwipeableTabs = () => {
         className="flex"
         style={{ width: TABS.length * width, willChange: 'transform' }}
       >
-        {TAB_CONTENT.map((Component, i) => (
-          <div key={TABS[i]} className="flex-shrink-0" style={{ width }}>
-            <Suspense fallback={SUSPENSE_FALLBACK}>
-              <Component />
-            </Suspense>
-          </div>
-        ))}
+        {TAB_CONTENT.map((Component, i) => {
+          const isActive = i === activeIndex;
+          return (
+            <div key={TABS[i]}
+              className="flex-shrink-0"
+              style={{
+                width,
+                overflow: isActive ? 'visible' : 'hidden',
+                height: isActive ? 'auto' : 0,
+                contain: isActive ? undefined : 'strict',
+              }}
+            >
+              <Suspense fallback={SUSPENSE_FALLBACK}>
+                <Component />
+              </Suspense>
+            </div>
+          );
+        })}
       </motion.div>
     </div>
   );
