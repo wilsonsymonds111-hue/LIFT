@@ -29,66 +29,36 @@ function _ensureAudio() {
 // Start preloading immediately
 _ensureAudio();
 
-let _completeSound = null;
-function _ensureComplete() {
-  if (!_completeSound) {
-    _completeSound = new Audio();
-    // Generate a short percussive "ding" as a data URL
-    const sampleRate = 44100;
-    const duration = 0.15; // seconds
-    const freq = 1760; // A6 — bright bell
-    const samples = Math.floor(sampleRate * duration);
-    const buffer = new Float32Array(samples);
-    for (let i = 0; i < samples; i++) {
-      const t = i / sampleRate;
-      const envelope = Math.exp(-t * 30); // quick decay
-      // Mix fundamental + slight harmonic for bell character
-      const wave = Math.sin(2 * Math.PI * freq * t) + 0.3 * Math.sin(2 * Math.PI * freq * 2.1 * t);
-      buffer[i] = wave * envelope * 0.6;
-    }
-    const wav = encodeWAV(buffer, sampleRate);
-    _completeSound.src = URL.createObjectURL(new Blob([wav], { type: 'audio/wav' }));
-    _completeSound.load();
-  }
-}
-function encodeWAV(samples, sampleRate) {
-  const numChannels = 1;
-  const bytesPerSample = 2;
-  const blockAlign = numChannels * bytesPerSample;
-  const byteRate = sampleRate * blockAlign;
-  const dataSize = samples.length * bytesPerSample;
-  const buffer = new ArrayBuffer(44 + dataSize);
-  const view = new DataView(buffer);
-  writeString(view, 0, 'RIFF');
-  view.setUint32(4, 36 + dataSize, true);
-  writeString(view, 8, 'WAVE');
-  writeString(view, 12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, numChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, byteRate, true);
-  view.setUint16(32, blockAlign, true);
-  view.setUint16(34, bytesPerSample * 8, true);
-  writeString(view, 36, 'data');
-  view.setUint32(40, dataSize, true);
-  let offset = 44;
-  for (let i = 0; i < samples.length; i++) {
-    const s = Math.max(-1, Math.min(1, samples[i]));
-    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-    offset += 2;
-  }
-  return buffer;
-}
-function writeString(view, offset, string) {
-  for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
-}
-_ensureComplete();
-function playCompleteSound() {
-  if (!_completeSound) _ensureComplete();
-  if (!_completeSound) return;
-  _completeSound.currentTime = 0;
-  _completeSound.play().catch(() => {});
+function playCompleteChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+
+    // First tone — mid, short
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.value = 880; // A5
+    gain1.gain.setValueAtTime(0.25, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.2);
+
+    // Second tone — higher, longer
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.value = 1320; // E6
+    gain2.gain.setValueAtTime(0.001, now + 0.12);
+    gain2.gain.exponentialRampToValueAtTime(0.25, now + 0.2);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.12);
+    osc2.stop(now + 0.5);
+  } catch (_) {}
 }
 
 function playTick() {
@@ -547,7 +517,7 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
 
   useEffect(() => {
     setTimeout(() => setShimmer(true), 200);
-    playCompleteSound();
+    playCompleteChime();
   }, []);
 
   // Top-right share button — shares the gold card
