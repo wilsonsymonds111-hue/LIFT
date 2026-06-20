@@ -25,10 +25,9 @@ const Sparkline = memo(function Sparkline({ data, width = 64, height = 32 }) {
         strokeLinejoin="round"
       />
       {values.map((v, i) => {
-        if (i !== values.length - 1) return null;
         const x = padX + i * stepX;
         const y = height - 2 - ((v - min) / range) * (height - 6);
-        return <circle key={i} cx={x} cy={y} r="3" fill="white" stroke="#3b82b6" strokeWidth="1.5" />;
+        return <circle key={i} cx={x} cy={y} r="2.5" fill="white" stroke="#3b82b6" strokeWidth="1.5" />;
       })}
     </svg>
   );
