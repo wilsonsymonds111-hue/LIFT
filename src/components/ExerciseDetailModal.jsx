@@ -6,8 +6,8 @@ import { base44 } from '@/api/base44Client';
 import ProgressGraph, { getNextGoal } from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
 
-export default function ExerciseDetailModal({ exercise, onClose }) {
-  const [tab, setTab] = useState('Charts');
+export default function ExerciseDetailModal({ exercise, onClose, initialTab }) {
+  const [tab, setTab] = useState(initialTab || 'Charts');
   const [history, setHistory] = useState([]);
   const [detail, setDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);

@@ -224,6 +224,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [showCustomRest, setShowCustomRest] = useState(false);
   const [customRestInput, setCustomRestInput] = useState('');
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
+  const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
   const [chartView, setChartView] = useState('weight');
   const lastEntry = exercise.history?.[exercise.history.length - 1];
   const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
@@ -273,7 +274,12 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         </div>
         <div className="flex items-center gap-3 relative flex-shrink-0">
           {exerciseImage ? (
-            <img src={exerciseImage} alt={exercise.name} className="w-28 h-24 rounded-lg object-contain" />
+            <img
+              src={exerciseImage}
+              alt={exercise.name}
+              className="w-28 h-24 rounded-lg object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+              onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
+            />
           ) : (
             <div className="w-28 h-24 rounded-lg bg-gray-100 flex items-center justify-center">
               <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
@@ -332,7 +338,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                 </button>
                 <div className="border-t border-gray-100 mx-3 my-1" />
                 <button
-                  onClick={() => { setShowMenu(false); setShowExerciseDetail(true); }}
+                  onClick={() => { setExerciseDetailInitialTab('Charts'); setShowMenu(false); setShowExerciseDetail(true); }}
                   className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
                 >
                   View Exercise Details
@@ -435,6 +441,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     {showExerciseDetail && (
       <ExerciseDetailModal
         exercise={exercise}
+        initialTab={exerciseDetailInitialTab}
         onClose={() => setShowExerciseDetail(false)}
       />
     )}
