@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Dumbbell } from 'lucide-react';
@@ -89,6 +89,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
   const [customSplit, setCustomSplit] = useState(null);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
+  const scrollRef = useRef(null);
 
   const exampleSplit = EXAMPLE_SPLITS_DATA[splitKey];
   const defaultSchedule = exampleSplit?.schedule || [1, 0, 1, 0, 1, 0, 1];
@@ -111,6 +112,13 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
     setStartDayIndex(c.startDayIndex);
     setEditing(false);
   }, [splitKey]);
+
+  // Scroll to top when editing panel opens so user sees the rest frequency settings
+  useEffect(() => {
+    if (editing && scrollRef.current) {
+      scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [editing]);
 
   useEffect(() => {
     if (!exampleSplit && splitKey) {
@@ -298,7 +306,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
               </div>
 
               {/* Scrollable body */}
-              <div className="flex-1 overflow-y-auto">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto">
               {/* Cycle editor */}
               <AnimatePresence>
                 {editing && (
