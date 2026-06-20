@@ -71,7 +71,6 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
   const [customSplit, setCustomSplit] = useState(null);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
   const exampleSplit = EXAMPLE_SPLITS_DATA[splitKey];
   const defaultSchedule = exampleSplit?.schedule || [1, 0, 1, 0, 1, 0, 1];
@@ -412,85 +411,22 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
               {/* Make Current button */}
               <div className="px-5 pb-4 pt-2">
                 <button
-                  onClick={() => setShowConfirm(true)}
+                  onClick={() => {
+                    if (editing) {
+                      saveCycle(splitKey, { onDays, offDays, startDayIndex });
+                      handleMakeCurrent();
+                    } else {
+                      setEditing(true);
+                    }
+                  }}
                   disabled={applying}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60"
                 >
-                  {applying ? 'Applying...' : 'Make This My Current Split'}
+                  {applying ? 'Applying...' : editing ? 'Apply With These Settings' : 'Make This My Current Split'}
                 </button>
               </div>
 
-              {/* Rest frequency confirmation modal */}
-              {showConfirm && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 rounded-t-3xl sm:rounded-3xl" onClick={() => setShowConfirm(false)}>
-                  <div
-                    onClick={e => e.stopPropagation()}
-                    className="bg-card rounded-2xl p-6 mx-5 max-w-sm w-full shadow-2xl border border-border"
-                  >
-                    <h3 className="text-lg font-extrabold text-foreground text-center">Rest Frequency</h3>
-                    <p className="text-sm text-muted-foreground text-center mt-1 mb-5">
-                      Confirm your rest day cycle before applying
-                    </p>
 
-                    {/* Frequency summary */}
-                    <div className="bg-blue-50 dark:bg-blue-950/20 rounded-xl p-4 mb-4">
-                      <p className="text-sm font-bold text-foreground text-center">
-                        {frequencyLabel}
-                      </p>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mt-3 mb-2">
-                        Starting on
-                      </p>
-                      <div className="flex justify-center gap-1">
-                        {shiftedSchedule.map((status, i) => {
-                          const isGymDay = status === 1;
-                          const isStart = shiftedStartDayIndex === i;
-                          const isToday = i === 0;
-                          return (
-                            <div
-                              key={i}
-                              className={`flex flex-col items-center py-1.5 px-2 rounded-lg text-xs font-bold ${
-                                isStart ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30' : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800'
-                              } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
-                            >
-                              <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{shiftedDayLabels[i]}</span>
-                              <div
-                                className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
-                                  isGymDay
-                                    ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
-                                    : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
-                                }`}
-                              >
-                                {isGymDay && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => {
-                          setShowConfirm(false);
-                          setEditing(true);
-                        }}
-                        className="flex-1 py-2.5 rounded-xl bg-muted text-foreground font-semibold text-sm hover:bg-muted/70 transition"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowConfirm(false);
-                          handleMakeCurrent();
-                        }}
-                        className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white font-semibold text-sm hover:bg-emerald-600 transition"
-                      >
-                        Looks Good
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </>
           )}
         </motion.div>
