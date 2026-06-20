@@ -161,21 +161,21 @@ const AnimatedRoutes = memo(() => {
 });
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, isGuest, isAuthenticated } = useAuth();
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return LOADING_SPINNER;
   }
 
-  if (authError) {
+  // In guest mode or authenticated, render the app normally
+  // Only block on truly unexpected errors
+  if (authError && !isGuest) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      navigateToLogin();
-      return null;
     }
   }
 
+  // Guest mode or authenticated – always render the app
   return <AnimatedRoutes />;
 };
 

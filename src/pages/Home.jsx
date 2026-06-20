@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
+import SyncBanner from '../components/SyncBanner';
 import WeekTracker from '../components/WeekTracker';
 import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
@@ -255,6 +256,9 @@ export default function Home() {
 
       {/* Weekly Tracker */}
       <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
+
+      {/* Sync Banner */}
+      <SyncBanner />
 
       {/* ==================== CURRENT SPLIT ==================== */}
       <div className="px-4 py-2">

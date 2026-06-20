@@ -6,22 +6,18 @@ import ProfileSheet from './ProfileSheet';
 const ProfileButton = memo(function ProfileButton() {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
-  const [profilePhoto, setProfilePhoto] = useState(null);
-  const [loaded, setLoaded] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
+  const [loaded, setLoaded] = useState(true);
 
   useEffect(() => {
+    // Try to get cloud profile photo, fall back to local
     base44.auth.me().then(user => {
       if (user?.profilePhoto) {
         setProfilePhoto(user.profilePhoto);
-      } else {
-        const local = localStorage.getItem('profilePhoto');
-        if (local) setProfilePhoto(local);
+        localStorage.setItem('profilePhoto', user.profilePhoto);
       }
-      setLoaded(true);
     }).catch(() => {
-      const local = localStorage.getItem('profilePhoto');
-      if (local) setProfilePhoto(local);
-      setLoaded(true);
+      // Guest mode – use localStorage photo (already loaded)
     });
   }, []);
 

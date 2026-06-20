@@ -1,15 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare } from 'lucide-react';
+import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, LogOut, Shield } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
 import { useNavVisibility } from '@/lib/NavContext';
+import { useAuth } from '@/lib/AuthContext';
 
 import { memo } from 'react';
 
 const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange }) {
   const [showFeedback, setShowFeedback] = useState(false);
   const { setHideNav } = useNavVisibility();
+  const { isAuthenticated, isGuest, handleCreateAccount, logout } = useAuth();
 
   // Hide bottom nav while profile sheet is open
   useEffect(() => {
@@ -41,10 +43,17 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       localStorage.setItem('profilePhoto', file_url);
-      await base44.auth.updateMe({ profilePhoto: file_url });
+      if (isAuthenticated) {
+        await base44.auth.updateMe({ profilePhoto: file_url });
+      }
       onPhotoChange(file_url);
     } catch {}
     setUploading(false);
+  };
+
+  const handleLogout = () => {
+    onClose();
+    logout(true);
   };
 
   return createPortal(
@@ -133,8 +142,68 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           </button>
         </div>
 
-        {/* Delete account */}
-        {!showDeleteConfirm ? (
+        {/* Account section */}
+        {isGuest && (
+          <button
+            onClick={handleCreateAccount}
+            className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+          >
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <UserPlus className="w-4 h-4 text-white" />
+            </div>
+            <div className="text-left flex-1">
+              <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Create Account</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Save your data to the cloud and sync across devices</p>
+            </div>
+          </button>
+        )}
+
+        {isGuest && (
+          <button
+            onClick={handleCreateAccount}
+            className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+          >
+            <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <LogIn className="w-4 h-4 text-foreground" />
+            </div>
+            <div className="text-left flex-1">
+              <p className="font-semibold text-foreground text-sm">Log In</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Access your synced data from another device</p>
+            </div>
+          </button>
+        )}
+
+        {isAuthenticated && (
+          <div className="bg-muted rounded-2xl px-4 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+                <Shield className="w-4 h-4 text-emerald-500" />
+              </div>
+              <div className="text-left flex-1">
+                <p className="font-semibold text-foreground text-sm">Account Synced</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Your data is saved to the cloud</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isAuthenticated && (
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+          >
+            <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <LogOut className="w-4 h-4 text-foreground" />
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-foreground text-sm">Log Out</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Switch back to offline mode</p>
+            </div>
+          </button>
+        )}
+
+        {/* Delete account — only show when authenticated */}
+        {isAuthenticated && !showDeleteConfirm && (
           <button
             onClick={() => setShowDeleteConfirm(true)}
             className="flex items-center gap-3 bg-red-50 dark:bg-red-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70"
@@ -147,7 +216,9 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               <p className="text-xs text-muted-foreground mt-0.5">Permanently remove all your data</p>
             </div>
           </button>
-        ) : (
+        )}
+
+        {isAuthenticated && showDeleteConfirm && (
           <div className="bg-card border border-red-200 rounded-2xl p-4 flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
@@ -176,6 +247,27 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               </button>
             </div>
           </div>
+        )}
+
+        {/* Clear local data — guest mode */}
+        {isGuest && (
+          <button
+            onClick={() => {
+              localStorage.removeItem('lift_user_data');
+              localStorage.removeItem('profilePhoto');
+              onClose();
+              window.location.reload();
+            }}
+            className="flex items-center gap-3 bg-red-50 dark:bg-red-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70 mt-2"
+          >
+            <div className="w-8 h-8 bg-red-100 dark:bg-red-900/60 rounded-full flex items-center justify-center flex-shrink-0">
+              <Trash2 className="w-4 h-4 text-red-500" />
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-red-500 text-sm">Clear Local Data</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Remove all data stored on this device</p>
+            </div>
+          </button>
         )}
 
         {showFeedback && (
