@@ -77,8 +77,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Guest mode badge */}
         {isAuthenticated && (
           <div className="flex justify-center">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-semibold">
-              <AlertTriangle className="w-3 h-3" />
+            <span className="text-muted-foreground text-xs font-semibold">
               You are in guest mode
             </span>
           </div>
@@ -194,10 +193,10 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
 
         {isAuthenticated && (
           <>
-            <div className="bg-muted rounded-2xl px-4 py-3.5">
+            <div className="bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-4 h-4 text-muted-foreground" />
+                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-4 h-4 text-blue-500" />
                 </div>
                 <div className="text-left flex-1">
                   <p className="font-semibold text-foreground text-sm">Data stored on this device</p>
