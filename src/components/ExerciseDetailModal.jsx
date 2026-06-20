@@ -67,7 +67,8 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
           let image_url = '';
           try {
             const imgRes = await base44.integrations.Core.GenerateImage({
-              prompt: `A clean, anatomical illustration of a person performing the "${exercise.name}" exercise in a gym, showing proper form. Professional fitness illustration style, white background, high quality instructional diagram.`,
+              prompt: `Professional gym-equipment-style anatomy illustration for "${exercise.name}". TWO identical 3D anatomical figures stacked vertically on a clean white background — top figure shows the STARTING position, bottom figure shows the FINISHING position. Both figures must be identical in size, proportions, camera angle, body composition, and anatomical detail — only the body position and equipment differ between them. Render the body in grayscale anatomical style with highly defined visible musculature and no skin texture, like a medical fitness reference diagram. Highlight ALL primary and secondary muscles activated during this exercise in bright flat red (#E6241E), ensuring anatomically accurate muscle activation for this specific movement. Do NOT highlight muscles that are not meaningfully contributing. Figures wear simple black shorts. Exercise equipment rendered in black with subtle highlights. Side-profile view with consistent directional lighting and realistic shadows. NO text, NO labels, NO arrows, NO numbers, NO watermarks, NO logos, NO annotations whatsoever.`,
+              existing_image_urls: ["https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/1940c0784_image.png"],
             });
             image_url = imgRes?.data?.url || imgRes?.url || '';
           } catch (_) {}
