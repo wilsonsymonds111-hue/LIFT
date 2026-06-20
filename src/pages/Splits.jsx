@@ -27,7 +27,6 @@ export default function Splits() {
   const queryClient = useQueryClient();
   const templates = useMemo(() => allTemplates.filter(t =>
     t.splitGroup &&
-    t.splitGroup.startsWith('custom_') &&
     !t.isActiveSplit
   ), [allTemplates]);
   const [menuOpen, setMenuOpen] = useState(null);
@@ -148,8 +147,8 @@ export default function Splits() {
     setSwapPhase('popup');
 
     // Optimistic cache update — UI reflects the change immediately
-    const newGroupId = Date.now().toString();
-    const oldGroupId = Date.now().toString() + '_old';
+    const newGroupId = 'custom_' + Date.now().toString();
+    const oldGroupId = (group.templates[0]?.splitGroup || '') + '_old';
     const groupIds = new Set(group.templates.map(t => t.id));
     queryClient.setQueryData(['workoutTemplates'], (prev) =>
       prev?.map(t => {
@@ -162,7 +161,7 @@ export default function Splits() {
     // DB migration in background
     try {
       await Promise.all(currentActive.map(t =>
-        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: (t.splitGroup || '') + '_old' })
       ));
       await Promise.all(group.templates.map((t, i) =>
         base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: true, splitGroup: newGroupId, sort_order: i })
@@ -234,8 +233,8 @@ export default function Splits() {
     setSwapPhase('popup');
 
     // Optimistic cache update — UI reflects the change immediately
-    const newGroupId = Date.now().toString();
-    const oldGroupId = Date.now().toString() + '_old';
+    const newGroupId = 'custom_' + Date.now().toString();
+    const oldGroupId = (currentActive[0]?.splitGroup || '') + '_old';
     const fakeId = `temp_${newGroupId}`;
     const fakeTemplates = splitData.workouts.map((w, i) => ({
       id: `${fakeId}_${i}`,
@@ -260,7 +259,7 @@ export default function Splits() {
     // Run DB migration in background while animation plays
     try {
       await Promise.all(currentActive.map(t =>
-        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: (t.splitGroup || '') + '_old' })
       ));
       const newTemplates = splitData.workouts.map((w, i) => ({
         name: w.name,
@@ -535,8 +534,8 @@ export default function Splits() {
             setSwapPhase('popup');
 
             // Optimistic cache update — UI reflects the change immediately
-            const newGroupId = Date.now().toString();
-            const oldGroupId = Date.now().toString() + '_old';
+            const newGroupId = 'custom_' + Date.now().toString();
+            const oldGroupId = (currentActive[0]?.splitGroup || '') + '_old';
             const fakeId = `temp_${newGroupId}`;
             const fakeTemplates = workouts.map((w, i) => ({
               id: `${fakeId}_${i}`,
@@ -561,7 +560,7 @@ export default function Splits() {
             // DB migration in background
             try {
               await Promise.all(currentActive.map(t =>
-                base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
+                base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: (t.splitGroup || '') + '_old' })
               ));
               const newTemplates = workouts.map((w, i) => ({
                 name: w.name,
