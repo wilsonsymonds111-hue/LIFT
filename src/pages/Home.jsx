@@ -15,9 +15,6 @@ import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
 
-// Rebuilt on every HMR update — busts stale useMemo caches
-const BUILD_ID = Date.now();
-
 // Default cycle patterns: { onDays, offDays } for known split types
 const SPLIT_CYCLES = {
   'push-pull-legs': { onDays: 3, offDays: 1 },
@@ -25,6 +22,57 @@ const SPLIT_CYCLES = {
   'ul-ppl': { onDays: 5, offDays: 1 },
   'full-body': { onDays: 1, offDays: 1 },
 };
+
+// --- Module-level schedule helpers (run fresh every render, no stale memo) ---
+
+function cycleToSchedule(onDays, offDays, startDayIdx) {
+  const cycleLength = onDays + offDays;
+  const schedule = [];
+  for (let i = 0; i < 7; i++) {
+    const daysFromStart = i >= startDayIdx ? i - startDayIdx : i + 7 - startDayIdx;
+    const pos = daysFromStart % cycleLength;
+    schedule.push(pos < onDays ? 1 : 0);
+  }
+  return schedule;
+}
+
+function resolveSchedule(key, workoutCount, groupId) {
+  const todayIndex = new Date().getDay();
+  const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
+
+  const defaultCycle = SPLIT_CYCLES[key];
+  let onDays = defaultCycle ? defaultCycle.onDays : null;
+  let offDays = defaultCycle ? defaultCycle.offDays : null;
+
+  if (!defaultCycle) {
+    try {
+      const cycleRaw = localStorage.getItem(`splitCycle_${groupId}`);
+      if (cycleRaw) {
+        const parsed = JSON.parse(cycleRaw);
+        onDays = Number(parsed.onDays);
+        offDays = Number(parsed.offDays);
+      }
+    } catch {}
+    onDays = onDays || Math.max(workoutCount, 1);
+    offDays = offDays || 1;
+  }
+
+  let startDayIndex;
+  try {
+    const keysToTry = [groupId, key].filter(Boolean);
+    for (const k of keysToTry) {
+      const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
+      if (cycleRaw) {
+        startDayIndex = Number(JSON.parse(cycleRaw).startDayIndex);
+        break;
+      }
+    }
+  } catch {}
+  startDayIndex = startDayIndex != null ? startDayIndex : todayMonSun;
+
+  const schedule = cycleToSchedule(onDays, offDays, startDayIndex);
+  return { schedule, startDayIndex, onDays, offDays };
+}
 
 const SPLIT_ACCENTS = {
   'upper-lower': {
@@ -112,116 +160,73 @@ export default function Home() {
     setShowCalendarSync(true);
   }, []);
 
-  // --- Split categorization ---
-  const { currentSplit, currentSplitName, splitDetection, dayWorkoutNames, todayWorkoutIndex } = useMemo(() => {
+  // --- Split categorization (computed fresh every render — no stale memo) ---
+
+  const { currentSplit, currentSplitName } = useMemo(() => {
     const hasActive = templates.some(t => t.isActiveSplit === true);
     const split = hasActive
       ? templates.filter(t => t.isActiveSplit === true)
       : templates.filter(t => !t.splitGroup || t.splitGroup === '');
 
-    const splitName = split.length > 0
+    const name = split.length > 0
       ? (split[0]?.splitName || [...new Set(split.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')))].join(' / ')).toUpperCase()
       : '';
 
-    const cycleToSchedule = (onDays, offDays, startDayIdx) => {
-      const cycleLength = onDays + offDays;
-      const schedule = [];
-      for (let i = 0; i < 7; i++) {
-        const daysFromStart = i >= startDayIdx ? i - startDayIdx : i + 7 - startDayIdx;
-        const pos = daysFromStart % cycleLength;
-        schedule.push(pos < onDays ? 1 : 0);
-      }
-      return schedule;
-    };
+    return { currentSplit: [...split].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)), currentSplitName: name };
+  }, [templates]);
 
-    const resolveSchedule = (key, workoutCount, groupId) => {
-      const todayIndex = new Date().getDay();
-      const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
+  // Compute schedule fresh every render — no caching that could go stale
+  const groupId = currentSplit.length > 0 ? currentSplit[0].splitGroup : null;
+  const names = currentSplit.map(t => (t.name || '').toLowerCase());
+  const hasUpper = names.some(n => n.includes('upper'));
+  const hasLower = names.some(n => n.includes('lower'));
+  const hasPush  = names.some(n => n.includes('push'));
+  const hasPull  = names.some(n => n.includes('pull'));
+  const hasLegs  = names.some(n => n.includes('legs'));
+  const hasFull  = names.some(n => n.includes('full'));
 
-      // For known split types, use the hardcoded cycle (bypasses localStorage)
-      const defaultCycle = SPLIT_CYCLES[key];
-      let onDays = defaultCycle ? defaultCycle.onDays : null;
-      let offDays = defaultCycle ? defaultCycle.offDays : null;
+  let splitKey, workoutCount;
+  if (currentSplit.length === 0) {
+    splitKey = 'full-body';
+    workoutCount = 0;
+  } else if (hasUpper && hasLower && hasPush && hasPull && hasLegs) {
+    splitKey = 'ul-ppl';
+    workoutCount = currentSplit.length;
+  } else if (hasPush && hasPull && hasLegs) {
+    splitKey = 'push-pull-legs';
+    workoutCount = currentSplit.length;
+  } else if (hasUpper && hasLower) {
+    splitKey = 'upper-lower';
+    workoutCount = currentSplit.length;
+  } else if (hasFull && !hasUpper && !hasLower) {
+    splitKey = 'full-body';
+    workoutCount = currentSplit.length;
+  } else {
+    splitKey = 'full-body';
+    workoutCount = currentSplit.length;
+  }
 
-      // For custom splits, try localStorage cycle
-      if (!defaultCycle) {
-        try {
-          const cycleRaw = localStorage.getItem(`splitCycle_${groupId}`);
-          if (cycleRaw) {
-            const parsed = JSON.parse(cycleRaw);
-            onDays = Number(parsed.onDays);
-            offDays = Number(parsed.offDays);
-          }
-        } catch {}
-        onDays = onDays || Math.max(workoutCount, 1);
-        offDays = offDays || 1;
-      }
+  const splitDetection = { key: splitKey, ...resolveSchedule(splitKey, workoutCount, groupId) };
 
-      // Start day from localStorage, or default to today
-      let startDayIndex;
-      try {
-        const keysToTry = [groupId, key].filter(Boolean);
-        for (const k of keysToTry) {
-          const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
-          if (cycleRaw) {
-            const parsed = JSON.parse(cycleRaw);
-            startDayIndex = Number(parsed.startDayIndex);
-            break;
-          }
-        }
-      } catch {}
-      startDayIndex = startDayIndex != null ? startDayIndex : todayMonSun;
-
-      const schedule = cycleToSchedule(onDays, offDays, startDayIndex);
-      return { schedule, startDayIndex, onDays, offDays };
-    };
-
-    const sorted = [...split].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-
-    const groupId = split.length > 0 ? split[0].splitGroup : null;
-
-    let detection;
-    if (split.length === 0) {
-      detection = { key: 'full-body', ...resolveSchedule('full-body', 0, null) };
-    } else {
-      const names = split.map(t => (t.name || '').toLowerCase());
-      const hasUpper = names.some(n => n.includes('upper'));
-      const hasLower = names.some(n => n.includes('lower'));
-      const hasPush  = names.some(n => n.includes('push'));
-      const hasPull  = names.some(n => n.includes('pull'));
-      const hasLegs  = names.some(n => n.includes('legs'));
-      const hasFull  = names.some(n => n.includes('full'));
-
-      if (hasFull && !hasUpper && !hasLower) detection = { key: 'full-body', ...resolveSchedule('full-body', split.length, groupId) };
-      else if (hasUpper && hasLower && hasPush && hasPull && hasLegs) detection = { key: 'ul-ppl', ...resolveSchedule('ul-ppl', split.length, groupId) };
-      else if (hasPush && hasPull && hasLegs) detection = { key: 'push-pull-legs', ...resolveSchedule('push-pull-legs', split.length, groupId) };
-      else if (hasUpper && hasLower) detection = { key: 'upper-lower', ...resolveSchedule('upper-lower', split.length, groupId) };
-      else detection = { key: 'full-body', ...resolveSchedule('full-body', split.length, groupId) };
+  const { schedule, startDayIndex, onDays, offDays } = splitDetection;
+  const cycleLength = (onDays || 1) + (offDays || 1);
+  const sorted = currentSplit;
+  const dayWorkoutNames = schedule.map((on, i) => {
+    if (on && sorted.length > 0) {
+      const daysFromStart = i >= startDayIndex ? i - startDayIndex : i + 7 - startDayIndex;
+      const dayInCycle = daysFromStart % cycleLength;
+      const workoutIdx = dayInCycle % sorted.length;
+      return sorted[workoutIdx]?.name?.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '') || '';
     }
+    return null;
+  });
 
-    // Map workout names to each day of the week (Mon=0 ... Sun=6)
-    const { schedule, startDayIndex, onDays, offDays } = detection;
-    const cycleLength = (onDays || 1) + (offDays || 1);
-    const dayWorkoutNames = schedule.map((on, i) => {
-      if (on && sorted.length > 0) {
-        const daysFromStart = i >= startDayIndex ? i - startDayIndex : i + 7 - startDayIndex;
-        const dayInCycle = daysFromStart % cycleLength;
-        const workoutIdx = dayInCycle % sorted.length;
-        return sorted[workoutIdx]?.name?.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '') || '';
-      }
-      return null;
-    });
-
-    // Which workout card (by sort_order index) is today's
-    const todayMonSun = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-    const todayDaysFromStart = todayMonSun >= startDayIndex ? todayMonSun - startDayIndex : todayMonSun + 7 - startDayIndex;
-    const todayInCycle = todayDaysFromStart % cycleLength;
-    const todayWorkoutIndex = schedule[todayMonSun] >= 1 && sorted.length > 0
-      ? (todayInCycle % sorted.length)
-      : -1;
-
-    return { currentSplit: sorted, currentSplitName: splitName, splitDetection: detection, dayWorkoutNames, todayWorkoutIndex };
-  }, [templates, BUILD_ID]);
+  const todayMonSun = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+  const todayDaysFromStart = todayMonSun >= startDayIndex ? todayMonSun - startDayIndex : todayMonSun + 7 - startDayIndex;
+  const todayInCycle = todayDaysFromStart % cycleLength;
+  const todayWorkoutIndex = schedule[todayMonSun] >= 1 && sorted.length > 0
+    ? (todayInCycle % sorted.length)
+    : -1;
 
   const handleCalendarSyncConfirm = useCallback((hour) => {
     setShowCalendarSync(false);
