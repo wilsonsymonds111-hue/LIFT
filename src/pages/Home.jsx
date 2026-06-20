@@ -164,8 +164,10 @@ export default function Home() {
       ? templates.filter(t => t.isActiveSplit === true)
       : templates.filter(t => !t.splitGroup || t.splitGroup === '');
 
+    // Prefer the first template's splitName, then check all templates for a shared splitName,
+    // then fall back to joining individual workout names
     const name = split.length > 0
-      ? (split[0]?.splitName || [...new Set(split.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')))].join(' / ')).toUpperCase()
+      ? (split[0]?.splitName || split.find(t => t.splitName)?.splitName || [...new Set(split.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')))].join(' / ')).toUpperCase()
       : '';
 
     return { currentSplit: [...split].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)), currentSplitName: name };
