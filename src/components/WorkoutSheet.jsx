@@ -15,9 +15,11 @@ import ProgressGraph from './ProgressGraph';
 
 /* ─── Sound Effect ──────────────────────────────────────────── */
 const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/87d1fec3a_ScreenRecording_06-16-202607-45-53_12.mp3';
+const LEVEL_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/b340fae3c_universfield-game-level-complete-143022.mp3';
 
-// Preload the audio clip so it plays instantly with zero latency
+// Preload the audio clips so they play instantly with zero latency
 let _audioEl = null;
+let _levelCompleteEl = null;
 
 function _ensureAudio() {
   if (!_audioEl) {
@@ -26,36 +28,22 @@ function _ensureAudio() {
     _audioEl.load();
   }
 }
+function _ensureLevelComplete() {
+  if (!_levelCompleteEl) {
+    _levelCompleteEl = new Audio(LEVEL_COMPLETE_SOUND);
+    _levelCompleteEl.preload = 'auto';
+    _levelCompleteEl.load();
+  }
+}
 // Start preloading immediately
 _ensureAudio();
+_ensureLevelComplete();
 
 function playCompleteChime() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const now = ctx.currentTime;
-
-    // Four-tone triumphant arpeggio with a big finish
-    const notes = [
-      { freq: 523,  start: 0,     peak: 0.06,  end: 0.18 },  // C5
-      { freq: 659,  start: 0.06,  peak: 0.12,  end: 0.24 },  // E5
-      { freq: 784,  start: 0.12,  peak: 0.18,  end: 0.30 },  // G5
-      { freq: 1047, start: 0.18,  peak: 0.25,  end: 0.65 },  // C6 (octave)
-    ];
-
-    notes.forEach(({ freq, start, peak, end }) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.001, now + start);
-      gain.gain.exponentialRampToValueAtTime(0.2, now + peak);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + end);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now + start);
-      osc.stop(now + end);
-    });
-  } catch (_) {}
+  if (!_levelCompleteEl) _ensureLevelComplete();
+  if (!_levelCompleteEl) return;
+  _levelCompleteEl.currentTime = 0;
+  _levelCompleteEl.play().catch(() => {});
 }
 
 function playTick() {
