@@ -41,6 +41,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       localStorage.setItem('profilePhoto', file_url);
+      await base44.auth.updateMe({ profilePhoto: file_url });
       onPhotoChange(file_url);
     } catch {}
     setUploading(false);

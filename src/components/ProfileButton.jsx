@@ -1,11 +1,29 @@
-import { useState, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { UserCircle } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 import ProfileSheet from './ProfileSheet';
 
 const ProfileButton = memo(function ProfileButton() {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
-  const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    base44.auth.me().then(user => {
+      if (user?.profilePhoto) {
+        setProfilePhoto(user.profilePhoto);
+      } else {
+        const local = localStorage.getItem('profilePhoto');
+        if (local) setProfilePhoto(local);
+      }
+      setLoaded(true);
+    }).catch(() => {
+      const local = localStorage.getItem('profilePhoto');
+      if (local) setProfilePhoto(local);
+      setLoaded(true);
+    });
+  }, []);
 
   const handleToggleDark = () => {
     const next = !darkMode;
