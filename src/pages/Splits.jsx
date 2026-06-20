@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
@@ -117,7 +117,7 @@ export default function Splits() {
     }
   }, [loading, mySplitGroups.length, showBuilder, activeTab]);
 
-  const handleMakeMySplitCurrent = async (group) => {
+  const handleMakeMySplitCurrent = useCallback(async (group) => {
     setMenuOpen(null);
 
     // Build display data from the group's templates
@@ -190,17 +190,17 @@ export default function Splits() {
       setSwapping(false);
       setSwapPhase(null);
     }
-  };
+  }, [queryClient]);
 
-  const handleDeleteMySplit = async (group) => {
+  const handleDeleteMySplit = useCallback(async (group) => {
     setMenuOpen(null);
     const ids = group.templates.map(t => t.id);
     queryClient.setQueryData(['workoutTemplates'], (prev) => prev?.filter(t => !ids.includes(t.id)));
     await Promise.all(ids.map(id => base44.entities.WorkoutTemplate.delete(id)));
     invalidateWorkoutTemplates(queryClient);
-  };
+  }, [queryClient]);
 
-  const handleMakeCurrentSplit = async (splitKey) => {
+  const handleMakeCurrentSplit = useCallback(async (splitKey) => {
     setMenuOpen(null);
     const splitData = EXAMPLE_SPLITS_DATA[splitKey];
     if (!splitData) return;
@@ -312,7 +312,7 @@ export default function Splits() {
       setSwapping(false);
       setSwapPhase(null);
     }
-  };
+  }, [queryClient]);
 
   if (loading) {
     return (

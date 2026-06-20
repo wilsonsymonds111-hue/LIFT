@@ -31,13 +31,20 @@ const pageVariants = {
 
 const PAGE_TRANSITION = { duration: 0.15, ease: [0.33, 1, 0.68, 1] };
 const SUSPENSE_FALLBACK = <div className="w-full h-screen bg-background" />;
+
+// Memo wrapper prevents inactive tab pages from re-rendering on every navigation
+const MemoTab = memo(({ Component }) => (
+  <Suspense fallback={SUSPENSE_FALLBACK}>
+    <Component />
+  </Suspense>
+));
 const LOADING_SPINNER = (
   <div className="fixed inset-0 flex items-center justify-center">
     <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
   </div>
 );
 
-const SlideIn = ({ children }) => (
+const SlideIn = memo(({ children }) => (
   <motion.div
     className="w-full min-h-screen bg-background"
     variants={pageVariants}
@@ -48,13 +55,13 @@ const SlideIn = ({ children }) => (
   >
     {children}
   </motion.div>
-);
+));
 
 const TAB_STYLES = { touchAction: 'pan-y' };
 
 const TAB_CONTENT = [Home, Splits, Exercises];
 
-const SwipeableTabs = () => {
+const SwipeableTabs = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
   const activeIndex = TABS.indexOf(location.pathname);
@@ -99,15 +106,13 @@ const SwipeableTabs = () => {
       >
         {TAB_CONTENT.map((Component, i) => (
           <div key={TABS[i]} className="flex-shrink-0 overflow-y-auto" style={{ width }}>
-            <Suspense fallback={SUSPENSE_FALLBACK}>
-              <Component />
-            </Suspense>
+            <MemoTab Component={Component} />
           </div>
         ))}
       </motion.div>
     </div>
   );
-};
+});
 
 // Preload sub-pages after tab content settles
 const usePreloadSubPages = () => {
