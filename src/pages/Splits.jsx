@@ -116,9 +116,8 @@ export default function Splits() {
     setMenuOpen(null);
 
     // Build display data from the group's templates
-    const names = group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, ''));
-    const uniqueNames = [...new Set(names)];
-    const splitName = uniqueNames.join(' / ').toUpperCase();
+    const splitName = group.templates[0]?.splitName ||
+      [...new Set(group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')))].join(' / ').toUpperCase();
     const splitData = {
       name: splitName,
       workouts: group.templates.map(t => ({
@@ -166,7 +165,7 @@ export default function Splits() {
     const groupIds = new Set(group.templates.map(t => t.id));
     queryClient.setQueryData(['workoutTemplates'], (prev) =>
       prev?.map(t => {
-        if (groupIds.has(t.id)) return { ...t, isActiveSplit: true, splitGroup: newGroupId };
+        if (groupIds.has(t.id)) return { ...t, isActiveSplit: true, splitGroup: newGroupId, splitName: splitName };
         if (t.isActiveSplit) return { ...t, isActiveSplit: false };
         return t;
       })
@@ -178,7 +177,7 @@ export default function Splits() {
         base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false })
       ));
       await Promise.all(group.templates.map((t, i) =>
-        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: true, splitGroup: newGroupId, sort_order: i })
+        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: true, splitGroup: newGroupId, sort_order: i, splitName: splitName })
       ));
       invalidateWorkoutTemplates(queryClient);
     } catch (_) {
@@ -258,6 +257,7 @@ export default function Splits() {
       sort_order: i,
       isActiveSplit: true,
       splitGroup: newGroupId,
+      splitName: splitData.name,
       created_date: new Date().toISOString(),
       updated_date: new Date().toISOString(),
     }));
@@ -282,6 +282,7 @@ export default function Splits() {
         sort_order: i,
         isActiveSplit: true,
         splitGroup: newGroupId,
+        splitName: splitData.name,
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
       invalidateWorkoutTemplates(queryClient);
@@ -350,61 +351,64 @@ export default function Splits() {
         </div>
       </div>
 
-      {/* Sub-tab content — both tabs always rendered, switched by button */}
-      <div className="relative overflow-hidden w-full">
-        <motion.div
-          animate={{ x: `-${tabIndex * 50}%` }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.3 }}
-          className="flex"
-          style={{ width: '200%' }}
-        >
-          {/* My Splits */}
-          <div className="w-1/2 flex-shrink-0 px-4">
-            <button
-              onClick={() => setShowBuilder(true)}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Create New Split
-            </button>
-            {mySplitGroups.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                {mySplitGroups.map((group) => {
-                  const isActive = group.templates.some(t => t.isActiveSplit);
-                  return (
-                  <SplitCard
-                    key={group.groupId}
-                    splitKey={group.groupId}
-                    name={group.templates[0]?.splitName || group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
-                    workouts={group.templates.map(t => ({ name: t.name }))}
-                    isActive={isActive}
-                    onCardClick={() => setActiveSplit(group.groupId)}
-                    onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
-                    menuRef={el => menuRef.current[group.groupId] = el}
-                  />
-                  );
-                })}
+      {/* Sub-tab content — only the active tab renders to avoid extra whitespace */}
+      <div className="relative w-full">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: activeTab === 'mine' ? -20 : 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: activeTab === 'mine' ? 20 : -20 }}
+            transition={{ duration: 0.15 }}
+          >
+            {activeTab === 'mine' ? (
+              <div className="px-4">
+                <button
+                  onClick={() => setShowBuilder(true)}
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Create New Split
+                </button>
+                {mySplitGroups.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    {mySplitGroups.map((group) => {
+                      const isActive = group.templates.some(t => t.isActiveSplit);
+                      return (
+                      <SplitCard
+                        key={group.groupId}
+                        splitKey={group.groupId}
+                        name={group.templates[0]?.splitName || group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
+                        workouts={group.templates.map(t => ({ name: t.name }))}
+                        isActive={isActive}
+                        onCardClick={() => setActiveSplit(group.groupId)}
+                        onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
+                        menuRef={el => menuRef.current[group.groupId] = el}
+                      />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="px-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
+                    <SplitCard
+                      key={key}
+                      splitKey={key}
+                      name={split.name}
+                      workouts={split.workouts}
+                      isActive={activeExampleSplits[key] || false}
+                      onCardClick={() => setActiveSplit(key)}
+                      cardRef={el => cardRefs.current[key] = el}
+                    />
+                  ))}
+                </div>
               </div>
             )}
-          </div>
-
-          {/* Example Splits */}
-          <div className="w-1/2 flex-shrink-0 px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
-                <SplitCard
-                  key={key}
-                  splitKey={key}
-                  name={split.name}
-                  workouts={split.workouts}
-                  isActive={activeExampleSplits[key] || false}
-                  onCardClick={() => setActiveSplit(key)}
-                  cardRef={el => cardRefs.current[key] = el}
-                />
-              ))}
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
 
@@ -568,6 +572,7 @@ export default function Splits() {
               sort_order: i,
               isActiveSplit: true,
               splitGroup: newGroupId,
+              splitName: splitData.name,
               created_date: new Date().toISOString(),
               updated_date: new Date().toISOString(),
             }));
@@ -592,6 +597,7 @@ export default function Splits() {
                 sort_order: i,
                 isActiveSplit: true,
                 splitGroup: newGroupId,
+                splitName: splitData.name,
               }));
               await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
               invalidateWorkoutTemplates(queryClient);
