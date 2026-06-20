@@ -72,6 +72,16 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           </button>
         </div>
 
+        {/* Guest mode badge */}
+        {isAuthenticated && (
+          <div className="flex justify-center">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-semibold">
+              <AlertTriangle className="w-3 h-3" />
+              You are in guest mode
+            </span>
+          </div>
+        )}
+
         {/* Photo upload */}
         <div className="flex flex-col items-center gap-3 py-2">
           <div className="relative">
