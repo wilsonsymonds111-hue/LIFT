@@ -37,8 +37,8 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
         onClick={onCardClick}
         className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden min-h-[160px]"
       >
-        {/* Glassy card background */}
-        <div className="absolute inset-0 rounded-2xl bg-white/70 dark:bg-white/[0.05] border border-white/40 dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.5)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)]" />
+        {/* Glassy card background — blurs decorative blobs behind */}
+        <div className="absolute inset-0 rounded-2xl bg-white/60 dark:bg-white/[0.06] backdrop-blur-xl border border-white/40 dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)]" />
 
         {/* Content */}
         <div className="relative p-5 flex flex-col justify-end h-full min-h-[160px]">
