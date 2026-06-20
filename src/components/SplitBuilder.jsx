@@ -1,11 +1,22 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, ChevronLeft, Plus, Dumbbell, Check, Sparkles, Pencil } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Plus, Dumbbell, Check, Sparkles, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import WorkoutBuilder from './WorkoutBuilder';
 
 const WORKOUT_LABELS = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
+const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+function cycleToSchedule(onDays, offDays, startDayIndex) {
+  const cycleLength = onDays + offDays;
+  const schedule = [];
+  for (let i = 0; i < 7; i++) {
+    const pos = ((i - startDayIndex) % cycleLength + cycleLength) % cycleLength;
+    schedule.push(pos < onDays ? 1 : 0);
+  }
+  return schedule;
+}
 
 export default function SplitBuilder({ onClose, onSaved }) {
   const [step, setStep] = useState(1);
@@ -15,6 +26,12 @@ export default function SplitBuilder({ onClose, onSaved }) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [splitName, setSplitName] = useState('');
+  const [restOnDays, setRestOnDays] = useState(1);
+  const [restOffDays, setRestOffDays] = useState(1);
+  const [restStartDay, setRestStartDay] = useState(() => {
+    const today = new Date().getDay();
+    return today === 0 ? 6 : today - 1;
+  });
 
   const handlePickCount = (count) => {
     setWorkoutCount(count);
@@ -23,6 +40,11 @@ export default function SplitBuilder({ onClose, onSaved }) {
       exercises: [],
     })));
     setStep(2);
+  };
+
+  const handleContinueToRest = () => {
+    if (!allWorkoutsNamed || !allWorkoutsHaveExercises) return;
+    setStep(3);
   };
 
   const handleBuildSave = (exerciseList) => {
@@ -75,6 +97,12 @@ export default function SplitBuilder({ onClose, onSaved }) {
         splitName: splitDisplayName,
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(templates);
+      // Save the rest day cycle so it's available when the split is made current
+      localStorage.setItem(`splitCycle_${groupId}`, JSON.stringify({
+        onDays: restOnDays,
+        offDays: restOffDays,
+        startDayIndex: restStartDay,
+      }));
       setSaved(true);
       setTimeout(() => {
         setSaving(false);
@@ -147,7 +175,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
               <span className="font-extrabold text-foreground text-base">New Split</span>
               <div className="w-8" />
             </>
-          ) : (
+          ) : step === 2 ? (
             <>
               <button onClick={() => setStep(1)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
                 <ChevronLeft className="w-4 h-4 text-foreground" />
@@ -159,9 +187,23 @@ export default function SplitBuilder({ onClose, onSaved }) {
                 className="flex-1 mx-3 bg-transparent font-extrabold text-foreground text-base text-center focus:outline-none placeholder:text-muted-foreground/50"
               />
               <button
+                onClick={handleContinueToRest}
+                disabled={!allWorkoutsNamed || !allWorkoutsHaveExercises}
+                className="flex items-center gap-1 px-4 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition"
+              >
+                Next <ChevronRight className="w-4 h-4" />
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => setStep(2)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
+                <ChevronLeft className="w-4 h-4 text-foreground" />
+              </button>
+              <span className="flex-1 text-center font-extrabold text-foreground text-base">Rest Frequency</span>
+              <button
                 onClick={handleSave}
-                disabled={!allWorkoutsNamed || !allWorkoutsHaveExercises || saving || saved}
-                className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition"
+                disabled={saving || saved}
+                className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition"
               >
                 {saving ? 'Saving…' : 'Save'}
               </button>
@@ -284,6 +326,88 @@ export default function SplitBuilder({ onClose, onSaved }) {
             )}
           </div>
         )}
+
+        {/* Step 3: Rest Day Frequency */}
+        {step === 3 && (() => {
+          const previewSchedule = cycleToSchedule(restOnDays, restOffDays, restStartDay);
+          const todayIndex = new Date().getDay();
+          const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
+          const frequencyLabel = `${restOnDays} day${restOnDays !== 1 ? 's' : ''} on, ${restOffDays} day${restOffDays !== 1 ? 's' : ''} off, repeat`;
+
+          return (
+            <div className="flex-1 overflow-y-auto px-5 py-6">
+              <p className="text-sm text-muted-foreground mb-5 text-center">
+                Set your training rhythm — this controls the weekly tracker and calendar sync.
+              </p>
+
+              {/* Days on / off inputs */}
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex-1">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days On</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={6}
+                    value={restOnDays}
+                    onChange={(e) => setRestOnDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
+                    className="w-full bg-card border-2 border-blue-200 dark:border-blue-800 rounded-xl px-3 py-3 text-lg font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days Off</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={6}
+                    value={restOffDays}
+                    onChange={(e) => setRestOffDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
+                    className="w-full bg-card border-2 border-blue-200 dark:border-blue-800 rounded-xl px-3 py-3 text-lg font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Frequency summary */}
+              <p className="text-sm font-bold text-foreground text-center mb-5">{frequencyLabel}</p>
+
+              {/* Start day selector */}
+              <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mb-2">
+                Tap a day to set cycle start
+              </p>
+              <div className="flex justify-between gap-1 mb-2">
+                {previewSchedule.map((status, i) => {
+                  const isGymDay = status === 1;
+                  const isToday = i === todayMonSun;
+                  const isStart = restStartDay === i;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => setRestStartDay(i)}
+                      className={`flex flex-col items-center flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-150 ${
+                        isStart
+                          ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30'
+                          : 'bg-card border-2 border-blue-200 dark:border-blue-800 hover:border-blue-400'
+                      } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
+                    >
+                      <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{DAY_LABELS[i]}</span>
+                      <div
+                        className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
+                          isGymDay
+                            ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
+                            : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
+                        } ${isToday && !isStart ? 'ring-[1.5px] ring-emerald-500 ring-offset-1' : ''}`}
+                      >
+                        {isGymDay && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                You can adjust this anytime from the split detail view.
+              </p>
+            </div>
+          );
+        })()}
 
         {/* Workout Builder */}
         {editingWorkoutIdx !== null && (

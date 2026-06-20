@@ -112,19 +112,23 @@ export default function Home() {
       ? [...new Set(split.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')))].join(' / ').toUpperCase()
       : '';
 
-    const resolveSchedule = (key, workoutCount) => {
+    const resolveSchedule = (key, workoutCount, groupId) => {
       const todayIndex = new Date().getDay();
       const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
       let onDays, offDays, startDayIndex;
+      // Try groupId first (for custom splits), then detection key
+      const keysToTry = [groupId, key].filter(Boolean);
       try {
-        const cycleRaw = localStorage.getItem(`splitCycle_${key}`);
-        if (cycleRaw) {
-          const parsed = JSON.parse(cycleRaw);
-          onDays = parsed.onDays;
-          offDays = parsed.offDays;
-          startDayIndex = parsed.startDayIndex;
-        } else {
-          const raw = localStorage.getItem(`splitSchedule_${key}`);
+        for (const k of keysToTry) {
+          const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
+          if (cycleRaw) {
+            const parsed = JSON.parse(cycleRaw);
+            onDays = parsed.onDays;
+            offDays = parsed.offDays;
+            startDayIndex = parsed.startDayIndex;
+            break;
+          }
+          const raw = localStorage.getItem(`splitSchedule_${k}`);
           if (raw) {
             const schedule = JSON.parse(raw);
             return { schedule, startDayIndex: todayMonSun, onDays: null, offDays: null };
@@ -147,9 +151,11 @@ export default function Home() {
 
     const sorted = [...split].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
+    const groupId = split.length > 0 ? split[0].splitGroup : null;
+
     let detection;
     if (split.length === 0) {
-      detection = { key: 'full-body', ...resolveSchedule('full-body', 0) };
+      detection = { key: 'full-body', ...resolveSchedule('full-body', 0, null) };
     } else {
       const names = split.map(t => (t.name || '').toLowerCase());
       const hasUpper = names.some(n => n.includes('upper'));
@@ -159,11 +165,11 @@ export default function Home() {
       const hasLegs  = names.some(n => n.includes('legs'));
       const hasFull  = names.some(n => n.includes('full'));
 
-      if (hasFull && !hasUpper && !hasLower) detection = { key: 'full-body', ...resolveSchedule('full-body', split.length) };
-      else if (hasUpper && hasLower && hasPush && hasPull && hasLegs) detection = { key: 'ul-ppl', ...resolveSchedule('ul-ppl', split.length) };
-      else if (hasPush && hasPull && hasLegs) detection = { key: 'push-pull-legs', ...resolveSchedule('push-pull-legs', split.length) };
-      else if (hasUpper && hasLower) detection = { key: 'upper-lower', ...resolveSchedule('upper-lower', split.length) };
-      else detection = { key: 'full-body', ...resolveSchedule('full-body', split.length) };
+      if (hasFull && !hasUpper && !hasLower) detection = { key: 'full-body', ...resolveSchedule('full-body', split.length, groupId) };
+      else if (hasUpper && hasLower && hasPush && hasPull && hasLegs) detection = { key: 'ul-ppl', ...resolveSchedule('ul-ppl', split.length, groupId) };
+      else if (hasPush && hasPull && hasLegs) detection = { key: 'push-pull-legs', ...resolveSchedule('push-pull-legs', split.length, groupId) };
+      else if (hasUpper && hasLower) detection = { key: 'upper-lower', ...resolveSchedule('upper-lower', split.length, groupId) };
+      else detection = { key: 'full-body', ...resolveSchedule('full-body', split.length, groupId) };
     }
 
     // Map workout names to each day of the week (Mon=0 ... Sun=6)
