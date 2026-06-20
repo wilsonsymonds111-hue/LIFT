@@ -25,7 +25,7 @@ export default function Exercises() {
       (results || []).forEach(ex => {
         if (ex.history?.length > 0) {
           map[ex.name] = ex.history
-            .map(h => ({ v: h.kg || 0, date: h.date ? new Date(h.date) : null }))
+            .map(h => ({ v: h.reps || 0, date: h.date ? new Date(h.date) : null }))
             .sort((a, b) => (a.date || 0) - (b.date || 0));
         }
       });
