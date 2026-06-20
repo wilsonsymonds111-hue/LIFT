@@ -367,7 +367,7 @@ export default function Splits() {
             dragElastic={0.08}
             onDragEnd={handleSubTabDragEnd}
             animate={{ x: -tabIndex * subTabWidth }}
-            transition={{ type: 'spring', stiffness: 330, damping: 34, mass: 0.75 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 36, mass: 0.4 }}
             className="flex"
             style={{ width: subTabWidth * 2, willChange: 'transform' }}
           >
@@ -421,12 +421,51 @@ export default function Splits() {
       </div>
 
       {/* Fallback when width not yet measured */}
-      {subTabWidth === 0 && activeTab === 'mine' && (
-        <div className="px-4">
-          <button onClick={() => setShowBuilder(true)} className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
-            <Plus className="w-4 h-4" />Create New Split
-          </button>
-        </div>
+      {subTabWidth === 0 && (
+        <>
+          {activeTab === 'mine' && (
+            <div className="px-4">
+              <button onClick={() => setShowBuilder(true)} className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+                <Plus className="w-4 h-4" />Create New Split
+              </button>
+              {mySplitGroups.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" style={GRID_CV}>
+                  {mySplitGroups.map((group) => {
+                    const isActive = group.templates.some(t => t.isActiveSplit);
+                    return (
+                    <SplitCard
+                      key={group.groupId}
+                      splitKey={group.groupId}
+                      name={group.templates[0]?.splitName || group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
+                      workouts={group.templates.map(t => ({ name: t.name }))}
+                      isActive={isActive}
+                      onCardClick={() => setActiveSplit(group.groupId)}
+                      onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
+                      menuRef={el => menuRef.current[group.groupId] = el}
+                    />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+          {activeTab === 'examples' && (
+            <div className="px-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={GRID_CV}>
+                {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
+                  <SplitCard
+                    key={key}
+                    splitKey={key}
+                    name={split.name}
+                    workouts={split.workouts}
+                    onCardClick={() => setActiveSplit(key)}
+                    cardRef={el => cardRefs.current[key] = el}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
 

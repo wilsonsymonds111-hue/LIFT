@@ -90,7 +90,7 @@ const SwipeableTabs = () => {
         dragElastic={0.08}
         onDragEnd={handleDragEnd}
         animate={{ x: -activeIndex * width }}
-        transition={{ type: 'spring', stiffness: 330, damping: 34, mass: 0.75 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 36, mass: 0.4 }}
         className="flex"
         style={{ width: TABS.length * width, height: '100%', willChange: 'transform' }}
       >
