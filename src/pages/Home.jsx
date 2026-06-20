@@ -18,35 +18,34 @@ const SPLIT_ACCENTS = {
   'upper-lower': {
     hex: '#2A8FFF',
     tint: 'rgba(30, 100, 220, 0.18)',
-    cardClasses: 'border-2 border-border hover:border-blue-500 shadow-md hover:shadow-lg',
+    cardClasses: 'border-2 border-border hover:border-blue-500',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-blue-500',
   },
   'push-pull-legs': {
     hex: '#43A047',
     tint: 'rgba(50, 140, 50, 0.18)',
-    cardClasses: 'border-2 border-border hover:border-emerald-500 shadow-md hover:shadow-lg',
+    cardClasses: 'border-2 border-border hover:border-emerald-500',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-emerald-500',
   },
   'full-body': {
     hex: '#8E24AA',
     tint: 'rgba(120, 30, 150, 0.18)',
-    cardClasses: 'border-2 border-border hover:border-purple-500 shadow-md hover:shadow-lg',
+    cardClasses: 'border-2 border-border hover:border-purple-500',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-purple-500',
   },
   'ul-ppl': {
     hex: '#F57C00',
     tint: 'rgba(220, 100, 0, 0.18)',
-    cardClasses: 'border-2 border-border hover:border-amber-500 shadow-md hover:shadow-lg',
+    cardClasses: 'border-2 border-border hover:border-amber-500',
     tagClasses: 'bg-muted text-muted-foreground',
     dotClass: 'bg-amber-500',
   },
 };
 
 const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
-const GRID_CV = { contentVisibility: 'auto', containIntrinsicSize: 'auto 200px' };
 
 export default function Home() {
   const navigate = useNavigate();
@@ -286,7 +285,7 @@ export default function Home() {
           </div>
 
           {currentSplit.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={GRID_CV}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {currentSplit.map((template, idx) => (
                 <TemplateCard
                   key={template.id}
