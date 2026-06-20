@@ -828,21 +828,38 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
     base44.entities.ExerciseDetail.list('name', 200).then(async (results) => {
-      const map = {};
+      // Case-insensitive map — template exercises may use different casing than ExerciseDetail
+      const detailByName = {};
       (results || []).forEach(d => {
-        if (d.image_url) map[d.name] = d.image_url;
+        if (d.image_url) detailByName[d.name.toLowerCase()] = d.image_url;
       });
 
-      // Fill in any exercises from the current template that are missing images
+      const map = {};
       const templateExercises = template?.exerciseList || [];
-      const missing = templateExercises.filter(e => !map[e.name]);
+      const missing = [];
+
+      templateExercises.forEach(ex => {
+        const key = ex.name.toLowerCase();
+        if (detailByName[key]) {
+          map[ex.name] = detailByName[key];
+        } else {
+          missing.push(ex);
+        }
+      });
+
       if (missing.length > 0) {
-        // Generate all missing images in parallel
-        const results = await Promise.all(missing.map(ex => ensureExerciseDetail(ex.name)));
+        const generated = await Promise.all(missing.map(ex => ensureExerciseDetail(ex.name)));
         missing.forEach((ex, i) => {
-          if (results[i]?.image_url) map[ex.name] = results[i].image_url;
+          if (generated[i]?.image_url) map[ex.name] = generated[i].image_url;
         });
       }
+
+      // Also populate the map for names that aren't in the template but exist in ExerciseDetail
+      (results || []).forEach(d => {
+        if (d.image_url && !Object.values(map).includes(d.image_url)) {
+          map[d.name] = d.image_url;
+        }
+      });
 
       setExerciseImages(map);
     });

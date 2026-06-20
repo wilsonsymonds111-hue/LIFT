@@ -4,9 +4,11 @@ import { base44 } from '@/api/base44Client';
 // If one already exists, returns its image_url. If not, generates one via AI and persists it.
 export async function ensureExerciseDetail(exerciseName) {
   try {
-    const results = await base44.entities.ExerciseDetail.filter({ name: exerciseName });
-    if (results?.length > 0 && results[0].image_url) {
-      return { image_url: results[0].image_url, muscles_worked: results[0].muscles_worked, existed: true };
+    // Fetch all to avoid case-sensitive filter misses — find match regardless of casing
+    const allDetails = await base44.entities.ExerciseDetail.list('name', 500);
+    const existing = allDetails?.find(d => d.name.toLowerCase() === exerciseName.toLowerCase());
+    if (existing?.image_url) {
+      return { image_url: existing.image_url, muscles_worked: existing.muscles_worked, existed: true };
     }
 
     // Generate — first get muscles, then image
@@ -21,9 +23,9 @@ export async function ensureExerciseDetail(exerciseName) {
 
     const image_url = imgRes?.url || '';
 
-    if (results?.length > 0) {
+    if (existing) {
       // Update existing record that had no image
-      await base44.entities.ExerciseDetail.update(results[0].id, { image_url, muscles_worked });
+      await base44.entities.ExerciseDetail.update(existing.id, { image_url, muscles_worked });
       return { image_url, existed: true };
     }
 
