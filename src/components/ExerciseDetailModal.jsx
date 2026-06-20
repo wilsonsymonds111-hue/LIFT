@@ -67,7 +67,7 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
           let image_url = '';
           try {
             const imgRes = await base44.integrations.Core.GenerateImage({
-              prompt: `A clean, anatomical illustration of a person performing the "${exercise.name}" exercise in a gym, showing proper form. Professional fitness illustration style, white background, high quality instructional diagram.`,
+              prompt: `Two side-by-side anatomical figures showing the "${exercise.name}" exercise: the left figure shows the starting position, the right figure shows the finishing position. Both figures are identical in size, proportions, camera angle, body composition, and anatomical detail — the only differences are body position and equipment placement. Clean white background. Grayscale anatomical style with visible musculature, no skin texture, like a fitness anatomy reference diagram. All primary and secondary muscles significantly involved in the exercise are highlighted in red, with anatomically accurate activation. Do not highlight muscles not meaningfully contributing. No text, labels, arrows, numbers, logos, watermarks, or annotations. Exercise equipment accurately represented for each phase. Professional museum-quality medical illustration style.`,
             });
             image_url = imgRes?.data?.url || imgRes?.url || '';
           } catch (_) {}
