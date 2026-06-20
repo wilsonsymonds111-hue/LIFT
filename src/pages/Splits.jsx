@@ -25,12 +25,9 @@ export default function Splits() {
   const navigate = useNavigate();
   const { data: allTemplates = [], isLoading: loading } = useWorkoutTemplates();
   const queryClient = useQueryClient();
-  const exampleSplitKeys = Object.keys(EXAMPLE_SPLITS_DATA);
   const templates = useMemo(() => allTemplates.filter(t =>
     t.splitGroup &&
-    !t.splitGroup.endsWith('_old') &&
-    !t.splitGroup.startsWith('removed_') &&
-    !exampleSplitKeys.includes(t.splitGroup) &&
+    t.splitGroup.startsWith('custom_') &&
     !t.isActiveSplit
   ), [allTemplates]);
   const [menuOpen, setMenuOpen] = useState(null);

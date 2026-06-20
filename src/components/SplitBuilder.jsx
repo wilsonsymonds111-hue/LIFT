@@ -61,7 +61,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
   const handleSave = async () => {
     if (!allWorkoutsNamed || !allWorkoutsHaveExercises) return;
     setSaving(true);
-    const groupId = Date.now().toString();
+    const groupId = 'custom_' + Date.now().toString();
     try {
       const templates = workouts.map((w, i) => ({
         name: w.name.trim(),
