@@ -29,36 +29,17 @@ function _ensureAudio() {
 // Start preloading immediately
 _ensureAudio();
 
-function playCompleteChime() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const now = ctx.currentTime;
-
-    // First tone — mid, short
-    const osc1 = ctx.createOscillator();
-    const gain1 = ctx.createGain();
-    osc1.type = 'sine';
-    osc1.frequency.value = 880; // A5
-    gain1.gain.setValueAtTime(0.25, now);
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-    osc1.connect(gain1);
-    gain1.connect(ctx.destination);
-    osc1.start(now);
-    osc1.stop(now + 0.2);
-
-    // Second tone — higher, longer
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.value = 1320; // E6
-    gain2.gain.setValueAtTime(0.001, now + 0.12);
-    gain2.gain.exponentialRampToValueAtTime(0.25, now + 0.2);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-    osc2.connect(gain2);
-    gain2.connect(ctx.destination);
-    osc2.start(now + 0.12);
-    osc2.stop(now + 0.5);
-  } catch (_) {}
+const WORKOUT_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/ef07423c3_speech.mp3';
+let _completeAudio = null;
+function _ensureComplete() {
+  if (!_completeAudio) { _completeAudio = new Audio(WORKOUT_COMPLETE_SOUND); _completeAudio.preload = 'auto'; _completeAudio.load(); }
+}
+_ensureComplete();
+function playCompleteSound() {
+  if (!_completeAudio) _ensureComplete();
+  if (!_completeAudio) return;
+  _completeAudio.currentTime = 0;
+  _completeAudio.play().catch(() => {});
 }
 
 function playTick() {
@@ -517,7 +498,7 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
 
   useEffect(() => {
     setTimeout(() => setShimmer(true), 200);
-    playCompleteChime();
+    playCompleteSound();
   }, []);
 
   // Top-right share button — shares the gold card
