@@ -1,21 +1,21 @@
 import { MoreHorizontal } from 'lucide-react';
 import { memo } from 'react';
 
-const SPLIT_COLORS = {
-  'upper-lower': { light: 'from-blue-500/20 to-blue-600/10', pill: 'bg-blue-500/20 text-blue-700 dark:text-blue-300' },
-  'push-pull-legs': { light: 'from-emerald-500/20 to-emerald-600/10', pill: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' },
-  'full-body': { light: 'from-purple-500/20 to-purple-600/10', pill: 'bg-purple-500/20 text-purple-700 dark:text-purple-300' },
-  'ul-ppl': { light: 'from-amber-500/20 to-amber-600/10', pill: 'bg-amber-500/20 text-amber-700 dark:text-amber-300' },
+const SPLIT_ACCENTS = {
+  'upper-lower':     { border: 'border-l-blue-500',   pill: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300' },
+  'push-pull-legs':  { border: 'border-l-emerald-500', pill: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' },
+  'full-body':       { border: 'border-l-purple-500',  pill: 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300' },
+  'ul-ppl':          { border: 'border-l-amber-500',   pill: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' },
 };
 
 function detectSplitType(workoutNames) {
   const lower = workoutNames.map(n => n.toLowerCase());
   const hasUpper = lower.some(n => n.includes('upper'));
   const hasLower = lower.some(n => n.includes('lower'));
-  const hasPush = lower.some(n => n.includes('push'));
-  const hasPull = lower.some(n => n.includes('pull'));
-  const hasLegs = lower.some(n => n.includes('legs'));
-  const hasFull = lower.some(n => n.includes('full'));
+  const hasPush  = lower.some(n => n.includes('push'));
+  const hasPull  = lower.some(n => n.includes('pull'));
+  const hasLegs  = lower.some(n => n.includes('legs'));
+  const hasFull  = lower.some(n => n.includes('full'));
 
   if (hasFull && !hasUpper && !hasLower) return 'full-body';
   if (hasPush && hasPull && hasLegs) return 'push-pull-legs';
@@ -26,53 +26,51 @@ function detectSplitType(workoutNames) {
 }
 
 const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
-  const colorKey = SPLIT_COLORS[splitKey] ? splitKey : detectSplitType(workouts.map(w => w.name));
-  const colors = SPLIT_COLORS[colorKey] || SPLIT_COLORS['upper-lower'];
+  const colorKey = SPLIT_ACCENTS[splitKey] ? splitKey : detectSplitType(workouts.map(w => w.name));
+  const colors = SPLIT_ACCENTS[colorKey] || SPLIT_ACCENTS['upper-lower'];
   const workoutCount = workouts.length;
-  const displayName = name.replace(/ Workout$/, '');
 
   return (
     <div ref={cardRef}>
       <div
         onClick={onCardClick}
-        className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden min-h-[160px]"
+        className={`relative bg-card rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-200 hover:scale-[1.01] hover:shadow-lg shadow-sm border border-border ${colors.border} border-l-[3px] min-h-[160px] p-5`}
       >
-        {/* Frosted grey card */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border border-gray-200/60 dark:border-gray-700/40 shadow-[0_2px_12px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.03)]" />
+        {/* Menu button */}
+        {onMenuToggle && (
+          <button
+            ref={menuRef}
+            onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center transition"
+          >
+            <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
 
-        {/* Content */}
-        <div className="relative p-5 flex flex-col justify-end h-full min-h-[160px]">
-          {/* Top row: menu */}
-          {onMenuToggle && (
-            <button
-              ref={menuRef}
-              onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/[0.06] dark:bg-white/[0.08] backdrop-blur-sm hover:bg-black/[0.12] dark:hover:bg-white/[0.15] flex items-center justify-center transition"
-            >
-              <MoreHorizontal className="w-4 h-4 text-foreground/70" />
-            </button>
-          )}
+        {/* Split name */}
+        <h3 className="font-bold text-foreground text-sm uppercase tracking-wide pr-6 leading-tight">
+          {name}
+        </h3>
 
-          {/* Split name */}
-          <h4 className="font-extrabold text-foreground text-sm uppercase tracking-wider pr-6 leading-tight">
-            {displayName}
-          </h4>
+        {/* Divider */}
+        <div className="w-8 h-0.5 bg-border rounded-full mt-3 mb-3" />
 
-          {/* Workout name pills */}
-          <div className="flex flex-wrap gap-1.5 mt-3">
-            {workouts.map((w, i) => (
-              <span key={i} className={`inline-flex items-center px-3 py-1.5 rounded-[6px] backdrop-blur-sm text-xs font-semibold tracking-wide ${colors.pill}`}>
-                {w.name}
-              </span>
-            ))}
-          </div>
+        {/* Workout list */}
+        <div className="space-y-1.5">
+          {workouts.map((w, i) => (
+            <div key={i} className="flex items-center gap-2.5">
+              <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${colorKey === 'upper-lower' ? 'bg-blue-500' : colorKey === 'push-pull-legs' ? 'bg-emerald-500' : colorKey === 'full-body' ? 'bg-purple-500' : 'bg-amber-500'}`} />
+              <span className="text-sm text-muted-foreground">{w.name}</span>
+            </div>
+          ))}
+        </div>
 
-          {/* Badge */}
-          <div className="mt-3">
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-foreground/[0.06] dark:bg-white/[0.08] backdrop-blur-sm text-foreground/70 text-xs font-semibold tracking-wide">
-              {workoutCount} work{workoutCount !== 1 ? 'outs' : 'out'}
-            </span>
-          </div>
+        {/* Badge */}
+        <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/60">
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-semibold ${colors.pill}`}>
+            {workoutCount} workout{workoutCount !== 1 ? 's' : ''}
+          </span>
+          <span className="text-[11px] text-muted-foreground">{name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')}</span>
         </div>
       </div>
     </div>
