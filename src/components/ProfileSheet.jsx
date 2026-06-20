@@ -188,19 +188,8 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
                   <Shield className="w-4 h-4 text-emerald-500" />
                 </div>
                 <div className="text-left flex-1">
-                  <p className="font-semibold text-foreground text-sm">Account Synced</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Your data is saved to the cloud</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl px-4 py-3.5">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle className="w-4 h-4 text-amber-500" />
-                </div>
-                <div className="text-left flex-1">
-                  <p className="font-semibold text-foreground text-sm">No login method set</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Create a username and password to access your data on other devices</p>
+                  <p className="font-semibold text-foreground text-sm">Guest Mode — Data Synced</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Your data is saved to the cloud, but you don't have a username and password yet</p>
                 </div>
               </div>
             </div>
@@ -213,7 +202,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               </div>
               <div className="text-left flex-1">
                 <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Create Login Credentials</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Set a username and password to secure your account</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Set a username and password to access your data on other devices</p>
               </div>
             </button>
           </>
