@@ -646,7 +646,7 @@ export default function Splits() {
                       {swapRef.current.oldName || 'Current Split'}
                     </h4>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {swapRef.current.oldData?.workouts?.length || 0} workout{(swapRef.current.oldData?.workouts?.length || 0) !== 1 ? 's' : ''} — {swapRef.current.oldData?.label || ''}
+                      {swapRef.current.oldData?.workouts?.length || 0} workout{(swapRef.current.oldData?.workouts?.length || 0) !== 1 ? 's' : ''}
                     </p>
                   </div>
                 </div>
@@ -676,7 +676,7 @@ export default function Splits() {
                         {swapRef.current.oldName || 'Current Split'}
                       </h4>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {swapRef.current.oldData?.workouts?.length || 0} workout{(swapRef.current.oldData?.workouts?.length || 0) !== 1 ? 's' : ''} — {swapRef.current.oldData?.label || ''}
+                        {swapRef.current.oldData?.workouts?.length || 0} workout{(swapRef.current.oldData?.workouts?.length || 0) !== 1 ? 's' : ''}
                       </p>
                     </div>
                   </div>
@@ -725,7 +725,7 @@ export default function Splits() {
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground mt-1 relative z-10">
-                        {swapRef.current.newData?.workouts?.length || 0} workout{(swapRef.current.newData?.workouts?.length || 0) > 1 ? 's' : ''} — {swapRef.current.newData?.label}
+                        {swapRef.current.newData?.workouts?.length || 0} workout{(swapRef.current.newData?.workouts?.length || 0) > 1 ? 's' : ''}
                       </p>
                       {swapPhase === 'success' && (
                         <motion.p
