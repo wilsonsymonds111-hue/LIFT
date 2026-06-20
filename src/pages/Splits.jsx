@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
@@ -65,12 +65,6 @@ export default function Splits() {
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
-
-  const handleSubTabDragEnd = useCallback((_, info) => {
-    const threshold = 80;
-    if (info.offset.x < -threshold && activeTab === 'mine') setActiveTab('examples');
-    else if (info.offset.x > threshold && activeTab === 'examples') setActiveTab('mine');
-  }, [activeTab]);
 
   const tabIndex = activeTab === 'mine' ? 0 : 1;
 
@@ -357,18 +351,13 @@ export default function Splits() {
         </div>
       </div>
 
-      {/* Swipeable sub-tab content — both tabs always rendered */}
+      {/* Sub-tab content — both tabs always rendered, switched by button */}
       <div ref={subTabContainerRef} className="relative overflow-hidden w-full">
         <motion.div
-          drag="x"
-          dragDirectionLock
-          dragConstraints={subTabWidth > 0 ? { left: -subTabWidth, right: 0 } : { left: 0, right: 0 }}
-          dragElastic={0.08}
-          onDragEnd={handleSubTabDragEnd}
-          animate={{ x: subTabWidth > 0 ? -tabIndex * subTabWidth : 0 }}
+          animate={{ x: -(tabIndex * (subTabWidth || (typeof window !== 'undefined' ? window.innerWidth - 32 : 320))) }}
           transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.3 }}
           className="flex"
-          style={{ width: (subTabWidth || window.innerWidth - 32) * 2, willChange: 'transform' }}
+          style={{ width: (subTabWidth || (typeof window !== 'undefined' ? window.innerWidth - 32 : 320)) * 2, willChange: 'transform' }}
         >
           {/* My Splits */}
           <div className="flex-shrink-0 px-4" style={{ width: subTabWidth || window.innerWidth - 32 }}>
