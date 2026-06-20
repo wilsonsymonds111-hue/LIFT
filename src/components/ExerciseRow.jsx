@@ -14,9 +14,9 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerc
       className="flex items-center gap-3 py-2.5 border-b border-border/50 cursor-pointer active:bg-muted/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
     >
       {/* Exercise image or letter fallback */}
-      <div className="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden bg-muted">
+      <div className="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden">
         {imageUrl ? (
-          <img src={imageUrl} alt={exercise.name} className="w-full h-full object-contain p-0.5" />
+          <img src={imageUrl} alt={exercise.name} className="w-full h-full object-cover" />
         ) : (
           <div className={`w-full h-full ${colors.bg} flex items-center justify-center`}>
             <span className={`text-sm font-bold ${colors.text}`}>{exercise.name[0]}</span>
