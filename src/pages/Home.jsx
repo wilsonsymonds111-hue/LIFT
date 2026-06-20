@@ -56,6 +56,7 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(null);
   const [splitMenuOpen, setSplitMenuOpen] = useState(false);
   const [showCalendarSync, setShowCalendarSync] = useState(false);
+  const [plusHovered, setPlusHovered] = useState(false);
   const menuRef = useRef({});
   const splitMenuBtnRef = useRef(null);
 
@@ -249,13 +250,30 @@ export default function Home() {
           <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate('/active-workout/empty-' + Date.now())}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-500 hover:bg-blue-600 text-white transition"
-            aria-label="Start an Empty Workout"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+          <div className="relative">
+            {plusHovered && (
+              <motion.div
+                initial={{ opacity: 0, x: 8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 8 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-12 top-1/2 -translate-y-1/2 bg-foreground text-background text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap pointer-events-none shadow-lg"
+              >
+                Start a new workout
+              </motion.div>
+            )}
+            <button
+              onClick={() => navigate('/active-workout/empty-' + Date.now())}
+              onMouseEnter={() => setPlusHovered(true)}
+              onMouseLeave={() => setPlusHovered(false)}
+              onTouchStart={() => setPlusHovered(true)}
+              onTouchEnd={() => setTimeout(() => setPlusHovered(false), 1500)}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-500 hover:bg-blue-600 text-white transition"
+              aria-label="Start a new workout"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
           <ProfileButton />
         </div>
       </div>
