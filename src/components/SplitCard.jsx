@@ -6,8 +6,12 @@ const SPLIT_IMAGES = {
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e9b1aea0d_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/2b264bebb_generated_image.png',
   'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5bc190219_image.png',
-  'default': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9024d2186_image.png',
 };
+
+const DEFAULT_IMAGES = [
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9024d2186_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6b7b7dcad_image.png',
+];
 
 function detectSplitType(workoutNames) {
   const lower = workoutNames.map(n => n.toLowerCase());
@@ -27,9 +31,11 @@ function detectSplitType(workoutNames) {
 }
 
 const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
-  const isExampleSplit = SPLIT_IMAGES[splitKey] && splitKey !== 'default';
+  const isExampleSplit = !!SPLIT_IMAGES[splitKey];
   const colorKey = isExampleSplit ? splitKey : detectSplitType(workouts.map(w => w.name));
-  const bgImage = isExampleSplit ? SPLIT_IMAGES[colorKey] : SPLIT_IMAGES['default'];
+  // For custom splits, cycle through default images based on split key
+  const defaultIndex = splitKey ? splitKey.split('').reduce((s, c) => s + c.charCodeAt(0), 0) % DEFAULT_IMAGES.length : 0;
+  const bgImage = isExampleSplit ? SPLIT_IMAGES[colorKey] : DEFAULT_IMAGES[defaultIndex];
   const workoutCount = workouts.length;
   const displayName = name.replace(/ Workout$/, '');
 

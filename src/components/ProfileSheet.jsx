@@ -144,33 +144,44 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
 
         {/* Account section */}
         {isGuest && (
-          <button
-            onClick={handleCreateAccount}
-            className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70"
-          >
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-              <UserPlus className="w-4 h-4 text-white" />
+          <>
+            <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl px-4 py-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-4 h-4 text-amber-500" />
+                </div>
+                <div className="text-left flex-1">
+                  <p className="font-semibold text-foreground text-sm">You are in guest mode</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Create an account to access your data on other devices</p>
+                </div>
+              </div>
             </div>
-            <div className="text-left flex-1">
-              <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Create Account</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Save your data to the cloud and sync across devices</p>
-            </div>
-          </button>
-        )}
+            <button
+              onClick={handleCreateAccount}
+              className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+            >
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <UserPlus className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-left flex-1">
+                <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Create Account</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Save your data to the cloud and sync across devices</p>
+              </div>
+            </button>
 
-        {isGuest && (
-          <button
-            onClick={handleCreateAccount}
-            className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
-          >
-            <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <LogIn className="w-4 h-4 text-foreground" />
-            </div>
-            <div className="text-left flex-1">
-              <p className="font-semibold text-foreground text-sm">Log In</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Access your synced data from another device</p>
-            </div>
-          </button>
+            <button
+              onClick={handleCreateAccount}
+              className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+            >
+              <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <LogIn className="w-4 h-4 text-foreground" />
+              </div>
+              <div className="text-left flex-1">
+                <p className="font-semibold text-foreground text-sm">Log In</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Access your synced data from another device</p>
+              </div>
+            </button>
+          </>
         )}
 
         {isAuthenticated && (
