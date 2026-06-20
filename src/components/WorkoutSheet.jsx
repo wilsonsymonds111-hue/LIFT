@@ -846,7 +846,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
       templateExercises.forEach(ex => {
         const key = ex.name.toLowerCase();
         if (detailByName[key]) {
-          map[ex.name] = detailByName[key];
+          map[key] = detailByName[key];
         } else {
           missing.push(ex);
         }
@@ -855,14 +855,14 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
       if (missing.length > 0) {
         const generated = await Promise.all(missing.map(ex => ensureExerciseDetail(ex.name)));
         missing.forEach((ex, i) => {
-          if (generated[i]?.image_url) map[ex.name] = generated[i].image_url;
+          if (generated[i]?.image_url) map[ex.name.toLowerCase()] = generated[i].image_url;
         });
       }
 
       // Also populate the map for names that aren't in the template but exist in ExerciseDetail
       (results || []).forEach(d => {
         if (d.image_url && !Object.values(map).includes(d.image_url)) {
-          map[d.name] = d.image_url;
+          map[d.name.toLowerCase()] = d.image_url;
         }
       });
 
@@ -1019,13 +1019,13 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                       const newOnes = picked.filter(e => !existing.has(e.name)).map(e => ({ ...e, sets: 1, history: [] }));
                       return [...prev, ...newOnes];
                     });
-                    // Generate images for newly added exercises in parallel
-                    const newNames = picked.filter(e => !exerciseImages[e.name]).map(e => e.name);
+                    // Load images for newly added exercises in parallel
+                    const newNames = picked.filter(e => !exerciseImages[e.name.toLowerCase()]).map(e => e.name);
                     if (newNames.length > 0) {
                       const results = await Promise.all(newNames.map(name => ensureExerciseDetail(name)));
                       const generated = {};
                       newNames.forEach((name, i) => {
-                        if (results[i]?.image_url) generated[name] = results[i].image_url;
+                        if (results[i]?.image_url) generated[name.toLowerCase()] = results[i].image_url;
                       });
                       setExerciseImages(prev => ({ ...prev, ...generated }));
                     }
@@ -1060,7 +1060,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                         <Draggable key={exercise.name + idx} draggableId={exercise.name + idx} index={idx}>
                           {(p) => (
                             <div ref={p.innerRef} {...p.draggableProps}>
-                              <ExerciseSection key={`${exercise.name}-${(exercise.history || []).length}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name]} onDeleteExercise={() => handleDeleteExercise(idx)} />
+                              <ExerciseSection key={`${exercise.name}-${(exercise.history || []).length}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name.toLowerCase()]} onDeleteExercise={() => handleDeleteExercise(idx)} />
                             </div>
                           )}
                         </Draggable>
