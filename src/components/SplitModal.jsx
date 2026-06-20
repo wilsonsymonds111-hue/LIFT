@@ -297,6 +297,8 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                 </div>
               </div>
 
+              {/* Scrollable body */}
+              <div className="flex-1 overflow-y-auto">
               {/* Cycle editor */}
               <AnimatePresence>
                 {editing && (
@@ -392,7 +394,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
               </AnimatePresence>
 
               {/* Workout cards — drag to reorder */}
-              <div className="flex-1 overflow-y-auto px-5 pt-4 pb-3">
+              <div className="px-5 pt-4 pb-3">
                 <DragDropContext onDragEnd={handleDragEnd}>
                   <Droppable droppableId="workout-list">
                     {(provided) => (
@@ -435,6 +437,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                 </DragDropContext>
               </div>
 
+              </div>
               {/* Make Current button */}
               <div className="px-5 pb-4 pt-2">
                 <button
