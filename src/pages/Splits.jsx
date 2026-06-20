@@ -91,6 +91,20 @@ export default function Splits() {
     return { splitGroups: groups, mySplitGroups: Object.values(groups) };
   }, [templates]);
 
+  // Detect which example splits are currently active
+  const activeExampleSplits = useMemo(() => {
+    const activeNames = new Set(allTemplates.filter(t => t.isActiveSplit).map(t => t.name));
+    return Object.fromEntries(
+      Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => {
+        const splitNames = new Set(split.workouts.map(w => w.name));
+        // Match if all active template names equal all split workout names
+        const isActive = activeNames.size > 0 && activeNames.size === splitNames.size &&
+          [...activeNames].every(n => splitNames.has(n));
+        return [key, isActive];
+      })
+    );
+  }, [allTemplates]);
+
   // If user has no saved splits, auto-switch to examples tab (unless builder is open or user just chose "mine")
   useEffect(() => {
     if (!loading && mySplitGroups.length === 0 && !showBuilder && activeTab !== 'mine') {
@@ -383,6 +397,7 @@ export default function Splits() {
                   splitKey={key}
                   name={split.name}
                   workouts={split.workouts}
+                  isActive={activeExampleSplits[key] || false}
                   onCardClick={() => setActiveSplit(key)}
                   cardRef={el => cardRefs.current[key] = el}
                 />

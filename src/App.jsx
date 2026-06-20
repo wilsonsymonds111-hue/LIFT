@@ -18,6 +18,7 @@ const TemplateDetail = lazy(() => import('./pages/TemplateDetail'));
 const SplitDetail = lazy(() => import('./pages/SplitDetail'));
 const SupportChat = lazy(() => import('./pages/SupportChat'));
 const Exercises = lazy(() => import('./pages/Exercises'));
+const Terms = lazy(() => import('./pages/Terms'));
 
 const TABS = ['/', '/splits', '/exercises'];
 
@@ -146,6 +147,7 @@ const AnimatedRoutes = memo(() => {
                 <Route path="/split/:key" element={<SlideIn><SplitDetail /></SlideIn>} />
                 <Route path="/active-workout/:id" element={<SlideIn><ActiveWorkout /></SlideIn>} />
                 <Route path="/support-chat/:id" element={<SlideIn><SupportChat /></SlideIn>} />
+                <Route path="/terms" element={<SlideIn><Terms /></SlideIn>} />
 
                 <Route path="*" element={<SlideIn><PageNotFound /></SlideIn>} />
               </Routes>
