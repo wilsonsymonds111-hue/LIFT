@@ -2,19 +2,26 @@ import { memo } from 'react';
 import { MUSCLE_COLORS } from '../lib/exercises';
 import Sparkline from './Sparkline';
 
-const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, onClick }) {
+const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerciseImages, onClick }) {
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
   const historyData = exerciseHistory[exercise.name];
   const chartData = historyData?.map(h => ({ v: h.v })) || [];
+  const imageUrl = exerciseImages?.[exercise.name];
 
   return (
     <div
       onClick={onClick}
       className="flex items-center gap-3 py-2.5 border-b border-border/50 cursor-pointer active:bg-muted/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
     >
-      {/* Letter avatar */}
-      <div className={`w-9 h-9 rounded-lg ${colors.bg} flex items-center justify-center flex-shrink-0`}>
-        <span className={`text-sm font-bold ${colors.text}`}>{exercise.name[0]}</span>
+      {/* Exercise image or letter fallback */}
+      <div className="w-9 h-9 rounded-lg flex-shrink-0 overflow-hidden bg-muted">
+        {imageUrl ? (
+          <img src={imageUrl} alt={exercise.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className={`w-full h-full ${colors.bg} flex items-center justify-center`}>
+            <span className={`text-sm font-bold ${colors.text}`}>{exercise.name[0]}</span>
+          </div>
+        )}
       </div>
 
       {/* Name + muscle */}

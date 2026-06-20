@@ -14,6 +14,7 @@ export default function Exercises() {
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [exerciseHistory, setExerciseHistory] = useState({});
+  const [exerciseImages, setExerciseImages] = useState({});
 
   const handleSelectExercise = useCallback((ex) => {
     setSelectedExercise(ex);
@@ -30,6 +31,13 @@ export default function Exercises() {
         }
       });
       setExerciseHistory(map);
+    });
+    base44.entities.ExerciseDetail.list('name', 500).then(results => {
+      const map = {};
+      (results || []).forEach(d => {
+        if (d.image_url) map[d.name] = d.image_url;
+      });
+      setExerciseImages(map);
     });
   }, []);
 
@@ -94,7 +102,7 @@ export default function Exercises() {
         })}
       </div>
 
-      <ExerciseList grouped={grouped} exerciseHistory={exerciseHistory} onSelectExercise={handleSelectExercise} />
+      <ExerciseList grouped={grouped} exerciseHistory={exerciseHistory} exerciseImages={exerciseImages} onSelectExercise={handleSelectExercise} />
 
       {selectedExercise && (
         <Suspense fallback={null}>

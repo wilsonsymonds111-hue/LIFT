@@ -3,7 +3,7 @@ import ExerciseRow from './ExerciseRow';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
-const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, onSelectExercise }) {
+const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exerciseImages, onSelectExercise }) {
   const sectionRefs = useRef({});
 
   const scrollToLetter = useCallback((letter) => {
@@ -22,12 +22,13 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, onSe
               {letter}
             </div>
             {exs.map(ex => (
-              <ExerciseRow
-                key={ex.name}
-                exercise={ex}
-                exerciseHistory={exerciseHistory}
-                onClick={() => onSelectExercise(ex)}
-              />
+            <ExerciseRow
+              key={ex.name}
+              exercise={ex}
+              exerciseHistory={exerciseHistory}
+              exerciseImages={exerciseImages}
+              onClick={() => onSelectExercise(ex)}
+            />
             ))}
           </div>
         ))}
