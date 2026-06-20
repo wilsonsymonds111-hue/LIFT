@@ -26,13 +26,30 @@ export default function CreateAccountModal({ onClose }) {
         </div>
 
         <div className="flex flex-col gap-3">
+          {/* Email & Password */}
+          <button
+            onClick={() => base44.auth.redirectToLogin()}
+            className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm transition active:opacity-80"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+            Sign up with Email
+          </button>
+
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-xs text-muted-foreground font-medium">or</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
           <button
             onClick={() => base44.auth.redirectToLogin()}
             className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-semibold text-sm transition active:opacity-80"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.05 20.28c-.98.95-2.05 1.47-3.36 1.47-1.33 0-2.53-.52-3.62-1.54-1.09-1.03-1.64-2.26-1.64-3.7s.55-2.62 1.64-3.64c1.09-1.02 2.3-1.54 3.62-1.54 1.31 0 2.38.52 3.36 1.47l-1.21 1.16c-.63-.59-1.38-.88-2.27-.88-.92 0-1.72.33-2.38.98-.65.64-.98 1.46-.98 2.45s.33 1.8.98 2.44c.66.65 1.46.98 2.38.98.89 0 1.64-.29 2.27-.88l1.21 1.16z"/>
-              <path d="M18.5 15.5h2v-3h-2v-2h-3v2h-2v3h2v2h3v-2z" fill="currentColor" opacity="0.7"/>
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
             </svg>
             Continue with Apple
           </button>
