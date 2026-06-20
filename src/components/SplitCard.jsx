@@ -6,6 +6,7 @@ const SPLIT_IMAGES = {
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e9b1aea0d_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/2b264bebb_generated_image.png',
   'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5bc190219_image.png',
+  'default': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9024d2186_image.png',
 };
 
 function detectSplitType(workoutNames) {
@@ -26,8 +27,9 @@ function detectSplitType(workoutNames) {
 }
 
 const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef }) {
-  const colorKey = SPLIT_IMAGES[splitKey] ? splitKey : detectSplitType(workouts.map(w => w.name));
-  const bgImage = SPLIT_IMAGES[colorKey] || SPLIT_IMAGES['upper-lower'];
+  const isExampleSplit = SPLIT_IMAGES[splitKey] && splitKey !== 'default';
+  const colorKey = isExampleSplit ? splitKey : detectSplitType(workouts.map(w => w.name));
+  const bgImage = isExampleSplit ? SPLIT_IMAGES[colorKey] : SPLIT_IMAGES['default'];
   const workoutCount = workouts.length;
   const displayName = name.replace(/ Workout$/, '');
 
