@@ -15,6 +15,14 @@ import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
 
+// Default cycle patterns: { onDays, offDays } for known split types
+const SPLIT_CYCLES = {
+  'push-pull-legs': { onDays: 3, offDays: 1 },
+  'upper-lower': { onDays: 1, offDays: 1 },
+  'ul-ppl': { onDays: 5, offDays: 1 },
+  'full-body': { onDays: 1, offDays: 1 },
+};
+
 const SPLIT_ACCENTS = {
   'upper-lower': {
     hex: '#2A8FFF',
@@ -112,37 +120,56 @@ export default function Home() {
       ? (split[0]?.splitName || [...new Set(split.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')))].join(' / ')).toUpperCase()
       : '';
 
+    const cycleToSchedule = (onDays, offDays, startDayIdx) => {
+      const cycleLength = onDays + offDays;
+      const schedule = [];
+      for (let i = 0; i < 7; i++) {
+        const daysFromStart = i >= startDayIdx ? i - startDayIdx : i + 7 - startDayIdx;
+        const pos = daysFromStart % cycleLength;
+        schedule.push(pos < onDays ? 1 : 0);
+      }
+      return schedule;
+    };
+
     const resolveSchedule = (key, workoutCount, groupId) => {
       const todayIndex = new Date().getDay();
       const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
-      let onDays, offDays, startDayIndex;
-      // Try groupId first (for custom splits), then detection key
-      const keysToTry = [groupId, key].filter(Boolean);
-      try {
-        for (const k of keysToTry) {
-          // Clear any stale splitSchedule that could override the cycle
-          localStorage.removeItem(`splitSchedule_${k}`);
-          const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
+
+      // For known split types, use the hardcoded cycle (bypasses localStorage)
+      const defaultCycle = SPLIT_CYCLES[key];
+      let onDays = defaultCycle ? defaultCycle.onDays : null;
+      let offDays = defaultCycle ? defaultCycle.offDays : null;
+
+      // For custom splits, try localStorage cycle
+      if (!defaultCycle) {
+        try {
+          const cycleRaw = localStorage.getItem(`splitCycle_${groupId}`);
           if (cycleRaw) {
             const parsed = JSON.parse(cycleRaw);
             onDays = Number(parsed.onDays);
             offDays = Number(parsed.offDays);
+          }
+        } catch {}
+        onDays = onDays || Math.max(workoutCount, 1);
+        offDays = offDays || 1;
+      }
+
+      // Start day from localStorage, or default to today
+      let startDayIndex;
+      try {
+        const keysToTry = [groupId, key].filter(Boolean);
+        for (const k of keysToTry) {
+          const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
+          if (cycleRaw) {
+            const parsed = JSON.parse(cycleRaw);
             startDayIndex = Number(parsed.startDayIndex);
             break;
           }
         }
       } catch {}
-      // Use the actual workout count to determine training days
-      onDays = onDays || Math.max(workoutCount, 1);
-      offDays = offDays || 1;
       startDayIndex = startDayIndex != null ? startDayIndex : todayMonSun;
-      const cycleLength = onDays + offDays;
-      const schedule = [];
-      for (let i = 0; i < 7; i++) {
-        const daysFromStart = i >= startDayIndex ? i - startDayIndex : i + 7 - startDayIndex;
-        const pos = daysFromStart % cycleLength;
-        schedule.push(pos < onDays ? 1 : 0);
-      }
+
+      const schedule = cycleToSchedule(onDays, offDays, startDayIndex);
       return { schedule, startDayIndex, onDays, offDays };
     };
 
