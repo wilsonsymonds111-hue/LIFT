@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
 import { Search } from 'lucide-react';
-import { ALL_EXERCISES, MUSCLES } from '../lib/exercises';
+import { MUSCLES } from '../lib/exercises';
+import { getAllExercises } from '../lib/customExercises';
 import { base44 } from '@/api/base44Client';
 import ProfileButton from '../components/ProfileButton';
 import ExerciseList from '../components/ExerciseList';
@@ -41,13 +42,15 @@ export default function Exercises() {
     });
   }, []);
 
+  const allExercises = useMemo(() => getAllExercises(), []);
+  
   const filtered = useMemo(() => {
-    return ALL_EXERCISES.filter(ex => {
+    return allExercises.filter(ex => {
       const matchSearch = !search.trim() || ex.name.toLowerCase().includes(search.toLowerCase());
       const matchMuscle = muscleFilter === 'All' || ex.muscle === muscleFilter;
       return matchSearch && matchMuscle;
     });
-  }, [search, muscleFilter]);
+  }, [allExercises, search, muscleFilter]);
 
   const grouped = useMemo(() => {
     const map = {};

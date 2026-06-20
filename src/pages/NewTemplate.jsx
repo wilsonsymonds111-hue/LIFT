@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Search } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { ALL_EXERCISES, MUSCLES } from '@/lib/exercises';
+import { MUSCLES } from '@/lib/exercises';
+import { getAllExercises } from '@/lib/customExercises';
 
 export default function NewTemplate() {
   const navigate = useNavigate();
@@ -11,13 +12,15 @@ export default function NewTemplate() {
   const [search, setSearch] = useState('');
   const [muscleFilter, setMuscleFilter] = useState('All');
 
+  const allExercises = useMemo(() => getAllExercises(), []);
+
   const filtered = useMemo(() => {
-    return ALL_EXERCISES.filter(ex => {
+    return allExercises.filter(ex => {
       const matchSearch = !search.trim() || ex.name.toLowerCase().includes(search.toLowerCase());
       const matchMuscle = muscleFilter === 'All' || ex.muscle === muscleFilter;
       return matchSearch && matchMuscle;
     });
-  }, [search, muscleFilter]);
+  }, [allExercises, search, muscleFilter]);
 
   const grouped = useMemo(() => {
     const map = {};
