@@ -80,7 +80,7 @@ export default function Splits() {
     }
   }, [swapPhase, swapOriginRect, navigate]);
 
-  // Group templates by splitGroup
+  // Group templates by splitGroup, sorted by creation order for stable image assignment
   const { splitGroups, mySplitGroups } = useMemo(() => {
     const groups = templates.reduce((acc, t) => {
       const key = t.splitGroup || '__ungrouped__' + t.id;
@@ -88,7 +88,12 @@ export default function Splits() {
       acc[key].templates.push(t);
       return acc;
     }, {});
-    return { splitGroups: groups, mySplitGroups: Object.values(groups) };
+    const sorted = Object.values(groups).sort((a, b) => {
+      const aDate = Math.min(...a.templates.map(t => new Date(t.created_date || 0).getTime()));
+      const bDate = Math.min(...b.templates.map(t => new Date(t.created_date || 0).getTime()));
+      return aDate - bDate;
+    });
+    return { splitGroups: groups, mySplitGroups: sorted };
   }, [templates]);
 
   // Detect which example splits are currently active
@@ -372,7 +377,7 @@ export default function Splits() {
                 </button>
                 {mySplitGroups.length > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    {mySplitGroups.map((group) => {
+                    {mySplitGroups.map((group, idx) => {
                       const isActive = group.templates.some(t => t.isActiveSplit);
                       return (
                       <SplitCard
@@ -381,6 +386,7 @@ export default function Splits() {
                         name={group.templates[0]?.splitName || group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
                         workouts={group.templates.map(t => ({ name: t.name }))}
                         isActive={isActive}
+                        imageIndex={idx}
                         onCardClick={() => setActiveSplit(group.groupId)}
                         onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
                         menuRef={el => menuRef.current[group.groupId] = el}

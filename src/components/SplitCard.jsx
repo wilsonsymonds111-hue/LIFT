@@ -31,13 +31,15 @@ function detectSplitType(workoutNames) {
   return 'upper-lower';
 }
 
-const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef, isActive }) {
+const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef, isActive, imageIndex }) {
   const isExampleSplit = !!SPLIT_IMAGES[splitKey];
   const colorKey = isExampleSplit ? splitKey : detectSplitType(workouts.map(w => w.name));
-  // For custom splits, use the numeric timestamp from the split key to pick a background image
-  const defaultIndex = splitKey
-    ? (parseInt(splitKey.match(/\d+/)?.[0] || '0', 10) || 0) % DEFAULT_IMAGES.length
-    : 0;
+  // For custom splits, use the explicit imageIndex prop if provided, otherwise fall back to key-based hash
+  const defaultIndex = imageIndex != null
+    ? imageIndex % DEFAULT_IMAGES.length
+    : splitKey
+      ? (parseInt(splitKey.match(/\d+/)?.[0] || '0', 10) || 0) % DEFAULT_IMAGES.length
+      : 0;
   const bgImage = isExampleSplit ? SPLIT_IMAGES[colorKey] : DEFAULT_IMAGES[defaultIndex];
   const workoutCount = workouts.length;
   const displayName = name.replace(/ Workout$/, '');
