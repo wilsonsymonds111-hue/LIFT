@@ -52,7 +52,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             backgroundImage: `url(${bgImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            filter: 'grayscale(1)',
+            filter: 'grayscale(1) blur(2px)',
           }}
         />
         {/* Gradient overlay for text readability */}
