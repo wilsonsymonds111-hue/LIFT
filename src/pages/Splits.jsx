@@ -53,7 +53,13 @@ export default function Splits() {
     localStorage.setItem('splitsActiveTab', activeTab);
   }, [activeTab]);
 
-  const tabIndex = activeTab === 'mine' ? 0 : 1;
+  // Track tab switch direction for slide animation: 1 = right (to examples), -1 = left (to mine)
+  const tabDirectionRef = useRef(0);
+
+  const handleTabSwitch = (tab) => {
+    tabDirectionRef.current = tab === 'examples' ? 1 : -1;
+    setActiveTab(tab);
+  };
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -113,7 +119,7 @@ export default function Splits() {
   // If user has no saved splits, auto-switch to examples tab (unless builder is open or user just chose "mine")
   useEffect(() => {
     if (!loading && mySplitGroups.length === 0 && !showBuilder && activeTab !== 'mine') {
-      setActiveTab('examples');
+      handleTabSwitch('examples');
     }
   }, [loading, mySplitGroups.length, showBuilder, activeTab]);
 
@@ -334,7 +340,7 @@ export default function Splits() {
       <div className="px-4 mb-5">
         <div className="flex bg-muted rounded-xl p-1 gap-1">
           <button
-            onClick={() => setActiveTab('mine')}
+            onClick={() => handleTabSwitch('mine')}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
               activeTab === 'mine'
                 ? 'bg-blue-500 text-white shadow-md'
@@ -344,7 +350,7 @@ export default function Splits() {
             My Splits
           </button>
           <button
-            onClick={() => setActiveTab('examples')}
+            onClick={() => handleTabSwitch('examples')}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
               activeTab === 'examples'
                 ? 'bg-blue-500 text-white shadow-md'
@@ -356,15 +362,15 @@ export default function Splits() {
         </div>
       </div>
 
-      {/* Sub-tab content — only the active tab renders to avoid extra whitespace */}
-      <div className="relative w-full">
-        <AnimatePresence mode="wait">
+      {/* Sub-tab content — side-by-side slide transition */}
+      <div className="relative w-full overflow-hidden">
+        <AnimatePresence initial={false}>
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, x: activeTab === 'mine' ? -20 : 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: activeTab === 'mine' ? 20 : -20 }}
-            transition={{ duration: 0.15 }}
+            initial={{ x: tabDirectionRef.current > 0 ? '100%' : '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: tabDirectionRef.current > 0 ? '-100%' : '100%' }}
+            transition={{ duration: 0.25, ease: [0.33, 1, 0.68, 1] }}
           >
             {activeTab === 'mine' ? (
               <div className="px-4">
@@ -493,7 +499,7 @@ export default function Splits() {
             onSaved={() => {
               setShowBuilder(false);
               invalidateWorkoutTemplates(queryClient);
-              setActiveTab('mine');
+              handleTabSwitch('mine');
               localStorage.setItem('splitsActiveTab', 'mine');
             }}
           />
