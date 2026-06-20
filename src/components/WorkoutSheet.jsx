@@ -485,17 +485,7 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
 
   useEffect(() => {
     setTimeout(() => setShimmer(true), 200);
-    // Celebration: confetti + voice
-    confetti({ particleCount: 80, spread: 100, origin: { y: 0.6 }, colors: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1'] });
-    setTimeout(() => confetti({ particleCount: 50, spread: 70, origin: { y: 0.55, x: 0.3 }, colors: ['#FFD700', '#FF6B6B'] }), 200);
-    setTimeout(() => confetti({ particleCount: 50, spread: 70, origin: { y: 0.55, x: 0.7 }, colors: ['#FFD700', '#4ECDC4'] }), 400);
-    if ('speechSynthesis' in window) {
-      setTimeout(() => {
-        const u = new SpeechSynthesisUtterance('Well done! Great workout!');
-        u.rate = 0.9; u.pitch = 1.1; u.volume = 0.8;
-        speechSynthesis.speak(u);
-      }, 300);
-    }
+    playTick();
   }, []);
 
   // Top-right share button — shares the gold card
