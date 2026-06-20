@@ -36,9 +36,9 @@ function playCompleteChime() {
 
     // Three-tone ascending arpeggio with gentle bell-like attack
     const notes = [
-      { freq: 660,  start: 0,     peak: 0.08,  end: 0.22 },  // E5
-      { freq: 880,  start: 0.08,  peak: 0.16,  end: 0.30 },  // A5
-      { freq: 1100, start: 0.16,  peak: 0.24,  end: 0.45 },  // C#6
+      { freq: 523,  start: 0,     peak: 0.07,  end: 0.20 },  // C5
+      { freq: 659,  start: 0.07,  peak: 0.14,  end: 0.28 },  // E5
+      { freq: 784,  start: 0.14,  peak: 0.22,  end: 0.42 },  // G5
     ];
 
     notes.forEach(({ freq, start, peak, end }) => {
