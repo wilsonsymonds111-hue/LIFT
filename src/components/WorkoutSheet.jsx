@@ -278,12 +278,12 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             <img
               src={exerciseImage}
               alt={exercise.name}
-              className="w-8 h-7 rounded-md object-contain cursor-pointer hover:scale-110 active:scale-95 transition-transform"
+              className="w-16 h-14 rounded-lg object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform"
               onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
             />
           ) : (
-            <div className="w-8 h-7 rounded-md bg-gray-100 flex items-center justify-center">
-              <span className="text-[10px] font-bold text-gray-400">{exercise.name[0]}</span>
+            <div className="w-16 h-14 rounded-lg bg-gray-100 flex items-center justify-center">
+              <span className="text-sm font-bold text-gray-400">{exercise.name[0]}</span>
             </div>
           )}
           {showMenu && (
