@@ -366,7 +366,7 @@ export default function Splits() {
           dragElastic={0.08}
           onDragEnd={handleSubTabDragEnd}
           animate={{ x: subTabWidth > 0 ? -tabIndex * subTabWidth : 0 }}
-          transition={{ type: 'spring', stiffness: 700, damping: 32, mass: 0.25 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.3 }}
           className="flex"
           style={{ width: (subTabWidth || window.innerWidth - 32) * 2, willChange: 'transform' }}
         >
