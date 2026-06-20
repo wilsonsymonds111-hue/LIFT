@@ -66,12 +66,13 @@ export const AuthProvider = ({ children }) => {
           }
         }
 
-        setAuthError({
-          type: 'unknown',
-          message: appError.message || 'Failed to load app'
-        });
-        setIsLoadingPublicSettings(false);
+        // Fallback to guest mode on non-auth errors
         setIsLoadingAuth(false);
+        setIsAuthenticated(false);
+        setIsGuest(true);
+        setCloudMode(false);
+        setAuthChecked(true);
+        setIsLoadingPublicSettings(false);
       }
     } catch (error) {
       console.error('Unexpected error:', error);
