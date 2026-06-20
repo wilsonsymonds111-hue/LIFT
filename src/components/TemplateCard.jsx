@@ -18,13 +18,13 @@ const relativeTime = (dateStr) => {
   return `${Math.floor(diffDays / 30)}mo ago`;
 };
 
-const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent, menuOpen, onToggleMenu, menuRef, onRemove }) {
+const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent, isMenuOpen, onToggleMenu, menuRef, onRemove }) {
   const navigate = useNavigate();
   const btnRef = useRef(null);
 
-  const handleBtnRef = (el) => {
+  const setBtnRef = (el) => {
     btnRef.current = el;
-    if (menuRef) menuRef(el);
+    if (menuRef && el) menuRef.current[template.id] = el;
   };
 
   return (
@@ -34,8 +34,8 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
       }`}
     >
       <button
-        ref={handleBtnRef}
-        onClick={e => { e.stopPropagation(); onToggleMenu(); }}
+        ref={setBtnRef}
+        onClick={e => { e.stopPropagation(); onToggleMenu(template.id); }}
         className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition z-10"
       >
         <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
@@ -54,7 +54,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
         </p>
       </div>
 
-      {menuOpen && createPortal(
+      {isMenuOpen && createPortal(
         <div
           onClick={e => e.stopPropagation()}
           className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[220px]"
@@ -65,7 +65,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
           }}
         >
           <button
-            onClick={onRemove}
+            onClick={() => onRemove(template)}
             className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-muted transition rounded-xl"
           >
             Remove from current split

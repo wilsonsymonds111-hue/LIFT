@@ -12,23 +12,7 @@ import ProfileButton from '../components/ProfileButton';
 import WeekTracker from '../components/WeekTracker';
 import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
-import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 import { generateWorkoutICS } from '../lib/icsGenerator';
-
-const relativeTime = (dateStr) => {
-  if (!dateStr) return null;
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now - date;
-  if (diffMs < 60000) return 'Just now';
-  if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
-  if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h ago`;
-  const diffDays = Math.floor(diffMs / 86400000);
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-  return `${Math.floor(diffDays / 30)}mo ago`;
-};
 
 const SPLIT_ACCENTS = {
   'upper-lower': {
@@ -97,6 +81,10 @@ export default function Home() {
   }, [menuOpen, splitMenuOpen]);
 
   const { pullY, refreshing } = usePullToRefresh(() => invalidateWorkoutTemplates(queryClient));
+
+  const handleToggleMenu = useCallback((templateId) => {
+    setMenuOpen(prev => prev === templateId ? null : templateId);
+  }, []);
 
   const handleRemoveFromSplit = useCallback(async (template) => {
     setMenuOpen(null);
@@ -305,10 +293,10 @@ export default function Home() {
                   template={template}
                   isTodayCard={idx === todayWorkoutIndex}
                   accent={accent}
-                  menuOpen={menuOpen === template.id}
-                  onToggleMenu={() => setMenuOpen(menuOpen === template.id ? null : template.id)}
-                  menuRef={el => { menuRef.current[template.id] = el; }}
-                  onRemove={() => handleRemoveFromSplit(template)}
+                  isMenuOpen={menuOpen === template.id}
+                  onToggleMenu={handleToggleMenu}
+                  menuRef={menuRef}
+                  onRemove={handleRemoveFromSplit}
                 />
               ))}
             </div>
