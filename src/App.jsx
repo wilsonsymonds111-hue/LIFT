@@ -62,12 +62,13 @@ const SwipeableTabs = () => {
   const [width, setWidth] = useState(0);
 
   useEffect(() => {
-    const update = () => {
-      if (containerRef.current) setWidth(containerRef.current.offsetWidth);
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      setWidth(el.offsetWidth);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
   }, []);
 
   const handleDragEnd = useCallback((_, info) => {
