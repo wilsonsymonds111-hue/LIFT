@@ -109,7 +109,7 @@ export default function Home() {
       : templates.filter(t => !t.splitGroup || t.splitGroup === '');
 
     const splitName = split.length > 0
-      ? [...new Set(split.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')))].join(' / ').toUpperCase()
+      ? (split[0]?.splitName || [...new Set(split.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')))].join(' / ')).toUpperCase()
       : '';
 
     const resolveSchedule = (key, workoutCount, groupId) => {
