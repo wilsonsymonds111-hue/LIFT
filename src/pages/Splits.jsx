@@ -27,6 +27,8 @@ export default function Splits() {
   const queryClient = useQueryClient();
   const templates = useMemo(() => allTemplates.filter(t =>
     t.splitGroup &&
+    t.splitGroup.startsWith('custom_') &&
+    !t.splitGroup.endsWith('_old') &&
     !t.isActiveSplit
   ), [allTemplates]);
   const [menuOpen, setMenuOpen] = useState(null);
