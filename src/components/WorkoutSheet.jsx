@@ -265,7 +265,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   return (
     <>
     <style>{graphFadeStyle}</style>
-    <div className="mb-4">
+    <div className="mb-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
       <div className="flex items-start justify-between mb-1 relative">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing truncate" {...dragHandleProps}>{exercise.name}</h3>

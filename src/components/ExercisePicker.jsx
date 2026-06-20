@@ -133,7 +133,8 @@ export default function ExercisePicker({ onClose, onAdd }) {
               <p className="text-sm text-gray-400 text-center mb-3">No results for "{search}"</p>
               <button
                 onClick={() => {
-                  const newEx = { name: search.trim(), muscle: detectMuscle(search.trim()) };
+                  const titleName = search.trim().replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+                  const newEx = { name: titleName, muscle: detectMuscle(titleName) };
                   saveCustomExercise(newEx);
                   setExercises(getAllExercises());
                   onAdd([newEx]);
