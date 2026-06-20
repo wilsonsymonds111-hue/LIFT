@@ -19,6 +19,7 @@ const SplitDetail = lazy(() => import('./pages/SplitDetail'));
 const SupportChat = lazy(() => import('./pages/SupportChat'));
 const Exercises = lazy(() => import('./pages/Exercises'));
 const Terms = lazy(() => import('./pages/Terms'));
+const Privacy = lazy(() => import('./pages/Privacy'));
 
 const TABS = ['/', '/splits', '/exercises'];
 
@@ -116,6 +117,8 @@ const usePreloadSubPages = () => {
       import('./pages/TemplateDetail');
       import('./pages/SplitDetail');
       import('./pages/SupportChat');
+      import('./pages/Terms');
+      import('./pages/Privacy');
     };
     const hasRIC = typeof requestIdleCallback === 'function';
     const id = hasRIC ? requestIdleCallback(preload, { timeout: 5000 }) : setTimeout(preload, 3000);
@@ -148,6 +151,7 @@ const AnimatedRoutes = memo(() => {
                 <Route path="/active-workout/:id" element={<SlideIn><ActiveWorkout /></SlideIn>} />
                 <Route path="/support-chat/:id" element={<SlideIn><SupportChat /></SlideIn>} />
                 <Route path="/terms" element={<SlideIn><Terms /></SlideIn>} />
+                <Route path="/privacy" element={<SlideIn><Privacy /></SlideIn>} />
 
                 <Route path="*" element={<SlideIn><PageNotFound /></SlideIn>} />
               </Routes>

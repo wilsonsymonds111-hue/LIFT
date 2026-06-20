@@ -220,7 +220,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           </>
         )}
 
-        {/* Terms & Conditions */}
+        {/* Legal links */}
         <Link
           to="/terms"
           onClick={onClose}
@@ -228,8 +228,20 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         >
           <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0" />
           <div className="text-left">
-            <p className="font-semibold text-foreground text-sm">Terms & Conditions</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Read our liability disclaimer</p>
+            <p className="font-semibold text-foreground text-sm">Terms of Service</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Legal terms & disclaimers</p>
+          </div>
+        </Link>
+
+        <Link
+          to="/privacy"
+          onClick={onClose}
+          className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+        >
+          <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0" />
+          <div className="text-left">
+            <p className="font-semibold text-foreground text-sm">Privacy Policy</p>
+            <p className="text-xs text-muted-foreground mt-0.5">How we handle your data</p>
           </div>
         </Link>
 

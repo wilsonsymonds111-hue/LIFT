@@ -13,77 +13,149 @@ export default function Terms() {
         >
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <h1 className="text-2xl font-extrabold text-foreground">Terms & Conditions</h1>
+        <h1 className="text-2xl font-extrabold text-foreground">Terms of Service</h1>
       </div>
 
       <div className="px-5 pb-10 space-y-6 text-sm text-muted-foreground leading-relaxed">
+        <p className="text-xs">Last updated: June 20, 2026</p>
+
         <div>
-          <h2 className="font-bold text-foreground text-base mb-2">Disclaimer</h2>
+          <h2 className="font-bold text-foreground text-base mb-2">1. Acceptance of Terms</h2>
           <p>
-            This application provides fitness information, workout recommendations, and exercise guidance for educational
-            and informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment.
+            By accessing or using this application, you agree to be bound by these Terms of Service. If you do not agree, do not use the application. We reserve the right to update these terms at any time. Continued use after changes constitutes acceptance.
           </p>
         </div>
 
         <div>
-          <h2 className="font-bold text-foreground text-base mb-2">Assumption of Risk</h2>
+          <h2 className="font-bold text-foreground text-base mb-2">2. AI Disclosure</h2>
           <p>
-            By using this application, you acknowledge that physical exercise involves inherent risks including but not
-            limited to injury, illness, and in rare cases, death. You voluntarily assume all risks associated with any
-            exercise program, activity, or advice accessed through this application.
+            This application uses artificial intelligence to generate exercise recommendations, workout suggestions, progression targets, exercise instructions, anatomical illustrations, and other content. AI-generated outputs are labelled where they appear. These outputs are informational only and may contain inaccuracies. You should independently verify any AI-generated information before relying on it.
           </p>
         </div>
 
         <div>
-          <h2 className="font-bold text-foreground text-base mb-2">Medical Clearance</h2>
+          <h2 className="font-bold text-foreground text-base mb-2">3. Fitness Disclaimer</h2>
           <p>
-            You should consult with a qualified healthcare professional before beginning any exercise program. Do not
-            use this application if you have any pre-existing medical conditions, injuries, or health concerns without
-            first obtaining medical clearance from your doctor.
+            All fitness information, workout recommendations, and exercise guidance provided by this application — whether AI-generated or not — are for educational and informational purposes only. Nothing in this application constitutes medical advice, diagnosis, or treatment. The application is not a substitute for professional medical guidance or personal training. Always consult a qualified healthcare professional before beginning any exercise program.
           </p>
         </div>
 
         <div>
-          <h2 className="font-bold text-foreground text-base mb-2">No Professional Relationship</h2>
+          <h2 className="font-bold text-foreground text-base mb-2">4. Assumption of Risk</h2>
           <p>
-            Use of this application does not create a trainer-client, doctor-patient, or any other professional
-            relationship. The exercises, routines, and guidance provided are generic and may not be suitable for your
-            individual needs, fitness level, or health status.
+            Physical exercise involves inherent risks including but not limited to injury, illness, cardiac events, and in rare cases, death. By using this application, you voluntarily assume all risks associated with any exercise program, activity, technique, or advice accessed through the application. You acknowledge that your use of any information provided is at your sole risk.
           </p>
         </div>
 
         <div>
-          <h2 className="font-bold text-foreground text-base mb-2">Limitation of Liability</h2>
+          <h2 className="font-bold text-foreground text-base mb-2">5. Medical Clearance</h2>
           <p>
-            To the fullest extent permitted by law, the developers, owners, and operators of this application shall not
-            be liable for any direct, indirect, incidental, special, consequential, or punitive damages arising from
-            your use of or reliance on this application, including but not limited to personal injury, property damage,
-            or loss of data.
+            Do not use this application if you have pre-existing medical conditions, injuries, or health concerns without first obtaining medical clearance from a licensed physician. Stop immediately and seek medical attention if you experience pain, dizziness, shortness of breath, or discomfort during exercise.
           </p>
         </div>
 
         <div>
-          <h2 className="font-bold text-foreground text-base mb-2">No Guarantees</h2>
+          <h2 className="font-bold text-foreground text-base mb-2">6. No Professional Relationship</h2>
           <p>
-            We make no guarantees regarding the accuracy, completeness, or effectiveness of any information provided.
-            Results vary by individual. Past performance or progress shown is not indicative of future results.
+            Use of this application does not create a trainer-client, doctor-patient, physical therapist, or any other professional relationship. The exercises, routines, and recommendations provided are generic and may not be suitable for your individual needs, fitness level, or health status.
           </p>
         </div>
 
         <div>
-          <h2 className="font-bold text-foreground text-base mb-2">User Responsibility</h2>
+          <h2 className="font-bold text-foreground text-base mb-2">7. User Responsibility</h2>
           <p>
-            You are solely responsible for ensuring that any exercises you perform are done with proper form, in a safe
-            environment, using appropriate equipment, and within your personal capabilities. Stop immediately if you
-            experience pain, dizziness, or discomfort.
+            You are solely responsible for: (a) ensuring exercises are performed with proper form, in a safe environment, using appropriate equipment, and within your personal capabilities; (b) determining whether any exercise or routine is appropriate for you; and (c) any consequences arising from your use of the application.
           </p>
         </div>
 
         <div>
-          <h2 className="font-bold text-foreground text-base mb-2">Acceptance</h2>
+          <h2 className="font-bold text-foreground text-base mb-2">8. Limitation of Liability</h2>
           <p>
-            By continuing to use this application, you acknowledge that you have read, understood, and agree to these
-            terms and conditions. If you do not agree, you should discontinue use of the application immediately.
+            To the fullest extent permitted by applicable law, the developers, owners, operators, employees, and affiliates of this application shall not be liable for any direct, indirect, incidental, special, consequential, exemplary, or punitive damages — including but not limited to personal injury, wrongful death, property damage, loss of data, loss of profits, or business interruption — arising from or related to your use of or inability to use the application, whether based on warranty, contract, tort (including negligence), or any other legal theory, even if advised of the possibility of such damages.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">9. Binding Arbitration</h2>
+          <p>
+            Any dispute, claim, or controversy arising out of or relating to these Terms or your use of the application shall be resolved exclusively through binding, individual arbitration administered by a mutually agreed arbitration provider, rather than in court. The arbitration shall be conducted on an individual basis — not as a class, consolidated, or representative action. Judgment on the arbitration award may be entered in any court having jurisdiction.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">10. Class Action Waiver</h2>
+          <p>
+            You agree to resolve disputes with us on an individual basis. You waive any right to participate in a class action lawsuit, class-wide arbitration, private attorney general action, or any other representative or consolidated proceeding against the application or its operators.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">11. Intellectual Property</h2>
+          <p>
+            All content, features, and functionality of this application — including but not limited to text, graphics, logos, software, algorithms, exercise databases, AI-generated images, and instructional content — are owned by or licensed to the application operators and are protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, modify, or create derivative works without express written permission.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">12. User-Generated Content</h2>
+          <p>
+            By uploading or submitting content (including profile photos, messages, feedback, or any other content), you represent and warrant that: (a) you own or have all necessary rights to the content; (b) the content does not infringe any third party's intellectual property, privacy, or other rights; and (c) the content complies with all applicable laws. You grant us a worldwide, non-exclusive, royalty-free license to use, store, and display your content solely for the purpose of operating and improving the application.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">13. DMCA Copyright Policy</h2>
+          <p>
+            We respect intellectual property rights. If you believe content on the application infringes your copyright, send a written notice containing: (a) identification of the copyrighted work; (b) identification of the infringing material; (c) your contact information; (d) a statement of good faith belief; and (e) a statement under penalty of perjury that the information is accurate and you are authorized to act on behalf of the copyright owner. Send notices to the contact information provided in the application.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">14. Content Removal Rights</h2>
+          <p>
+            We reserve the right, but not the obligation, to review, monitor, remove, or disable access to any user-generated content at our sole discretion, without notice, for any reason — including content we believe violates these Terms, infringes third-party rights, or is otherwise objectionable.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">15. Indemnification</h2>
+          <p>
+            You agree to indemnify, defend, and hold harmless the application operators, developers, owners, employees, and affiliates from any claims, liabilities, damages, losses, costs, or expenses — including reasonable legal fees — arising from: (a) your use of the application; (b) your violation of these Terms; (c) your uploaded content; (d) your violation of any third-party rights; or (e) any injury or damages caused by your exercise activities.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">16. Account Termination</h2>
+          <p>
+            We reserve the right to suspend or terminate your access to the application at any time, for any reason, without notice. Upon termination, your right to use the application will immediately cease. Provisions that by their nature should survive termination shall survive, including ownership, disclaimers, indemnification, and limitations of liability.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">17. Third-Party Services</h2>
+          <p>
+            This application may integrate with third-party services including AI model providers, cloud storage, authentication services, and analytics platforms. We are not responsible for the content, privacy practices, or functionality of any third-party services. Use of third-party services is subject to their respective terms and policies.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">18. Governing Law</h2>
+          <p>
+            These Terms shall be governed by and construed in accordance with the laws of Australia, without regard to conflict of law principles. Any disputes not subject to arbitration shall be resolved exclusively in the courts of Australia.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">19. Severability</h2>
+          <p>
+            If any provision of these Terms is found to be unenforceable or invalid, that provision shall be severed and the remaining provisions shall remain in full force and effect.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-foreground text-base mb-2">20. Contact</h2>
+          <p>
+            For questions about these Terms, legal notices, DMCA claims, or other inquiries, please use the Feedback & Support feature within the application.
           </p>
         </div>
       </div>
