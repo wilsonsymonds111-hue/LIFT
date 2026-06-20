@@ -3,15 +3,16 @@ import { Check, Dumbbell, Minus } from 'lucide-react';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-function getTooltipText(status, isPast, isToday, isNoData) {
+function getTooltipText(status, isPast, isToday, isNoData, workoutName) {
   const isGymDay = status >= 1;
   const isCompleted = status === 2;
   if (!isGymDay) return 'Rest day 😌';
+  const name = workoutName ? `${workoutName} workout` : 'Workout';
   if (isNoData) return 'Split starts here — no data yet';
-  if (isPast && isCompleted) return 'Workout completed ✅';
-  if (isPast && !isCompleted) return 'Missed workout ❌';
-  if (isToday) return "Workout today — let's go! 💪";
-  return 'Workout day ahead 💪';
+  if (isPast && isCompleted) return `${name} completed ✅`;
+  if (isPast && !isCompleted) return `Missed ${name.toLowerCase()} ❌`;
+  if (isToday) return `${name} today — let's go 💪`;
+  return `${name} day ahead 💪`;
 }
 
 function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [] }) {
@@ -106,7 +107,8 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
             const isPast = activeDay < 0;
             const isToday = activeDay === 0;
             const noData = origIdx < startDayIndex && origIdx < todayMonSun;
-            return getTooltipText(s, isPast, isToday, noData);
+            const name = rotatedNames[activeDay] || null;
+            return getTooltipText(s, isPast, isToday, noData, name);
           })()}
         </span>
       </div>
