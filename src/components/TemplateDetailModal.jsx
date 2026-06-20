@@ -77,7 +77,7 @@ export default function TemplateDetailModal({ template, onClose, onSave, onStart
           {template.exerciseList?.map((exercise, idx) => (
             <div key={idx} className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-foreground text-sm leading-snug">{exercise.sets} × {exercise.name}</p>
+                <p className="font-bold text-foreground text-sm leading-snug">{exercise.sets || 2} × {exercise.name}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
               </div>
               {exercise.history && exercise.history.length > 0 && (

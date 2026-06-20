@@ -9,7 +9,7 @@ export default function WorkoutBuilder({ onClose, onSave, initialExercises = [] 
       ...ex,
       defaultSets: ex.defaultSets?.length
         ? ex.defaultSets
-        : Array.from({ length: ex.sets || 1 }, () => ({ kg: '', reps: '' })),
+        : Array.from({ length: ex.sets || 2 }, () => ({ kg: '', reps: '' })),
     }))
   );
   const [showPicker, setShowPicker] = useState(false);
@@ -19,7 +19,7 @@ export default function WorkoutBuilder({ onClose, onSave, initialExercises = [] 
       const existing = new Set(prev.map(e => e.name));
       const newOnes = exercises
         .filter(e => !existing.has(e.name))
-        .map(e => ({ ...e, sets: 1, history: e.history || [], defaultSets: [{ kg: '', reps: '' }] }));
+        .map(e => ({ ...e, sets: 2, history: e.history || [], defaultSets: [{ kg: '', reps: '' }, { kg: '', reps: '' }] }));
       return [...prev, ...newOnes];
     });
     setShowPicker(false);
