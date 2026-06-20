@@ -340,10 +340,7 @@ export default function Splits() {
 
       {/* My Splits Tab */}
       {activeTab === 'mine' && (
-        <div className="px-4 relative">
-          <div className="absolute top-[-40px] left-[-20px] w-40 h-40 rounded-full bg-blue-400/15 dark:bg-blue-400/10 blur-3xl pointer-events-none" />
-          <div className="absolute top-[120px] right-[-30px] w-48 h-48 rounded-full bg-purple-400/15 dark:bg-purple-400/10 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-[-40px] left-[30%] w-36 h-36 rounded-full bg-emerald-400/12 dark:bg-emerald-400/08 blur-3xl pointer-events-none" />
+        <div className="px-4">
           <button
             onClick={() => setShowBuilder(true)}
             className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
@@ -371,12 +368,8 @@ export default function Splits() {
 
       {/* Example Splits Tab */}
       {activeTab === 'examples' && (
-        <div className="px-4 relative">
-          {/* Decorative blobs for glassy backdrop-blur effect */}
-          <div className="absolute top-[-40px] left-[-20px] w-40 h-40 rounded-full bg-blue-400/15 dark:bg-blue-400/10 blur-3xl pointer-events-none" />
-          <div className="absolute top-[120px] right-[-30px] w-48 h-48 rounded-full bg-purple-400/15 dark:bg-purple-400/10 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-[-40px] left-[30%] w-36 h-36 rounded-full bg-emerald-400/12 dark:bg-emerald-400/08 blur-3xl pointer-events-none" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative" style={GRID_CV}>
+        <div className="px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={GRID_CV}>
             {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
               <SplitCard
                 key={key}
