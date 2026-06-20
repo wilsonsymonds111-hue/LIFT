@@ -7,6 +7,7 @@ import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
 import ExerciseDetailModal from './ExerciseDetailModal';
 import { getDefaultRestDuration } from '../lib/exerciseDefaults';
+import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
 import ProgressGraph from './ProgressGraph';
@@ -823,17 +824,30 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     });
   }, []);
 
-  // Load exercise images from ExerciseDetail
+  // Load exercise images from ExerciseDetail, generating missing ones on the fly
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
-    base44.entities.ExerciseDetail.list('name', 500).then(results => {
+    base44.entities.ExerciseDetail.list('name', 500).then(async (results) => {
       const map = {};
       (results || []).forEach(d => {
         if (d.image_url) map[d.name] = d.image_url;
       });
+
+      // Fill in any exercises from the current template that are missing images
+      const templateExercises = template?.exerciseList || [];
+      const missing = templateExercises.filter(e => !map[e.name]);
+      if (missing.length > 0) {
+        const generated = {};
+        for (const ex of missing) {
+          const result = await ensureExerciseDetail(ex.name);
+          if (result.image_url) generated[ex.name] = result.image_url;
+        }
+        Object.assign(map, generated);
+      }
+
       setExerciseImages(map);
     });
-  }, []);
+  }, [template?.id]);
 
   // Merge Exercise entity history into exercises
   useEffect(() => {
