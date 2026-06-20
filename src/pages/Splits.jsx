@@ -50,21 +50,9 @@ export default function Splits() {
     const stored = localStorage.getItem('splitsActiveTab');
     return stored || 'examples';
   });
-  const [subTabWidth, setSubTabWidth] = useState(0);
-  const subTabContainerRef = useRef(null);
-
   useEffect(() => {
     localStorage.setItem('splitsActiveTab', activeTab);
   }, [activeTab]);
-
-  useEffect(() => {
-    const update = () => {
-      if (subTabContainerRef.current) setSubTabWidth(subTabContainerRef.current.offsetWidth);
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
 
   const tabIndex = activeTab === 'mine' ? 0 : 1;
 
@@ -352,15 +340,15 @@ export default function Splits() {
       </div>
 
       {/* Sub-tab content — both tabs always rendered, switched by button */}
-      <div ref={subTabContainerRef} className="relative overflow-hidden w-full">
+      <div className="relative overflow-hidden w-full">
         <motion.div
-          animate={{ x: -(tabIndex * (subTabWidth || (typeof window !== 'undefined' ? window.innerWidth - 32 : 320))) }}
+          animate={{ x: `-${tabIndex * 50}%` }}
           transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.3 }}
           className="flex"
-          style={{ width: (subTabWidth || (typeof window !== 'undefined' ? window.innerWidth - 32 : 320)) * 2, willChange: 'transform' }}
+          style={{ width: '200%' }}
         >
           {/* My Splits */}
-          <div className="flex-shrink-0 px-4" style={{ width: subTabWidth || window.innerWidth - 32 }}>
+          <div className="w-1/2 flex-shrink-0 px-4">
             <button
               onClick={() => setShowBuilder(true)}
               className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
@@ -390,7 +378,7 @@ export default function Splits() {
           </div>
 
           {/* Example Splits */}
-          <div className="flex-shrink-0 px-4" style={{ width: subTabWidth || window.innerWidth - 32 }}>
+          <div className="w-1/2 flex-shrink-0 px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
                 <SplitCard
