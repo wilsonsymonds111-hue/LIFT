@@ -85,17 +85,6 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
     [onDays, offDays, startDayIndex]
   );
 
-  // Shift the week to start from today so the user sees the next 7 days
-  const shiftedDayLabels = useMemo(
-    () => [...DAY_LABELS.slice(todayMonSun), ...DAY_LABELS.slice(0, todayMonSun)],
-    [todayMonSun]
-  );
-  const shiftedSchedule = useMemo(
-    () => [...previewSchedule.slice(todayMonSun), ...previewSchedule.slice(0, todayMonSun)],
-    [previewSchedule, todayMonSun]
-  );
-  const shiftedStartDayIndex = (startDayIndex - todayMonSun + 7) % 7;
-
   // When the modal opens for a different split, reload cycle
   useEffect(() => {
     const c = loadCycle(splitKey, defaultSchedule);
@@ -217,6 +206,17 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
   }, [onDays, offDays]);
 
   const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  // Shift the week to start from today so the user sees the next 7 days
+  const shiftedDayLabels = useMemo(
+    () => [...DAY_LABELS.slice(todayMonSun), ...DAY_LABELS.slice(0, todayMonSun)],
+    [todayMonSun]
+  );
+  const shiftedSchedule = useMemo(
+    () => [...previewSchedule.slice(todayMonSun), ...previewSchedule.slice(0, todayMonSun)],
+    [previewSchedule, todayMonSun]
+  );
+  const shiftedStartDayIndex = (startDayIndex - todayMonSun + 7) % 7;
 
   return createPortal(
     <AnimatePresence>
