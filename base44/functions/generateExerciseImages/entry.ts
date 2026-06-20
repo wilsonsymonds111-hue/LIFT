@@ -27,7 +27,7 @@ const ALL_EXERCISES = [
   "Wrist Curl", "Zottman Curl"
 ];
 
-const IMAGE_PROMPT = (name) => `Two side-by-side anatomical figures showing the "${name}" exercise: the left figure shows the starting position, the right figure shows the finishing position. Both figures are identical in size, proportions, camera angle, body composition, and anatomical detail — the only differences are body position and equipment placement. Clean white background. Grayscale anatomical style with visible musculature, no skin texture, like a fitness anatomy reference diagram. All primary and secondary muscles significantly involved in the exercise are highlighted in red, with anatomically accurate activation. Do not highlight muscles not meaningfully contributing. No text, labels, arrows, numbers, logos, watermarks, or annotations. Exercise equipment accurately represented for each phase. Professional museum-quality medical illustration style.`;
+const IMAGE_PROMPT = (name, muscles) => `Two side-by-side anatomical figures showing the "${name}" exercise: the left figure shows the starting position, the right figure shows the finishing position. Both figures are identical in size, proportions, camera angle, body composition, and anatomical detail. Clean white background. Grayscale anatomical style with visible musculature, no skin texture, like a fitness anatomy reference diagram. ONLY the following muscles must be highlighted in red: ${muscles}. No other muscles should be red. No text, labels, arrows, numbers, logos, watermarks, or annotations. Exercise equipment accurately represented for each phase. Professional museum-quality medical illustration style.`;
 
 Deno.serve(async (req) => {
   try {
@@ -40,32 +40,33 @@ Deno.serve(async (req) => {
     const existingDetails = await base44.asServiceRole.entities.ExerciseDetail.list('name', 500);
     const existingNames = new Set((existingDetails || []).map(d => d.name));
 
-    // Find exercises that need images (no record at all)
     const needed = ALL_EXERCISES.filter(name => !existingNames.has(name));
 
     if (needed.length === 0) {
       return Response.json({ message: 'All exercises already have detail records', generated: 0, remaining: 0 });
     }
 
-    // Generate image + instructions for the first exercise that needs it
     const name = needed[0];
 
     try {
-      const [imgRes, llmRes, musclesRes] = await Promise.all([
-        base44.asServiceRole.integrations.Core.GenerateImage({ prompt: IMAGE_PROMPT(name) }),
+      // First determine the muscles for this exercise
+      const musclesRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+        prompt: `List the primary and secondary muscle groups worked by the "${name}" exercise. Output ONLY a comma-separated list, e.g. "Chest, Front Delts, Triceps". Keep it to 3-5 muscles max. No other text.`,
+      });
+      const muscles_worked = typeof musclesRes === 'string' ? musclesRes.trim() : (musclesRes?.data || '').trim();
+
+      // Then generate image and instructions in parallel, using the specific muscles in the image prompt
+      const [imgRes, llmRes] = await Promise.all([
+        base44.asServiceRole.integrations.Core.GenerateImage({ prompt: IMAGE_PROMPT(name, muscles_worked) }),
         base44.asServiceRole.integrations.Core.InvokeLLM({
           prompt: `Write 4 short, numbered step-by-step instructions for how to perform the "${name}" exercise at the gym. Keep each step to 1-2 sentences. Be clear and concise. Output format: plain text with each step on a new line starting with the number and a period.`,
-        }),
-        base44.asServiceRole.integrations.Core.InvokeLLM({
-          prompt: `List the primary and secondary muscle groups worked by the "${name}" exercise. Output as a short comma-separated list only, e.g. "Chest, Front Delts, Triceps". Keep it to 3-5 muscles max.`,
         }),
       ]);
 
       const image_url = imgRes?.url || '';
       const instructions = typeof llmRes === 'string' ? llmRes : (llmRes?.data || '');
-      const muscles_worked = typeof musclesRes === 'string' ? musclesRes : (musclesRes?.data || '');
 
-      const created = await base44.asServiceRole.entities.ExerciseDetail.create({
+      await base44.asServiceRole.entities.ExerciseDetail.create({
         name,
         image_url,
         instructions,

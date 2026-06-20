@@ -51,26 +51,25 @@ export default function ExerciseDetailModal({ exercise, onClose }) {
         setDetail(results[0]);
         setLoadingDetail(false);
       } else {
-        // Generate details via LLM
+        // Generate details via LLM: first determine muscles, then image + instructions
         try {
-          const [llmRes, musclesRes] = await Promise.all([
+          // Step 1: get the muscles worked
+          const musclesRes = await base44.integrations.Core.InvokeLLM({
+            prompt: `List the primary and secondary muscle groups worked by the "${exercise.name}" exercise. Output ONLY a comma-separated list, e.g. "Chest, Front Delts, Triceps". Keep it to 3-5 muscles max. No other text.`,
+          });
+          const muscles_worked = (musclesRes?.data || musclesRes || exercise.muscle).trim();
+
+          // Step 2: generate image (with specific muscles) and instructions in parallel
+          const [imgRes, llmRes] = await Promise.all([
+            base44.integrations.Core.GenerateImage({
+              prompt: `Two side-by-side anatomical figures showing the "${exercise.name}" exercise: the left figure shows the starting position, the right figure shows the finishing position. Both figures are identical in size, proportions, camera angle, body composition, and anatomical detail. Clean white background. Grayscale anatomical style with visible musculature, no skin texture, like a fitness anatomy reference diagram. ONLY the following muscles must be highlighted in red: ${muscles_worked}. No other muscles should be red. No text, labels, arrows, numbers, logos, watermarks, or annotations. Exercise equipment accurately represented for each phase. Professional museum-quality medical illustration style.`,
+            }).catch(() => ({ url: '' })),
             base44.integrations.Core.InvokeLLM({
               prompt: `Write 4 short, numbered step-by-step instructions for how to perform the "${exercise.name}" exercise at the gym. Keep each step to 1-2 sentences. Be clear and concise. Output format: plain text with each step on a new line starting with the number and a period.`,
             }),
-            base44.integrations.Core.InvokeLLM({
-              prompt: `List the primary and secondary muscle groups worked by the "${exercise.name}" exercise. Output as a short comma-separated list only, e.g. "Chest, Front Delts, Triceps". Keep it to 3-5 muscles max.`,
-            }),
           ]);
+          const image_url = imgRes?.url || '';
           const instructions = llmRes?.data || llmRes || '';
-          const muscles_worked = musclesRes?.data || musclesRes || exercise.muscle;
-          // Generate an image
-          let image_url = '';
-          try {
-            const imgRes = await base44.integrations.Core.GenerateImage({
-              prompt: `Two side-by-side anatomical figures showing the "${exercise.name}" exercise: the left figure shows the starting position, the right figure shows the finishing position. Both figures are identical in size, proportions, camera angle, body composition, and anatomical detail — the only differences are body position and equipment placement. Clean white background. Grayscale anatomical style with visible musculature, no skin texture, like a fitness anatomy reference diagram. All primary and secondary muscles significantly involved in the exercise are highlighted in red, with anatomically accurate activation. Do not highlight muscles not meaningfully contributing. No text, labels, arrows, numbers, logos, watermarks, or annotations. Exercise equipment accurately represented for each phase. Professional museum-quality medical illustration style.`,
-            });
-            image_url = imgRes?.data?.url || imgRes?.url || '';
-          } catch (_) {}
           const newDetail = await base44.entities.ExerciseDetail.create({
             name: exercise.name,
             instructions,
