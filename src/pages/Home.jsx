@@ -15,6 +15,9 @@ import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
 
+// Rebuilt on every HMR update — busts stale useMemo caches
+const BUILD_ID = Date.now();
+
 // Default cycle patterns: { onDays, offDays } for known split types
 const SPLIT_CYCLES = {
   'push-pull-legs': { onDays: 3, offDays: 1 },
@@ -218,7 +221,7 @@ export default function Home() {
       : -1;
 
     return { currentSplit: sorted, currentSplitName: splitName, splitDetection: detection, dayWorkoutNames, todayWorkoutIndex };
-  }, [templates]);
+  }, [templates, BUILD_ID]);
 
   const handleCalendarSyncConfirm = useCallback((hour) => {
     setShowCalendarSync(false);
