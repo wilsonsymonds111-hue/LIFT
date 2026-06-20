@@ -42,10 +42,8 @@ function cycleToSchedule(onDays, offDays, startDayIndex) {
   const cycleLength = onDays + offDays;
   const schedule = [];
   for (let i = 0; i < 7; i++) {
-    const fwd = (i - startDayIndex + 7) % 7;
-    const bwd = (startDayIndex - i + 7) % 7;
-    const offset = fwd <= bwd ? fwd : -bwd;
-    const pos = ((offset % cycleLength) + cycleLength) % cycleLength;
+    const daysFromStart = i >= startDayIndex ? i - startDayIndex : i + 7 - startDayIndex;
+    const pos = daysFromStart % cycleLength;
     schedule.push(pos < onDays ? 1 : 0);
   }
   return schedule;
