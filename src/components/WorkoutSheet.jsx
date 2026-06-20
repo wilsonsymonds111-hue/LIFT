@@ -273,10 +273,10 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         </div>
         <div className="flex items-center gap-3 relative flex-shrink-0">
           {exerciseImage ? (
-            <img src={exerciseImage} alt={exercise.name} className="w-20 h-16 rounded-lg object-contain" />
+            <img src={exerciseImage} alt={exercise.name} className="w-28 h-24 rounded-lg object-contain" />
           ) : (
-            <div className="w-20 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
-              <span className="text-sm font-bold text-gray-400">{exercise.name[0]}</span>
+            <div className="w-28 h-24 rounded-lg bg-gray-100 flex items-center justify-center">
+              <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
             </div>
           )}
           {showMenu && (
