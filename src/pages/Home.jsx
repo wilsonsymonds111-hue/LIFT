@@ -101,24 +101,6 @@ export default function Home() {
     setShowCalendarSync(true);
   }, []);
 
-  const handleCalendarSyncConfirm = useCallback((hour) => {
-    setShowCalendarSync(false);
-    const ics = generateWorkoutICS({
-      splitName: currentSplitName,
-      workouts: currentSplit.map(t => ({ name: t.name })),
-      schedule: splitDetection.schedule,
-      startDayIndex: splitDetection.startDayIndex,
-      workoutHour: hour,
-    });
-    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'lift-workouts.ics';
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [currentSplitName, currentSplit, splitDetection]);
-
   // --- Split categorization ---
   const { currentSplit, currentSplitName, splitDetection, dayWorkoutNames, todayWorkoutIndex } = useMemo(() => {
     const hasActive = templates.some(t => t.isActiveSplit === true);
@@ -207,6 +189,24 @@ export default function Home() {
 
     return { currentSplit: sorted, currentSplitName: splitName, splitDetection: detection, dayWorkoutNames, todayWorkoutIndex };
   }, [templates]);
+
+  const handleCalendarSyncConfirm = useCallback((hour) => {
+    setShowCalendarSync(false);
+    const ics = generateWorkoutICS({
+      splitName: currentSplitName,
+      workouts: currentSplit.map(t => ({ name: t.name })),
+      schedule: splitDetection.schedule,
+      startDayIndex: splitDetection.startDayIndex,
+      workoutHour: hour,
+    });
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'lift-workouts.ics';
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [currentSplitName, currentSplit, splitDetection]);
 
   const accent = useMemo(() => SPLIT_ACCENTS[splitDetection.key] || SPLIT_ACCENTS['full-body'], [splitDetection.key]);
 
