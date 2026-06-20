@@ -280,89 +280,98 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
               </div>
 
               {/* Cycle editor */}
-              {editing && (
-                <div className="px-5 py-4 border-b border-border bg-blue-50/50 dark:bg-blue-950/10">
-                  <p className="text-xs font-semibold text-muted-foreground mb-4 text-center uppercase tracking-wider">
-                    Cycle Settings
-                  </p>
-
-                  {/* Days on / off inputs */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days On</label>
-                      <input
-                        type="number"
-                        min={1}
-                        max={6}
-                        value={onDays}
-                        onChange={(e) => setOnDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
-                        className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days Off</label>
-                      <input
-                        type="number"
-                        min={1}
-                        max={6}
-                        value={offDays}
-                        onChange={(e) => setOffDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
-                        className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Frequency summary */}
-                  <p className="text-sm font-bold text-foreground text-center mb-4">
-                    {frequencyLabel}
-                  </p>
-
-                  {/* Combined start-day selector + preview */}
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mb-2">
-                    Tap a day to set cycle start
-                  </p>
-                  <div className="flex justify-between gap-1 mb-3">
-                    {shiftedSchedule.map((status, i) => {
-                      const isGymDay = status === 1;
-                      const isToday = i === 0;
-                      const isStart = shiftedStartDayIndex === i;
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => setStartDayIndex((i + todayMonSun) % 7)}
-                          className={`flex flex-col items-center flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-150 ${
-                            isStart
-                              ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30'
-                              : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 hover:border-blue-400'
-                          } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
-                        >
-                          <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{shiftedDayLabels[i]}</span>
-                          <div
-                            className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
-                              isGymDay
-                                ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
-                                : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
-                            } ${isToday && !isStart ? 'ring-[1.5px] ring-emerald-500 ring-offset-1' : ''}`}
-                          >
-                            {isGymDay && <Dumbbell className={`w-2.5 h-2.5 ${isStart ? 'text-white' : 'text-white'}`} strokeWidth={2.5} />}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Done button */}
-                  <button
-                    onClick={() => {
-                      saveCycle(splitKey, { onDays, offDays, startDayIndex });
-                      setEditing(false);
-                    }}
-                    className="w-full mt-4 py-2 rounded-lg bg-blue-500 text-white text-xs font-bold hover:bg-blue-600 transition"
+              <AnimatePresence>
+                {editing && (
+                  <motion.div
+                    initial={{ scaleY: 0, opacity: 0 }}
+                    animate={{ scaleY: 1, opacity: 1 }}
+                    exit={{ scaleY: 0, opacity: 0 }}
+                    transition={{ type: 'spring', damping: 26, stiffness: 340, mass: 0.6 }}
+                    style={{ transformOrigin: 'top center' }}
+                    className="px-5 py-4 border-b border-border bg-blue-50/50 dark:bg-blue-950/10 overflow-hidden"
                   >
-                    Done
-                  </button>
-                </div>
-              )}
+                    <p className="text-xs font-semibold text-muted-foreground mb-4 text-center uppercase tracking-wider">
+                      Cycle Settings
+                    </p>
+
+                    {/* Days on / off inputs */}
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="flex-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days On</label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={6}
+                          value={onDays}
+                          onChange={(e) => setOnDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
+                          className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days Off</label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={6}
+                          value={offDays}
+                          onChange={(e) => setOffDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
+                          className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Frequency summary */}
+                    <p className="text-sm font-bold text-foreground text-center mb-4">
+                      {frequencyLabel}
+                    </p>
+
+                    {/* Combined start-day selector + preview */}
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mb-2">
+                      Tap a day to set cycle start
+                    </p>
+                    <div className="flex justify-between gap-1 mb-3">
+                      {shiftedSchedule.map((status, i) => {
+                        const isGymDay = status === 1;
+                        const isToday = i === 0;
+                        const isStart = shiftedStartDayIndex === i;
+                        return (
+                          <button
+                            key={i}
+                            onClick={() => setStartDayIndex((i + todayMonSun) % 7)}
+                            className={`flex flex-col items-center flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-150 ${
+                              isStart
+                                ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30'
+                                : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 hover:border-blue-400'
+                            } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
+                          >
+                            <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{shiftedDayLabels[i]}</span>
+                            <div
+                              className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
+                                isGymDay
+                                  ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
+                                  : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
+                              } ${isToday && !isStart ? 'ring-[1.5px] ring-emerald-500 ring-offset-1' : ''}`}
+                            >
+                              {isGymDay && <Dumbbell className={`w-2.5 h-2.5 ${isStart ? 'text-white' : 'text-white'}`} strokeWidth={2.5} />}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Done button */}
+                    <button
+                      onClick={() => {
+                        saveCycle(splitKey, { onDays, offDays, startDayIndex });
+                        setEditing(false);
+                      }}
+                      className="w-full mt-4 py-2 rounded-lg bg-blue-500 text-white text-xs font-bold hover:bg-blue-600 transition"
+                    >
+                      Done
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Workout cards — drag to reorder */}
               <div className="flex-1 overflow-y-auto px-5 pt-4 pb-3">
