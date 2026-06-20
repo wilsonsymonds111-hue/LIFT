@@ -2,10 +2,10 @@ import { MoreHorizontal } from 'lucide-react';
 import { memo } from 'react';
 
 const SPLIT_ACCENTS = {
-  'upper-lower':     { hoverBorder: 'hover:border-blue-500',   dot: 'bg-blue-500',   pill: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300' },
-  'push-pull-legs':  { hoverBorder: 'hover:border-emerald-500', dot: 'bg-emerald-500', pill: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' },
-  'full-body':       { hoverBorder: 'hover:border-purple-500',  dot: 'bg-purple-500',  pill: 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300' },
-  'ul-ppl':          { hoverBorder: 'hover:border-amber-500',   dot: 'bg-amber-500',   pill: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' },
+  'upper-lower':     { hoverBorder: 'hover:border-blue-500',   dot: 'bg-blue-500',   pill: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800' },
+  'push-pull-legs':  { hoverBorder: 'hover:border-emerald-500', dot: 'bg-emerald-500', pill: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' },
+  'full-body':       { hoverBorder: 'hover:border-purple-500',  dot: 'bg-purple-500',  pill: 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border-purple-200 dark:border-purple-800' },
+  'ul-ppl':          { hoverBorder: 'hover:border-amber-500',   dot: 'bg-amber-500',   pill: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800' },
 };
 
 function detectSplitType(workoutNames) {
@@ -34,7 +34,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
     <div ref={cardRef}>
       <div
         onClick={onCardClick}
-        className={`relative bg-card rounded-xl p-4 shadow-[0_2px_10px_rgba(0,0,0,0.12)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.18)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)] hover:scale-[1.02] transition-all duration-150 cursor-pointer border-2 border-blue-400/30 ${colors.hoverBorder}`}
+        className={`relative bg-card rounded-xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45)] hover:shadow-[0_8px_28px_rgba(0,0,0,0.22)] dark:hover:shadow-[0_8px_28px_rgba(0,0,0,0.55)] hover:scale-[1.02] transition-all duration-150 cursor-pointer border-2 border-blue-400/30 ${colors.hoverBorder}`}
       >
         {/* Menu button */}
         {onMenuToggle && (
@@ -48,27 +48,33 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
         )}
 
         {/* Split name */}
-        <h3 className="font-bold text-foreground text-sm uppercase tracking-wide pr-8">
+        <h3 className="font-extrabold text-foreground text-lg tracking-tight pr-8 leading-tight">
           {name}
         </h3>
 
-        {/* Divider */}
-        <div className={`w-8 h-0.5 ${colors.dot} rounded-full mt-2.5 mb-3 opacity-60`} />
+        {/* Colored accent line */}
+        <div className={`w-10 h-1 ${colors.dot} rounded-full mt-3 mb-4`} />
 
-        {/* Workout list */}
-        <div className="space-y-1.5">
+        {/* Workout pills */}
+        <div className="flex flex-wrap gap-2">
           {workouts.map((w, i) => (
-            <div key={i} className="flex items-center gap-2.5">
+            <span
+              key={i}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold ${colors.pill}`}
+            >
               <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${colors.dot}`} />
-              <span className="text-xs text-muted-foreground">{w.name}</span>
-            </div>
+              {w.name}
+            </span>
           ))}
         </div>
 
-        {/* Badge */}
-        <div className="mt-3.5 pt-3 border-t border-border/60">
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-semibold ${colors.pill}`}>
+        {/* Bottom row */}
+        <div className="flex items-center justify-between mt-4 pt-3.5 border-t border-border/60">
+          <span className="text-xs font-semibold text-muted-foreground">
             {workoutCount} workout{workoutCount !== 1 ? 's' : ''}
+          </span>
+          <span className={`text-[11px] font-bold uppercase tracking-wider ${colorKey === 'upper-lower' ? 'text-blue-500' : colorKey === 'push-pull-legs' ? 'text-emerald-500' : colorKey === 'full-body' ? 'text-purple-500' : 'text-amber-500'}`}>
+            {colorKey === 'upper-lower' ? 'Upper/Lower' : colorKey === 'push-pull-legs' ? 'PPL' : colorKey === 'full-body' ? 'Full Body' : 'UL/PPL'}
           </span>
         </div>
       </div>
