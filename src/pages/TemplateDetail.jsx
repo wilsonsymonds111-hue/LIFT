@@ -120,7 +120,7 @@ export default function TemplateDetail() {
             </div>
             {history.length > 0 && (
               <div className="w-16 h-8 flex-shrink-0 flex items-center justify-center">
-                <Sparkline data={history.slice(-6).map(h => ({ v: typeof h === 'object' ? h.reps : h }))} width={64} height={32} />
+                <Sparkline data={history.map(h => ({ v: typeof h === 'object' ? h.reps : h }))} width={64} height={32} />
               </div>
             )}
           </div>

@@ -5,7 +5,7 @@ import Sparkline from './Sparkline';
 const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, onClick }) {
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
   const historyData = exerciseHistory[exercise.name];
-  const chartData = historyData?.slice(-6).map(h => ({ v: h.v })) || [];
+  const chartData = historyData?.map(h => ({ v: h.v })) || [];
 
   return (
     <div
