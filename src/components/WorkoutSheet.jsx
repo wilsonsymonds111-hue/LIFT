@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
+import ExerciseDetailModal from './ExerciseDetailModal';
 import { getDefaultRestDuration } from '../lib/exerciseDefaults';
 import html2canvas from 'html2canvas';
 import confetti from 'canvas-confetti';
@@ -222,6 +223,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [restEnabled, setRestEnabled] = useState(true);
   const [showCustomRest, setShowCustomRest] = useState(false);
   const [customRestInput, setCustomRestInput] = useState('');
+  const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [chartView, setChartView] = useState('weight');
   const lastEntry = exercise.history?.[exercise.history.length - 1];
   const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
@@ -321,6 +323,12 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                 </button>
                 <div className="border-t border-gray-100 mx-3 my-1" />
                 <button
+                  onClick={() => { setShowMenu(false); setShowExerciseDetail(true); }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
+                >
+                  View Exercise Details
+                </button>
+                <button
                   onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
                   className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
                 >
@@ -415,9 +423,15 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         + Add Set
       </button>
     </div>
+    {showExerciseDetail && (
+      <ExerciseDetailModal
+        exercise={exercise}
+        onClose={() => setShowExerciseDetail(false)}
+      />
+    )}
     </>
-  );
-});
+    );
+    });
 
 /* ─── Icons ──────────────────────────────────────────────────── */
 function InstagramIcon({ size = 20 }) {
