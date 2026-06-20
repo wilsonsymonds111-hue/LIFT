@@ -24,12 +24,33 @@ function relativeTime(dateStr) {
   return `${Math.floor(diffDays / 30)}mo ago`;
 }
 
+const KNOWN_CYCLES = {
+  'push-pull-legs': { onDays: 3, offDays: 1 },
+  'upper-lower': { onDays: 2, offDays: 1 },
+  'full-body': { onDays: 1, offDays: 1 },
+  'ul-ppl': { onDays: 5, offDays: 1 },
+};
+
 function loadCycle(splitKey, fallbackSchedule) {
+  const todayIndex = new Date().getDay();
+  const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
+  const defaults = KNOWN_CYCLES[splitKey] || null;
+
   try {
     const raw = localStorage.getItem(`splitCycle_${splitKey}`);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // If a known split with no user customization, use the authoritative defaults
+      if (defaults && parsed.onDays === defaults.onDays && parsed.offDays === defaults.offDays) {
+        return { ...defaults, startDayIndex: todayMonSun };
+      }
+      return { ...parsed, startDayIndex: todayMonSun };
+    }
   } catch {}
-  // Compute default cycle from the fallback schedule (longest consecutive runs)
+
+  if (defaults) return { ...defaults, startDayIndex: todayMonSun };
+
+  // Compute default cycle from the fallback schedule for custom splits
   let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
   for (let i = 0; i < fallbackSchedule.length; i++) {
     if (fallbackSchedule[i] === 1) {
@@ -44,9 +65,6 @@ function loadCycle(splitKey, fallbackSchedule) {
   }
   if (curOn > maxOn) maxOn = curOn;
   if (curOff > maxOff) maxOff = curOff;
-  // Default start day to today — past days before today are "no data" not "missed"
-  const todayIndex = new Date().getDay();
-  const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
   return { onDays: maxOn || 1, offDays: maxOff || 1, startDayIndex: todayMonSun };
 }
 

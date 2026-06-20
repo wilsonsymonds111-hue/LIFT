@@ -18,7 +18,7 @@ import { generateWorkoutICS } from '../lib/icsGenerator';
 // Default cycle patterns: { onDays, offDays } for known split types
 const SPLIT_CYCLES = {
   'push-pull-legs': { onDays: 3, offDays: 1 },
-  'upper-lower': { onDays: 1, offDays: 1 },
+  'upper-lower': { onDays: 2, offDays: 1 },
   'ul-ppl': { onDays: 5, offDays: 1 },
   'full-body': { onDays: 1, offDays: 1 },
 };
