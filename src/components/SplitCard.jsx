@@ -53,7 +53,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
         <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-transparent" />
 
         {/* Content */}
-        <div className="relative p-5 flex flex-col justify-end h-full min-h-[160px]">
+        <div className="relative p-5 flex flex-col justify-center h-full min-h-[160px]">
           {/* Top row: menu */}
           {onMenuToggle && (
             <button
@@ -66,7 +66,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           )}
 
           {/* Split name */}
-          <h4 className="font-extrabold text-white text-sm uppercase tracking-wider pr-6 leading-tight">
+          <h4 className="font-extrabold text-white text-lg uppercase tracking-wider pr-6 leading-tight">
             {displayName}
           </h4>
 
