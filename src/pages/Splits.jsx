@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
@@ -50,10 +50,29 @@ export default function Splits() {
     const stored = localStorage.getItem('splitsActiveTab');
     return stored || 'examples';
   });
+  const [subTabWidth, setSubTabWidth] = useState(0);
+  const subTabContainerRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem('splitsActiveTab', activeTab);
   }, [activeTab]);
+
+  useEffect(() => {
+    const update = () => {
+      if (subTabContainerRef.current) setSubTabWidth(subTabContainerRef.current.offsetWidth);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const handleSubTabDragEnd = useCallback((_, info) => {
+    const threshold = 80;
+    if (info.offset.x < -threshold && activeTab === 'mine') setActiveTab('examples');
+    else if (info.offset.x > threshold && activeTab === 'examples') setActiveTab('mine');
+  }, [activeTab]);
+
+  const tabIndex = activeTab === 'mine' ? 0 : 1;
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -338,54 +357,75 @@ export default function Splits() {
         </div>
       </div>
 
-      {/* My Splits Tab */}
-      {activeTab === 'mine' && (
-        <div className="px-4">
-          <button
-            onClick={() => setShowBuilder(true)}
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+      {/* Swipeable sub-tab content */}
+      <div ref={subTabContainerRef} className="relative overflow-hidden w-full">
+        {subTabWidth > 0 && (
+          <motion.div
+            drag="x"
+            dragDirectionLock
+            dragConstraints={{ left: -subTabWidth, right: 0 }}
+            dragElastic={0.08}
+            onDragEnd={handleSubTabDragEnd}
+            animate={{ x: -tabIndex * subTabWidth }}
+            transition={{ type: 'spring', stiffness: 330, damping: 34, mass: 0.75 }}
+            className="flex"
+            style={{ width: subTabWidth * 2, willChange: 'transform' }}
           >
-            <Plus className="w-4 h-4" />
-            Create New Split
-          </button>
-          {mySplitGroups.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" style={GRID_CV}>
-              {mySplitGroups.map((group) => {
-                const isActive = group.templates.some(t => t.isActiveSplit);
-                return (
-                <SplitCard
-                  key={group.groupId}
-                  splitKey={group.groupId}
-                  name={group.templates[0]?.splitName || group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
-                  workouts={group.templates.map(t => ({ name: t.name }))}
-                  isActive={isActive}
-                  onCardClick={() => setActiveSplit(group.groupId)}
-                  onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
-                  menuRef={el => menuRef.current[group.groupId] = el}
-                />
-                );
-              })}
+            {/* My Splits */}
+            <div className="flex-shrink-0 px-4" style={{ width: subTabWidth }}>
+              <button
+                onClick={() => setShowBuilder(true)}
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Create New Split
+              </button>
+              {mySplitGroups.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" style={GRID_CV}>
+                  {mySplitGroups.map((group) => {
+                    const isActive = group.templates.some(t => t.isActiveSplit);
+                    return (
+                    <SplitCard
+                      key={group.groupId}
+                      splitKey={group.groupId}
+                      name={group.templates[0]?.splitName || group.templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' • ')}
+                      workouts={group.templates.map(t => ({ name: t.name }))}
+                      isActive={isActive}
+                      onCardClick={() => setActiveSplit(group.groupId)}
+                      onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
+                      menuRef={el => menuRef.current[group.groupId] = el}
+                    />
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
 
-      {/* Example Splits Tab */}
-      {activeTab === 'examples' && (
+            {/* Example Splits */}
+            <div className="flex-shrink-0 px-4" style={{ width: subTabWidth }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={GRID_CV}>
+                {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
+                  <SplitCard
+                    key={key}
+                    splitKey={key}
+                    name={split.name}
+                    workouts={split.workouts}
+                    onCardClick={() => setActiveSplit(key)}
+                    cardRef={el => cardRefs.current[key] = el}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Fallback when width not yet measured */}
+      {subTabWidth === 0 && activeTab === 'mine' && (
         <div className="px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={GRID_CV}>
-            {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
-              <SplitCard
-                key={key}
-                splitKey={key}
-                name={split.name}
-                workouts={split.workouts}
-
-                onCardClick={() => setActiveSplit(key)}
-                cardRef={el => cardRefs.current[key] = el}
-              />
-            ))}
-          </div>
+          <button onClick={() => setShowBuilder(true)} className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+            <Plus className="w-4 h-4" />Create New Split
+          </button>
         </div>
       )}
 

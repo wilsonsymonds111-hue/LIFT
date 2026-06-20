@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
-import { useEffect, useRef, useMemo, useCallback, lazy, Suspense, memo } from 'react';
+import { useEffect, useRef, useMemo, useCallback, useState, lazy, Suspense, memo } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -28,7 +28,6 @@ const pageVariants = {
 };
 
 const PAGE_TRANSITION = { duration: 0.15, ease: [0.33, 1, 0.68, 1] };
-const SWIPE_TRANSITION = { duration: 0.08, ease: [0.33, 1, 0.68, 1] };
 const SUSPENSE_FALLBACK = <div className="w-full h-screen bg-background" />;
 const LOADING_SPINNER = (
   <div className="fixed inset-0 flex items-center justify-center">
@@ -49,59 +48,59 @@ const SlideIn = ({ children }) => (
   </motion.div>
 );
 
-const preloadMap = { '/splits': () => import('./pages/Splits'), '/': () => import('./pages/Home'), '/exercises': () => import('./pages/Exercises') };
+const TAB_STYLES = { touchAction: 'pan-y' };
 
-const TAB_STYLES = { touchAction: 'pan-y', contain: 'layout style paint' };
-const DRAG_STYLES = { willChange: 'transform', contain: 'layout style paint' };
+const TAB_CONTENT = [Home, Splits, Exercises];
 
 const SwipeableTabs = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const activeIndex = TABS.indexOf(location.pathname);
-  const constraintsRef = useRef(null);
   const containerRef = useRef(null);
+  const [width, setWidth] = useState(0);
 
-  // Preload the other tabs' chunks after initial render
   useEffect(() => {
-    const others = TABS.filter((_, i) => i !== activeIndex).map(p => preloadMap[p]).filter(Boolean);
-    if (others.length === 0) return;
-    const hasRIC = typeof requestIdleCallback === 'function';
-    const ids = others.map(preload =>
-      hasRIC ? requestIdleCallback(preload, { timeout: 2000 }) : setTimeout(preload, 200)
-    );
-    return () => ids.forEach(id => hasRIC ? cancelIdleCallback(id) : clearTimeout(id));
-  }, [activeIndex]);
+    const update = () => {
+      if (containerRef.current) setWidth(containerRef.current.offsetWidth);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
-  const snapToTab = useCallback((index) => {
-    if (index >= 0 && index < TABS.length && index !== activeIndex) {
-      navigate(TABS[index]);
+  const handleDragEnd = useCallback((_, info) => {
+    const threshold = 80;
+    if (info.offset.x < -threshold && activeIndex < TABS.length - 1) {
+      navigate(TABS[activeIndex + 1]);
+    } else if (info.offset.x > threshold && activeIndex > 0) {
+      navigate(TABS[activeIndex - 1]);
     }
   }, [activeIndex, navigate]);
 
+  if (!width) {
+    return <div ref={containerRef} className="w-full flex-1"><Suspense fallback={SUSPENSE_FALLBACK}><Home /></Suspense></div>;
+  }
+
   return (
-    <div className="relative overflow-hidden w-full flex-1" ref={constraintsRef} style={TAB_STYLES}>
+    <div ref={containerRef} className="relative overflow-hidden w-full flex-1" style={TAB_STYLES}>
       <motion.div
-        ref={containerRef}
         drag="x"
         dragDirectionLock
-        dragConstraints={constraintsRef}
-        dragElastic={0}
-        dragMomentum={false}
-        onDragEnd={(_, info) => {
-          const threshold = 50;
-          if (info.offset.x < -threshold) snapToTab(activeIndex + 1);
-          else if (info.offset.x > threshold) snapToTab(activeIndex - 1);
-        }}
-        animate={{ x: 0 }}
-        transition={SWIPE_TRANSITION}
-        className="flex w-full"
-        style={DRAG_STYLES}
+        dragConstraints={{ left: -(TABS.length - 1) * width, right: 0 }}
+        dragElastic={0.08}
+        onDragEnd={handleDragEnd}
+        animate={{ x: -activeIndex * width }}
+        transition={{ type: 'spring', stiffness: 330, damping: 34, mass: 0.75 }}
+        className="flex"
+        style={{ width: TABS.length * width, height: '100%', willChange: 'transform' }}
       >
-        <div className="flex-shrink-0 w-full overflow-y-auto">
-          <Suspense fallback={SUSPENSE_FALLBACK}>
-            {activeIndex === 0 ? <Home key="home" /> : activeIndex === 1 ? <Splits key="splits" /> : <Exercises key="exercises" />}
-          </Suspense>
-        </div>
+        {TAB_CONTENT.map((Component, i) => (
+          <div key={TABS[i]} className="flex-shrink-0 overflow-y-auto" style={{ width, height: '100%' }}>
+            <Suspense fallback={SUSPENSE_FALLBACK}>
+              <Component />
+            </Suspense>
+          </div>
+        ))}
       </motion.div>
     </div>
   );
