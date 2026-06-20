@@ -1,8 +1,17 @@
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
 export default function CreateAccountModal({ onClose }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleEmailSignUp = () => {
+    if (!email.trim() || !password.trim()) return;
+    base44.auth.redirectToLogin();
+  };
+
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
@@ -27,16 +36,31 @@ export default function CreateAccountModal({ onClose }) {
 
         <div className="flex flex-col gap-3">
           {/* Email & Password */}
-          <button
-            onClick={() => base44.auth.redirectToLogin()}
-            className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm transition active:opacity-80"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="2" />
-              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-            </svg>
-            Sign up with Email
-          </button>
+          <div className="flex flex-col gap-3">
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Email"
+              autoComplete="email"
+              className="w-full border-2 border-border rounded-2xl px-4 py-3 bg-background text-foreground text-sm font-medium placeholder:text-muted-foreground focus:outline-none focus:border-emerald-500 transition"
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Password"
+              autoComplete="new-password"
+              className="w-full border-2 border-border rounded-2xl px-4 py-3 bg-background text-foreground text-sm font-medium placeholder:text-muted-foreground focus:outline-none focus:border-emerald-500 transition"
+            />
+            <button
+              onClick={handleEmailSignUp}
+              disabled={!email.trim() || !password.trim()}
+              className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-white font-semibold text-sm transition active:opacity-80"
+            >
+              Sign Up
+            </button>
+          </div>
 
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px bg-border" />
