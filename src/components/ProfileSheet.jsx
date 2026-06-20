@@ -192,14 +192,14 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
 
         {isAuthenticated && (
           <>
-            <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5">
+            <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-4 h-4 text-emerald-500" />
+                <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-4 h-4 text-amber-500" />
                 </div>
                 <div className="text-left flex-1">
-                  <p className="font-semibold text-foreground text-sm">Guest Mode — Data Synced</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Your data is saved to the cloud, but you don't have a username and password yet</p>
+                  <p className="font-semibold text-foreground text-sm">Data stored on this device</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Create an account to save a copy to the cloud and sync across devices</p>
                 </div>
               </div>
             </div>
@@ -211,8 +211,8 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
                 <UserPlus className="w-4 h-4 text-white" />
               </div>
               <div className="text-left flex-1">
-                <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Create Login Credentials</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Set a username and password to access your data on other devices</p>
+                <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Create Account</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Set a username and password to sync your data to the cloud</p>
               </div>
             </button>
           </>
