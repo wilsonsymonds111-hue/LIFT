@@ -34,20 +34,45 @@ function playCompleteChime() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const now = ctx.currentTime;
 
-    // Three-tone ascending arpeggio with gentle bell-like attack
-    const notes = [
-      { freq: 660,  start: 0,     peak: 0.08,  end: 0.22 },  // E5
-      { freq: 880,  start: 0.08,  peak: 0.16,  end: 0.30 },  // A5
-      { freq: 1100, start: 0.16,  peak: 0.24,  end: 0.45 },  // C#6
+    // Low bass thud — weight and impact
+    const bass = ctx.createOscillator();
+    const bassGain = ctx.createGain();
+    bass.type = 'sine';
+    bass.frequency.value = 98; // G2
+    bassGain.gain.setValueAtTime(0.6, now);
+    bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    bass.connect(bassGain);
+    bassGain.connect(ctx.destination);
+    bass.start(now);
+    bass.stop(now + 0.25);
+
+    // Rising sweep — builds anticipation
+    const sweep = ctx.createOscillator();
+    const sweepGain = ctx.createGain();
+    sweep.type = 'sine';
+    sweep.frequency.setValueAtTime(200, now);
+    sweep.frequency.exponentialRampToValueAtTime(1200, now + 0.2);
+    sweepGain.gain.setValueAtTime(0.08, now);
+    sweepGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    sweep.connect(sweepGain);
+    sweepGain.connect(ctx.destination);
+    sweep.start(now);
+    sweep.stop(now + 0.2);
+
+    // Major chord fanfare — A major: A4, C#5, E5
+    const chord = [
+      { freq: 440,  start: 0.18, peak: 0.28, end: 0.65 },  // A4
+      { freq: 554,  start: 0.20, peak: 0.30, end: 0.70 },  // C#5
+      { freq: 660,  start: 0.22, peak: 0.32, end: 0.75 },  // E5
     ];
 
-    notes.forEach(({ freq, start, peak, end }) => {
+    chord.forEach(({ freq, start, peak, end }) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'sine';
+      osc.type = 'triangle';
       osc.frequency.value = freq;
       gain.gain.setValueAtTime(0.001, now + start);
-      gain.gain.exponentialRampToValueAtTime(0.2, now + peak);
+      gain.gain.exponentialRampToValueAtTime(0.22, now + peak);
       gain.gain.exponentialRampToValueAtTime(0.001, now + end);
       osc.connect(gain);
       gain.connect(ctx.destination);
