@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, Shield } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
+import CreateAccountModal from './CreateAccountModal';
 import { useNavVisibility } from '@/lib/NavContext';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -10,8 +11,9 @@ import { memo } from 'react';
 
 const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange }) {
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showCreateAccount, setShowCreateAccount] = useState(false);
   const { setHideNav } = useNavVisibility();
-  const { isAuthenticated, isGuest, handleCreateAccount } = useAuth();
+  const { isAuthenticated, isGuest } = useAuth();
 
   // Hide bottom nav while profile sheet is open
   useEffect(() => {
@@ -163,7 +165,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               </div>
             </div>
             <button
-              onClick={handleCreateAccount}
+              onClick={() => setShowCreateAccount(true)}
               className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -176,7 +178,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             </button>
 
             <button
-              onClick={handleCreateAccount}
+              onClick={() => setShowCreateAccount(true)}
               className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
               <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
@@ -204,7 +206,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               </div>
             </div>
             <button
-              onClick={handleCreateAccount}
+              onClick={() => setShowCreateAccount(true)}
               className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -290,6 +292,10 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
 
         {showFeedback && (
           <FeedbackModal onClose={() => setShowFeedback(false)} />
+        )}
+
+        {showCreateAccount && (
+          <CreateAccountModal onClose={() => setShowCreateAccount(false)} />
         )}
       </div>
     </div>,
