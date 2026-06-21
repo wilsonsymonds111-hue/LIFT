@@ -67,16 +67,25 @@ const SwipeableTabs = memo(() => {
   const activeIndex = TABS.indexOf(location.pathname);
   const containerRef = useRef(null);
   const [width, setWidth] = useState(0);
+  // Track which tabs have ever been "visited" so we only mount/fetch what's needed
+  const visitedRef = useRef(new Set([0]));
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    let raf;
     const ro = new ResizeObserver(() => {
-      setWidth(el.offsetWidth);
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setWidth(el.offsetWidth));
     });
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => { ro.disconnect(); cancelAnimationFrame(raf); };
   }, []);
+
+  // Mark current + adjacent tabs as visited
+  visitedRef.current.add(activeIndex);
+  if (activeIndex > 0) visitedRef.current.add(activeIndex - 1);
+  if (activeIndex < TABS.length - 1) visitedRef.current.add(activeIndex + 1);
 
   const handleDragEnd = useCallback((_, info) => {
     const threshold = 80;
@@ -102,11 +111,11 @@ const SwipeableTabs = memo(() => {
         animate={{ x: -activeIndex * width }}
         transition={{ type: 'spring', stiffness: 400, damping: 26, mass: 0.18 }}
         className="flex absolute top-0 bottom-0 overflow-hidden"
-        style={{ width: TABS.length * width, willChange: 'transform' }}
+        style={{ width: TABS.length * width, willChange: 'transform', transform: 'translateZ(0)' }}
       >
         {TAB_CONTENT.map((Component, i) => (
           <div key={TABS[i]} className="flex-shrink-0 overflow-y-auto" style={{ width }}>
-            <MemoTab Component={Component} />
+            {visitedRef.current.has(i) ? <MemoTab Component={Component} /> : <div className="w-full h-full bg-background" />}
           </div>
         ))}
       </motion.div>

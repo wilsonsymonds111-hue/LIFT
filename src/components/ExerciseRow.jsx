@@ -16,7 +16,7 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerc
       {/* Exercise image or letter fallback */}
       <div className="w-14 h-11 rounded-lg flex-shrink-0 overflow-hidden">
         {imageUrl ? (
-          <img src={imageUrl} alt={exercise.name} className="w-full h-full object-contain" />
+          <img src={imageUrl} alt={exercise.name} loading="lazy" decoding="async" className="w-full h-full object-contain" />
         ) : (
           <div className={`w-full h-full ${colors.bg} flex items-center justify-center`}>
             <span className={`text-sm font-bold ${colors.text}`}>{exercise.name[0]}</span>

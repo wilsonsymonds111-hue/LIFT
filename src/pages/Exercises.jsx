@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { Search } from 'lucide-react';
 import { MUSCLES } from '../lib/exercises';
 import { getAllExercises } from '../lib/customExercises';
@@ -13,10 +13,19 @@ const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
 
 export default function Exercises() {
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debounceRef = useRef(null);
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [exerciseHistory, setExerciseHistory] = useState({});
   const [exerciseImages, setExerciseImages] = useState({});
+
+  const handleSearchChange = useCallback((e) => {
+    const val = e.target.value;
+    setSearch(val);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setDebouncedSearch(val), 100);
+  }, []);
 
   const handleSelectExercise = useCallback((ex) => {
     setSelectedExercise(ex);
@@ -48,12 +57,13 @@ export default function Exercises() {
   const allExercises = useMemo(() => getAllExercises(), []);
   
   const filtered = useMemo(() => {
+    const q = debouncedSearch.trim().toLowerCase();
     return allExercises.filter(ex => {
-      const matchSearch = !search.trim() || ex.name.toLowerCase().includes(search.toLowerCase());
+      const matchSearch = !q || ex.name.toLowerCase().includes(q);
       const matchMuscle = muscleFilter === 'All' || ex.muscle === muscleFilter;
       return matchSearch && matchMuscle;
     });
-  }, [allExercises, search, muscleFilter]);
+  }, [allExercises, debouncedSearch, muscleFilter]);
 
   const grouped = useMemo(() => {
     const map = {};
@@ -81,7 +91,7 @@ export default function Exercises() {
           <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
           <input
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Search"
             className="bg-transparent text-sm flex-1 focus:outline-none text-foreground placeholder:text-muted-foreground"
           />
