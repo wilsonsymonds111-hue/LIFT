@@ -153,27 +153,8 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab }) {
     return text.split('\n').filter(line => /^\d+\./.test(line.trim()));
   };
 
-  const shimmerCSS = `
-    @keyframes goldShimmer {
-      0% { transform: translateX(-100%) skewX(-15deg); }
-      100% { transform: translateX(300%) skewX(-15deg); }
-    }
-    .gold-shimmer::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,215,0,0.25) 40%, rgba(255,255,255,0.2) 50%, rgba(255,215,0,0.25) 60%, transparent 100%);
-      transform: translateX(-100%) skewX(-15deg);
-      animation: goldShimmer 2s ease-in-out 0.3s forwards;
-      pointer-events: none;
-      border-radius: inherit;
-      z-index: 1;
-    }
-  `;
-
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>
-      <style>{shimmerCSS}</style>
       <div
         className="relative bg-card rounded-3xl w-[92%] max-w-md max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
         onClick={e => e.stopPropagation()}
@@ -216,7 +197,7 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab }) {
                 </div>
               ) : detail?.image_url ? (
                 <div className="relative w-full bg-muted rounded-2xl overflow-hidden">
-                  <img src={detail.image_url} alt={exercise.name} className="w-full block" />
+                  <img src={detail.image_url} alt={exercise.name} className="w-full block" loading="lazy" decoding="async" />
                 </div>
               ) : (
                 <div className={`w-full aspect-video rounded-2xl flex items-center justify-center ${colors.bg}`}>

@@ -1,30 +1,6 @@
 import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
-const punchDotStyle = `
-  @keyframes dotSnapIn {
-    0%   { transform: scale(0); opacity: 0; }
-    65%  { transform: scale(1.25); opacity: 1; }
-    100% { transform: scale(1);    opacity: 1; }
-  }
-  @keyframes dotRipple {
-    0%   { r: 4;  opacity: 0.8; stroke-width: 2; }
-    100% { r: 16; opacity: 0;   stroke-width: 0.5; }
-  }
-  @keyframes dotRetract {
-    0%   { transform: scale(1); opacity: 1; }
-    30%  { transform: scale(1.2); }
-    100% { transform: scale(0); opacity: 0; }
-  }
-  @keyframes segmentFadeIn  { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes segmentFadeOut { from { opacity: 1; } to { opacity: 0; } }
-  .snap-dot    { transform-box: fill-box; transform-origin: center; animation: dotSnapIn  0.4s cubic-bezier(0.34,1.56,0.64,1) forwards !important; animation-iteration-count: 1 !important; }
-  .ripple-ring { animation: dotRipple  0.65s ease-out forwards !important; animation-iteration-count: 1 !important; fill: none; stroke: #d4a017; }
-  .retract-dot { transform-box: fill-box; transform-origin: center; animation: dotRetract 0.35s cubic-bezier(0.55,0,1,0.45) forwards !important; animation-iteration-count: 1 !important; }
-  .new-seg-in  { animation: segmentFadeIn  0.5s ease forwards; }
-  .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
-`;
-
 // Exercise classification helpers — exported for use in ExerciseDetailModal
 const ISOLATION_KEYWORDS = ['leg extension', 'hamstring curl', 'calf raise', 'lateral raise', 'bicep curl', 'tricep extension', 'pec deck', 'cable fly', 'rear delt fly'];
 
@@ -276,7 +252,6 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
 
   return (
     <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '12px 4px 8px' }}>
-      <style>{punchDotStyle}</style>
       {!hideLabel && (
         <p className="text-xs font-bold text-blue-500 uppercase tracking-wider text-center mb-2">
           {labelOverride || (isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)')}
