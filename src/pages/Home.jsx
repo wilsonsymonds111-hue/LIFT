@@ -234,11 +234,13 @@ export default function Home() {
 
   const todayMonSun = useMemo(() => new Date().getDay() === 0 ? 6 : new Date().getDay() - 1, []);
 
-  // Enhance schedule with completion status (2 = completed today)
+  // Enhance schedule with completion status (2 = today's workout completed)
   const scheduleWithCompletions = useMemo(() => {
     const todayStr = new Date().toISOString().slice(0, 10);
     return schedule.map((status, i) => {
       if (status < 1 || sorted.length === 0) return status;
+      // Only today can be "completed"
+      if (i !== todayMonSun) return 1;
       let onDayCount = 0;
       for (let j = startDayIndex; ; j++) {
         const idx = j % 7;
@@ -250,7 +252,7 @@ export default function Home() {
       const completed = template?.lastPerformed?.slice(0, 10) === todayStr;
       return completed ? 2 : 1;
     });
-  }, [schedule, startDayIndex, sorted]);
+  }, [schedule, startDayIndex, sorted, todayMonSun]);
 
   // Which on-day index is today (0-based)
   const todayWorkoutIndex = useMemo(() => {
