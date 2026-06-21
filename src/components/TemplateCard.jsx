@@ -37,8 +37,8 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
     >
       {/* Green checkmark — completed today */}
       {isCompleted && (
-        <div className="absolute top-3 left-3 w-8 h-8 flex items-center justify-center rounded-full bg-emerald-500 text-white z-10 shadow-md">
-          <Check className="w-5 h-5" strokeWidth={3} />
+        <div className="absolute top-3 left-3 w-6 h-6 flex items-center justify-center rounded-full bg-emerald-500 text-white z-10 shadow-md">
+          <Check className="w-3.5 h-3.5" strokeWidth={3} />
         </div>
       )}
 

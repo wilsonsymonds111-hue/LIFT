@@ -1,16 +1,14 @@
 import { useState, memo } from 'react';
-import { Check, Dumbbell, Minus } from 'lucide-react';
+import { Check, Dumbbell } from 'lucide-react';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-function getTooltipText(status, isPast, isToday, isNoData, workoutName) {
+function getTooltipText(status, isToday, workoutName) {
   const isGymDay = status >= 1;
   const isCompleted = status === 2;
   if (!isGymDay) return 'Rest day 😌';
   const name = workoutName ? `${workoutName} workout` : 'Workout';
-  if (isNoData) return 'Split starts here — no data yet';
-  if (isPast && isCompleted) return `${name} completed ✅`;
-  if (isPast && !isCompleted) return `Missed ${name.toLowerCase()} ❌`;
+  if (isCompleted) return `${name} completed ✅`;
   if (isToday) return `${name} today — let's go 💪`;
   return `${name} day ahead 💪`;
 }
@@ -46,18 +44,12 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
       {/* Circles row */}
       <div className="flex justify-between px-0.5">
         {rotatedSchedule.map((status, i) => {
-          const origIdx = (todayMonSun + i) % 7;
           const isToday = i === 0;
           const isGymDay = status >= 1;
-          const beforeSplitStart = origIdx < startDayIndex && origIdx < todayMonSun;
-          const noData = false;
-          const missed = false;
-          const showCheck = false;
-          const showDumbbell = isGymDay;
+          const isCompleted = status === 2;
 
           let bgClass = '';
-          if (missed) bgClass = 'border border-gray-300 dark:border-gray-600 bg-transparent';
-          else if (noData) bgClass = 'border border-gray-300 dark:border-gray-600 bg-transparent';
+          if (isCompleted) bgClass = 'bg-emerald-500';
           else if (isGymDay) bgClass = 'bg-blue-500';
           else bgClass = 'border border-blue-300 dark:border-blue-700 bg-transparent';
 
@@ -75,10 +67,8 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
                     : ''
                 } ${bgClass}`}
               >
-                {showCheck && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
-                {missed && <Minus className="w-3 h-3 text-gray-400 dark:text-gray-500" strokeWidth={3} />}
-                {noData && <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 leading-none">—</span>}
-                {showDumbbell && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
+                {isCompleted && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                {isGymDay && !isCompleted && <Dumbbell className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />}
               </div>
               {/* Workout name beneath */}
               <span
@@ -104,11 +94,9 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
           {(() => {
             const origIdx = (todayMonSun + activeDay) % 7;
             const s = schedule[origIdx];
-            const isPast = activeDay < 0;
             const isToday = activeDay === 0;
-            const noData = origIdx < startDayIndex && origIdx < todayMonSun;
             const name = rotatedNames[activeDay] || null;
-            return getTooltipText(s, isPast, isToday, noData, name);
+            return getTooltipText(s, isToday, name);
           })()}
         </span>
       </div>

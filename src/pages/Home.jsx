@@ -233,6 +233,25 @@ export default function Home() {
   }, [schedule, startDayIndex, sorted]);
 
   const todayMonSun = useMemo(() => new Date().getDay() === 0 ? 6 : new Date().getDay() - 1, []);
+
+  // Enhance schedule with completion status (2 = completed today)
+  const scheduleWithCompletions = useMemo(() => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    return schedule.map((status, i) => {
+      if (status < 1 || sorted.length === 0) return status;
+      let onDayCount = 0;
+      for (let j = startDayIndex; ; j++) {
+        const idx = j % 7;
+        if (schedule[idx]) onDayCount++;
+        if (idx === i) break;
+      }
+      const workoutIdx = (onDayCount - 1) % sorted.length;
+      const template = sorted[workoutIdx];
+      const completed = template?.lastPerformed?.slice(0, 10) === todayStr;
+      return completed ? 2 : 1;
+    });
+  }, [schedule, startDayIndex, sorted]);
+
   // Which on-day index is today (0-based)
   const todayWorkoutIndex = useMemo(() => {
     if (schedule[todayMonSun] < 1 || sorted.length === 0) return -1;
@@ -310,7 +329,7 @@ export default function Home() {
       </div>
 
       {/* Weekly Tracker */}
-      <WeekTracker schedule={splitDetection.schedule} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
+      <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
 
       {/* Sync Banner */}
       <SyncBanner />
