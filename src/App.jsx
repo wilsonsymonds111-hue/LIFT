@@ -114,7 +114,7 @@ const SwipeableTabs = memo(() => {
         style={{ width: TABS.length * width, willChange: 'transform', transform: 'translateZ(0)' }}
       >
         {TAB_CONTENT.map((Component, i) => (
-          <div key={TABS[i]} className="flex-shrink-0 overflow-y-auto" style={{ width }}>
+          <div key={TABS[i]} className="flex-shrink-0 overflow-y-auto" style={{ width, contain: 'layout style' }}>
             {visitedRef.current.has(i) ? <MemoTab Component={Component} /> : <div className="w-full h-full bg-background" />}
           </div>
         ))}
@@ -134,6 +134,9 @@ const usePreloadSubPages = () => {
       import('./pages/SupportChat');
       import('./pages/Terms');
       import('./pages/Privacy');
+      // Preload adjacent tabs for instant swipe
+      import('./pages/Splits');
+      import('./pages/Exercises');
     };
     const hasRIC = typeof requestIdleCallback === 'function';
     const id = hasRIC ? requestIdleCallback(preload, { timeout: 5000 }) : setTimeout(preload, 3000);
