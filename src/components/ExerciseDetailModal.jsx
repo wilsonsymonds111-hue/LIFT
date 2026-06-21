@@ -7,6 +7,13 @@ import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import ProgressGraph, { getNextGoal } from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
 
+const TABS = ['Charts', 'About'];
+
+const parseInstructions = (text) => {
+  if (!text) return [];
+  return text.split('\n').filter(line => /^\d+\./.test(line.trim()));
+};
+
 export default function ExerciseDetailModal({ exercise, onClose, initialTab }) {
   const [tab, setTab] = useState(initialTab || 'Charts');
   const [history, setHistory] = useState([]);
@@ -146,13 +153,6 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab }) {
       })()
     : null;
 
-  const tabs = ['Charts', 'About'];
-
-  const parseInstructions = (text) => {
-    if (!text) return [];
-    return text.split('\n').filter(line => /^\d+\./.test(line.trim()));
-  };
-
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>
       <div
@@ -170,7 +170,7 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab }) {
 
         {/* Tabs */}
         <div className="flex border-b border-border mx-5 flex-shrink-0">
-          {tabs.map(t => (
+          {TABS.map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}

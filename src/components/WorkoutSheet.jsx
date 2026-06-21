@@ -205,8 +205,6 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
 });
 
 /* ─── ExerciseSection ────────────────────────────────────────── */
-const graphFadeStyle = `@keyframes graphFadeIn { from { opacity: 0.3; transform: scaleY(0.96); } to { opacity: 1; transform: scaleY(1); } }`;
-
 const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage }) {
   // Compute PR from exercise history for progression targets
   const pr = useMemo(() => {
@@ -282,7 +280,6 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
 
   return (
     <>
-    <style>{graphFadeStyle}</style>
     <div className="mb-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
       <div className="flex items-start justify-between mb-1 relative">
         <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -297,6 +294,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
               src={exerciseImage}
               alt={exercise.name}
               className="w-16 h-14 rounded-lg object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+              decoding="async"
               onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
             />
           ) : (
@@ -554,24 +552,6 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
 
   return (
     <>
-      <style>{`
-        @keyframes goldShimmer {
-          0% { transform: translateX(-100%) skewX(-15deg); }
-          100% { transform: translateX(300%) skewX(-15deg); }
-        }
-        .gold-shimmer::after {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(90deg, transparent 0%, rgba(255,215,0,0.6) 40%, rgba(255,255,255,0.5) 50%, rgba(255,215,0,0.6) 60%, transparent 100%);
-          transform: translateX(-100%) skewX(-15deg);
-          animation: goldShimmer 2s ease-in-out 0.3s forwards;
-          pointer-events: none;
-          border-radius: inherit;
-          z-index: 1;
-        }
-      `}</style>
-
       <div className="fixed inset-0 z-[60] flex items-center justify-center">
         <div className="absolute inset-0 bg-black/60" />
 
