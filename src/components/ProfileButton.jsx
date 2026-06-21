@@ -6,6 +6,7 @@ import ProfileSheet from './ProfileSheet';
 const ProfileButton = memo(function ProfileButton() {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
+  const [autoDarkMode, setAutoDarkMode] = useState(() => localStorage.getItem('autoDarkMode') !== 'false');
   const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
   const [loaded, setLoaded] = useState(true);
 
@@ -24,16 +25,26 @@ const ProfileButton = memo(function ProfileButton() {
   const handleToggleDark = () => {
     const next = !darkMode;
     setDarkMode(next);
+    localStorage.setItem('darkMode', String(next));
+    document.documentElement.classList.toggle('dark', next);
+  };
+
+  const handleToggleAuto = () => {
+    const next = !autoDarkMode;
+    setAutoDarkMode(next);
+    localStorage.setItem('autoDarkMode', String(next));
     if (next) {
-      localStorage.setItem('darkMode', 'true');
-    } else {
-      localStorage.removeItem('darkMode');
+      // Auto mode on: apply time-based
       const hour = new Date().getHours();
       const isNight = hour >= 19 || hour < 7;
       document.documentElement.classList.toggle('dark', isNight);
-      return;
+      setDarkMode(isNight);
+    } else {
+      // Auto mode off: apply manual preference
+      const manual = localStorage.getItem('darkMode') === 'true';
+      document.documentElement.classList.toggle('dark', manual);
+      setDarkMode(manual);
     }
-    document.documentElement.classList.toggle('dark', true);
   };
 
   const handlePhotoChange = (url) => {
@@ -60,7 +71,9 @@ const ProfileButton = memo(function ProfileButton() {
         <ProfileSheet
           onClose={() => setShowProfile(false)}
           darkMode={darkMode}
+          autoDarkMode={autoDarkMode}
           onToggleDark={handleToggleDark}
+          onToggleAuto={handleToggleAuto}
           profilePhoto={profilePhoto}
           onPhotoChange={handlePhotoChange}
         />
