@@ -24,8 +24,16 @@ const ProfileButton = memo(function ProfileButton() {
   const handleToggleDark = () => {
     const next = !darkMode;
     setDarkMode(next);
-    document.documentElement.classList.toggle('dark', next);
-    localStorage.setItem('darkMode', String(next));
+    if (next) {
+      localStorage.setItem('darkMode', 'true');
+    } else {
+      localStorage.removeItem('darkMode');
+      const hour = new Date().getHours();
+      const isNight = hour >= 19 || hour < 7;
+      document.documentElement.classList.toggle('dark', isNight);
+      return;
+    }
+    document.documentElement.classList.toggle('dark', true);
   };
 
   const handlePhotoChange = (url) => {
