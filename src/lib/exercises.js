@@ -16,7 +16,6 @@ export const ALL_EXERCISES = [
   { name: 'Bradford Press', muscle: 'Shoulders' },
   { name: 'Bulgarian Split Squat', muscle: 'Legs' },
   { name: 'Burpee', muscle: 'Full Body' },
-  { name: 'Cable Crossover', muscle: 'Chest' },
   { name: 'Cable Crunch', muscle: 'Core' },
   { name: 'Cable Curl', muscle: 'Arms' },
   { name: 'Cable Fly', muscle: 'Chest' },
