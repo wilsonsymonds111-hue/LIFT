@@ -193,13 +193,14 @@ const AuthenticatedApp = () => {
 
 function App() {
   useEffect(() => {
-    // Initialize dark mode from localStorage or system preference
+    // Initialize dark mode from localStorage, or auto by local time of day
     const stored = localStorage.getItem('darkMode');
     if (stored !== null) {
       document.documentElement.classList.toggle('dark', stored === 'true');
     } else {
-      const mq = window.matchMedia('(prefers-color-scheme: dark)');
-      document.documentElement.classList.toggle('dark', mq.matches);
+      const hour = new Date().getHours();
+      const isNight = hour >= 19 || hour < 7;
+      document.documentElement.classList.toggle('dark', isNight);
     }
   }, []);
 
