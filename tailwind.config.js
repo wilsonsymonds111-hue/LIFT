@@ -77,11 +77,16 @@ module.exports = {
   				to: {
   					height: '0'
   				}
+  			},
+  			'breathe': {
+  				'0%, 100%': { transform: 'scale(1)', opacity: '1' },
+  				'50%': { transform: 'scale(1.8)', opacity: '0.4' }
   			}
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+  			'breathe': 'breathe 2s ease-in-out infinite'
   		}
   	}
   },

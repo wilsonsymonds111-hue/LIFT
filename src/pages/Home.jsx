@@ -340,7 +340,7 @@ export default function Home() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-breathe shadow-[0_0_6px_rgba(59,130,246,0.6)]" />
                 <h3 className="font-semibold text-foreground text-sm">Current Split</h3>
               </div>
               {currentSplitName && (
