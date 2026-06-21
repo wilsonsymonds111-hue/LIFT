@@ -50,7 +50,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
         <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
       </button>
 
-      <div onClick={() => navigate(`/template/${template.id}`)} className="cursor-pointer">
+      <div onClick={() => navigate(`/template/${template.id}`)} className={`cursor-pointer ${isCompleted ? 'pl-6' : ''}`}>
         <h4 className="font-bold text-foreground pr-8">{template.name}</h4>
         <p className="text-xs text-muted-foreground mt-1.5 line-clamp-1">
           {(template.exerciseList?.length > 0
