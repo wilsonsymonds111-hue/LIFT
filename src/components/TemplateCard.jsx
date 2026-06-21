@@ -1,6 +1,6 @@
 import { memo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const relativeTime = (dateStr) => {
@@ -18,7 +18,7 @@ const relativeTime = (dateStr) => {
   return `${Math.floor(diffDays / 30)}mo ago`;
 };
 
-const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent, isMenuOpen, onToggleMenu, menuRef, onRemove }) {
+const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompleted, accent, isMenuOpen, onToggleMenu, menuRef, onRemove }) {
   const navigate = useNavigate();
   const btnRef = useRef(null);
 
@@ -29,10 +29,19 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
 
   return (
     <div
-      className={`relative bg-card rounded-xl p-4 shadow-[0_2px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.35)] hover:scale-[1.02] hover:border-emerald-500 transition-all duration-150 border-2 border-border ${
-        isTodayCard ? 'ring-2 ring-emerald-400/60' : ''
+      className={`relative bg-card rounded-xl p-4 shadow-[0_2px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.35)] hover:scale-[1.02] hover:border-emerald-500 transition-all duration-150 border-2 ${
+        isCompleted
+          ? 'border-emerald-400 bg-emerald-50/60 dark:bg-emerald-950/30'
+          : `border-border ${isTodayCard ? 'ring-2 ring-emerald-400/60' : ''}`
       }`}
     >
+      {/* Green checkmark — completed today */}
+      {isCompleted && (
+        <div className="absolute top-3 left-3 w-8 h-8 flex items-center justify-center rounded-full bg-emerald-500 text-white z-10 shadow-md">
+          <Check className="w-5 h-5" strokeWidth={3} />
+        </div>
+      )}
+
       <button
         ref={setBtnRef}
         onClick={e => { e.stopPropagation(); onToggleMenu(template.id); }}

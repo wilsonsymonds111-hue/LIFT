@@ -340,19 +340,24 @@ export default function Home() {
           </div>
 
           {currentSplit.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {currentSplit.map((template, idx) => (
-                <TemplateCard
-                  key={template.id}
-                  template={template}
-                  isTodayCard={idx === todayWorkoutIndex}
-                  accent={accent}
-                  isMenuOpen={menuOpen === template.id}
-                  onToggleMenu={handleToggleMenu}
-                  menuRef={menuRef}
-                  onRemove={handleRemoveFromSplit}
-                />
-              ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {currentSplit.map((template, idx) => {
+              const todayStr = new Date().toISOString().slice(0, 10);
+              const isCompleted = template.lastPerformed?.slice(0, 10) === todayStr;
+              return (
+              <TemplateCard
+                key={template.id}
+                template={template}
+                isTodayCard={idx === todayWorkoutIndex}
+                isCompleted={isCompleted}
+                accent={accent}
+                isMenuOpen={menuOpen === template.id}
+                onToggleMenu={handleToggleMenu}
+                menuRef={menuRef}
+                onRemove={handleRemoveFromSplit}
+              />
+              );
+            })}
             </div>
           ) : (
             <div className="text-center py-12 text-muted-foreground">
