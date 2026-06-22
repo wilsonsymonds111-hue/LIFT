@@ -17,7 +17,7 @@ export const ALL_EXERCISES = [
   { name: 'Bulgarian Split Squat', muscle: 'Legs' },
   { name: 'Burpee', muscle: 'Full Body' },
   { name: 'Cable Crunch', muscle: 'Core' },
-  { name: 'Cable Curl', muscle: 'Arms' },
+  { name: 'Bicep Cable Curl', muscle: 'Arms' },
   { name: 'Cable Fly', muscle: 'Chest' },
   { name: 'Cable Lateral Raise', muscle: 'Shoulders' },
   { name: 'Cable Row', muscle: 'Back' },
