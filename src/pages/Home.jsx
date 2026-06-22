@@ -243,7 +243,8 @@ export default function Home() {
 
   // Enhance schedule with completion status (2 = today's workout completed)
   const scheduleWithCompletions = useMemo(() => {
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const _now = new Date();
+    const todayStr = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`;
     return schedule.map((status, i) => {
       if (status < 1 || sorted.length === 0) return status;
       // Only today can be "completed"
@@ -373,7 +374,8 @@ export default function Home() {
           {currentSplit.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {currentSplit.map((template, idx) => {
-              const todayStr = new Date().toISOString().slice(0, 10);
+              const _now = new Date();
+              const todayStr = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`;
               const isCompleted = template.lastPerformed?.slice(0, 10) === todayStr;
               return (
               <TemplateCard
