@@ -453,17 +453,13 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
               <div className="px-5 pb-4 pt-2">
                 <button
                   onClick={() => {
-                    if (editing) {
-                      saveCycle(splitKey, { onDays, offDays, startDayIndex });
-                      handleMakeCurrent();
-                    } else {
-                      setEditing(true);
-                    }
+                    if (editing) saveCycle(splitKey, { onDays, offDays, startDayIndex });
+                    handleMakeCurrent();
                   }}
                   disabled={applying}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60"
                 >
-                  {applying ? 'Applying...' : editing ? 'Apply With These Settings' : 'Make This My Current Split'}
+                  {applying ? 'Applying...' : 'Make This My Current Split'}
                 </button>
               </div>
 
