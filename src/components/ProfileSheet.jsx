@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, Shield } from 'lucide-react';
+import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, Shield, Download } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
 import CreateAccountModal from './CreateAccountModal';
 import BodyWeightTracker from './BodyWeightTracker';
+import ImportStrongModal from './ImportStrongModal';
 import { useNavVisibility } from '@/lib/NavContext';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -14,6 +15,7 @@ import { memo } from 'react';
 const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange }) {
   const [showFeedback, setShowFeedback] = useState(false);
   const [showCreateAccount, setShowCreateAccount] = useState(false);
+  const [showImportStrong, setShowImportStrong] = useState(false);
   const { setHideNav } = useNavVisibility();
   const { isAuthenticated, isGuest } = useAuth();
 
@@ -120,6 +122,20 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             onChange={handlePhotoUpload}
           />
         </div>
+
+        {/* Import from Strong */}
+        <button
+          onClick={() => setShowImportStrong(true)}
+          className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+        >
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <Download className="w-4 h-4 text-white" />
+          </div>
+          <div className="text-left flex-1">
+            <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Import from Strong</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Bring your workout history from the Strong app</p>
+          </div>
+        </button>
 
         {/* Body Weight Tracker */}
         <BodyWeightTracker />
@@ -313,6 +329,10 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
 
         {showCreateAccount && (
           <CreateAccountModal onClose={() => setShowCreateAccount(false)} />
+        )}
+
+        {showImportStrong && (
+          <ImportStrongModal onClose={() => setShowImportStrong(false)} />
         )}
       </div>
     </div>,
