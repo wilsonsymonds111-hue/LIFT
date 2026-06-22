@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { saveWorkout, syncOfflineQueue } from '../lib/offlineQueue';
 import WorkoutSheet from '../components/WorkoutSheet';
 
 export default function ActiveWorkout() {
@@ -24,49 +25,16 @@ export default function ActiveWorkout() {
 
   const handleSaveHistory = async (templateId, snapshot, exerciseList) => {
     if (templateId.startsWith('empty-')) return;
-    const today = new Date().toISOString().slice(0, 10);
-
-    // Build map of existing Exercise entities
-    const allExercises = await base44.entities.Exercise.list('name', 500);
-    const exerciseMap = {};
-    (allExercises || []).forEach(ex => { exerciseMap[ex.name] = ex; });
-
-    // Save history to the Exercise entity (shared across all splits)
-    const exerciseSaves = exerciseList
-      .filter(ex => snapshot[ex.name])
-      .map(async (ex) => {
-        const best = snapshot[ex.name];
-        const entry = { kg: best.kg, reps: best.reps, date: today };
-        try {
-          const existing = exerciseMap[ex.name];
-          if (existing) {
-            await base44.entities.Exercise.update(existing.id, {
-              history: [...(existing.history || []), entry],
-              muscle: ex.muscle || existing.muscle,
-            });
-          } else {
-            await base44.entities.Exercise.create({
-              name: ex.name,
-              muscle: ex.muscle || '',
-              history: [entry],
-            });
-          }
-        } catch (e) {
-          console.error('Failed to save exercise history:', ex.name, e);
-        }
-      });
-
-    // Update template lastPerformed
-    try {
-      await base44.entities.WorkoutTemplate.update(templateId, {
-        lastPerformed: new Date().toISOString(),
-      });
-    } catch (e) {
-      console.error('Failed to save workout:', e);
-    }
-
-    await Promise.all(exerciseSaves);
+    await saveWorkout(templateId, snapshot, exerciseList);
   };
+
+  // Sync any queued workouts when back online
+  useEffect(() => {
+    const onOnline = () => { syncOfflineQueue(); };
+    window.addEventListener('online', onOnline);
+    if (navigator.onLine) { syncOfflineQueue(); }
+    return () => window.removeEventListener('online', onOnline);
+  }, []);
 
   if (loading) {
     return (

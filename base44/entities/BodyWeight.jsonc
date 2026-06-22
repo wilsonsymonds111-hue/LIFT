@@ -1,0 +1,17 @@
+{
+  "name": "BodyWeight",
+  "type": "object",
+  "properties": {
+    "weight": {
+      "type": "number"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "weight",
+    "date"
+  ]
+}

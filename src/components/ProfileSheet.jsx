@@ -5,6 +5,7 @@ import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, User
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
 import CreateAccountModal from './CreateAccountModal';
+import BodyWeightTracker from './BodyWeightTracker';
 import { useNavVisibility } from '@/lib/NavContext';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -119,6 +120,9 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             onChange={handlePhotoUpload}
           />
         </div>
+
+        {/* Body Weight Tracker */}
+        <BodyWeightTracker />
 
         {/* Feedback & Support */}
         <button

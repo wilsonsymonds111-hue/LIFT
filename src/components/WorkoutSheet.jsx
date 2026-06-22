@@ -1,785 +1,18 @@
-import { useState, useEffect, useRef, useMemo, useCallback, memo, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { History, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
+import { History, MoreHorizontal } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
-import { getDefaultRestDuration } from '../lib/exerciseDefaults';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import { getExerciseDetailList } from '../lib/exerciseCache';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
-import ProgressGraph from './ProgressGraph';
-const ExerciseDetailModal = lazy(() => import('./ExerciseDetailModal'));
+import { useTimer } from '../hooks/useTimer';
+import { notifyRestComplete } from '../lib/workoutSounds';
+import ExerciseSection from './workout/ExerciseSection';
+import SummaryScreen from './workout/SummaryScreen';
 
-/* ─── Sound Effect ──────────────────────────────────────────── */
-const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/87d1fec3a_ScreenRecording_06-16-202607-45-53_12.mp3';
-const LEVEL_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/b340fae3c_universfield-game-level-complete-143022.mp3';
-
-// Preload the audio clips so they play instantly with zero latency
-let _audioEl = null;
-let _levelCompleteEl = null;
-
-function _ensureAudio() {
-  if (!_audioEl) {
-    _audioEl = new Audio(SET_COMPLETE_SOUND);
-    _audioEl.preload = 'auto';
-    _audioEl.load();
-  }
-}
-function _ensureLevelComplete() {
-  if (!_levelCompleteEl) {
-    _levelCompleteEl = new Audio(LEVEL_COMPLETE_SOUND);
-    _levelCompleteEl.preload = 'auto';
-    _levelCompleteEl.load();
-  }
-}
-// Start preloading immediately
-_ensureAudio();
-_ensureLevelComplete();
-
-function playCompleteChime() {
-  if (!_levelCompleteEl) _ensureLevelComplete();
-  if (!_levelCompleteEl) return;
-  _levelCompleteEl.currentTime = 0;
-  _levelCompleteEl.play().catch(() => {});
-}
-
-function playTick() {
-  if (!_audioEl) _ensureAudio();
-  if (!_audioEl) return;
-  _audioEl.currentTime = 0;
-  _audioEl.play().catch(() => {});
-}
-
-/* ─── Rest timer complete notification ────────────────────────── */
-function notifyRestComplete() {
-  playTick();
-  // Vibrate
-  if (navigator.vibrate) {
-    try { navigator.vibrate([200, 100, 200]); } catch (_) {}
-  }
-  // System notification (works when locked on most Android + installed PWA)
-  if ('Notification' in window && Notification.permission === 'granted') {
-    try {
-      new Notification("Rest's up! 🏋️", {
-        body: 'Get back to work',
-        tag: 'rest-timer',
-        requireInteraction: true,
-      });
-    } catch (_) {}
-  }
-}
-
-/* ─── Timer ──────────────────────────────────────────────────── */
-function useTimer() {
-  const [seconds, setSeconds] = useState(0);
-  const ref = useRef(seconds);
-  ref.current = seconds;
-  useEffect(() => {
-    const id = setInterval(() => setSeconds(s => s + 1), 1000);
-    return () => clearInterval(id);
-  }, []);
-  const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
-  const ss = String(seconds % 60).padStart(2, '0');
-  return { display: `${mm}:${ss}` };
-}
-
-
-
-/* ─── SetRow ─────────────────────────────────────────────────── */
-const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete, restDuration = 120 }) {
-  const [kg, setKg] = useState(initialKg ?? previous?.kg ?? '');
-  const [reps, setReps] = useState(initialReps ?? previous?.reps ?? '');
-  const [done, setDone] = useState(false);
-  const [swipeX, setSwipeX] = useState(0);
-  const [swiping, setSwiping] = useState(false);
-  const [restSeconds, setRestSeconds] = useState(null);
-  const startXRef = useRef(null);
-  const hasEdited = useRef(false);
-  const restRef = useRef(null);
-  const restEndRef = useRef(null);
-
-  useEffect(() => {
-    if (done) {
-      const end = Date.now() + restDuration * 1000;
-      restEndRef.current = end;
-      setRestSeconds(restDuration);
-      const tick = () => {
-        const remaining = Math.round((end - Date.now()) / 1000);
-        if (remaining <= 0) {
-          clearInterval(restRef.current);
-          setRestSeconds(0);
-          notifyRestComplete();
-        } else {
-          setRestSeconds(remaining);
-        }
-      };
-      restRef.current = setInterval(tick, 250);
-      const onVisible = () => { if (!document.hidden) tick(); };
-      document.addEventListener('visibilitychange', onVisible);
-      return () => {
-        clearInterval(restRef.current);
-        document.removeEventListener('visibilitychange', onVisible);
-      };
-    } else {
-      clearInterval(restRef.current);
-      setRestSeconds(null);
-      restEndRef.current = null;
-    }
-    return () => clearInterval(restRef.current);
-  }, [done]);
-  const DELETE_THRESHOLD = 80;
-
-
-
-  const handleToggle = () => {
-    const next = !done;
-    setDone(next);
-    if (next) {
-      if (navigator.vibrate) navigator.vibrate(15);
-      playTick();
-      onComplete?.({ kg: kg !== '' ? parseFloat(kg) : 0, reps: reps !== '' ? parseInt(reps) : 0 });
-    } else {
-      onComplete?.(null);
-    }
-  };
-
-  const onPointerDown = (e) => {
-    startXRef.current = e.clientX;
-    setSwiping(true);
-  };
-  const onPointerMove = (e) => {
-    if (!swiping || startXRef.current === null) return;
-    const dx = Math.min(0, e.clientX - startXRef.current);
-    setSwipeX(Math.max(dx, -DELETE_THRESHOLD - 20));
-  };
-  const onPointerUp = () => {
-    if (swipeX < -DELETE_THRESHOLD) {
-      onDelete?.();
-    } else {
-      setSwipeX(0);
-    }
-    setSwiping(false);
-    startXRef.current = null;
-  };
-
-  return (
-    <div>
-      <div className="relative overflow-hidden rounded-lg">
-        {/* Red delete background */}
-        <div className="absolute inset-y-0 right-0 flex items-center justify-end px-4 bg-red-500 rounded-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-          </svg>
-        </div>
-        {/* Swipeable row */}
-        <div
-          className={`grid grid-cols-[40px_1fr_80px_80px_44px] items-center gap-1 py-1.5 px-1 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
-          style={{ transform: `translateX(${swipeX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease' }}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerLeave={onPointerUp}
-        >
-          <span className="text-sm font-semibold text-center text-gray-500">{setNum}</span>
-          <span className="text-sm text-gray-400 text-center">
-            {previous ? `${previous.kg} kg × ${previous.reps}` : '—'}
-          </span>
-          <input
-            type="number" value={kg}
-            onChange={e => { hasEdited.current = true; setKg(e.target.value); if (done) onComplete?.({ kg: parseFloat(e.target.value) || 0, reps: parseInt(reps) || 0 }); }}
-            placeholder="—"
-            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
-          />
-          <input
-            type="number" value={reps}
-            onChange={e => { hasEdited.current = true; setReps(e.target.value); if (done) onComplete?.({ kg: parseFloat(kg) || 0, reps: parseInt(e.target.value) || 0 }); }}
-            placeholder="—"
-            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
-          />
-          <button
-            onClick={handleToggle}
-            className={`w-11 h-11 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-400 text-white' : 'bg-gray-200 text-gray-400'}`}
-          >
-            <Check className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-      {done && restSeconds !== null && restSeconds > 0 && (
-        <div
-          className="w-full bg-blue-500 text-white font-bold text-center py-1.5 rounded-xl mt-2 text-base tracking-wider cursor-pointer select-none"
-          onClick={() => { clearInterval(restRef.current); setRestSeconds(0); }}
-        >
-          {String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')}
-        </div>
-      )}
-    </div>
-  );
-});
-
-/* ─── ExerciseSection ────────────────────────────────────────── */
-const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage }) {
-  // Compute PR from exercise history for progression targets
-  const pr = useMemo(() => {
-    const history = exercise.history || [];
-    if (history.length === 0) return null;
-    const toKg = (h) => typeof h === 'object' ? (h.kg || 0) : (h || 0);
-    const toReps = (h) => typeof h === 'object' ? (h.reps || 8) : 8;
-    const isBodyweight = history.every(h => toKg(h) === 0);
-    if (isBodyweight) {
-      const maxReps = Math.max(...history.map(toReps));
-      return { kg: 0, reps: maxReps, bodyweight: true };
-    }
-    const maxKg = Math.max(...history.map(toKg));
-    const entriesAtMaxKg = history.filter(h => toKg(h) === maxKg);
-    const maxReps = Math.max(...entriesAtMaxKg.map(toReps));
-    return { kg: maxKg, reps: maxReps, bodyweight: false };
-  }, [exercise.history]);
-
-  const [sets, setSets] = useState(() => {
-    const setCount = Math.max(1, exercise.sets || 1);
-    if (!pr) return Array.from({ length: setCount }, (_, i) => ({ id: i + 1, suggestedKg: null, suggestedReps: null }));
-    return Array.from({ length: setCount }, (_, i) => ({
-      id: i + 1,
-      suggestedKg: pr.bodyweight ? null : pr.kg,
-      suggestedReps: pr.reps + i + 1,
-    }));
-  });
-  const [completedSets, setCompletedSets] = useState({});
-  const [showMenu, setShowMenu] = useState(false);
-  const [note, setNote] = useState('');
-  const [showNote, setShowNote] = useState(false);
-  const [restDuration, setRestDuration] = useState(() => getDefaultRestDuration(exercise.name));
-  const [restEnabled, setRestEnabled] = useState(true);
-  const [showCustomRest, setShowCustomRest] = useState(false);
-  const [customRestInput, setCustomRestInput] = useState('');
-  const [showExerciseDetail, setShowExerciseDetail] = useState(false);
-  const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
-  const [chartView, setChartView] = useState('weight');
-  const lastEntry = exercise.history?.[exercise.history.length - 1];
-  const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
-  const sessionResults = Object.values(completedSets).filter(Boolean);
-  const graphHistory = sessionResults.length > 0
-    ? [...(exercise.history || []), ...sessionResults]
-    : exercise.history;
-  const graphAnimKey = sessionResults.length;
-  const prevCountRef = useRef(0);
-  const animDir = sessionResults.length >= prevCountRef.current ? 'add' : 'remove';
-  useEffect(() => { prevCountRef.current = sessionResults.length; }, [sessionResults.length]);
-
-  // Bodyweight: no kg in history AND no kg in current session results
-  const allEntries = [...(exercise.history || []), ...sessionResults];
-  const isBodyweight = allEntries.length === 0
-    ? false
-    : allEntries.every(h => {
-        const kg = typeof h === 'object' ? (h.kg ?? 0) : (h ?? 0);
-        return kg === 0 || kg == null;
-      });
-
-  // Reps chart: filter to current max weight level
-  const repsHistory = (() => {
-    const fullHistory = exercise.history || [];
-    if (fullHistory.length === 0) return fullHistory;
-    const kgs = fullHistory.map(h => (typeof h === 'object' ? h.kg || 0 : h || 0)).filter(k => k > 0);
-    const maxKg = kgs.length > 0 ? Math.max(...kgs) : 0;
-    const filtered = maxKg > 0
-      ? fullHistory.filter(h => ((typeof h === 'object' ? h.kg || 0 : h || 0)) === maxKg)
-      : fullHistory;
-    return filtered.map(h => (typeof h === 'object' ? { ...h, kg: 0 } : { kg: 0, reps: h, date: null }));
-  })();
-
-  const displayHistory = chartView === 'reps' ? (sessionResults.length > 0 ? [...repsHistory, ...sessionResults.map(s => ({ ...s, kg: 0 }))] : repsHistory) : graphHistory;
-  const displayBodyweight = chartView === 'reps' ? true : isBodyweight;
-
-  return (
-    <>
-    <div className="mb-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
-      <div className="flex items-start justify-between mb-1 relative">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing truncate" {...dragHandleProps}>{exercise.name}</h3>
-          <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 transition flex-shrink-0">
-            <MoreHorizontal className="w-3.5 h-3.5 text-gray-400" />
-          </button>
-        </div>
-        <div className="flex items-center gap-3 relative flex-shrink-0">
-          {exerciseImage ? (
-            <img
-              src={exerciseImage}
-              alt={exercise.name}
-              className="w-16 h-14 rounded-lg object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform"
-              decoding="async"
-              onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
-            />
-          ) : (
-            <div className="w-16 h-14 rounded-lg bg-gray-100 flex items-center justify-center">
-              <span className="text-sm font-bold text-gray-400">{exercise.name[0]}</span>
-            </div>
-          )}
-          {showMenu && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-7 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[190px]">
-                {/* Note toggle */}
-                <button
-                  onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
-                >
-                  {showNote ? 'Remove Note' : 'Add Note'}
-                </button>
-                <div className="border-t border-gray-100 mx-3 my-1" />
-                {/* Rest timer options */}
-                <p className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rest Timer</p>
-                <button
-                  onClick={() => { setRestEnabled(true); setRestDuration(getDefaultRestDuration(exercise.name)); setShowCustomRest(false); setShowMenu(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration === getDefaultRestDuration(exercise.name) ? 'text-blue-500' : 'text-gray-700'}`}
-                >
-                  Default ({getDefaultRestDuration(exercise.name) / 60} min)
-                </button>
-                <button
-                  onClick={() => setShowCustomRest(c => !c)}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration !== getDefaultRestDuration(exercise.name) ? 'text-blue-500' : 'text-gray-700'}`}
-                >
-                  Custom…
-                </button>
-                {showCustomRest && (
-                  <div className="px-4 pb-2 flex items-center gap-2">
-                    <input
-                      type="number"
-                      value={customRestInput}
-                      onChange={e => setCustomRestInput(e.target.value)}
-                      placeholder="sec"
-                      className="w-16 text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <button
-                      onClick={() => {
-                        const s = parseInt(customRestInput);
-                        if (s > 0) { setRestDuration(s); setRestEnabled(true); }
-                        setShowCustomRest(false); setShowMenu(false);
-                      }}
-                      className="text-xs bg-blue-500 text-white px-2 py-1 rounded-lg font-semibold"
-                    >Set</button>
-                  </div>
-                )}
-                <button
-                  onClick={() => { setRestEnabled(false); setShowMenu(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${!restEnabled ? 'text-blue-500' : 'text-gray-700'}`}
-                >
-                  Off
-                </button>
-                <div className="border-t border-gray-100 mx-3 my-1" />
-                <button
-                  onClick={() => { setExerciseDetailInitialTab('Charts'); setShowMenu(false); setShowExerciseDetail(true); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
-                >
-                  View Exercise Details
-                </button>
-                <button
-                  onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
-                >
-                  Remove Exercise
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-      {showNote && (
-        <textarea
-          value={note}
-          onChange={e => setNote(e.target.value)}
-          placeholder="Add a note…"
-          rows={2}
-          className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
-        />
-      )}
-      <div className="flex justify-center mb-2">
-        <div className="inline-flex bg-muted rounded-full p-0.5">
-          <button
-            onClick={() => setChartView('weight')}
-            className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${chartView === 'weight' ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            Weight
-          </button>
-          <button
-            onClick={() => setChartView('reps')}
-            className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${chartView === 'reps' ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            Reps
-          </button>
-        </div>
-      </div>
-      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact />
-      <div className="grid grid-cols-[40px_1fr_80px_80px_44px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
-        <span className="text-center">Set</span>
-        <span className="text-center">Previous</span>
-        <span className="text-center">kg</span>
-        <span className="text-center">Reps</span>
-        <span></span>
-      </div>
-      {sets.map((s, i) => (
-        <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
-        <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg ?? (i === 0 && prev ? prev.kg : null)} initialReps={s.suggestedReps ?? (i === 0 && prev ? prev.reps + 1 : null)} restDuration={restEnabled ? restDuration : 0}
-          onComplete={(result) => {
-            const setIndex = sets.findIndex(r => r.id === s.id);
-            const wasCompleted = !!completedSets[s.id];
-            setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
-            if (result) {
-              onBestSet?.(exercise.name, result.kg, result.reps);
-              if (!wasCompleted) {
-                // Dynamic progression: if current set failed its target, adjust the next set
-                const currentSet = sets[setIndex];
-                const targetReps = currentSet.suggestedReps;
-                const achieved = targetReps != null && result.reps >= targetReps;
-                if (!achieved && setIndex < sets.length - 1 && targetReps != null) {
-                  setSets(prev => prev.map((r, i) => {
-                    if (i <= setIndex) return r;
-                    return { ...r, suggestedReps: targetReps };
-                  }));
-                }
-              }
-            }
-          }}
-          onDelete={() => {
-            setSets(p => p.filter(r => r.id !== s.id));
-            setCompletedSets(prev => { const next = {...prev}; delete next[s.id]; return next; });
-          }} />
-        </div>
-      ))}
-      <button
-        onClick={() => {
-          const sessionCompleted = Object.values(completedSets).filter(Boolean);
-          let suggestedKg = null, suggestedReps = null;
-          if (sessionCompleted.length > 0) {
-            const last = sessionCompleted[sessionCompleted.length - 1];
-            suggestedKg = last.kg;
-            suggestedReps = last.reps + 1;
-          } else if (pr) {
-            suggestedKg = pr.bodyweight ? null : pr.kg;
-            suggestedReps = pr.reps + sets.length + 1;
-          } else {
-            const lastEntry = exercise.history?.[exercise.history.length - 1];
-            if (lastEntry) {
-              suggestedKg = typeof lastEntry === 'object' ? lastEntry.kg : lastEntry;
-              suggestedReps = (typeof lastEntry === 'object' ? lastEntry.reps : 8) + 1;
-            }
-          }
-          setSets(p => [...p, { id: Date.now(), suggestedKg, suggestedReps }]);
-        }}
-        className="mt-2 w-full py-1.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
-      >
-        + Add Set
-      </button>
-    </div>
-    {showExerciseDetail && (
-      <Suspense fallback={null}>
-        <ExerciseDetailModal
-          exercise={exercise}
-          initialTab={exerciseDetailInitialTab}
-          initialHistory={exercise.history}
-          initialImage={exerciseImage}
-          onClose={() => setShowExerciseDetail(false)}
-        />
-      </Suspense>
-    )}
-    </>
-    );
-    });
-
-/* ─── Icons ──────────────────────────────────────────────────── */
-function InstagramIcon({ size = 20 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="2" fill="none"/>
-      <circle cx="12" cy="12" r="4.5" stroke="white" strokeWidth="2" fill="none"/>
-      <circle cx="17.5" cy="6.5" r="1" fill="white"/>
-    </svg>
-  );
-}
-
-function Star({ size = 24, delay = 0 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"
-      className="text-yellow-400 animate-bounce"
-      style={{ animationDelay: `${delay}ms`, animationDuration: '0.6s', animationIterationCount: 3 }}>
-      <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-    </svg>
-  );
-}
-
-/* ─── SummaryScreen ──────────────────────────────────────────── */
-function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, onDone }) {
-  const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-  const cardRef = useRef(null);
-  const igStickerRef = useRef(null);
-  const [sharing, setSharing] = useState(false);
-  const [igSharing, setIgSharing] = useState(false);
-  const [shimmer, setShimmer] = useState(false);
-
-  const prSet = new Set(prs.map(p => p.name));
-
-  useEffect(() => {
-    setTimeout(() => setShimmer(true), 200);
-    playCompleteChime();
-  }, []);
-
-  // Top-right share button — shares the gold card
-  const handleShare = async () => {
-    if (!cardRef.current) return;
-    setSharing(true);
-    try {
-      const { default: html2canvas } = await import('html2canvas');
-      const canvas = await html2canvas(cardRef.current, { scale: 3, useCORS: true, backgroundColor: null, logging: false });
-      canvas.toBlob(async (blob) => {
-        const file = new File([blob], 'workout.png', { type: 'image/png' });
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${template.name} Workout` });
-        } else {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = 'workout.png'; a.click();
-          URL.revokeObjectURL(url);
-        }
-        setSharing(false);
-      }, 'image/png');
-    } catch { setSharing(false); }
-  };
-
-  // Instagram story button — captures the full-screen sticker overlay
-  const handleInstagramShare = async () => {
-    if (!igStickerRef.current) return;
-    setIgSharing(true);
-    try {
-      const { default: html2canvas } = await import('html2canvas');
-      const canvas = await html2canvas(igStickerRef.current, {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: null,
-        logging: false,
-        width: 390,
-        height: 844,
-      });
-      canvas.toBlob(async (blob) => {
-        const file = new File([blob], 'workout-story.png', { type: 'image/png' });
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${template.name} Workout` });
-        } else {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = 'workout-story.png'; a.click();
-          URL.revokeObjectURL(url);
-        }
-        setIgSharing(false);
-      }, 'image/png');
-    } catch { setIgSharing(false); }
-  };
-
-  return (
-    <>
-      <div className="fixed inset-0 z-[60] flex items-center justify-center">
-        <div className="absolute inset-0 bg-black/60" />
-
-        <div className="relative bg-gray-50 rounded-3xl w-[92%] max-w-sm flex flex-col shadow-2xl overflow-hidden"
-          style={{ animation: 'none' }}>
-
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 pt-4 pb-1 flex-shrink-0">
-            <button onClick={onDone} className="w-11 h-11 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
-              <X className="w-5 h-5 text-gray-700" />
-            </button>
-            <div className="flex items-end gap-1">
-              <Star size={22} delay={0} />
-              <Star size={30} delay={120} />
-              <Star size={22} delay={240} />
-            </div>
-            <button onClick={handleShare} disabled={sharing} className="w-11 h-11 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
-              <Share className="w-5 h-5 text-gray-700" />
-            </button>
-          </div>
-
-          {/* Title */}
-          <div className="text-center px-4 pb-3 flex-shrink-0">
-            <h1 className="text-2xl font-extrabold text-gray-900">Well Done!</h1>
-            <p className="text-gray-500 text-sm mt-0.5">You crushed your {template.name} workout!</p>
-          </div>
-
-          {/* Gold shimmer summary card */}
-          <div ref={cardRef}
-            className={`mx-4 mb-4 bg-white rounded-2xl border-2 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`}
-            style={{ borderColor: '#FFD700', boxShadow: '0 0 20px rgba(255,215,0,0.3)' }}>
-
-            {/* Card header */}
-            <div className="px-4 pt-4 pb-2" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-extrabold text-gray-900 text-lg tracking-wide">{template.name}</h2>
-                  <p className="text-gray-500 text-xs mt-0.5">{today}</p>
-                </div>
-                <div className="text-3xl">🏆</div>
-              </div>
-              <div className="flex items-center gap-4 mt-2">
-                <div className="flex items-center gap-1 text-xs text-gray-600 font-medium">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{durationDisplay}</span>
-                </div>
-                <div className="flex items-center gap-1 text-xs font-bold text-yellow-600">
-                  <Trophy className="w-3.5 h-3.5" />
-                  <span>{prs.length} PR{prs.length !== 1 ? 's' : ''}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-yellow-200" />
-
-            {/* Exercise rows */}
-            <div className="px-4 py-3 space-y-2">
-              {exercises.map((ex, i) => {
-                const best = bestSets[ex.name];
-                const isPR = prSet.has(ex.name);
-                return (
-                  <div key={i} className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="text-xs text-gray-700 font-medium leading-snug">{ex.sets} × {ex.name}</span>
-                      {isPR && (
-                        <span className="flex-shrink-0 text-[10px] font-bold bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full leading-none">PR</span>
-                      )}
-                    </div>
-                    <span className="flex-shrink-0 text-xs text-gray-500 font-semibold">
-                      {best ? (best.kg ? `${best.kg} kg × ${best.reps}` : `${best.reps} reps`) : '—'}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Action buttons */}
-          <div className="px-4 pb-5 flex flex-col gap-2 flex-shrink-0">
-            <button
-              onClick={handleInstagramShare}
-              disabled={igSharing}
-              className="w-full flex items-center justify-center gap-2 text-white font-bold py-3.5 rounded-2xl text-sm transition active:scale-95 shadow-md"
-              style={{ background: 'linear-gradient(90deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
-            >
-              <InstagramIcon size={20} />
-              {igSharing ? 'Preparing…' : 'Share to Instagram Story'}
-            </button>
-            <button
-              onClick={onDone}
-              className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-2xl text-sm transition"
-            >
-              Done
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Hidden Instagram Story Sticker (9:16, captured by html2canvas) ── */}
-      <div
-        ref={igStickerRef}
-        style={{
-          position: 'fixed',
-          left: '-9999px',
-          top: 0,
-          width: '390px',
-          height: '844px',
-          background: 'rgba(0,0,0,0.82)',
-          fontFamily: 'system-ui, -apple-system, sans-serif',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: '60px 28px 50px',
-          boxSizing: 'border-box',
-        }}
-      >
-        {/* Top: workout name */}
-        <div>
-          {template.name.split(' ').map((word, wi) => (
-            <div key={wi} style={{
-              fontSize: '56px',
-              fontWeight: '900',
-              lineHeight: 1.05,
-              letterSpacing: '-1px',
-              color: wi % 2 === 1 ? '#FFD700' : '#ffffff',
-              textTransform: 'uppercase',
-            }}>{word}</div>
-          ))}
-          <div style={{ fontSize: '18px', fontWeight: '700', color: '#aaaaaa', letterSpacing: '4px', textTransform: 'uppercase', marginTop: '6px' }}>WORKOUT</div>
-
-          {/* Date / duration / PR row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '20px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', padding: '6px 10px' }}>
-              <span style={{ fontSize: '13px', color: '#ccc' }}>📅</span>
-              <span style={{ fontSize: '13px', fontWeight: '600', color: '#fff' }}>{today}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', padding: '6px 10px' }}>
-              <span style={{ fontSize: '13px', color: '#ccc' }}>⏱</span>
-              <span style={{ fontSize: '13px', fontWeight: '600', color: '#fff' }}>{durationDisplay}</span>
-            </div>
-            {prs.length > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#FFD700', borderRadius: '10px', padding: '6px 10px' }}>
-                <span style={{ fontSize: '13px' }}>🏆</span>
-                <span style={{ fontSize: '13px', fontWeight: '800', color: '#000' }}>{prs.length} PR</span>
-              </div>
-            )}
-          </div>
-
-          {/* Divider */}
-          <div style={{ height: '1px', background: 'rgba(255,255,255,0.15)', margin: '24px 0' }} />
-
-          {/* Exercise list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {exercises.map((ex, i) => {
-              const best = bestSets[ex.name];
-              const isPR = prSet.has(ex.name);
-              return (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <span style={{ fontSize: '16px' }}>💪</span>
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: '14px', fontWeight: '600', color: '#fff', lineHeight: 1.3 }}>{ex.sets} × {ex.name}</div>
-                    </div>
-                    {isPR && (
-                      <div style={{ background: '#FFD700', borderRadius: '6px', padding: '2px 7px', flexShrink: 0 }}>
-                        <span style={{ fontSize: '10px', fontWeight: '900', color: '#000' }}>PR</span>
-                      </div>
-                    )}
-                  </div>
-                  <span style={{ fontSize: '13px', color: '#aaa', fontWeight: '600', flexShrink: 0, marginLeft: '8px' }}>
-                    {best ? (best.kg ? `${best.kg} kg × ${best.reps}` : `${best.reps} reps`) : '—'}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Bottom stats bar */}
-        <div style={{ display: 'flex', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.15)', overflow: 'hidden', background: 'rgba(255,255,255,0.05)' }}>
-          {[
-            { label: 'DURATION', value: durationDisplay, emoji: '⏱' },
-            { label: "PR'S HIT", value: prs.length, emoji: '🏆' },
-            { label: 'EXERCISES', value: exercises.length, emoji: '🏋️' },
-          ].map((stat, i) => (
-            <div key={i} style={{
-              flex: 1,
-              padding: '14px 8px',
-              textAlign: 'center',
-              borderRight: i < 2 ? '1px solid rgba(255,255,255,0.1)' : 'none',
-            }}>
-              <div style={{ fontSize: '10px', fontWeight: '700', color: '#888', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>{stat.label}</div>
-              <div style={{ fontSize: '22px', fontWeight: '900', color: '#FFD700' }}>{stat.value}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-    </>
-  );
-}
-
-/* ─── WorkoutSheet ───────────────────────────────────────────── */
 export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [minimized, setMinimized] = useState(false);
   const [prs, setPrs] = useState([]);
@@ -795,11 +28,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [showRestTimerPicker, setShowRestTimerPicker] = useState(false);
   const [globalRestDuration, setGlobalRestDuration] = useState(120);
-  // Active rest timer state
-  const [restActive, setRestActive] = useState(false);       // timer running
-  const [restSeconds, setRestSeconds] = useState(0);         // current countdown
-  const [restTotal, setRestTotal] = useState(0);             // original duration
-  const [restMinimized, setRestMinimized] = useState(false); // pill vs modal
+  const [restActive, setRestActive] = useState(false);
+  const [restSeconds, setRestSeconds] = useState(0);
+  const [restTotal, setRestTotal] = useState(0);
+  const [restMinimized, setRestMinimized] = useState(false);
   const restIntervalRef = useRef(null);
   const restEndRef = useRef(null);
   const { display: timer } = useTimer();
@@ -840,7 +72,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     setRestTotal(t => Math.max(0, t + delta));
   };
 
-  // Recalculate rest timer immediately when app returns to foreground (survives screen lock)
   useEffect(() => {
     if (!restActive) return;
     const onVisible = () => {
@@ -862,24 +93,20 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
 
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  // Request notification permission for rest timer alerts
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
   }, []);
 
-  // Load Exercise entity history (shared across all splits via React Query cache)
   const { data: exerciseHistoryData = {} } = useExerciseHistory();
   useEffect(() => {
-    getExerciseDetailList().then(() => {}); // warm cache on mount
+    getExerciseDetailList().then(() => {});
   }, []);
 
-  // Load exercise images from ExerciseDetail, generating missing ones on the fly
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
     getExerciseDetailList().then(async (results) => {
-      // Case-insensitive map — template exercises may use different casing than ExerciseDetail
       const detailByName = {};
       (results || []).forEach(d => {
         if (d.image_url) detailByName[d.name.toLowerCase()] = d.image_url;
@@ -905,7 +132,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
         });
       }
 
-      // Also populate the map for names that aren't in the template but exist in ExerciseDetail
       (results || []).forEach(d => {
         if (d.image_url && !Object.values(map).includes(d.image_url)) {
           map[d.name.toLowerCase()] = d.image_url;
@@ -916,7 +142,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     });
   }, [template?.id]);
 
-  // Merge Exercise entity history into exercises
   useEffect(() => {
     if (Object.keys(exerciseHistoryData).length === 0) return;
     setExercises(prev => prev.map(ex => ({
@@ -941,9 +166,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     const computedPrs = exercises.filter(ex => {
       const best = snapshot[ex.name];
       if (!best) return false;
-      // Brand new exercise with no history — first recorded set is always a PR
       if (!ex.history || ex.history.length === 0) return true;
-      // Bodyweight exercise (kg is 0 or null) — PR is purely reps-based
       const isBodyweight = ex.history.every(h => { const k = toKg(h); return k === 0 || k == null; }) && (best.kg === 0 || best.kg == null);
       if (isBodyweight) {
         const maxReps = Math.max(...ex.history.map(toReps));
@@ -951,7 +174,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
       }
       const maxKg = Math.max(...ex.history.map(toKg));
       if (best.kg > maxKg) return true;
-      // Same weight but more reps = PR
       if (best.kg === maxKg) {
         const maxRepsAtMaxKg = Math.max(...ex.history.filter(h => toKg(h) === maxKg).map(toReps));
         return best.reps > maxRepsAtMaxKg;
@@ -986,10 +208,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
 
   return (
     <>
-      {/* Overlay — only when fully open */}
       {!minimized && <div className="fixed inset-0 z-30 bg-black/50 pointer-events-none" />}
 
-      {/* Minimized Spotify-style strip */}
       {minimized && (
         <div
           className="fixed inset-x-0 bottom-0 z-40 bg-gray-900 flex items-center justify-between px-4 py-3 shadow-2xl cursor-pointer"
@@ -1015,7 +235,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
         </div>
       )}
 
-      {/* Full sheet */}
       <div className={`fixed inset-x-0 bottom-0 z-40 bg-background rounded-t-3xl shadow-2xl transition-all duration-300 ease-in-out flex flex-col ${minimized ? 'h-0 overflow-hidden' : 'h-[95vh]'}`}
         style={!minimized ? { paddingTop: 'env(safe-area-inset-top)' } : undefined}
       >
@@ -1025,7 +244,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
 
         <>
             <div className="relative flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
-              {/* Rest timer pill (minimized) or icon button */}
               {restActive && restMinimized ? (
                 <RestTimerPill
                   seconds={restSeconds}
@@ -1038,7 +256,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                 </button>
               )}
 
-              {/* Full rest timer modal */}
               {restActive && !restMinimized && (
                 <RestTimerModal
                   seconds={restSeconds}
@@ -1065,7 +282,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                       const newOnes = picked.filter(e => !existing.has(e.name)).map(e => ({ ...e, sets: 1, history: [] }));
                       return [...prev, ...newOnes];
                     });
-                    // Load images for newly added exercises in parallel
                     const newNames = picked.filter(e => !exerciseImages[e.name.toLowerCase()]).map(e => e.name);
                     if (newNames.length > 0) {
                       const results = await Promise.all(newNames.map(name => ensureExerciseDetail(name)));
@@ -1117,7 +333,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                 </Droppable>
               </DragDropContext>
 
-              {/* Bottom buttons - scroll to see */}
               <div className="mt-6 flex flex-col gap-2">
                 <button
                   onClick={() => setShowExercisePicker(true)}
