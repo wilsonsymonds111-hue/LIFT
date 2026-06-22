@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } fro
 import { Search } from 'lucide-react';
 import { MUSCLES } from '../lib/exercises';
 import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
-import { findSimilarExercise } from '../lib/exerciseSearch';
+import { findSimilarExercise, tokenMatchesName } from '../lib/exerciseSearch';
 import NoResultsSuggestion from '../components/exercises/NoResultsSuggestion';
 import CreateExerciseModal from '../components/exercises/CreateExerciseModal';
 import { Plus } from 'lucide-react';
@@ -68,13 +68,12 @@ export default function Exercises() {
     if (!q) {
       return allExercises.filter(ex => muscleFilter === 'All' || ex.muscle === muscleFilter);
     }
-    // Token-based search: every query word must appear as a substring in the exercise name.
-    // Works for any word — "barbell", "press", "incline", "smith", "machine", etc.
+    // Token-based fuzzy search: every query word must match the exercise name.
+    // Handles typos like "dumbell" → "dumbbell" via Levenshtein distance.
     const queryTokens = q.split(/\s+/).filter(Boolean);
     return allExercises.filter(ex => {
       if (muscleFilter !== 'All' && ex.muscle !== muscleFilter) return false;
-      const nameLower = ex.name.toLowerCase();
-      return queryTokens.every(token => nameLower.includes(token));
+      return queryTokens.every(token => tokenMatchesName(token, ex.name));
     });
   }, [allExercises, debouncedSearch, muscleFilter]);
 

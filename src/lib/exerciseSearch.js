@@ -29,6 +29,30 @@ function tokenize(str) {
 }
 
 /**
+ * Checks if a single query token matches an exercise name.
+ * Uses exact substring match first, then falls back to word-level fuzzy
+ * matching (Levenshtein) so typos like "dumbell" still match "dumbbell".
+ */
+export function tokenMatchesName(token, name) {
+  const nameLower = name.toLowerCase();
+  const qt = token.toLowerCase();
+  if (!qt) return false;
+
+  // 1. Exact substring match on full name (handles "curl" → "Bicep Curl (Dumbbell)")
+  if (nameLower.includes(qt)) return true;
+
+  // 2. Word-level fuzzy match (handles "dumbell" → "dumbbell")
+  const eTokens = tokenize(name);
+  return eTokens.some(et => {
+    const ml = Math.max(qt.length, et.length);
+    if (ml === 0) return false;
+    const dist = levenshtein(qt, et);
+    // Allow ~1 edit per 4 characters (25% tolerance), minimum 1
+    return dist <= Math.max(1, Math.floor(ml / 4));
+  });
+}
+
+/**
  * Returns { exercise, score } for the best fuzzy match, or null if nothing is close enough.
  * Combines three signals: full-string Levenshtein, token overlap (substring), and
  * minimum token-level Levenshtein (catches misspellings without inflating on partial matches).
