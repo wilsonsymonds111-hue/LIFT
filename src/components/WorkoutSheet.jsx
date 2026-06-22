@@ -1,17 +1,15 @@
-import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, memo, lazy, Suspense } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { History, MoreHorizontal, Check, ChevronDown, Trophy, Clock, Share, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
-import ExerciseDetailModal from './ExerciseDetailModal';
 import { getDefaultRestDuration } from '../lib/exerciseDefaults';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import { getExerciseDetailList } from '../lib/exerciseCache';
-import html2canvas from 'html2canvas';
-import confetti from 'canvas-confetti';
 import ProgressGraph from './ProgressGraph';
+const ExerciseDetailModal = lazy(() => import('./ExerciseDetailModal'));
 
 /* ─── Sound Effect ──────────────────────────────────────────── */
 const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/87d1fec3a_ScreenRecording_06-16-202607-45-53_12.mp3';
@@ -456,11 +454,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       </button>
     </div>
     {showExerciseDetail && (
-      <ExerciseDetailModal
-        exercise={exercise}
-        initialTab={exerciseDetailInitialTab}
-        onClose={() => setShowExerciseDetail(false)}
-      />
+      <Suspense fallback={null}>
+        <ExerciseDetailModal
+          exercise={exercise}
+          initialTab={exerciseDetailInitialTab}
+          onClose={() => setShowExerciseDetail(false)}
+        />
+      </Suspense>
     )}
     </>
     );
@@ -508,6 +508,7 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
     if (!cardRef.current) return;
     setSharing(true);
     try {
+      const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(cardRef.current, { scale: 3, useCORS: true, backgroundColor: null, logging: false });
       canvas.toBlob(async (blob) => {
         const file = new File([blob], 'workout.png', { type: 'image/png' });
@@ -528,6 +529,7 @@ function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, on
     if (!igStickerRef.current) return;
     setIgSharing(true);
     try {
+      const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(igStickerRef.current, {
         scale: 3,
         useCORS: true,

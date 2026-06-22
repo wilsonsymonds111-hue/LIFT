@@ -31,7 +31,7 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
               exercise={ex}
               exerciseHistory={exerciseHistory}
               exerciseImages={exerciseImages}
-              onClick={() => onSelectExercise(ex)}
+              onSelect={onSelectExercise}
             />
             ))}
           </div>

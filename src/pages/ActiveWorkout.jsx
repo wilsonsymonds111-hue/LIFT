@@ -16,9 +16,8 @@ export default function ActiveWorkout() {
       setLoading(false);
       return;
     }
-    base44.entities.WorkoutTemplate.list('sort_order', 200).then(results => {
-      const found = results?.find(t => t.id === id);
-      if (found) setTemplate(found);
+    base44.entities.WorkoutTemplate.filter({ id }).then(results => {
+      if (results?.[0]) setTemplate(results[0]);
       setLoading(false);
     });
   }, [id]);
