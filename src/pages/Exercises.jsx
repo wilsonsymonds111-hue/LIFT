@@ -69,13 +69,11 @@ export default function Exercises() {
       return allExercises.filter(ex => muscleFilter === 'All' || ex.muscle === muscleFilter);
     }
     // Token-based search: every query word must appear as a substring in the exercise name.
-    // This handles "dumbbell curl" matching "Bicep Curl (Dumbbell)" and "incline dumbbell" matching "Dumbbell Incline Chest Press".
+    // Works for any word — "barbell", "press", "incline", "smith", "machine", etc.
     const queryTokens = q.split(/\s+/).filter(Boolean);
-    const nameLowerCache = {};
     return allExercises.filter(ex => {
       if (muscleFilter !== 'All' && ex.muscle !== muscleFilter) return false;
-      if (!nameLowerCache[ex.name]) nameLowerCache[ex.name] = ex.name.toLowerCase();
-      const nameLower = nameLowerCache[ex.name];
+      const nameLower = ex.name.toLowerCase();
       return queryTokens.every(token => nameLower.includes(token));
     });
   }, [allExercises, debouncedSearch, muscleFilter]);
