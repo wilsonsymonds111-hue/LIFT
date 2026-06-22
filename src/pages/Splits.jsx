@@ -661,7 +661,7 @@ export default function Splits() {
 
             {/* ── Phase 2: Old slides left, new stamps over it from right ── */}
             {(swapPhase === 'swap' || swapPhase === 'success') && (
-              <div className="relative pointer-events-none" style={SWAP_CARD_W}>
+              <div className="relative pointer-events-none" style={{ ...SWAP_CARD_W, height: 200 }}>
                 {/* Old split slides out to the left */}
                 <motion.div
                   initial={{ x: 0, opacity: 1, scale: 1 }}
