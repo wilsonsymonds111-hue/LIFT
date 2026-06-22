@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
+import { useQueryClient } from '@tanstack/react-query';
+import { useExerciseHistory } from '../hooks/useExerciseHistory';
 import Sparkline from '../components/Sparkline';
 import EditTemplateModal from '../components/EditTemplateModal';
 
@@ -24,41 +27,18 @@ function relativeTime(dateStr) {
 export default function TemplateDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [template, setTemplate] = useState(null);
-  const [exerciseData, setExerciseData] = useState({});
-  const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    Promise.all([
-      base44.entities.WorkoutTemplate.list('sort_order', 200).then(results => results?.find(t => t.id === id)),
-      base44.entities.Exercise.list('name', 500),
-    ]).then(([found, exercises]) => {
-      if (found) setTemplate(found);
-      // Build a map of exercise name → history
-      const map = {};
-      (exercises || []).forEach(ex => {
-        map[ex.name] = ex.history || [];
-      });
-      setExerciseData(map);
-      setLoading(false);
-    });
-  }, [id]);
-
-  if (loading) {
-    return createPortal(
-      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
-        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
-      </div>,
-      document.body
-    );
-  }
+  // Reuse React Query cache from Home page — data is already loaded, no refetch
+  const { data: templates } = useWorkoutTemplates();
+  const { data: exerciseData = {} } = useExerciseHistory();
+  const template = templates?.find(t => t.id === id);
 
   if (!template) {
     return createPortal(
-      <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-4 bg-black/60">
-        <p className="text-white">Template not found</p>
-        <button onClick={() => navigate('/')} className="text-blue-400 font-semibold">Go back</button>
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
+        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
       </div>,
       document.body
     );
@@ -71,7 +51,7 @@ export default function TemplateDetail() {
         onClose={() => setShowEdit(false)}
         onSave={async (updated) => {
           await base44.entities.WorkoutTemplate.update(updated.id, updated);
-          setTemplate(updated);
+          queryClient.invalidateQueries({ queryKey: ['workoutTemplates'] });
           setShowEdit(false);
         }}
       />

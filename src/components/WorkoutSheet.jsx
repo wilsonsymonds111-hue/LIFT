@@ -100,9 +100,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   }, []);
 
   const { data: exerciseHistoryData = {} } = useExerciseHistory();
-  useEffect(() => {
-    getExerciseDetailList().then(() => {});
-  }, []);
 
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
@@ -112,33 +109,28 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
         if (d.image_url) detailByName[d.name.toLowerCase()] = d.image_url;
       });
 
+      // Set known images immediately — don't block on missing ones
       const map = {};
-      const templateExercises = template?.exerciseList || [];
       const missing = [];
-
-      templateExercises.forEach(ex => {
+      (template?.exerciseList || []).forEach(ex => {
         const key = ex.name.toLowerCase();
         if (detailByName[key]) {
           map[key] = detailByName[key];
         } else {
-          missing.push(ex);
+          missing.push(ex.name);
         }
       });
-
-      if (missing.length > 0) {
-        const generated = await Promise.all(missing.map(ex => ensureExerciseDetail(ex.name)));
-        missing.forEach((ex, i) => {
-          if (generated[i]?.image_url) map[ex.name.toLowerCase()] = generated[i].image_url;
-        });
-      }
-
-      (results || []).forEach(d => {
-        if (d.image_url && !Object.values(map).includes(d.image_url)) {
-          map[d.name.toLowerCase()] = d.image_url;
-        }
-      });
-
       setExerciseImages(map);
+
+      // Generate missing images in background, update as each completes
+      missing.forEach(async (name) => {
+        try {
+          const detail = await ensureExerciseDetail(name);
+          if (detail?.image_url) {
+            setExerciseImages(prev => ({ ...prev, [name.toLowerCase()]: detail.image_url }));
+          }
+        } catch {}
+      });
     });
   }, [template?.id]);
 

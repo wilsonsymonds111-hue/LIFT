@@ -17,10 +17,10 @@ export default function ActiveWorkout() {
       setLoading(false);
       return;
     }
-    base44.entities.WorkoutTemplate.filter({ id }).then(results => {
-      if (results?.[0]) setTemplate(results[0]);
+    base44.entities.WorkoutTemplate.get(id).then(t => {
+      if (t) setTemplate(t);
       setLoading(false);
-    });
+    }).catch(() => setLoading(false));
   }, [id]);
 
   const handleSaveHistory = async (templateId, snapshot, exerciseList) => {
