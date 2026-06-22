@@ -91,7 +91,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
   const [applying, setApplying] = useState(false);
   const [customSplit, setCustomSplit] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [editing, setEditing] = useState(true);
+  const [editing, setEditing] = useState(false);
   const [restConfirmed, setRestConfirmed] = useState(false);
   const scrollRef = useRef(null);
 
@@ -114,7 +114,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
     setOnDays(c.onDays);
     setOffDays(c.offDays);
     setStartDayIndex(c.startDayIndex);
-    setEditing(true);
+    setEditing(false);
     setRestConfirmed(false);
   }, [splitKey]);
 
@@ -481,9 +481,8 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                 <button
                   onClick={() => {
                     if (!restConfirmed) {
-                      saveCycle(splitKey, { onDays, offDays, startDayIndex });
                       setRestConfirmed(true);
-                      setEditing(false);
+                      setEditing(true);
                     } else {
                       handleMakeCurrent();
                     }
