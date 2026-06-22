@@ -65,10 +65,18 @@ export default function Exercises() {
   
   const filtered = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase();
+    if (!q) {
+      return allExercises.filter(ex => muscleFilter === 'All' || ex.muscle === muscleFilter);
+    }
+    // Token-based search: every query word must appear as a substring in the exercise name.
+    // This handles "dumbbell curl" matching "Bicep Curl (Dumbbell)" and "incline dumbbell" matching "Dumbbell Incline Chest Press".
+    const queryTokens = q.split(/\s+/).filter(Boolean);
+    const nameLowerCache = {};
     return allExercises.filter(ex => {
-      const matchSearch = !q || ex.name.toLowerCase().includes(q);
-      const matchMuscle = muscleFilter === 'All' || ex.muscle === muscleFilter;
-      return matchSearch && matchMuscle;
+      if (muscleFilter !== 'All' && ex.muscle !== muscleFilter) return false;
+      if (!nameLowerCache[ex.name]) nameLowerCache[ex.name] = ex.name.toLowerCase();
+      const nameLower = nameLowerCache[ex.name];
+      return queryTokens.every(token => nameLower.includes(token));
     });
   }, [allExercises, debouncedSearch, muscleFilter]);
 
