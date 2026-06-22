@@ -14,7 +14,7 @@ const COMPOUND_KEYWORDS = [
   'hang clean', 'clean and press',
   'bulgarian split squat',
   'goblet squat',
-  'front squat', 'hack squat', 'smith squat',
+  'front squat', 'hack squat', 'smith squat', 'smith machine squat',
   'romanian deadlift',
   'sumo deadlift',
   'trap bar deadlift',
