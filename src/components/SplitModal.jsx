@@ -91,7 +91,8 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
   const [applying, setApplying] = useState(false);
   const [customSplit, setCustomSplit] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(true);
+  const [restConfirmed, setRestConfirmed] = useState(false);
   const scrollRef = useRef(null);
 
   const exampleSplit = EXAMPLE_SPLITS_DATA[splitKey];
@@ -113,7 +114,8 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
     setOnDays(c.onDays);
     setOffDays(c.offDays);
     setStartDayIndex(c.startDayIndex);
-    setEditing(false);
+    setEditing(true);
+    setRestConfirmed(false);
   }, [splitKey]);
 
   // Scroll to top when editing panel opens so user sees the rest frequency settings
@@ -387,29 +389,30 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                         const isToday = i === 0;
                         const isStart = shiftedStartDayIndex === i;
                         return (
-                          <button
-                            key={i}
-                            onClick={() => setStartDayIndex((i + todayMonSun) % 7)}
-                            className={`flex flex-col items-center flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-150 ${
-                              isStart
-                                ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30'
-                                : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 hover:border-blue-400'
-                            } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
-                          >
-                            <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{shiftedDayLabels[i]}</span>
-                            <div
-                              className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
-                                isGymDay
-                                  ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
-                                  : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
-                              } ${isToday && !isStart ? 'ring-[1.5px] ring-emerald-500 ring-offset-1' : ''}`}
+                          <div key={i} className="flex flex-col items-center flex-1">
+                            <button
+                              onClick={() => setStartDayIndex((i + todayMonSun) % 7)}
+                              className={`flex flex-col items-center w-full py-2 rounded-lg text-xs font-bold transition-all duration-150 ${
+                                isStart
+                                  ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30'
+                                  : 'bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 hover:border-blue-400'
+                              } ${isToday && !isStart ? 'ring-[2px] ring-emerald-500 ring-offset-1' : ''}`}
                             >
-                              {isGymDay && <Dumbbell className={`w-2.5 h-2.5 ${isStart ? 'text-white' : 'text-white'}`} strokeWidth={2.5} />}
-                            </div>
-                            <span className={`text-[8px] mt-1 leading-tight text-center truncate w-full ${isStart ? 'text-white/90' : 'text-muted-foreground'}`}>
+                              <span className={`${isStart ? 'text-white/80' : 'text-muted-foreground'} text-[10px]`}>{shiftedDayLabels[i]}</span>
+                              <div
+                                className={`w-5 h-5 mt-1 rounded-full flex items-center justify-center ${
+                                  isGymDay
+                                    ? isStart ? 'bg-white/30' : 'bg-blue-500 shadow-sm shadow-blue-500/30'
+                                    : isStart ? 'border-2 border-white/40' : 'border-2 border-blue-300 dark:border-blue-700'
+                                } ${isToday && !isStart ? 'ring-[1.5px] ring-emerald-500 ring-offset-1' : ''}`}
+                              >
+                                {isGymDay && <Dumbbell className={`w-2.5 h-2.5 ${isStart ? 'text-white' : 'text-white'}`} strokeWidth={2.5} />}
+                              </div>
+                            </button>
+                            <span className={`text-[8px] mt-1 leading-tight text-center truncate w-full ${isStart ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-muted-foreground'}`}>
                               {shiftedWorkoutLabels[i]}
                             </span>
-                          </button>
+                          </div>
                         );
                       })}
                     </div>
@@ -477,13 +480,18 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
               <div className="px-5 pb-4 pt-2">
                 <button
                   onClick={() => {
-                    if (editing) saveCycle(splitKey, { onDays, offDays, startDayIndex });
-                    handleMakeCurrent();
+                    if (!restConfirmed) {
+                      saveCycle(splitKey, { onDays, offDays, startDayIndex });
+                      setRestConfirmed(true);
+                      setEditing(false);
+                    } else {
+                      handleMakeCurrent();
+                    }
                   }}
                   disabled={applying}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60"
                 >
-                  {applying ? 'Applying...' : 'Make This My Current Split'}
+                  {applying ? 'Applying...' : restConfirmed ? 'Make This My Current Split' : 'Confirm REST Frequency'}
                 </button>
               </div>
 
