@@ -318,7 +318,7 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-background pb-28">
+    <div className="health-gradient pb-28">
       <PullToRefreshIndicator pullY={pullY} refreshing={refreshing} />
 
       {/* Page Title */}

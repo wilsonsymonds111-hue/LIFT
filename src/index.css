@@ -77,6 +77,14 @@
 
 
 
+/* Apple Health-style gradient background */
+.health-gradient {
+  background: linear-gradient(135deg, #FFD1B3 0%, #F5DCE8 45%, #E0C3FC 100%);
+}
+.dark .health-gradient {
+  background: linear-gradient(135deg, #1a1520 0%, #1e1a2e 50%, #1a1520 100%);
+}
+
 /* Exercise detail shimmer – defined once, not injected per render */
 @keyframes goldShimmer {
   0% { transform: translateX(-100%) skewX(-15deg); }

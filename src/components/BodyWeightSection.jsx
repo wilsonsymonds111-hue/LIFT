@@ -1,5 +1,5 @@
 import { useState, useEffect, memo } from 'react';
-import { Scale, TrendingUp, TrendingDown, Minus, ChevronRight } from 'lucide-react';
+import { Scale, ChevronRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import BodyWeightChartModal from './BodyWeightChartModal';
 
@@ -7,8 +7,6 @@ function BodyWeightSection() {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [quickWeight, setQuickWeight] = useState('');
-  const [saving, setSaving] = useState(false);
 
   const fetchEntries = async () => {
     try {
@@ -23,28 +21,11 @@ function BodyWeightSection() {
   useEffect(() => { fetchEntries(); }, []);
 
   const latest = entries[0];
-  const previous = entries[1];
-  const trend = !latest || !previous ? null :
-    latest.weight > previous.weight ? 'up' :
-    latest.weight < previous.weight ? 'down' : 'flat';
-  const trendValue = latest && previous ? (latest.weight - previous.weight).toFixed(1) : null;
+  const dateLabel = latest?.date
+    ? new Date(latest.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+    : '';
 
-  const handleQuickLog = async () => {
-    const w = parseFloat(quickWeight);
-    if (!w || w <= 0) return;
-    setSaving(true);
-    try {
-      const today = new Date().toISOString().slice(0, 10);
-      await base44.entities.BodyWeight.create({ weight: w, date: today });
-      setQuickWeight('');
-      await fetchEntries();
-    } catch (e) {
-      console.error('Failed to save body weight:', e);
-    }
-    setSaving(false);
-  };
-
-  // Mini sparkline points
+  // Mini sparkline
   const sparkPoints = entries.length > 1
     ? (() => {
         const reversed = [...entries].reverse();
@@ -62,82 +43,52 @@ function BodyWeightSection() {
 
   return (
     <>
-      <div className="px-4 py-2">
+      <div className="px-4 py-1.5">
         <div
           onClick={() => setShowModal(true)}
-          className="bg-card border border-border rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer active:scale-[0.98]"
+          className="bg-white dark:bg-card rounded-[20px] p-3.5 shadow-sm cursor-pointer active:scale-[0.98] transition"
         >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-900/40 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Scale className="w-4.5 h-4.5 text-emerald-500" />
+          {/* Header */}
+          <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center gap-1.5">
+              <div className="w-5 h-5 bg-purple-100 dark:bg-purple-900/40 rounded-md flex items-center justify-center">
+                <Scale className="w-3 h-3 text-purple-500" />
               </div>
-              <div>
-                <p className="font-bold text-foreground text-sm">Body Weight</p>
-                <p className="text-[11px] text-muted-foreground">Tap to view chart & history</p>
-              </div>
+              <span className="text-xs font-semibold text-gray-500 dark:text-muted-foreground">Weight</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            <div className="flex items-center gap-0.5">
+              {dateLabel && <span className="text-xs text-gray-400 dark:text-muted-foreground">{dateLabel}</span>}
+              <ChevronRight className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
+            </div>
           </div>
 
-          <div className="flex items-end justify-between gap-3">
-            <div className="flex items-baseline gap-2">
+          {/* Body */}
+          <div className="flex items-end justify-between">
+            <div className="flex items-baseline gap-1">
               {loading ? (
-                <div className="h-7 w-20 bg-muted rounded animate-pulse" />
+                <div className="h-6 w-16 bg-gray-100 dark:bg-muted rounded animate-pulse" />
               ) : latest ? (
                 <>
-                  <span className="text-2xl font-extrabold text-foreground">{latest.weight}</span>
-                  <span className="text-sm text-muted-foreground font-medium">kg</span>
-                  {trend && (
-                    <span className={`flex items-center gap-0.5 text-xs font-semibold ml-1 ${
-                      trend === 'up' ? 'text-red-400' : trend === 'down' ? 'text-emerald-500' : 'text-muted-foreground'
-                    }`}>
-                      {trend === 'up' && <TrendingUp className="w-3 h-3" />}
-                      {trend === 'down' && <TrendingDown className="w-3 h-3" />}
-                      {trend === 'flat' && <Minus className="w-3 h-3" />}
-                      {trendValue > 0 && `+${trendValue}`}
-                      {trendValue < 0 && trendValue}
-                      {trend === 'flat' && '0'}
-                    </span>
-                  )}
+                  <span className="text-2xl font-bold text-black dark:text-foreground">{latest.weight}</span>
+                  <span className="text-xs text-gray-400 dark:text-muted-foreground font-medium">kg</span>
                 </>
               ) : (
-                <span className="text-sm text-muted-foreground">No data yet</span>
+                <span className="text-sm text-gray-400 dark:text-muted-foreground">Tap to log</span>
               )}
             </div>
 
             {sparkPoints && (
-              <svg viewBox="0 0 100 20" className="w-24 h-10 flex-shrink-0" preserveAspectRatio="none">
+              <svg viewBox="0 0 100 20" className="w-14 h-7 flex-shrink-0" preserveAspectRatio="none">
                 <polyline
                   points={sparkPoints}
                   fill="none"
-                  stroke="rgb(16, 185, 129)"
+                  stroke="rgb(168, 85, 247)"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
             )}
-          </div>
-
-          {/* Quick log */}
-          <div className="flex gap-2 mt-3" onClick={e => e.stopPropagation()}>
-            <input
-              type="number"
-              step="0.1"
-              value={quickWeight}
-              onChange={e => setQuickWeight(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleQuickLog()}
-              placeholder="Log today's weight (kg)"
-              className="flex-1 border border-border rounded-xl px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-400"
-            />
-            <button
-              onClick={handleQuickLog}
-              disabled={saving || !quickWeight}
-              className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-semibold disabled:opacity-40 transition active:scale-95"
-            >
-              {saving ? '…' : 'Log'}
-            </button>
           </div>
         </div>
       </div>
