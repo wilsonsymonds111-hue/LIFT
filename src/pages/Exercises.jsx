@@ -1,7 +1,9 @@
 import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { Search } from 'lucide-react';
 import { MUSCLES } from '../lib/exercises';
-import { getAllExercises } from '../lib/customExercises';
+import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
+import { findSimilarExercise } from '../lib/exerciseSearch';
+import NoResultsSuggestion from '../components/exercises/NoResultsSuggestion';
 import { base44 } from '@/api/base44Client';
 import { getExerciseDetailList } from '../lib/exerciseCache';
 import ProfileButton from '../components/ProfileButton';
@@ -19,6 +21,8 @@ export default function Exercises() {
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [exerciseHistory, setExerciseHistory] = useState({});
   const [exerciseImages, setExerciseImages] = useState({});
+  const [customExercisesVersion, setCustomExercisesVersion] = useState(0);
+  const [creating, setCreating] = useState(false);
 
   const handleSearchChange = useCallback((e) => {
     const val = e.target.value;
@@ -54,7 +58,7 @@ export default function Exercises() {
     });
   }, []);
 
-  const allExercises = useMemo(() => getAllExercises(), []);
+  const allExercises = useMemo(() => getAllExercises(), [customExercisesVersion]);
   
   const filtered = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase();
@@ -75,7 +79,44 @@ export default function Exercises() {
     return Object.entries(map).sort(([a], [b]) => a.localeCompare(b));
   }, [filtered]);
 
+  const suggestion = useMemo(() => {
+    if (filtered.length > 0 || !debouncedSearch.trim()) return null;
+    return findSimilarExercise(debouncedSearch, allExercises);
+  }, [filtered.length, debouncedSearch, allExercises]);
 
+  const handleSelectSuggestion = useCallback((ex) => {
+    setSelectedExercise(ex);
+  }, []);
+
+  const handleCreateCustom = useCallback(async () => {
+    const raw = debouncedSearch.trim();
+    if (!raw) return;
+    const capitalizedName = raw.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    setCreating(true);
+    try {
+      let muscle = 'Full Body';
+      try {
+        const res = await base44.integrations.Core.InvokeLLM({
+          prompt: `What primary muscle group does the exercise "${capitalizedName}" target? Respond with exactly one word from: Arms, Back, Chest, Core, Full Body, Legs, Shoulders`,
+          response_json_schema: {
+            type: 'object',
+            properties: { muscle: { type: 'string', enum: ['Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders'] } },
+            required: ['muscle'],
+          },
+        });
+        muscle = res?.muscle || 'Full Body';
+      } catch {}
+      saveCustomExercise({ name: capitalizedName, muscle });
+      setCustomExercisesVersion(v => v + 1);
+      setSearch('');
+      setDebouncedSearch('');
+      setSelectedExercise({ name: capitalizedName, muscle });
+    } catch (e) {
+      console.error('Failed to create custom exercise:', e);
+    } finally {
+      setCreating(false);
+    }
+  }, [debouncedSearch]);
 
   return (
     <div className="bg-background pb-24">
@@ -118,7 +159,17 @@ export default function Exercises() {
         })}
       </div>
 
-      <ExerciseList grouped={grouped} exerciseHistory={exerciseHistory} exerciseImages={exerciseImages} onSelectExercise={handleSelectExercise} />
+      {filtered.length === 0 && debouncedSearch.trim() ? (
+        <NoResultsSuggestion
+          query={debouncedSearch}
+          suggestion={suggestion}
+          onSelectSuggestion={handleSelectSuggestion}
+          onCreateCustom={handleCreateCustom}
+          creating={creating}
+        />
+      ) : (
+        <ExerciseList grouped={grouped} exerciseHistory={exerciseHistory} exerciseImages={exerciseImages} onSelectExercise={handleSelectExercise} />
+      )}
 
       {selectedExercise && (
         <Suspense fallback={null}>
