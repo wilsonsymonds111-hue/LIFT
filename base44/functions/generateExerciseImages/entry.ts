@@ -6,7 +6,7 @@ const ALL_EXERCISES = [
   "Bent Over Lateral Raise", "Bicep Curl (Barbell)", "Bicep Curl Dumbbell Supinated", "Box Jump", "Bradford Press",
   "Bulgarian Split Squat", "Burpee", "Cable Crossover", "Cable Crunch", "Cable Curl",
   "Cable Fly", "Cable Lateral Raise", "Cable Row", "Calf Raise (Machine)", "Chest Dip",
-  "Chin Up", "Clean and Press", "Close Grip Bench Press", "Crunch", "Dead Bug",
+  "Chin Up", "Clean and Press", "Close Grip Smith Chest Press", "Crunch", "Dead Bug",
   "Deadlift (Barbell)", "Decline Bench Press", "Decline Crunch", "Dumbbell Fly", "Face Pull",
   "Farmer's Walk", "Front Raise", "Front Squat", "Glute Bridge", "Goblet Squat",
   "Good Morning", "Hack Squat", "Hammer Curl", "Hang Clean", "Hanging Leg Raise",

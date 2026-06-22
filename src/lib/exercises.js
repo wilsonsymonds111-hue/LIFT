@@ -25,7 +25,7 @@ export const ALL_EXERCISES = [
   { name: 'Chest Dip', muscle: 'Chest' },
   { name: 'Chin Up', muscle: 'Back' },
   { name: 'Clean and Press', muscle: 'Full Body' },
-  { name: 'Close Grip Bench Press', muscle: 'Arms' },
+  { name: 'Close Grip Smith Chest Press', muscle: 'Chest' },
   { name: 'Crunch', muscle: 'Core' },
   { name: 'Dead Bug', muscle: 'Core' },
   { name: 'Deadlift (Barbell)', muscle: 'Back' },
