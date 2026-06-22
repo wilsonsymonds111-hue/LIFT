@@ -45,6 +45,7 @@ function resolveSchedule(key, workoutCount, groupId) {
 
   // Check localStorage for user customizations — overrides defaults even for known types.
   // Try both the split key (stored by RestFrequencyConfirmModal) and the group ID.
+  let savedStartDayIndex = null;
   try {
     const keysToTry = [key, groupId].filter(Boolean);
     for (const k of keysToTry) {
@@ -53,6 +54,7 @@ function resolveSchedule(key, workoutCount, groupId) {
         const parsed = JSON.parse(cycleRaw);
         onDays = Number(parsed.onDays) || onDays;
         offDays = Number(parsed.offDays) || offDays;
+        savedStartDayIndex = Number(parsed.startDayIndex);
         break;
       }
     }
@@ -61,10 +63,8 @@ function resolveSchedule(key, workoutCount, groupId) {
   if (!onDays) onDays = Math.max(workoutCount, 1);
   if (!offDays) offDays = 1;
 
-  // Always start the cycle from today so the display makes intuitive sense.
-  // A stale startDayIndex from localStorage would make the 7-day window
-  // cut across the cycle boundary, showing a misleading number of consecutive on-days.
-  const startDayIndex = todayMonSun;
+  // Use the user's chosen cycle start day if they saved one; otherwise start from today.
+  const startDayIndex = (savedStartDayIndex !== null && !isNaN(savedStartDayIndex)) ? savedStartDayIndex : todayMonSun;
 
   const schedule = cycleToSchedule(onDays, offDays, startDayIndex);
   return { schedule, startDayIndex, onDays, offDays };
