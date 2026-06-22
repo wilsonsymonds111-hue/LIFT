@@ -8,6 +8,7 @@ import { RestTimerModal, RestTimerPill } from './RestTimerModal';
 import { getDefaultRestDuration } from '../lib/exerciseDefaults';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import { getExerciseDetailList } from '../lib/exerciseCache';
+import { useExerciseHistory } from '../hooks/useExerciseHistory';
 import ProgressGraph from './ProgressGraph';
 const ExerciseDetailModal = lazy(() => import('./ExerciseDetailModal'));
 
@@ -97,19 +98,34 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   const startXRef = useRef(null);
   const hasEdited = useRef(false);
   const restRef = useRef(null);
+  const restEndRef = useRef(null);
 
   useEffect(() => {
     if (done) {
+      const end = Date.now() + restDuration * 1000;
+      restEndRef.current = end;
       setRestSeconds(restDuration);
-      restRef.current = setInterval(() => {
-        setRestSeconds(s => {
-          if (s <= 1) { clearInterval(restRef.current); notifyRestComplete(); return 0; }
-          return s - 1;
-        });
-      }, 1000);
+      const tick = () => {
+        const remaining = Math.round((end - Date.now()) / 1000);
+        if (remaining <= 0) {
+          clearInterval(restRef.current);
+          setRestSeconds(0);
+          notifyRestComplete();
+        } else {
+          setRestSeconds(remaining);
+        }
+      };
+      restRef.current = setInterval(tick, 250);
+      const onVisible = () => { if (!document.hidden) tick(); };
+      document.addEventListener('visibilitychange', onVisible);
+      return () => {
+        clearInterval(restRef.current);
+        document.removeEventListener('visibilitychange', onVisible);
+      };
     } else {
       clearInterval(restRef.current);
       setRestSeconds(null);
+      restEndRef.current = null;
     }
     return () => clearInterval(restRef.current);
   }, [done]);
@@ -172,13 +188,13 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           </span>
           <input
             type="number" value={kg}
-            onChange={e => { hasEdited.current = true; setKg(e.target.value); }}
+            onChange={e => { hasEdited.current = true; setKg(e.target.value); if (done) onComplete?.({ kg: parseFloat(e.target.value) || 0, reps: parseInt(reps) || 0 }); }}
             placeholder="—"
             className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
           />
           <input
             type="number" value={reps}
-            onChange={e => { hasEdited.current = true; setReps(e.target.value); }}
+            onChange={e => { hasEdited.current = true; setReps(e.target.value); if (done) onComplete?.({ kg: parseFloat(kg) || 0, reps: parseInt(e.target.value) || 0 }); }}
             placeholder="—"
             className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
           />
@@ -407,18 +423,21 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg ?? (i === 0 && prev ? prev.kg : null)} initialReps={s.suggestedReps ?? (i === 0 && prev ? prev.reps + 1 : null)} restDuration={restEnabled ? restDuration : 0}
           onComplete={(result) => {
             const setIndex = sets.findIndex(r => r.id === s.id);
+            const wasCompleted = !!completedSets[s.id];
             setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
             if (result) {
               onBestSet?.(exercise.name, result.kg, result.reps);
-              // Dynamic progression: if current set failed its target, adjust the next set
-              const currentSet = sets[setIndex];
-              const targetReps = currentSet.suggestedReps;
-              const achieved = targetReps != null && result.reps >= targetReps;
-              if (!achieved && setIndex < sets.length - 1 && targetReps != null) {
-                setSets(prev => prev.map((r, i) => {
-                  if (i <= setIndex) return r;
-                  return { ...r, suggestedReps: targetReps };
-                }));
+              if (!wasCompleted) {
+                // Dynamic progression: if current set failed its target, adjust the next set
+                const currentSet = sets[setIndex];
+                const targetReps = currentSet.suggestedReps;
+                const achieved = targetReps != null && result.reps >= targetReps;
+                if (!achieved && setIndex < sets.length - 1 && targetReps != null) {
+                  setSets(prev => prev.map((r, i) => {
+                    if (i <= setIndex) return r;
+                    return { ...r, suggestedReps: targetReps };
+                  }));
+                }
               }
             }
           }}
@@ -773,7 +792,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
       name: ex.name.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()),
     }))
   );
-  const [exerciseHistory, setExerciseHistory] = useState({});
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [showRestTimerPicker, setShowRestTimerPicker] = useState(false);
   const [globalRestDuration, setGlobalRestDuration] = useState(120);
@@ -783,34 +801,64 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [restTotal, setRestTotal] = useState(0);             // original duration
   const [restMinimized, setRestMinimized] = useState(false); // pill vs modal
   const restIntervalRef = useRef(null);
+  const restEndRef = useRef(null);
   const { display: timer } = useTimer();
   const bestSetsRef = useRef({});
 
-  // Start the rest countdown
   const startRestTimer = (duration) => {
     clearInterval(restIntervalRef.current);
+    const end = Date.now() + duration * 1000;
+    restEndRef.current = end;
     setRestTotal(duration);
     setRestSeconds(duration);
     setRestActive(true);
     setRestMinimized(false);
-    restIntervalRef.current = setInterval(() => {
-      setRestSeconds(s => {
-        if (s <= 1) { clearInterval(restIntervalRef.current); setRestActive(false); notifyRestComplete(); return 0; }
-        return s - 1;
-      });
-    }, 1000);
+    const tick = () => {
+      const remaining = Math.round((restEndRef.current - Date.now()) / 1000);
+      if (remaining <= 0) {
+        clearInterval(restIntervalRef.current);
+        setRestSeconds(0);
+        setRestActive(false);
+        notifyRestComplete();
+      } else {
+        setRestSeconds(remaining);
+      }
+    };
+    restIntervalRef.current = setInterval(tick, 250);
   };
 
   const stopRestTimer = () => {
     clearInterval(restIntervalRef.current);
+    restEndRef.current = null;
     setRestActive(false);
     setRestMinimized(false);
   };
 
   const adjustRestTimer = (delta) => {
+    if (restEndRef.current) restEndRef.current += delta * 1000;
     setRestSeconds(s => Math.max(0, s + delta));
     setRestTotal(t => Math.max(0, t + delta));
   };
+
+  // Recalculate rest timer immediately when app returns to foreground (survives screen lock)
+  useEffect(() => {
+    if (!restActive) return;
+    const onVisible = () => {
+      if (!document.hidden && restEndRef.current) {
+        const remaining = Math.round((restEndRef.current - Date.now()) / 1000);
+        if (remaining <= 0) {
+          clearInterval(restIntervalRef.current);
+          setRestSeconds(0);
+          setRestActive(false);
+          notifyRestComplete();
+        } else {
+          setRestSeconds(remaining);
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [restActive]);
 
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -821,16 +869,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     }
   }, []);
 
-  // Load Exercise entity history (shared across all splits)
+  // Load Exercise entity history (shared across all splits via React Query cache)
+  const { data: exerciseHistoryData = {} } = useExerciseHistory();
   useEffect(() => {
-    getExerciseDetailList().then(() => {}); // warm cache on mount for dual-purpose
-    base44.entities.Exercise.list('name', 200).then(results => {
-      const map = {};
-      (results || []).forEach(ex => {
-        map[ex.name] = ex.history || [];
-      });
-      setExerciseHistory(map);
-    });
+    getExerciseDetailList().then(() => {}); // warm cache on mount
   }, []);
 
   // Load exercise images from ExerciseDetail, generating missing ones on the fly
@@ -876,12 +918,12 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
 
   // Merge Exercise entity history into exercises
   useEffect(() => {
-    if (Object.keys(exerciseHistory).length === 0) return;
+    if (Object.keys(exerciseHistoryData).length === 0) return;
     setExercises(prev => prev.map(ex => ({
       ...ex,
-      history: exerciseHistory[ex.name] || ex.history || [],
+      history: exerciseHistoryData[ex.name] || ex.history || [],
     })));
-  }, [exerciseHistory]);
+  }, [exerciseHistoryData]);
 
   const handleBestSet = useCallback((name, kg, reps) => {
     const today = new Date().toISOString().slice(0, 10);

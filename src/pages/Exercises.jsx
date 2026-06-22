@@ -8,6 +8,7 @@ import CreateExerciseModal from '../components/exercises/CreateExerciseModal';
 import { Plus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { getExerciseDetailList } from '../lib/exerciseCache';
+import { useExerciseHistory } from '../hooks/useExerciseHistory';
 import ProfileButton from '../components/ProfileButton';
 import ExerciseList from '../components/ExerciseList';
 
@@ -38,21 +39,22 @@ export default function Exercises() {
     setSelectedExercise(ex);
   }, []);
 
-  useEffect(() => {
-    Promise.all([
-      base44.entities.Exercise.list('name', 200),
-      getExerciseDetailList(),
-    ]).then(([exerciseResults, detailResults]) => {
-      const historyMap = {};
-      (exerciseResults || []).forEach(ex => {
-        if (ex.history?.length > 0) {
-          historyMap[ex.name] = ex.history
-            .map(h => ({ v: h.reps || 0, date: h.date ? new Date(h.date) : null }))
-            .sort((a, b) => (a.date || 0) - (b.date || 0));
-        }
-      });
-      setExerciseHistory(historyMap);
+  const { data: exerciseHistoryData = {} } = useExerciseHistory();
 
+  useEffect(() => {
+    const historyMap = {};
+    Object.entries(exerciseHistoryData).forEach(([name, history]) => {
+      if (history?.length > 0) {
+        historyMap[name] = history
+          .map(h => ({ v: h.reps || 0, date: h.date ? new Date(h.date) : null }))
+          .sort((a, b) => (a.date || 0) - (b.date || 0));
+      }
+    });
+    setExerciseHistory(historyMap);
+  }, [exerciseHistoryData]);
+
+  useEffect(() => {
+    getExerciseDetailList().then(detailResults => {
       const imageMap = {};
       (detailResults || []).forEach(d => {
         if (d.image_url) imageMap[d.name] = d.image_url;
