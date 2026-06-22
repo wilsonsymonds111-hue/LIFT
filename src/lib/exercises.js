@@ -47,7 +47,7 @@ export const ALL_EXERCISES = [
   { name: 'Hollow Body Hold', muscle: 'Core' },
   { name: 'Incline Barbell Press', muscle: 'Chest' },
   { name: 'Dumbbell Incline Chest Press', muscle: 'Chest' },
-  { name: 'Incline Smith Press', muscle: 'Chest' },
+  { name: 'Incline Smith Chest Press', muscle: 'Chest' },
   { name: 'Incline Curl', muscle: 'Arms' },
   { name: 'Iso-Lateral Row (Machine)', muscle: 'Back' },
   { name: 'JM Press', muscle: 'Arms' },
