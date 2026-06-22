@@ -311,7 +311,9 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                 </button>
                 <div className="text-center">
                   <h2 className="text-lg font-extrabold text-foreground">{split.name}</h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">{split.description}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {restConfirmed && !editing ? frequencyLabel : split.description}
+                  </p>
                 </div>
                 <div className="relative group">
                   <button
@@ -409,7 +411,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                                 {isGymDay && <Dumbbell className={`w-2.5 h-2.5 ${isStart ? 'text-white' : 'text-white'}`} strokeWidth={2.5} />}
                               </div>
                             </button>
-                            <span className={`text-[8px] mt-1 leading-tight text-center truncate w-full ${isStart ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-muted-foreground'}`}>
+                            <span className={`text-[8px] mt-1 leading-tight text-center w-full whitespace-normal break-words h-8 flex items-center justify-center ${isStart ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-muted-foreground'}`}>
                               {shiftedWorkoutLabels[i]}
                             </span>
                           </div>
