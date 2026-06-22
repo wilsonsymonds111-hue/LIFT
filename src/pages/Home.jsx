@@ -412,7 +412,7 @@ export default function Home() {
                   className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
                 >
                   <Moon className="w-4 h-4 text-blue-500" />
-                  Edit rest frequency
+                  Edit workout order & rest frequency
                 </button>
                 <button
                   onClick={handleSyncToCalendar}
