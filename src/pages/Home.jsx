@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
-import { MoreHorizontal, CalendarPlus, Plus } from 'lucide-react';
+import { MoreHorizontal, CalendarPlus, Plus, Moon } from 'lucide-react';
 import CalendarSyncModal from '../components/CalendarSyncModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -13,6 +13,8 @@ import WeekTracker from '../components/WeekTracker';
 import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
+
+const SplitModal = lazy(() => import('../components/SplitModal'));
 
 // Default cycle patterns: { onDays, offDays } for known split types
 const SPLIT_CYCLES = {
@@ -114,6 +116,7 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(null);
   const [splitMenuOpen, setSplitMenuOpen] = useState(false);
   const [showCalendarSync, setShowCalendarSync] = useState(false);
+  const [showSplitEditor, setShowSplitEditor] = useState(false);
   const menuRef = useRef({});
   const splitMenuBtnRef = useRef(null);
 
@@ -405,6 +408,13 @@ export default function Home() {
                 style={{ top: `${top}px`, right: `${right}px`, zIndex: 100 }}
               >
                 <button
+                  onClick={() => { setSplitMenuOpen(false); setShowSplitEditor(true); }}
+                  className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
+                >
+                  <Moon className="w-4 h-4 text-blue-500" />
+                  Edit rest frequency
+                </button>
+                <button
                   onClick={handleSyncToCalendar}
                   className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
                 >
@@ -423,6 +433,19 @@ export default function Home() {
           onClose={() => setShowCalendarSync(false)}
           onSync={handleCalendarSyncConfirm}
         />
+      )}
+
+      {showSplitEditor && groupId && (
+        <Suspense fallback={null}>
+          <SplitModal
+            splitKey={groupId}
+            onClose={() => setShowSplitEditor(false)}
+            onMakeCurrent={async () => {
+              setShowSplitEditor(false);
+              invalidateWorkoutTemplates(queryClient);
+            }}
+          />
+        </Suspense>
       )}
 
     </div>
