@@ -458,6 +458,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         <ExerciseDetailModal
           exercise={exercise}
           initialTab={exerciseDetailInitialTab}
+          initialHistory={exercise.history}
+          initialImage={exerciseImage}
           onClose={() => setShowExerciseDetail(false)}
         />
       </Suspense>

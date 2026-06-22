@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
+import { getExerciseDetailList } from '../lib/exerciseCache';
 import ProgressGraph, { getNextGoal } from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
 
@@ -14,12 +15,12 @@ const parseInstructions = (text) => {
   return text.split('\n').filter(line => /^\d+\./.test(line.trim()));
 };
 
-export default function ExerciseDetailModal({ exercise, onClose, initialTab }) {
+export default function ExerciseDetailModal({ exercise, onClose, initialTab, initialHistory, initialImage }) {
   const [tab, setTab] = useState(initialTab || 'Charts');
-  const [history, setHistory] = useState([]);
-  const [detail, setDetail] = useState(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
-  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [history, setHistory] = useState(initialHistory || []);
+  const [detail, setDetail] = useState(initialImage ? { image_url: initialImage } : null);
+  const [loadingDetail, setLoadingDetail] = useState(!initialImage);
+  const [loadingHistory, setLoadingHistory] = useState(!initialHistory);
   const [shimmer, setShimmer] = useState(false);
   const [chartView, setChartView] = useState('weight');
   const [swipeDir, setSwipeDir] = useState(0);
@@ -39,8 +40,9 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab }) {
 
   useEffect(() => { setTimeout(() => setShimmer(true), 200); }, []);
 
-  // Fetch workout history from the Exercise entity (shared across all splits)
+  // Fetch workout history from the Exercise entity (only if not passed in)
   useEffect(() => {
+    if (initialHistory) return;
     base44.entities.Exercise.filter({ name: exercise.name }).then(results => {
       if (results.length > 0) {
         setHistory(results[0].history || []);
@@ -49,42 +51,40 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab }) {
       }
       setLoadingHistory(false);
     });
-  }, [exercise.name]);
+  }, [exercise.name, initialHistory]);
 
   // Fetch or generate exercise detail (instructions + image)
   useEffect(() => {
-    setLoadingDetail(true);
-    base44.entities.ExerciseDetail.filter({ name: exercise.name }).then(async (results) => {
+    // Use cached ExerciseDetail list (already warmed by parent pages) to avoid a fresh API call
+    getExerciseDetailList().then(async (cached) => {
+      const results = (cached || []).filter(d => d.name === exercise.name);
+      // If we already have image from parent, keep it; otherwise use cached
       if (results?.length > 0 && results[0].instructions) {
-        setDetail(results[0]);
+        setDetail(prev => ({ ...results[0], image_url: prev?.image_url || results[0].image_url }));
         setLoadingDetail(false);
-      } else {
-        // Generate via shared utility (image + muscles), then add instructions
-        try {
-          const generated = await ensureExerciseDetail(exercise.name);
-
-          // Generate instructions
-          const llmRes = await base44.integrations.Core.InvokeLLM({
-            prompt: `Write 4 short, numbered step-by-step instructions for how to perform the "${exercise.name}" exercise at the gym. Keep each step to 1-2 sentences. Be clear and concise. Output format: plain text with each step on a new line starting with the number and a period.`,
-          });
-          const instructions = llmRes?.data || llmRes || '';
-
-          if (results?.length > 0) {
-            await base44.entities.ExerciseDetail.update(results[0].id, { instructions });
-            setDetail({ ...results[0], image_url: generated.image_url, instructions, muscles_worked: generated.muscles_worked || results[0].muscles_worked });
-          } else {
-            // ensureExerciseDetail already created the record; now update with instructions
-            const fresh = await base44.entities.ExerciseDetail.filter({ name: exercise.name });
-            if (fresh?.length > 0) {
-              await base44.entities.ExerciseDetail.update(fresh[0].id, { instructions });
-              setDetail({ ...fresh[0], instructions });
-            }
-          }
-        } catch (_) {}
-        setLoadingDetail(false);
+        return;
       }
+      // No instructions in cache — check if we at least have the image cached
+      const cachedDetail = results?.[0];
+      if (cachedDetail?.image_url || initialImage) {
+        setDetail(prev => ({ ...prev, image_url: initialImage || cachedDetail?.image_url }));
+      }
+      // Generate via shared utility (image + muscles), then add instructions
+      try {
+        const generated = await ensureExerciseDetail(exercise.name);
+        const llmRes = await base44.integrations.Core.InvokeLLM({
+          prompt: `Write 4 short, numbered step-by-step instructions for how to perform the "${exercise.name}" exercise at the gym. Keep each step to 1-2 sentences. Be clear and concise. Output format: plain text with each step on a new line starting with the number and a period.`,
+        });
+        const instructions = llmRes?.data || llmRes || '';
+        const fresh = await base44.entities.ExerciseDetail.filter({ name: exercise.name });
+        if (fresh?.length > 0) {
+          await base44.entities.ExerciseDetail.update(fresh[0].id, { instructions });
+          setDetail({ ...fresh[0], image_url: generated.image_url || initialImage, instructions, muscles_worked: generated.muscles_worked || fresh[0].muscles_worked });
+        }
+      } catch (_) {}
+      setLoadingDetail(false);
     });
-  }, [exercise.name]);
+  }, [exercise.name, initialImage]);
 
   const allEntries = history.length > 0 ? history : [];
   const isBodyweight = allEntries.length > 0
