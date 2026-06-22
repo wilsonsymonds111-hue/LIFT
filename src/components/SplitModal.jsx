@@ -488,7 +488,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                     }
                   }}
                   disabled={applying}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60"
+                  className={`w-full text-white font-bold py-3 rounded-xl text-sm transition disabled:opacity-60 ${restConfirmed ? 'bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700' : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700'}`}
                 >
                   {applying ? 'Applying...' : restConfirmed ? 'Make This My Current Split' : 'Confirm REST Frequency'}
                 </button>
