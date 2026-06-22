@@ -20,7 +20,7 @@ const BottomNav = memo(function BottomNav() {
       className="fixed left-3 right-3 z-50"
       style={{ bottom: `calc(6px + env(safe-area-inset-bottom))` }}
     >
-      <nav className={`flex items-center justify-around h-[50px] px-2 rounded-full backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.35)] ring-1 ring-white/30 dark:ring-white/[0.06] ${location.pathname === '/splits' ? 'bg-white/65 dark:bg-gray-700/40' : 'bg-gray-300/40 dark:bg-gray-800/40'}`}>
+      <nav className={`flex items-center justify-around h-[50px] px-2 rounded-full backdrop-blur-xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.35)] ring-1 ring-white/30 dark:ring-white/[0.06] ${location.pathname === '/splits' ? 'bg-white/65 dark:bg-gray-700/40' : 'bg-gray-300/40 dark:bg-gray-800/40'}`}>
         {tabs.map(({ path, Icon }) => {
           const active = location.pathname === path;
           return (
