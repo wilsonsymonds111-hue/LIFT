@@ -72,6 +72,7 @@ export const base44 = {
     WorkoutTemplate: wrapEntity('WorkoutTemplate', rawClient.entities.WorkoutTemplate),
     Exercise: wrapEntity('Exercise', rawClient.entities.Exercise),
     ExerciseDetail: wrapEntity('ExerciseDetail', rawClient.entities.ExerciseDetail),
+    BodyWeight: wrapEntity('BodyWeight', rawClient.entities.BodyWeight),
     User: rawClient.entities.User,
   },
   // asServiceRole intentionally excluded — requires a service token

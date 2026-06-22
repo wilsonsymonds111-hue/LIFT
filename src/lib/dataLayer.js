@@ -170,6 +170,27 @@ export const localEntities = {
       return getOne(getStore(), 'exerciseDetails', id);
     },
   },
+
+  BodyWeight: {
+    list(sort, limit) {
+      return listAll(getStore(), 'bodyWeights', sort, limit);
+    },
+    filter(query, sort, limit) {
+      return filterItems(getStore(), 'bodyWeights', query, sort, limit);
+    },
+    create(data) {
+      return createOne(getStore(), 'bodyWeights', data);
+    },
+    update(id, data) {
+      return updateOne(getStore(), 'bodyWeights', id, data);
+    },
+    delete(id) {
+      return deleteOne(getStore(), 'bodyWeights', id);
+    },
+    get(id) {
+      return getOne(getStore(), 'bodyWeights', id);
+    },
+  },
 };
 
 // ── Profile photo ──
