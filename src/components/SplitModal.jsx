@@ -76,9 +76,12 @@ function cycleToSchedule(onDays, offDays, startDayIndex) {
   const cycleLength = onDays + offDays;
   const schedule = [];
   for (let i = 0; i < 7; i++) {
-    const daysFromStart = i >= startDayIndex ? i - startDayIndex : i + 7 - startDayIndex;
-    const pos = daysFromStart % cycleLength;
-    schedule.push(pos < onDays ? 1 : 0);
+    if (i < startDayIndex) {
+      schedule.push(0); // Before cycle start — rest day
+    } else {
+      const pos = (i - startDayIndex) % cycleLength;
+      schedule.push(pos < onDays ? 1 : 0);
+    }
   }
   return schedule;
 }
