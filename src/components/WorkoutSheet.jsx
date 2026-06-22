@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { History, MoreHorizontal } from 'lucide-react';
+import { History } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
@@ -294,7 +294,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
             <div className="flex-1 overflow-y-auto px-4 pt-2 pb-24">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{template.name}</h1>
-                <MoreHorizontal className="w-5 h-5 text-blue-400" />
               </div>
               <p className="text-sm text-gray-500 mb-0.5">📅 {today}</p>
               <p className="text-sm text-gray-500 mb-4">🕐 {timer}</p>
