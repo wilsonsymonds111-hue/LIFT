@@ -247,6 +247,27 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
   );
   const shiftedStartDayIndex = (startDayIndex - todayMonSun + 7) % 7;
 
+  // Compute which workout is scheduled for each day — workouts cycle in order across on-days
+  const dayWorkoutLabels = useMemo(() => {
+    const workouts = orderedWorkouts.length > 0 ? orderedWorkouts : (split?.workouts || []);
+    if (workouts.length === 0) return Array(7).fill('Rest');
+    const labels = [];
+    let workoutIdx = 0;
+    for (let i = 0; i < 7; i++) {
+      if (previewSchedule[i] === 1) {
+        labels.push(workouts[workoutIdx % workouts.length].name);
+        workoutIdx++;
+      } else {
+        labels.push('Rest');
+      }
+    }
+    return labels;
+  }, [previewSchedule, orderedWorkouts, split]);
+  const shiftedWorkoutLabels = useMemo(
+    () => [...dayWorkoutLabels.slice(todayMonSun), ...dayWorkoutLabels.slice(0, todayMonSun)],
+    [dayWorkoutLabels, todayMonSun]
+  );
+
   return createPortal(
     <AnimatePresence>
       <motion.div
@@ -385,6 +406,9 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                             >
                               {isGymDay && <Dumbbell className={`w-2.5 h-2.5 ${isStart ? 'text-white' : 'text-white'}`} strokeWidth={2.5} />}
                             </div>
+                            <span className={`text-[8px] mt-1 leading-tight text-center truncate w-full ${isStart ? 'text-white/90' : 'text-muted-foreground'}`}>
+                              {shiftedWorkoutLabels[i]}
+                            </span>
                           </button>
                         );
                       })}
