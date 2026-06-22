@@ -4,6 +4,8 @@ import { MUSCLES } from '../lib/exercises';
 import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
 import { findSimilarExercise } from '../lib/exerciseSearch';
 import NoResultsSuggestion from '../components/exercises/NoResultsSuggestion';
+import CreateExerciseModal from '../components/exercises/CreateExerciseModal';
+import { Plus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { getExerciseDetailList } from '../lib/exerciseCache';
 import ProfileButton from '../components/ProfileButton';
@@ -23,6 +25,7 @@ export default function Exercises() {
   const [exerciseImages, setExerciseImages] = useState({});
   const [customExercisesVersion, setCustomExercisesVersion] = useState(0);
   const [creating, setCreating] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const handleSearchChange = useCallback((e) => {
     const val = e.target.value;
@@ -118,12 +121,47 @@ export default function Exercises() {
     }
   }, [debouncedSearch]);
 
+  const handleCreateFromModal = useCallback(async (rawName) => {
+    const capitalizedName = rawName.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    setCreating(true);
+    try {
+      let muscle = 'Full Body';
+      try {
+        const res = await base44.integrations.Core.InvokeLLM({
+          prompt: `What primary muscle group does the exercise "${capitalizedName}" target? Respond with exactly one word from: Arms, Back, Chest, Core, Full Body, Legs, Shoulders`,
+          response_json_schema: {
+            type: 'object',
+            properties: { muscle: { type: 'string', enum: ['Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders'] } },
+            required: ['muscle'],
+          },
+        });
+        muscle = res?.muscle || 'Full Body';
+      } catch {}
+      saveCustomExercise({ name: capitalizedName, muscle });
+      setCustomExercisesVersion(v => v + 1);
+      setShowCreateModal(false);
+      setSelectedExercise({ name: capitalizedName, muscle });
+    } catch (e) {
+      console.error('Failed to create custom exercise:', e);
+    } finally {
+      setCreating(false);
+    }
+  }, []);
+
   return (
     <div className="bg-background pb-24">
       {/* Header */}
       <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
         <h1 className="text-3xl font-extrabold text-foreground leading-tight">Exercises</h1>
-        <ProfileButton />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950/50 hover:scale-110 active:scale-95 transition-all duration-150 border-2 border-border hover:border-blue-400/30 flex-shrink-0"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+          <ProfileButton />
+        </div>
       </div>
 
       {/* Search */}
@@ -169,6 +207,13 @@ export default function Exercises() {
         />
       ) : (
         <ExerciseList grouped={grouped} exerciseHistory={exerciseHistory} exerciseImages={exerciseImages} onSelectExercise={handleSelectExercise} />
+      )}
+
+      {showCreateModal && (
+        <CreateExerciseModal
+          onClose={() => setShowCreateModal(false)}
+          onCreate={handleCreateFromModal}
+        />
       )}
 
       {selectedExercise && (
