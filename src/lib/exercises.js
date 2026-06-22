@@ -105,7 +105,6 @@ export const ALL_EXERCISES = [
   { name: 'Step Up', muscle: 'Legs' },
   { name: 'Straight Arm Pulldown', muscle: 'Back' },
   { name: 'Sumo Deadlift', muscle: 'Legs' },
-  { name: 'Svend Press', muscle: 'Chest' },
   { name: 'T-Bar Row', muscle: 'Back' },
   { name: 'Thruster', muscle: 'Full Body' },
   { name: 'Trap Bar Deadlift', muscle: 'Legs' },
