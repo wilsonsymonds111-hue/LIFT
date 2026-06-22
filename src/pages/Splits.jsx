@@ -290,9 +290,10 @@ export default function Splits() {
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
       invalidateWorkoutTemplates(queryClient);
-      // Persist default cycle so Home page knows the schedule
+      // Persist default cycle only if the user hasn't already saved one via the
+      // RestFrequencyConfirmModal — otherwise we'd overwrite their chosen start day.
       const schedule = splitData.schedule;
-      if (schedule) {
+      if (schedule && !localStorage.getItem(`splitCycle_${splitKey}`)) {
         let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
         for (let i = 0; i < schedule.length; i++) {
           if (schedule[i] >= 1) { curOn++; if (curOff > maxOff) maxOff = curOff; curOff = 0; }
