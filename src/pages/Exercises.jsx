@@ -70,11 +70,11 @@ export default function Exercises() {
     }
     // Token-based fuzzy search: every query word must match the exercise name.
     // Handles typos like "dumbell" → "dumbbell" via Levenshtein distance.
+    // When searching, ignore the muscle filter so all matching exercises appear
     const queryTokens = q.split(/\s+/).filter(Boolean);
-    return allExercises.filter(ex => {
-      if (muscleFilter !== 'All' && ex.muscle !== muscleFilter) return false;
-      return queryTokens.every(token => tokenMatchesName(token, ex.name));
-    });
+    return allExercises.filter(ex =>
+      queryTokens.every(token => tokenMatchesName(token, ex.name))
+    );
   }, [allExercises, debouncedSearch, muscleFilter]);
 
   const grouped = useMemo(() => {
