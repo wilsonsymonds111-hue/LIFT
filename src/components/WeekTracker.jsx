@@ -1,17 +1,7 @@
-import { useState, memo } from 'react';
+import { memo } from 'react';
 import { Check, Dumbbell } from 'lucide-react';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-
-function getTooltipText(status, isToday, workoutName) {
-  const isGymDay = status >= 1;
-  const isCompleted = status === 2;
-  if (!isGymDay) return 'Rest day 😌';
-  const name = workoutName ? `${workoutName} workout` : 'Workout';
-  if (isCompleted) return `${name} completed ✅`;
-  if (isToday) return `${name} today — let's go 💪`;
-  return `${name} day ahead 💪`;
-}
 
 function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [] }) {
   const todayIndex = new Date().getDay();
@@ -24,8 +14,6 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
   const rotatedNames = rawWorkoutNames.length > 0
     ? [...rawWorkoutNames.slice(todayMonSun), ...rawWorkoutNames.slice(0, todayMonSun)]
     : [];
-
-  const [activeDay, setActiveDay] = useState(0);
 
   return (
     <div className="px-4 pb-2">
@@ -57,8 +45,6 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
             <div
               key={i}
               className="flex flex-col items-center w-5"
-              onMouseEnter={() => setActiveDay(i)}
-              onMouseLeave={() => setActiveDay(0)}
             >
               <div
                 className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-150 cursor-pointer ${
@@ -83,23 +69,6 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
         })}
       </div>
 
-      {/* Tooltip */}
-      <div className="flex flex-col items-center mt-2">
-        {cycleLabel && (
-          <span className="text-[10px] font-semibold text-blue-500 dark:text-blue-400 text-center">
-            {cycleLabel}
-          </span>
-        )}
-        <span className="text-[11px] font-medium text-muted-foreground text-center min-h-[16px]">
-          {(() => {
-            const origIdx = (todayMonSun + activeDay) % 7;
-            const s = schedule[origIdx];
-            const isToday = activeDay === 0;
-            const name = rotatedNames[activeDay] || null;
-            return getTooltipText(s, isToday, name);
-          })()}
-        </span>
-      </div>
     </div>
   );
 }

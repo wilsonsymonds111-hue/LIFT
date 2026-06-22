@@ -10,6 +10,7 @@ import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
 import SyncBanner from '../components/SyncBanner';
 import WeekTracker from '../components/WeekTracker';
+import BodyWeightSection from '../components/BodyWeightSection';
 import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
@@ -338,6 +339,9 @@ export default function Home() {
 
       {/* Weekly Tracker */}
       <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
+
+      {/* Body Weight Tracker */}
+      <BodyWeightSection />
 
       {/* Sync Banner */}
       <SyncBanner />
