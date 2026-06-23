@@ -79,7 +79,7 @@
 
 /* Apple Health / MyFitnessPal-style gradient background */
 .health-gradient {
-  background: linear-gradient(180deg, #B8E0FF 0%, #D4E9FF 20%, #E8EEF5 50%, #F0F4F8 100%);
+  background: linear-gradient(180deg, #E3F0FF 0%, #F0F4F8 40%, #F5F5F5 100%);
 }
 .dark .health-gradient {
   background: linear-gradient(180deg, #1a2235 0%, #181a2a 25%, #0f0f0f 100%);

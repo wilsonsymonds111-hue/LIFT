@@ -25,7 +25,7 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
             <div className="pt-4 pb-1.5 px-4 text-lg font-bold text-black dark:text-foreground">
               {letter}
             </div>
-            <div className="mx-2 bg-white/40 dark:bg-card/20 rounded-2xl overflow-hidden border border-gray-200/30 dark:border-gray-600/20 backdrop-blur-sm">
+            <div className="mx-2 bg-white dark:bg-card rounded-2xl overflow-hidden border border-gray-200/50 dark:border-border/50">
             {exs.map((ex, idx) => (
             <ExerciseRow
               key={ex.name}
