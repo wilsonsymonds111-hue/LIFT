@@ -1,22 +1,18 @@
 import { useState, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, Plus, Trash2, Edit3, Check, Apple, Info } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, Edit3, Check, Apple } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts';
+import { Slider } from '@/components/ui/slider';
 import { base44 } from '@/api/base44Client';
 import WeightEntryKeypad from './WeightEntryKeypad';
-
-const PERIODS = [
-  { key: 'D', days: 1 },
-  { key: 'W', days: 7 },
-  { key: 'M', days: 30 },
-  { key: '6M', days: 180 },
-  { key: 'Y', days: 365 },
-];
 
 const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
 export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
-  const [period, setPeriod] = useState('6M');
+  const [zoom, setZoom] = useState(() => {
+    const stored = localStorage.getItem('bodyWeightZoom');
+    return stored ? Number(stored) : 0;
+  });
   const [showKeypad, setShowKeypad] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editWeight, setEditWeight] = useState('');
@@ -30,12 +26,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   [entries]);
 
   const filtered = useMemo(() => {
-    const days = PERIODS.find(p => p.key === period)?.days ?? 180;
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - days);
-    cutoff.setHours(0, 0, 0, 0);
-    return sorted.filter(e => new Date(e.date + 'T00:00:00') >= cutoff);
-  }, [sorted, period]);
+    if (sorted.length <= 3) return sorted;
+    const showCount = Math.max(3, Math.round(sorted.length * (1 - zoom / 100)));
+    return sorted.slice(-showCount);
+  }, [sorted, zoom]);
+
+  const handleZoomChange = (value) => {
+    const v = value[0];
+    setZoom(v);
+    localStorage.setItem('bodyWeightZoom', String(v));
+  };
 
   const chartData = useMemo(() =>
     filtered.map(e => ({
@@ -145,25 +145,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
         </button>
       </div>
 
-      {/* Time period selector */}
-      <div className="px-4 pb-3 flex-shrink-0">
-        <div className="bg-black/5 dark:bg-muted rounded-full p-1 flex">
-          {PERIODS.map(p => (
-            <button
-              key={p.key}
-              onClick={() => setPeriod(p.key)}
-              className={`flex-1 py-1.5 rounded-full text-xs font-semibold transition ${
-                period === p.key
-                  ? 'bg-white dark:bg-card text-black dark:text-foreground shadow-sm'
-                  : 'text-gray-500 dark:text-muted-foreground'
-              }`}
-            >
-              {p.key}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Metric section */}
       <div className="px-4 pb-2 flex-shrink-0">
         <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">AVERAGE</p>
@@ -176,9 +157,9 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       </div>
 
       {/* Chart */}
-      <div className="px-4 pb-4 flex-shrink-0">
+      <div className="px-4 pb-2 flex-shrink-0">
         {chartData.length > 1 ? (
-          <div className="bg-white dark:bg-card rounded-2xl p-3 shadow-sm">
+          <div className="bg-white dark:bg-card rounded-2xl p-3">
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" opacity={0.7} />
@@ -193,11 +174,28 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="bg-white dark:bg-card rounded-2xl p-8 text-center shadow-sm">
+          <div className="bg-white dark:bg-card rounded-2xl p-8 text-center">
             <p className="text-sm text-gray-500 dark:text-muted-foreground">Log at least 2 entries to see your trend chart.</p>
           </div>
         )}
       </div>
+
+      {/* Zoom slider */}
+      {sorted.length > 3 && (
+        <div className="px-6 pb-4 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-semibold text-gray-400 dark:text-muted-foreground flex-shrink-0">All</span>
+            <Slider
+              value={[zoom]}
+              onValueChange={handleZoomChange}
+              max={100}
+              step={1}
+              className="flex-1"
+            />
+            <span className="text-[10px] font-semibold text-gray-400 dark:text-muted-foreground flex-shrink-0">Recent</span>
+          </div>
+        </div>
+      )}
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-4 pb-6">
