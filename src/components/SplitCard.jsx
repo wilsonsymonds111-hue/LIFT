@@ -1,17 +1,17 @@
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Dumbbell, ChevronRight, Check } from 'lucide-react';
 import { memo } from 'react';
 
-const SPLIT_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/60f426734_image.png',
-  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e9b1aea0d_image.png',
-  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/2b264bebb_generated_image.png',
-  'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5bc190219_image.png',
+const SPLIT_COLORS = {
+  'upper-lower': { icon: 'text-blue-500', iconBg: 'bg-blue-50 dark:bg-blue-950/40', title: 'text-blue-500', bars: ['#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'] },
+  'push-pull-legs': { icon: 'text-purple-500', iconBg: 'bg-purple-50 dark:bg-purple-950/40', title: 'text-purple-500', bars: ['#A855F7', '#C084FC', '#D8B4FE', '#E9D5FF'] },
+  'full-body': { icon: 'text-orange-500', iconBg: 'bg-orange-50 dark:bg-orange-950/40', title: 'text-orange-500', bars: ['#F97316', '#FB923C', '#FDBA74', '#FED7AA'] },
+  'ul-ppl': { icon: 'text-emerald-500', iconBg: 'bg-emerald-50 dark:bg-emerald-950/40', title: 'text-emerald-500', bars: ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0'] },
 };
 
-const DEFAULT_IMAGES = [
-  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9024d2186_image.png',
-  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6b7b7dcad_image.png',
-  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/fb7125a5d_image.png',
+const DEFAULT_COLORS = [
+  { icon: 'text-blue-500', iconBg: 'bg-blue-50 dark:bg-blue-950/40', title: 'text-blue-500', bars: ['#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'] },
+  { icon: 'text-rose-500', iconBg: 'bg-rose-50 dark:bg-rose-950/40', title: 'text-rose-500', bars: ['#F43F5E', '#FB7185', '#FDA4AF', '#FECDD3'] },
+  { icon: 'text-amber-500', iconBg: 'bg-amber-50 dark:bg-amber-950/40', title: 'text-amber-500', bars: ['#F59E0B', '#FBBF24', '#FCD34D', '#FDE68A'] },
 ];
 
 function detectSplitType(workoutNames) {
@@ -32,78 +32,94 @@ function detectSplitType(workoutNames) {
 }
 
 const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef, isActive, imageIndex }) {
-  const isExampleSplit = !!SPLIT_IMAGES[splitKey];
+  const isExampleSplit = !!SPLIT_COLORS[splitKey];
   const colorKey = isExampleSplit ? splitKey : detectSplitType(workouts.map(w => w.name));
-  // For custom splits, use the explicit imageIndex prop if provided, otherwise fall back to key-based hash
-  const defaultIndex = imageIndex != null
-    ? imageIndex % DEFAULT_IMAGES.length
-    : splitKey
-      ? (parseInt(splitKey.match(/\d+/)?.[0] || '0', 10) || 0) % DEFAULT_IMAGES.length
-      : 0;
-  const bgImage = isExampleSplit ? SPLIT_IMAGES[colorKey] : DEFAULT_IMAGES[defaultIndex];
+  const colors = SPLIT_COLORS[colorKey] || DEFAULT_COLORS[
+    imageIndex != null
+      ? imageIndex % DEFAULT_COLORS.length
+      : splitKey
+        ? (parseInt(splitKey.match(/\d+/)?.[0] || '0', 10) || 0) % DEFAULT_COLORS.length
+        : 0
+  ];
+
   const workoutCount = workouts.length;
   const displayName = name.replace(/ Workout$/, '');
+
+  // Mini bar chart — one bar per workout, heights vary for visual interest
+  const barHeights = workouts.map((_, i) => {
+    const base = 40 + (i * 13) % 45;
+    return Math.min(base, 90);
+  });
 
   return (
     <div ref={cardRef}>
       <div
         onClick={onCardClick}
-        className="relative rounded-2xl cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden min-h-[160px] focus:outline-none hover:ring-2 hover:ring-blue-400/60"
+        className="relative bg-white dark:bg-card rounded-[20px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-gray-100/80 dark:border-border shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
       >
-        {/* Black & white background image layer */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url(${bgImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            filter: 'grayscale(1) blur(2px)',
-          }}
-        />
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/20" />
-        {/* Subtle vignette */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-transparent" />
-
-        {/* Content */}
-        <div className="relative p-5 flex flex-col justify-center h-full min-h-[160px]">
-          {/* Active badge */}
-          {isActive && (
-            <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-emerald-500/80 backdrop-blur-sm text-white text-[10px] font-extrabold uppercase tracking-wider">
-              Current Split
+        <div className="p-4">
+          {/* Header row */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${colors.iconBg}`}>
+                <Dumbbell className={`w-4 h-4 ${colors.icon}`} strokeWidth={2.5} />
+              </div>
+              <span className={`text-sm font-bold ${colors.title}`}>{displayName}</span>
             </div>
-          )}
+            <div className="flex items-center gap-1">
+              {isActive && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wide">
+                  <Check className="w-2.5 h-2.5" strokeWidth={3} />
+                  Current
+                </span>
+              )}
+              {onMenuToggle ? (
+                <button
+                  ref={menuRef}
+                  onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-muted transition"
+                >
+                  <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+                </button>
+              ) : (
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              )}
+            </div>
+          </div>
 
-          {/* Top row: menu */}
-          {onMenuToggle && (
-            <button
-              ref={menuRef}
-              onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 flex items-center justify-center transition"
-            >
-              <MoreHorizontal className="w-4 h-4 text-white/90" />
-            </button>
-          )}
+          {/* Content row: big value + mini bar chart */}
+          <div className="flex items-end justify-between">
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-bold text-black dark:text-foreground leading-none">{workoutCount}</span>
+              <span className="text-xs text-gray-400 dark:text-muted-foreground font-medium">workout{workoutCount !== 1 ? 's' : ''}</span>
+            </div>
 
-          {/* Split name */}
-          <h4 className="font-extrabold text-white text-lg uppercase tracking-wider pr-6 leading-tight">
-            {displayName}
-          </h4>
+            {/* Mini bar chart */}
+            <div className="flex items-end gap-1 h-9">
+              {barHeights.map((h, i) => (
+                <div
+                  key={i}
+                  className="w-1.5 rounded-full"
+                  style={{
+                    height: `${h}%`,
+                    backgroundColor: colors.bars[i % colors.bars.length],
+                    opacity: i === barHeights.length - 1 ? 1 : 0.5,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
 
           {/* Workout name pills */}
           <div className="flex flex-wrap gap-1.5 mt-3">
             {workouts.map((w, i) => (
-              <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-[6px] bg-blue-400/25 backdrop-blur-sm text-blue-100 text-xs font-semibold tracking-wide">
+              <span
+                key={i}
+                className="inline-flex items-center px-2.5 py-1 rounded-md bg-gray-50 dark:bg-muted text-gray-600 dark:text-muted-foreground text-[11px] font-medium"
+              >
                 {w.name}
               </span>
             ))}
-          </div>
-
-          {/* Badge */}
-          <div className="mt-3">
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white text-xs font-semibold tracking-wide">
-              {workoutCount} work{workoutCount !== 1 ? 'outs' : 'out'}
-            </span>
           </div>
         </div>
       </div>
