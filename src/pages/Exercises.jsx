@@ -46,7 +46,7 @@ export default function Exercises() {
     Object.entries(exerciseHistoryData).forEach(([name, history]) => {
       if (history?.length > 0) {
         historyMap[name] = history
-          .map(h => ({ v: h.reps || 0, date: h.date ? new Date(h.date) : null }))
+          .map(h => ({ v: h.reps || 0, kg: h.kg || 0, reps: h.reps || 0, date: h.date ? new Date(h.date) : null }))
           .sort((a, b) => (a.date || 0) - (b.date || 0));
       }
     });
