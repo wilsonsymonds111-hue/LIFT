@@ -15,10 +15,17 @@ const DEFAULT_COLORS = [
 ];
 
 const EXERCISE_IMAGES = [
-  'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=300&fit=crop&sat=-100',
-  'https://images.unsplash.com/photo-1581009146989-51e4a94201e5?w=500&h=300&fit=crop&sat=-100',
-  'https://images.unsplash.com/photo-1572988626981-21fca8aef4ea?w=500&h=300&fit=crop&sat=-100',
-  'https://images.unsplash.com/photo-1599058917212-d217cde29706?w=500&h=300&fit=crop&sat=-100',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/0e890b4e6_generated_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6c19ca21c_generated_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/36a580eac_generated_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/8ac0f57d5_generated_image.png',
+];
+
+const TEXT_COLORS = [
+  { title: 'text-blue-600', subtitle: 'text-blue-500', accent: 'bg-blue-100/50 text-blue-700' },
+  { title: 'text-amber-600', subtitle: 'text-amber-500', accent: 'bg-amber-100/50 text-amber-700' },
+  { title: 'text-emerald-600', subtitle: 'text-emerald-500', accent: 'bg-emerald-100/50 text-emerald-700' },
+  { title: 'text-rose-600', subtitle: 'text-rose-500', accent: 'bg-rose-100/50 text-rose-700' },
 ];
 
 function detectSplitType(workoutNames) {
@@ -66,18 +73,25 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
         : 0
   ];
 
+  const colorIndex = imageIndex != null
+    ? imageIndex % TEXT_COLORS.length
+    : splitKey
+      ? (parseInt(splitKey.match(/\d+/)?.[0] || '0', 10) || 0) % TEXT_COLORS.length
+      : 0;
+  const cardColors = TEXT_COLORS[colorIndex];
+
   return (
     <div ref={cardRef}>
       <div
         onClick={onCardClick}
         className="relative bg-white dark:bg-card rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-gray-100/80 dark:border-border shadow-[0_2px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
       >
-        {/* Subtle black and white gym background */}
+        {/* Slightly blurred black and white gym background */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-15"
+          className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{ 
             backgroundImage: `url('${imageUrl}')`,
-            filter: 'saturate(0)'
+            filter: 'blur(3px) saturate(0) contrast(1.1)'
           }}
         />
 
@@ -85,7 +99,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           {/* Header row */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-lg font-bold text-gray-950 dark:text-white tracking-tight leading-tight">{displayName}</span>
+              <span className={`text-lg font-bold ${cardColors.title} dark:text-white tracking-tight leading-tight`}>{displayName}</span>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               {isActive && (
@@ -110,8 +124,8 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
 
           {/* Workout count */}
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-gray-950 dark:text-white leading-none">{workoutCount}</span>
-            <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">workout{workoutCount !== 1 ? 's' : ''}</span>
+            <span className={`text-3xl font-bold ${cardColors.title} dark:text-white leading-none`}>{workoutCount}</span>
+            <span className={`text-sm ${cardColors.subtitle} dark:text-gray-400 font-normal`}>workout{workoutCount !== 1 ? 's' : ''}</span>
           </div>
 
           {/* Workout name pills */}
@@ -119,7 +133,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             {workouts.map((w, i) => (
               <span
                 key={i}
-                className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-400/20 dark:bg-white/10 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[12px] font-medium border border-gray-300/40 dark:border-white/10"
+                className={`inline-flex items-center px-3 py-1.5 rounded-full ${cardColors.accent} dark:bg-white/10 backdrop-blur-sm dark:text-gray-300 text-[12px] font-medium border border-current/20 dark:border-white/10`}
               >
                 {w.name}
               </span>
