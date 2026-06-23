@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { MUSCLE_COLORS } from '../lib/exercises';
 import Sparkline from './Sparkline';
 
-const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerciseImages, onSelect }) {
+const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerciseImages, onSelect, isLast }) {
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
   const historyData = exerciseHistory[exercise.name];
   const chartData = historyData?.map(h => ({ v: h.v })) || [];
@@ -11,7 +11,7 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerc
   return (
     <div
       onClick={() => onSelect(exercise)}
-      className="flex items-center gap-3 py-2.5 border-b border-border/50 cursor-pointer active:bg-muted/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
+      className={`flex items-center gap-3 py-3 px-3 cursor-pointer active:bg-black/5 dark:active:bg-muted/50 transition-colors duration-150 ${isLast ? '' : 'border-b border-gray-100 dark:border-border/50'}`}
     >
       {/* Exercise image or letter fallback */}
       <div className="w-14 h-11 rounded-lg flex-shrink-0 overflow-hidden">

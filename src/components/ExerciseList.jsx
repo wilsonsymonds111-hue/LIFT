@@ -22,18 +22,21 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
             ref={el => sectionRefs.current[letter] = el}
             style={{ contentVisibility: 'auto', containIntrinsicSize: `auto ${exs.length * 56}px` }}
           >
-            <div className="py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest glass-header sticky top-0">
+            <div className="pt-3 pb-1 px-1 text-xs font-bold text-muted-foreground uppercase tracking-widest">
               {letter}
             </div>
-            {exs.map(ex => (
+            <div className="bg-white dark:bg-card rounded-2xl shadow-sm overflow-hidden">
+            {exs.map((ex, idx) => (
             <ExerciseRow
               key={ex.name}
               exercise={ex}
               exerciseHistory={exerciseHistory}
               exerciseImages={exerciseImages}
               onSelect={onSelectExercise}
+              isLast={idx === exs.length - 1}
             />
             ))}
+            </div>
           </div>
         ))}
         {grouped.length === 0 && (
