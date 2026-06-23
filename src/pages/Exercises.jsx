@@ -173,13 +173,13 @@ export default function Exercises() {
 
       {/* Search */}
       <div className="px-4 pb-3">
-        <div className="flex items-center gap-2 bg-[#EFEFF4] dark:bg-card rounded-xl px-3.5 py-2.5">
-          <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+        <div className="flex items-center gap-2.5 bg-white dark:bg-card rounded-2xl px-4 py-3 shadow-sm">
+          <Search className="w-4 h-4 text-[#8e8e93] flex-shrink-0" strokeWidth={2} />
           <input
             value={search}
             onChange={handleSearchChange}
             placeholder="Search exercises"
-            className="bg-transparent text-sm flex-1 focus:outline-none text-foreground placeholder:text-gray-400"
+            className="bg-transparent text-sm flex-1 focus:outline-none text-foreground placeholder:text-[#8e8e93]"
           />
         </div>
       </div>
