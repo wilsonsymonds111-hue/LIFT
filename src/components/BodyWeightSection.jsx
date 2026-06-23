@@ -97,23 +97,24 @@ function BodyWeightSection() {
             </div>
 
             {sparkPoints && (
-              <svg viewBox="0 0 100 20" className="w-16 h-8 flex-shrink-0" preserveAspectRatio="none">
+              <svg viewBox="0 0 100 20" className="w-20 h-9 flex-shrink-0" preserveAspectRatio="none">
                 <polyline
                   points={sparkPoints}
                   fill="none"
                   stroke="rgb(168, 85, 247)"
-                  strokeWidth="1.2"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  opacity="0.8"
                 />
                 {dotData.map((dot, i) => (
                   <circle
                     key={i}
                     cx={dot.x}
                     cy={dot.y}
-                    r="1.5"
-                    fill="rgb(168, 85, 247)"
+                    r="2.5"
+                    fill="white"
+                    stroke="rgb(168, 85, 247)"
+                    strokeWidth="2"
                   />
                 ))}
               </svg>
