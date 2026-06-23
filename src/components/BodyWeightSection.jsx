@@ -1,5 +1,5 @@
-import { useState, useEffect, memo } from 'react';
-import { Scale, ChevronRight } from 'lucide-react';
+import { useState, useEffect, memo, useMemo } from 'react';
+import { Scale, ChevronRight, Zap, Dumbbell } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import BodyWeightChartModal from './BodyWeightChartModal';
 
@@ -7,6 +7,12 @@ function BodyWeightSection() {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || 'cutting');
+
+  const handleGoalModeChange = (mode) => {
+    setGoalMode(mode);
+    localStorage.setItem('goalMode', mode);
+  };
 
   const fetchEntries = async () => {
     try {
@@ -25,40 +31,29 @@ function BodyWeightSection() {
     ? new Date(latest.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
     : '';
 
-  // Mini sparkline with dots
-  const { sparkPoints, dotData } = entries.length > 1
-    ? (() => {
-        const reversed = [...entries].reverse();
-        const weights = reversed.map(e => e.weight);
-        const min = Math.min(...weights);
-        const max = Math.max(...weights);
-        const range = max - min || 1;
-        
-        // Determine sampling: show up to 5 dots
-        const step = Math.max(1, Math.ceil(reversed.length / 5));
-        const dots = [];
-        for (let i = 0; i < reversed.length; i += step) {
-          dots.push(i);
-        }
-        if (!dots.includes(reversed.length - 1)) {
-          dots.push(reversed.length - 1);
-        }
-        
-        const polylinePoints = reversed.map((e, i) => {
-          const x = (i / (reversed.length - 1)) * 100;
-          const y = 20 - ((e.weight - min) / range) * 16 - 2;
-          return `${x},${y}`;
-        }).join(' ');
-        
-        const dotCoords = dots.map(i => {
-          const x = (i / (reversed.length - 1)) * 100;
-          const y = 20 - ((reversed[i].weight - min) / range) * 16 - 2;
-          return { x, y };
-        });
-        
-        return { sparkPoints: polylinePoints, dotData: dotCoords };
-      })()
-    : { sparkPoints: null, dotData: [] };
+  // Mini sparkline — matches the exercise card style (blue line, blue dots, gold latest dot)
+  const sparkline = useMemo(() => {
+    if (entries.length < 2) return null;
+    const reversed = [...entries].reverse();
+    const weights = reversed.map(e => e.weight);
+    const min = Math.min(...weights);
+    const max = Math.max(...weights);
+    const range = max - min || 1;
+    const W = 64, H = 24, PAD = 4;
+    const innerW = W - PAD * 2;
+    const innerH = H - PAD * 2;
+    const total = weights.length;
+    const stepX = total === 1 ? 0 : innerW / (total - 1);
+    const pts = weights.map((v, i) => ({
+      x: PAD + (total === 1 ? innerW / 2 : i * stepX),
+      y: PAD + innerH - ((v - min) / range) * innerH,
+    }));
+    const dotIndices = [];
+    const step = Math.max(1, Math.ceil(total / 5));
+    for (let i = 0; i < total; i += step) dotIndices.push(i);
+    if (!dotIndices.includes(total - 1)) dotIndices.push(total - 1);
+    return { pts, dotIndices };
+  }, [entries]);
 
   return (
     <>
@@ -67,6 +62,26 @@ function BodyWeightSection() {
           onClick={() => setShowModal(true)}
           className="bg-white dark:bg-card rounded-[20px] p-3.5 cursor-pointer active:scale-[0.98] transition"
         >
+          {/* Cutting / Bulking toggle */}
+          <div className="flex bg-gray-100 dark:bg-muted rounded-full p-0.5 mb-2.5" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={() => handleGoalModeChange('cutting')}
+              className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-[11px] font-semibold transition ${
+                goalMode === 'cutting' ? 'bg-white dark:bg-card text-amber-500 shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
+              }`}
+            >
+              <Zap className="w-3 h-3" /> Cutting
+            </button>
+            <button
+              onClick={() => handleGoalModeChange('bulking')}
+              className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-[11px] font-semibold transition ${
+                goalMode === 'bulking' ? 'bg-white dark:bg-card text-blue-500 shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
+              }`}
+            >
+              <Dumbbell className="w-3 h-3" /> Bulking
+            </button>
+          </div>
+
           {/* Header */}
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
@@ -96,27 +111,20 @@ function BodyWeightSection() {
               )}
             </div>
 
-            {sparkPoints && (
-              <svg viewBox="0 0 100 24" className="w-16 h-6 flex-shrink-0">
+            {sparkline && (
+              <svg width={64} height={24} viewBox="0 0 64 24" className="flex-shrink-0 block" overflow="visible">
                 <polyline
-                  points={sparkPoints}
+                  points={sparkline.pts.map(p => `${p.x},${p.y}`).join(' ')}
                   fill="none"
-                  stroke="rgb(168, 85, 247)"
-                  strokeWidth="2"
+                  stroke="#3b82f6"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                {dotData.map((dot, i) => (
-                  <circle
-                    key={i}
-                    cx={dot.x}
-                    cy={dot.y}
-                    r="2.2"
-                    fill="white"
-                    stroke="rgb(168, 85, 247)"
-                    strokeWidth="1.8"
-                  />
+                {sparkline.dotIndices.filter(i => i !== sparkline.pts.length - 1).map((idx, n) => (
+                  <circle key={n} cx={sparkline.pts[idx].x} cy={sparkline.pts[idx].y} r={1.8} fill="#3b82f6" stroke="white" strokeWidth={0.8} />
                 ))}
+                <circle cx={sparkline.pts[sparkline.pts.length - 1].x} cy={sparkline.pts[sparkline.pts.length - 1].y} r={2.5} fill="#d4a017" stroke="white" strokeWidth={0.8} />
               </svg>
             )}
           </div>

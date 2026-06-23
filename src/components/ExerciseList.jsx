@@ -44,6 +44,16 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
         )}
       </div>
 
+      {/* Thin vertical fade strip — blurs content overlapping the alphabet legend, full height with soft top/bottom edges */}
+      <div
+        className="fixed top-1/2 -translate-y-1/2 right-0 w-10 pointer-events-none z-20 backdrop-blur-sm bg-gradient-to-l from-background via-background/50 to-transparent dark:from-background dark:via-background/50"
+        style={{
+          height: '600px',
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)',
+        }}
+      />
+
       {availableLetters.length > 0 && (
         <div className="fixed right-1 top-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 z-30">
           {LETTERS.map(l => {
