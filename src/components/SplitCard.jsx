@@ -15,10 +15,10 @@ const DEFAULT_COLORS = [
 ];
 
 const EXERCISE_IMAGES = [
-  'https://images.unsplash.com/photo-1587280413256-afc9d30aede4?w=500&h=300&fit=crop',
-  'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=300&fit=crop',
-  'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&h=300&fit=crop',
-  'https://images.unsplash.com/photo-1594381898411-84ec4f5cd234?w=500&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=300&fit=crop&sat=-100',
+  'https://images.unsplash.com/photo-1581009146989-51e4a94201e5?w=500&h=300&fit=crop&sat=-100',
+  'https://images.unsplash.com/photo-1572988626981-21fca8aef4ea?w=500&h=300&fit=crop&sat=-100',
+  'https://images.unsplash.com/photo-1599058917212-d217cde29706?w=500&h=300&fit=crop&sat=-100',
 ];
 
 function detectSplitType(workoutNames) {
@@ -72,10 +72,13 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
         onClick={onCardClick}
         className="relative bg-white dark:bg-card rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-gray-100/80 dark:border-border shadow-[0_2px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
       >
-        {/* Subtle background image */}
+        {/* Blurred black and white gym background */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-10"
-          style={{ backgroundImage: `url('${imageUrl}')` }}
+          className="absolute inset-0 bg-cover bg-center opacity-8"
+          style={{ 
+            backgroundImage: `url('${imageUrl}')`,
+            filter: 'blur(18px) saturate(0)'
+          }}
         />
 
         <div className="relative p-5 z-10">
