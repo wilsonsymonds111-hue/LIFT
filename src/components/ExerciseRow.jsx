@@ -42,9 +42,9 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerc
         <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
       </div>
 
-      {/* PR text */}
+      {/* PR pill */}
       {prLabel && (
-        <span className="ml-auto flex-shrink-0 text-xs text-gray-500 dark:text-muted-foreground">
+        <span className="ml-auto flex-shrink-0 text-xs font-medium text-[#8e8e93] dark:text-muted-foreground bg-[#e5e5ea] dark:bg-muted px-2.5 py-1 rounded-full">
           {prLabel}
         </span>
       )}
