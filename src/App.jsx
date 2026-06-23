@@ -26,14 +26,14 @@ const lazyRetry = (importFn, retries = 5) =>
     attempt(retries);
   });
 
-const Home = lazy(() => lazyRetry(() => import('./pages/Home')));
-const Splits = lazy(() => lazyRetry(() => import('./pages/Splits')));
+import Home from './pages/Home';
+import Splits from './pages/Splits';
+import Exercises from './pages/Exercises';
 const NewTemplate = lazy(() => lazyRetry(() => import('./pages/NewTemplate')));
 const ActiveWorkout = lazy(() => lazyRetry(() => import('./pages/ActiveWorkout')));
 const TemplateDetail = lazy(() => lazyRetry(() => import('./pages/TemplateDetail')));
 const SplitDetail = lazy(() => lazyRetry(() => import('./pages/SplitDetail')));
 const SupportChat = lazy(() => lazyRetry(() => import('./pages/SupportChat')));
-const Exercises = lazy(() => lazyRetry(() => import('./pages/Exercises')));
 const Terms = lazy(() => lazyRetry(() => import('./pages/Terms')));
 const Privacy = lazy(() => lazyRetry(() => import('./pages/Privacy')));
 
@@ -150,9 +150,6 @@ const usePreloadSubPages = () => {
       import('./pages/SupportChat');
       import('./pages/Terms');
       import('./pages/Privacy');
-      // Preload adjacent tabs for instant swipe
-      import('./pages/Splits');
-      import('./pages/Exercises');
     };
     const hasRIC = typeof requestIdleCallback === 'function';
     const id = hasRIC ? requestIdleCallback(preload, { timeout: 5000 }) : setTimeout(preload, 3000);
