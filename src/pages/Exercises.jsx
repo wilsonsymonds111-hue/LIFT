@@ -173,7 +173,7 @@ export default function Exercises() {
 
       {/* Search */}
       <div className="px-4 pb-3">
-        <div className="flex items-center gap-2.5 bg-white dark:bg-card rounded-2xl px-4 py-3 shadow-sm">
+        <div className="flex items-center gap-2.5 bg-white/40 dark:bg-white/10 backdrop-blur-xl rounded-2xl px-4 py-3 border border-white/30 dark:border-white/10">
           <Search className="w-4 h-4 text-[#8e8e93] flex-shrink-0" strokeWidth={2} />
           <input
             value={search}
