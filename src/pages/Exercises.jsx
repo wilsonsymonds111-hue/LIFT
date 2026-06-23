@@ -173,13 +173,13 @@ export default function Exercises() {
 
       {/* Search */}
       <div className="px-4 pb-3">
-        <div className="flex items-center gap-2 bg-white/60 dark:bg-card rounded-2xl px-3.5 py-2.5 shadow-sm">
-          <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+        <div className="flex items-center gap-2 bg-muted rounded-xl px-3 py-2.5">
+          <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
           <input
             value={search}
             onChange={handleSearchChange}
-            placeholder="Search exercises"
-            className="bg-transparent text-sm flex-1 focus:outline-none text-foreground placeholder:text-gray-400"
+            placeholder="Search"
+            className="bg-transparent text-sm flex-1 focus:outline-none text-foreground placeholder:text-muted-foreground"
           />
         </div>
       </div>
@@ -192,10 +192,10 @@ export default function Exercises() {
             <button
               key={m}
               onClick={() => setMuscleFilter(m)}
-              className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition border ${
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${
                 active
-                  ? 'bg-white text-blue-500 border-blue-500 shadow-sm'
-                  : 'bg-white text-gray-500 border-gray-200 hover:text-gray-700'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-muted text-muted-foreground hover:text-foreground'
               }`}
             >
               {m}
