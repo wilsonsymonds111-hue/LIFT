@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { MoreHorizontal, CalendarPlus, Plus, Moon } from 'lucide-react';
-// Home page — workout dashboard
+// force HMR refresh
 import CalendarSyncModal from '../components/CalendarSyncModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
