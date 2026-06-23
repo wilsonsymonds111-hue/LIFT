@@ -10,16 +10,31 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import BottomNav from './components/BottomNav';
 import { NavProvider } from '@/lib/NavContext';
 
-const Home = lazy(() => import('./pages/Home'));
-const Splits = lazy(() => import('./pages/Splits'));
-const NewTemplate = lazy(() => import('./pages/NewTemplate'));
-const ActiveWorkout = lazy(() => import('./pages/ActiveWorkout'));
-const TemplateDetail = lazy(() => import('./pages/TemplateDetail'));
-const SplitDetail = lazy(() => import('./pages/SplitDetail'));
-const SupportChat = lazy(() => import('./pages/SupportChat'));
-const Exercises = lazy(() => import('./pages/Exercises'));
-const Terms = lazy(() => import('./pages/Terms'));
-const Privacy = lazy(() => import('./pages/Privacy'));
+// Retry wrapper for lazy imports — recovers from transient Vite HMR
+// "Failed to fetch dynamically imported module" errors after recompiles.
+const lazyRetry = (importFn, retries = 3) =>
+  new Promise((resolve, reject) => {
+    const attempt = (n) => {
+      importFn()
+        .then(resolve)
+        .catch((err) => {
+          if (n > 0) setTimeout(() => attempt(n - 1), 200);
+          else reject(err);
+        });
+    };
+    attempt(retries);
+  });
+
+const Home = lazy(() => lazyRetry(() => import('./pages/Home')));
+const Splits = lazy(() => lazyRetry(() => import('./pages/Splits')));
+const NewTemplate = lazy(() => lazyRetry(() => import('./pages/NewTemplate')));
+const ActiveWorkout = lazy(() => lazyRetry(() => import('./pages/ActiveWorkout')));
+const TemplateDetail = lazy(() => lazyRetry(() => import('./pages/TemplateDetail')));
+const SplitDetail = lazy(() => lazyRetry(() => import('./pages/SplitDetail')));
+const SupportChat = lazy(() => lazyRetry(() => import('./pages/SupportChat')));
+const Exercises = lazy(() => lazyRetry(() => import('./pages/Exercises')));
+const Terms = lazy(() => lazyRetry(() => import('./pages/Terms')));
+const Privacy = lazy(() => lazyRetry(() => import('./pages/Privacy')));
 
 const TABS = ['/', '/splits', '/exercises'];
 
