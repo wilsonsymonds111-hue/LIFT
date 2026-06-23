@@ -5,7 +5,6 @@ import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, User
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
 import CreateAccountModal from './CreateAccountModal';
-import BodyWeightTracker from './BodyWeightTracker';
 import ImportStrongModal from './ImportStrongModal';
 import { useNavVisibility } from '@/lib/NavContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -136,9 +135,6 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             <p className="text-xs text-muted-foreground mt-0.5">Bring your workout history from the Strong app</p>
           </div>
         </button>
-
-        {/* Body Weight Tracker */}
-        <BodyWeightTracker />
 
         {/* Feedback & Support */}
         <button
