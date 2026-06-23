@@ -1,29 +1,17 @@
 import { memo } from 'react';
 import { MUSCLE_COLORS } from '../lib/exercises';
+import Sparkline from './Sparkline';
 
 const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerciseImages, onSelect, isLast }) {
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
   const historyData = exerciseHistory[exercise.name];
+  const chartData = historyData?.map(h => ({ v: h.v })) || [];
   const imageUrl = exerciseImages?.[exercise.name];
-
-  // Compute PR from history — find the entry with the highest weight (kg),
-  // or if no weight entries, the highest reps.
-  let prLabel = null;
-  if (historyData?.length > 0) {
-    const hasWeight = historyData.some(h => h.kg > 0);
-    if (hasWeight) {
-      const best = historyData.reduce((best, h) => (h.kg > best.kg ? h : best), historyData[0]);
-      prLabel = `${best.kg} kg (×${best.reps || 1})`;
-    } else {
-      const best = historyData.reduce((best, h) => ((h.reps || 0) > (best.reps || 0) ? h : best), historyData[0]);
-      prLabel = `${best.reps || 0} reps`;
-    }
-  }
 
   return (
     <div
       onClick={() => onSelect(exercise)}
-      className={`flex items-center gap-3 py-3 px-3 cursor-pointer active:bg-black/5 dark:active:bg-muted/50 transition-colors duration-150 ${isLast ? '' : 'border-b border-gray-200/40 dark:border-border/30'}`}
+      className={`flex items-center gap-3 py-3 px-3 cursor-pointer active:bg-black/5 dark:active:bg-muted/50 transition-colors duration-150 ${isLast ? '' : 'border-b border-gray-100 dark:border-border/50'}`}
     >
       {/* Exercise image or letter fallback */}
       <div className="w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-muted">
@@ -42,11 +30,11 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerc
         <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
       </div>
 
-      {/* PR pill */}
-      {prLabel && (
-        <span className="ml-auto flex-shrink-0 text-xs font-medium text-muted-foreground">
-          {prLabel}
-        </span>
+      {/* Mini sparkline */}
+      {chartData.length > 0 && (
+        <div className="w-16 h-8 ml-auto flex-shrink-0 flex items-center justify-center">
+          <Sparkline data={chartData} width={64} height={32} />
+        </div>
       )}
     </div>
   );
