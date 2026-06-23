@@ -156,7 +156,7 @@ export default function Exercises() {
   }, []);
 
   return (
-    <div className="bg-gradient-to-br from-blue-400 via-cyan-300 to-emerald-200 dark:bg-gradient-to-br dark:from-blue-900 dark:via-cyan-800 dark:to-emerald-900 pb-24">
+    <div className="health-gradient pb-24">
       {/* Header */}
       <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
         <h1 className="text-3xl font-extrabold text-foreground leading-tight">Exercises</h1>
