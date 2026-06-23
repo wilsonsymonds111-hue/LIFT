@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import BottomNav from './components/BottomNav';
 import { NavProvider } from '@/lib/NavContext';
+import ImportErrorBoundary from './components/ImportErrorBoundary';
 
 // Retry wrapper for lazy imports — recovers from transient Vite HMR
 // "Failed to fetch dynamically imported module" errors after recompiles.
@@ -214,7 +215,11 @@ const AuthenticatedApp = () => {
   }
 
   // Guest mode or authenticated – always render the app
-  return <AnimatedRoutes />;
+  return (
+    <ImportErrorBoundary>
+      <AnimatedRoutes />
+    </ImportErrorBoundary>
+  );
 };
 
 
