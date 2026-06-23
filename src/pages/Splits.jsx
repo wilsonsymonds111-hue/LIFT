@@ -332,13 +332,13 @@ export default function Splits() {
 
       {/* Top Tabs */}
       <div className="px-4 mb-5">
-        <div className="flex bg-black/5 dark:bg-muted rounded-full p-1 gap-1">
+        <div className="flex bg-blue-100 dark:bg-blue-950/30 rounded-full p-1 gap-1">
           <button
             onClick={() => setActiveTab('mine')}
             className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
               activeTab === 'mine'
-                ? 'bg-white dark:bg-card text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-white dark:bg-card text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-blue-600 dark:text-blue-400/70 hover:text-blue-700 dark:hover:text-blue-300'
             }`}
           >
             My Splits
@@ -347,8 +347,8 @@ export default function Splits() {
             onClick={() => setActiveTab('examples')}
             className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
               activeTab === 'examples'
-                ? 'bg-white dark:bg-card text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-white dark:bg-card text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-blue-600 dark:text-blue-400/70 hover:text-blue-700 dark:hover:text-blue-300'
             }`}
           >
             Example Splits
@@ -369,7 +369,7 @@ export default function Splits() {
             <div className="px-4">
               <button
                 onClick={() => setShowBuilder(true)}
-                className="w-full bg-white dark:bg-card text-foreground font-medium text-sm py-2.5 rounded-2xl border border-gray-200/70 dark:border-border transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+                className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium text-sm py-2.5 rounded-2xl transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Create New Split
