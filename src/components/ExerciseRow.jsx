@@ -34,7 +34,7 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerc
       {/* PR display */}
       {pr && (
         <div className="ml-auto flex-shrink-0 text-right">
-          <p className="text-sm text-muted-foreground">{pr.v} reps</p>
+          <p className="text-sm text-muted-foreground">{pr.kg} kg (×{pr.v})</p>
         </div>
       )}
     </div>
