@@ -70,11 +70,11 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
     <div ref={cardRef}>
       <div
         onClick={onCardClick}
-        className="relative bg-gradient-to-br from-gray-200/40 to-gray-300/50 dark:from-gray-800/40 dark:to-gray-700/40 backdrop-blur-xl rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-white/30 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]"
+        className="relative bg-white dark:bg-card rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-gray-100/80 dark:border-border shadow-[0_2px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
       >
         {/* Subtle background image */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-15"
+          className="absolute inset-0 bg-cover bg-center opacity-10"
           style={{ backgroundImage: `url('${imageUrl}')` }}
         />
 
@@ -82,7 +82,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           {/* Header row */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-base font-semibold text-gray-900 dark:text-gray-100 tracking-tight leading-tight">{displayName}</span>
+              <span className="text-lg font-bold text-gray-950 dark:text-white tracking-tight leading-tight">{displayName}</span>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               {isActive && (
@@ -107,7 +107,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
 
           {/* Workout count */}
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-medium text-gray-800 dark:text-gray-200 leading-none">{workoutCount}</span>
+            <span className="text-3xl font-bold text-gray-950 dark:text-white leading-none">{workoutCount}</span>
             <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">workout{workoutCount !== 1 ? 's' : ''}</span>
           </div>
 
