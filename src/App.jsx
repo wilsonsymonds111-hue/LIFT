@@ -13,13 +13,13 @@ import ImportErrorBoundary from './components/ImportErrorBoundary';
 
 // Retry wrapper for lazy imports — recovers from transient Vite HMR
 // "Failed to fetch dynamically imported module" errors after recompiles.
-const lazyRetry = (importFn, retries = 3) =>
+const lazyRetry = (importFn, retries = 5) =>
   new Promise((resolve, reject) => {
     const attempt = (n) => {
       importFn()
         .then(resolve)
         .catch((err) => {
-          if (n > 0) setTimeout(() => attempt(n - 1), 200);
+          if (n > 0) setTimeout(() => attempt(n - 1), 500);
           else reject(err);
         });
     };
