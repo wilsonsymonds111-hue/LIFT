@@ -6,7 +6,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import ProfileButton from '../components/ProfileButton';
 import SplitCard from '../components/SplitCard';
 import RestFrequencyConfirmModal from '../components/RestFrequencyConfirmModal';
-import SplitsTabButtons from '../components/SplitsTabButtons.jsx';
 
 const SplitBuilder = lazy(() => import('../components/SplitBuilder'));
 const SplitModal = lazy(() => import('../components/SplitModal'));
@@ -332,7 +331,30 @@ export default function Splits() {
       </div>
 
       {/* Top Tabs */}
-      <SplitsTabButtons activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="px-4 mb-5">
+        <div className="flex bg-black/5 dark:bg-muted rounded-full p-1 gap-1">
+          <button
+            onClick={() => setActiveTab('mine')}
+            className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
+              activeTab === 'mine'
+                ? 'bg-white dark:bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            My Splits
+          </button>
+          <button
+            onClick={() => setActiveTab('examples')}
+            className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
+              activeTab === 'examples'
+                ? 'bg-white dark:bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Example Splits
+          </button>
+        </div>
+      </div>
 
       {/* Sub-tab content — side-by-side slide (both panels rendered, animated as a strip) */}
       <div className="relative w-full overflow-hidden">
