@@ -116,13 +116,13 @@ function BodyWeightSection() {
                 <polyline
                   points={sparkline.pts.map(p => `${p.x},${p.y}`).join(' ')}
                   fill="none"
-                  stroke="#3b82f6"
+                  stroke="#A855F7"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
                 {sparkline.dotIndices.filter(i => i !== sparkline.pts.length - 1).map((idx, n) => (
-                  <circle key={n} cx={sparkline.pts[idx].x} cy={sparkline.pts[idx].y} r={1.8} fill="#3b82f6" stroke="white" strokeWidth={0.8} />
+                  <circle key={n} cx={sparkline.pts[idx].x} cy={sparkline.pts[idx].y} r={1.8} fill="#A855F7" stroke="white" strokeWidth={0.8} />
                 ))}
                 <circle cx={sparkline.pts[sparkline.pts.length - 1].x} cy={sparkline.pts[sparkline.pts.length - 1].y} r={2.5} fill="#d4a017" stroke="white" strokeWidth={0.8} />
               </svg>
