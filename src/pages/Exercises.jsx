@@ -202,7 +202,7 @@ export default function Exercises() {
           ))}
         </div>
         {/* Blur overlay on right to prevent overlap with alphabet legend */}
-        <div className="absolute top-0 right-0 bottom-0 w-20 pointer-events-none bg-gradient-to-l from-background dark:from-background to-transparent" />
+        <div className="absolute top-0 right-0 bottom-0 w-40 pointer-events-none bg-gradient-to-l from-background via-background dark:from-background dark:via-background to-transparent" />
       </div>
 
       {filtered.length === 0 && debouncedSearch.trim() ? (
