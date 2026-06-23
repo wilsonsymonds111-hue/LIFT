@@ -25,21 +25,40 @@ function BodyWeightSection() {
     ? new Date(latest.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
     : '';
 
-  // Mini sparkline
-  const sparkPoints = entries.length > 1
+  // Mini sparkline with dots
+  const { sparkPoints, dotData } = entries.length > 1
     ? (() => {
         const reversed = [...entries].reverse();
         const weights = reversed.map(e => e.weight);
         const min = Math.min(...weights);
         const max = Math.max(...weights);
         const range = max - min || 1;
-        return reversed.map((e, i) => {
+        
+        // Determine sampling: show up to 5 dots
+        const step = Math.max(1, Math.ceil(reversed.length / 5));
+        const dots = [];
+        for (let i = 0; i < reversed.length; i += step) {
+          dots.push(i);
+        }
+        if (!dots.includes(reversed.length - 1)) {
+          dots.push(reversed.length - 1);
+        }
+        
+        const polylinePoints = reversed.map((e, i) => {
           const x = (i / (reversed.length - 1)) * 100;
           const y = 20 - ((e.weight - min) / range) * 16 - 2;
           return `${x},${y}`;
         }).join(' ');
+        
+        const dotCoords = dots.map(i => {
+          const x = (i / (reversed.length - 1)) * 100;
+          const y = 20 - ((reversed[i].weight - min) / range) * 16 - 2;
+          return { x, y };
+        });
+        
+        return { sparkPoints: polylinePoints, dotData: dotCoords };
       })()
-    : null;
+    : { sparkPoints: null, dotData: [] };
 
   return (
     <>
@@ -78,15 +97,25 @@ function BodyWeightSection() {
             </div>
 
             {sparkPoints && (
-              <svg viewBox="0 0 100 20" className="w-14 h-7 flex-shrink-0" preserveAspectRatio="none">
+              <svg viewBox="0 0 100 20" className="w-16 h-8 flex-shrink-0" preserveAspectRatio="none">
                 <polyline
                   points={sparkPoints}
                   fill="none"
                   stroke="rgb(168, 85, 247)"
-                  strokeWidth="1.5"
+                  strokeWidth="1.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  opacity="0.8"
                 />
+                {dotData.map((dot, i) => (
+                  <circle
+                    key={i}
+                    cx={dot.x}
+                    cy={dot.y}
+                    r="1.5"
+                    fill="rgb(168, 85, 247)"
+                  />
+                ))}
               </svg>
             )}
           </div>
