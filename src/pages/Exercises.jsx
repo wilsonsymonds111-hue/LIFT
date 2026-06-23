@@ -28,6 +28,51 @@ export default function Exercises() {
   const [creating, setCreating] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
+  // Drag-to-scroll for the muscle filter pills. The swipeable-tab container
+  // (App.jsx) sets touch-action: pan-y and captures horizontal drags for
+  // tab-swiping; a child can't override that (pan-x ∩ pan-y = none), so native
+  // overflow scrolling is blocked. We stop the tab drag from starting and
+  // drive the scroll manually with pointer events.
+  const pillsRef = useRef(null);
+  const pillsDrag = useRef({ active: false, startX: 0, startScroll: 0, moved: false });
+  const justDraggedRef = useRef(false);
+
+  const onPillsPointerMove = (e) => {
+    if (!pillsDrag.current.active) return;
+    const el = pillsRef.current;
+    if (!el) return;
+    const dx = e.clientX - pillsDrag.current.startX;
+    if (Math.abs(dx) > 5) pillsDrag.current.moved = true;
+    el.scrollLeft = pillsDrag.current.startScroll - dx;
+  };
+
+  const onPillsPointerUp = () => {
+    if (pillsDrag.current.moved) {
+      justDraggedRef.current = true;
+      window.setTimeout(() => { justDraggedRef.current = false; }, 60);
+    }
+    pillsDrag.current.active = false;
+    window.removeEventListener('pointermove', onPillsPointerMove);
+    window.removeEventListener('pointerup', onPillsPointerUp);
+    window.removeEventListener('pointercancel', onPillsPointerUp);
+  };
+
+  const onPillsPointerDown = (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.stopPropagation();
+    const el = pillsRef.current;
+    if (!el) return;
+    pillsDrag.current = { active: true, startX: e.clientX, startScroll: el.scrollLeft, moved: false };
+    window.addEventListener('pointermove', onPillsPointerMove);
+    window.addEventListener('pointerup', onPillsPointerUp);
+    window.addEventListener('pointercancel', onPillsPointerUp);
+  };
+
+  const handlePillClick = (m) => {
+    if (justDraggedRef.current) return;
+    setMuscleFilter(m === muscleFilter ? 'All' : m);
+  };
+
   const handleSearchChange = useCallback((e) => {
     const val = e.target.value;
     setSearch(val);
@@ -186,11 +231,16 @@ export default function Exercises() {
 
       {/* Filter pills */}
       <div className="pb-3 relative">
-        <div className="px-4 flex gap-2 overflow-x-auto overflow-y-hidden scrollbar-hide" style={{ touchAction: 'pan-x', overscrollBehavior: 'contain' }}>
+        <div
+          ref={pillsRef}
+          className="px-4 flex gap-2 overflow-x-auto overflow-y-hidden scrollbar-hide cursor-grab active:cursor-grabbing select-none"
+          style={{ touchAction: 'pan-x', overscrollBehavior: 'contain' }}
+          onPointerDown={onPillsPointerDown}
+        >
           {MUSCLES.filter(m => m !== 'All').map(m => (
             <button
               key={m}
-              onClick={() => setMuscleFilter(m === muscleFilter ? 'All' : m)}
+              onClick={() => handlePillClick(m)}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition whitespace-nowrap ${
                 muscleFilter === m
                   ? 'bg-blue-500 text-white'
