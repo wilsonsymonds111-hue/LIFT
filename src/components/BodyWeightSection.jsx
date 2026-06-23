@@ -97,7 +97,7 @@ function BodyWeightSection() {
             </div>
 
             {sparkPoints && (
-              <svg viewBox="0 0 100 20" className="w-20 h-9 flex-shrink-0" preserveAspectRatio="none">
+              <svg viewBox="0 0 100 24" className="w-16 h-6 flex-shrink-0">
                 <polyline
                   points={sparkPoints}
                   fill="none"
@@ -111,10 +111,10 @@ function BodyWeightSection() {
                     key={i}
                     cx={dot.x}
                     cy={dot.y}
-                    r="2.5"
+                    r="2.2"
                     fill="white"
                     stroke="rgb(168, 85, 247)"
-                    strokeWidth="2"
+                    strokeWidth="1.8"
                   />
                 ))}
               </svg>
