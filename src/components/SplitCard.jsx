@@ -72,12 +72,12 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
         onClick={onCardClick}
         className="relative bg-white dark:bg-card rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-gray-100/80 dark:border-border shadow-[0_2px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
       >
-        {/* Blurred black and white gym background */}
+        {/* Subtle black and white gym background */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-12"
+          className="absolute inset-0 bg-cover bg-center opacity-15"
           style={{ 
             backgroundImage: `url('${imageUrl}')`,
-            filter: 'blur(6px) saturate(0)'
+            filter: 'saturate(0)'
           }}
         />
 
