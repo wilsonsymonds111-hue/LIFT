@@ -401,13 +401,14 @@ export default function Splits() {
           <div style={{ width: '50%', flexShrink: 0 }}>
             <div className="px-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split]) => (
+                {Object.entries(EXAMPLE_SPLITS_DATA).map(([key, split], idx) => (
                   <SplitCard
                     key={key}
                     splitKey={key}
                     name={split.name}
                     workouts={split.workouts}
                     isActive={activeExampleSplits[key] || false}
+                    imageIndex={idx}
                     onCardClick={() => setActiveSplit(key)}
                     cardRef={el => cardRefs.current[key] = el}
                   />
