@@ -25,7 +25,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   const [unit, setUnit] = useState(() => localStorage.getItem('weightUnit') || 'kg');
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [goalWeight, setGoalWeight] = useState('');
-  const [goalDate, setGoalDate] = useState('');
   const [goalData, setGoalData] = useState(null);
   const [loadingGoal, setLoadingGoal] = useState(false);
   const [goalError, setGoalError] = useState('');
@@ -48,35 +47,42 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   };
 
   const handleSetGoal = async () => {
-    if (!goalWeight || !goalDate) {
-      setGoalError('Please enter both weight and date');
+    if (!goalWeight) {
+      setGoalError('Please enter a goal weight');
       return;
     }
-    const latest = entries[0];
+    const latest = entries[entries.length - 1];
     if (!latest) {
       setGoalError('Log at least one entry first');
       return;
     }
-    const current = parseFloat(goalWeight);
-    if (current <= 0) {
+    const goalWeightKg = unit === 'lbs' ? lbsToKg(parseFloat(goalWeight)) : parseFloat(goalWeight);
+    if (goalWeightKg <= 0) {
       setGoalError('Goal weight must be positive');
       return;
     }
-    const startDate = new Date(latest.date);
-    const endDate = new Date(goalDate);
-    const daysToGoal = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-    const changeKg = current - latest.weight;
-    const weeklyChangeKg = (changeKg / (daysToGoal / 7)).toFixed(2);
-    const isLosing = changeKg < 0;
-    const rate = Math.abs(weeklyChangeKg);
 
     setLoadingGoal(true);
     setGoalError('');
     try {
+      const changeKg = goalWeightKg - latest.weight;
+      const direction = changeKg < 0 ? 'lose' : 'gain';
       const res = await base44.integrations.Core.InvokeLLM({
-        prompt: `A user is setting a fitness goal: current weight ${latest.weight}kg, goal weight ${current}kg by ${goalDate} (${daysToGoal} days, ${(daysToGoal / 7).toFixed(1)} weeks). This requires a weight change of ${changeKg}kg, or ${weeklyChangeKg}kg per week. Is this a safe and achievable goal? Respond in 1 sentence confirming if it's feasible and briefly explaining why (safe weight loss is ~0.5kg/week, safe gain is ~0.25kg/week).`,
+        prompt: `A user wants to ${direction} weight from ${latest.weight}kg to ${goalWeightKg}kg. At a safe rate of 0.5kg per week, is this a realistic goal? Respond with a brief confirmation (1 sentence) about whether this goal is achievable at 0.5kg/week pace.`,
       });
-      setGoalData({ current: latest.weight, goal: current, weeklyChange: parseFloat(weeklyChangeKg), daysToGoal, goalDate, confirmation: res });
+      const daysToGoal = Math.ceil(Math.abs(changeKg) / 0.5 * 7);
+      const goalDate = new Date(latest.date);
+      goalDate.setDate(goalDate.getDate() + daysToGoal);
+      setGoalData({ 
+        current: latest.weight, 
+        goal: goalWeightKg, 
+        weeklyChange: changeKg < 0 ? -0.5 : 0.5, 
+        daysToGoal, 
+        goalDate: goalDate.toISOString().split('T')[0], 
+        confirmation: res 
+      });
+      setShowGoalModal(false);
+      setGoalWeight('');
     } catch (e) {
       setGoalError('Failed to get AI confirmation. Try again.');
       console.error(e);
@@ -314,8 +320,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
               <Target className="w-4 h-4 text-white" />
             </div>
             <div className="text-left flex-1">
-              <p className="font-semibold text-black dark:text-foreground text-sm">Set AI Weight Goal</p>
-              <p className="text-xs text-gray-600 dark:text-muted-foreground mt-0.5">Get AI confirmation for your target</p>
+              <p className="font-semibold text-black dark:text-foreground text-sm">Set Weight Goal</p>
+              <p className="text-xs text-gray-600 dark:text-muted-foreground mt-0.5">At 0.5kg/week pace</p>
             </div>
           </button>
         )}
@@ -323,6 +329,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
         {showGoalModal && (
           <div className="bg-white dark:bg-card rounded-2xl px-4 py-4 mb-4 border border-gray-200 dark:border-border">
             <div className="space-y-3">
+              <p className="text-xs font-semibold text-gray-600 dark:text-muted-foreground">Target weight at 0.5kg/week</p>
               <input
                 type="number"
                 step="0.1"
@@ -330,12 +337,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                 value={goalWeight}
                 onChange={e => setGoalWeight(e.target.value)}
                 className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-gray-400"
-              />
-              <input
-                type="date"
-                value={goalDate}
-                onChange={e => setGoalDate(e.target.value)}
-                className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               {goalError && (
                 <div className="flex items-start gap-2 bg-red-50 dark:bg-red-950/30 rounded-lg p-2.5 border border-red-200 dark:border-red-700/30">
@@ -348,7 +349,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                 disabled={loadingGoal}
                 className="w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition"
               >
-                {loadingGoal ? 'Getting AI confirmation...' : 'Set Goal & Confirm'}
+                {loadingGoal ? 'Confirming...' : 'Set Goal'}
               </button>
             </div>
           </div>
