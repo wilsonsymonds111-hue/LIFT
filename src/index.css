@@ -84,8 +84,23 @@
 
 /* Exercises page gradient: blue fades to grey by ~60%, then stays grey */
 .exercises-gradient {
+  background: #F5F5F5;
+  position: relative;
+}
+.exercises-gradient::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
   background: linear-gradient(180deg, #B8E0FF 0%, #D4E9FF 8%, #E8EEF5 25%, #F5F5F5 60%, #F5F5F5 100%);
-  background-attachment: fixed;
+  pointer-events: none;
+  z-index: 0;
+}
+.exercises-gradient > * {
+  position: relative;
+  z-index: 1;
 }
 .dark .health-gradient {
   background: linear-gradient(180deg, #1a2235 0%, #181a2a 25%, #0f0f0f 100%);
