@@ -2,16 +2,16 @@ import { MoreHorizontal, Dumbbell, ChevronRight, Check } from 'lucide-react';
 import { memo } from 'react';
 
 const SPLIT_COLORS = {
-  'upper-lower': { icon: 'text-blue-500', iconBg: 'bg-blue-50 dark:bg-blue-950/40', title: 'text-blue-500', bars: ['#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'], gradient: 'from-blue-600 to-blue-900' },
-  'push-pull-legs': { icon: 'text-purple-500', iconBg: 'bg-purple-50 dark:bg-purple-950/40', title: 'text-purple-500', bars: ['#A855F7', '#C084FC', '#D8B4FE', '#E9D5FF'], gradient: 'from-purple-600 to-purple-900' },
-  'full-body': { icon: 'text-orange-500', iconBg: 'bg-orange-50 dark:bg-orange-950/40', title: 'text-orange-500', bars: ['#F97316', '#FB923C', '#FDBA74', '#FED7AA'], gradient: 'from-orange-600 to-orange-900' },
-  'ul-ppl': { icon: 'text-emerald-500', iconBg: 'bg-emerald-50 dark:bg-emerald-950/40', title: 'text-emerald-500', bars: ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0'], gradient: 'from-emerald-600 to-emerald-900' },
+  'upper-lower': {},
+  'push-pull-legs': {},
+  'full-body': {},
+  'ul-ppl': {},
 };
 
 const DEFAULT_COLORS = [
-  { icon: 'text-blue-500', iconBg: 'bg-blue-50 dark:bg-blue-950/40', title: 'text-blue-500', bars: ['#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'], gradient: 'from-blue-600 to-blue-900' },
-  { icon: 'text-rose-500', iconBg: 'bg-rose-50 dark:bg-rose-950/40', title: 'text-rose-500', bars: ['#F43F5E', '#FB7185', '#FDA4AF', '#FECDD3'], gradient: 'from-rose-600 to-rose-900' },
-  { icon: 'text-amber-500', iconBg: 'bg-amber-50 dark:bg-amber-950/40', title: 'text-amber-500', bars: ['#F59E0B', '#FBBF24', '#FCD34D', '#FDE68A'], gradient: 'from-amber-600 to-amber-900' },
+  {},
+  {},
+  {},
 ];
 
 const EXERCISE_IMAGES = [
@@ -70,28 +70,24 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
     <div ref={cardRef}>
       <div
         onClick={onCardClick}
-        className="relative bg-white dark:bg-card rounded-[20px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-gray-100/80 dark:border-border shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
+        className="relative bg-gradient-to-br from-gray-200/40 to-gray-300/50 dark:from-gray-800/40 dark:to-gray-700/40 backdrop-blur-xl rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-white/30 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]"
       >
-        {/* Background image + gradient overlay */}
+        {/* Subtle background image */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-25 blur-sm"
+          className="absolute inset-0 bg-cover bg-center opacity-15"
           style={{ backgroundImage: `url('${imageUrl}')` }}
         />
-        <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} opacity-80`} />
 
-        <div className="relative p-4 z-10">
+        <div className="relative p-5 z-10">
           {/* Header row */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-lg flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/30`}>
-                <Dumbbell className="w-4 h-4 text-white" strokeWidth={2.5} />
-              </div>
-              <span className="text-sm font-bold text-white drop-shadow-md">{displayName}</span>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <span className="text-base font-semibold text-gray-900 dark:text-gray-100 tracking-tight leading-tight">{displayName}</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-shrink-0">
               {isActive && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wide">
-                  <Check className="w-2.5 h-2.5" strokeWidth={3} />
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100/50 dark:bg-emerald-900/30 backdrop-blur-sm text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold uppercase tracking-wide border border-emerald-200/50 dark:border-emerald-700/30">
+                  <Check className="w-3 h-3" strokeWidth={2.5} />
                   Current
                 </span>
               )}
@@ -99,45 +95,28 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
                 <button
                   ref={menuRef}
                   onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/20 transition"
+                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-400/20 dark:hover:bg-white/10 transition"
                 >
-                  <MoreHorizontal className="w-4 h-4 text-white/80" />
+                  <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                 </button>
               ) : (
-                <ChevronRight className="w-4 h-4 text-white/80" />
+                <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               )}
             </div>
           </div>
 
-          {/* Content row: big value + mini bar chart */}
-          <div className="flex items-end justify-between">
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-white drop-shadow-md leading-none">{workoutCount}</span>
-              <span className="text-xs text-white/80 font-medium">workout{workoutCount !== 1 ? 's' : ''}</span>
-            </div>
-
-            {/* Mini bar chart */}
-            <div className="flex items-end gap-1 h-9">
-              {barHeights.map((h, i) => (
-                <div
-                  key={i}
-                  className="w-1.5 rounded-full"
-                  style={{
-                    height: `${h}%`,
-                    backgroundColor: colors.bars[i % colors.bars.length],
-                    opacity: i === barHeights.length - 1 ? 1 : 0.5,
-                  }}
-                />
-              ))}
-            </div>
+          {/* Workout count */}
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-medium text-gray-800 dark:text-gray-200 leading-none">{workoutCount}</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">workout{workoutCount !== 1 ? 's' : ''}</span>
           </div>
 
           {/* Workout name pills */}
-          <div className="flex flex-wrap gap-1.5 mt-3">
+          <div className="flex flex-wrap gap-2 mt-4">
             {workouts.map((w, i) => (
               <span
                 key={i}
-                className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/20 backdrop-blur-sm text-white text-[11px] font-medium border border-white/30"
+                className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-400/20 dark:bg-white/10 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[12px] font-medium border border-gray-300/40 dark:border-white/10"
               >
                 {w.name}
               </span>
