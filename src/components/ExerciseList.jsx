@@ -15,7 +15,7 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
 
   return (
     <div className="relative">
-      <div className="pl-4 pr-10">
+      <div className="pl-4 pr-2">
         {grouped.map(([letter, exs]) => (
           <div
             key={letter}
@@ -25,7 +25,7 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
             <div className="pt-4 pb-1.5 px-1 text-lg font-bold text-black dark:text-foreground">
               {letter}
             </div>
-            <div className="bg-white dark:bg-card rounded-xl border border-gray-200/40 dark:border-border/40 overflow-hidden">
+            <div className="bg-white dark:bg-card rounded-xl border border-gray-200/20 dark:border-border/20 overflow-hidden">
             {exs.map((ex, idx) => (
             <ExerciseRow
               key={ex.name}
