@@ -18,6 +18,9 @@ export default function usePullToRefresh(onRefresh) {
 
   useEffect(() => {
     const onTouchStart = (e) => {
+      // Skip touches on fixed-position overlays (modals, bottom sheets) —
+      // these are portaled outside the scroll container and shouldn't trigger pull-to-refresh
+      if (e.target?.closest?.('.fixed')) return;
       const scrollTop = containerRef.current
         ? containerRef.current.scrollTop
         : document.documentElement.scrollTop;
