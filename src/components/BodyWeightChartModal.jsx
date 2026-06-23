@@ -181,7 +181,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       </div>
 
       {/* Zoom slider */}
-      {sorted.length > 3 && (
+      {sorted.length > 1 && (
         <div className="px-6 pb-4 flex-shrink-0">
           <div className="flex items-center gap-3">
             <span className="text-[10px] font-semibold text-gray-400 dark:text-muted-foreground flex-shrink-0">All</span>

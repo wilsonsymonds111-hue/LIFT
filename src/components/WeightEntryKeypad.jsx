@@ -1,19 +1,13 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check, Delete, User } from 'lucide-react';
+import { Delete } from 'lucide-react';
 
-const KEYS = [
-  { k: '1', sub: '' }, { k: '2', sub: 'ABC' }, { k: '3', sub: 'DEF' },
-  { k: '4', sub: 'GHI' }, { k: '5', sub: 'JKL' }, { k: '6', sub: 'MNO' },
-  { k: '7', sub: 'PQRS' }, { k: '8', sub: 'TUV' }, { k: '9', sub: 'WXYZ' },
-  { k: '.', sub: '' }, { k: '0', sub: '' }, { k: 'del', sub: '' },
-];
+const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'del'];
 
 export default function WeightEntryKeypad({ onClose, onSave }) {
   const [value, setValue] = useState('');
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const timeStr = now.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' });
 
   const handleKey = (key) => {
     if (key === 'del') {
@@ -33,71 +27,62 @@ export default function WeightEntryKeypad({ onClose, onSave }) {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] bg-[#F2F2F7] dark:bg-background flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-[calc(1rem+env(safe-area-inset-top))] pb-3">
-        <button
-          onClick={onClose}
-          className="w-9 h-9 flex items-center justify-center rounded-full bg-[#E5E5EA] dark:bg-muted active:scale-95 transition"
-        >
-          <X className="w-4 h-4 text-black dark:text-foreground" />
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={!value || parseFloat(value) <= 0}
-          className="w-9 h-9 flex items-center justify-center rounded-full bg-[#E5E5EA] dark:bg-muted disabled:opacity-40 active:scale-95 transition"
-        >
-          <Check className="w-5 h-5 text-purple-500" />
-        </button>
-      </div>
+    <div className="fixed inset-0 z-[60] flex items-end" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/30" />
 
-      {/* Central content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <div className="w-20 h-20 rounded-full bg-white dark:bg-card shadow-sm flex items-center justify-center mb-4">
-          <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center">
-            <User className="w-7 h-7 text-white" />
-          </div>
+      <div
+        onClick={e => e.stopPropagation()}
+        className="relative w-full bg-[#F2F2F7] dark:bg-background rounded-t-3xl pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-2xl"
+        style={{ animation: 'slideUp 0.25s cubic-bezier(0.33, 1, 0.68, 1)' }}
+      >
+        <style>{`@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>
+
+        {/* Grab handle */}
+        <div className="flex justify-center pt-2 pb-1">
+          <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-muted" />
         </div>
-        <h2 className="text-2xl font-bold text-black dark:text-foreground mb-6">Weight</h2>
 
-        {/* Input card */}
-        <div className="w-full max-w-sm bg-white dark:bg-card rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100 dark:border-border">
-            <span className="text-sm text-gray-500 dark:text-muted-foreground">Date</span>
-            <span className="text-sm font-medium text-black dark:text-foreground bg-[#E5E5EA] dark:bg-muted px-3 py-1 rounded-full">{dateStr}</span>
-          </div>
-          <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100 dark:border-border">
-            <span className="text-sm text-gray-500 dark:text-muted-foreground">Time</span>
-            <span className="text-sm font-medium text-black dark:text-foreground bg-[#E5E5EA] dark:bg-muted px-3 py-1 rounded-full">{timeStr}</span>
-          </div>
-          <div className="flex items-center justify-between px-4 py-3.5">
-            <span className="text-sm text-gray-500 dark:text-muted-foreground">kg</span>
-            <span className="text-2xl font-bold text-black dark:text-foreground tabular-nums">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-2">
+          <button onClick={onClose} className="text-sm font-medium text-gray-500 dark:text-muted-foreground active:opacity-60 transition">Cancel</button>
+          <span className="text-sm font-semibold text-black dark:text-foreground">New Weight</span>
+          <button
+            onClick={handleSave}
+            disabled={!value || parseFloat(value) <= 0}
+            className="text-sm font-bold text-purple-500 disabled:opacity-40 active:opacity-60 transition"
+          >
+            Save
+          </button>
+        </div>
+
+        {/* Weight display */}
+        <div className="flex flex-col items-center py-3">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-5xl font-bold text-black dark:text-foreground tabular-nums">
               {value || <span className="text-gray-300 dark:text-muted-foreground">0</span>}
             </span>
+            <span className="text-xl font-medium text-gray-400 dark:text-muted-foreground">kg</span>
           </div>
+          <span className="text-xs text-gray-400 dark:text-muted-foreground mt-1">{dateStr}</span>
         </div>
-      </div>
 
-      {/* Keypad */}
-      <div className="px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-        <div className="grid grid-cols-3 gap-2.5 max-w-sm mx-auto">
-          {KEYS.map(({ k, sub }) => (
-            <button
-              key={k}
-              onClick={() => handleKey(k)}
-              className="h-14 rounded-2xl bg-white dark:bg-card shadow-sm flex flex-col items-center justify-center active:bg-gray-100 dark:active:bg-muted transition"
-            >
-              {k === 'del' ? (
-                <Delete className="w-5 h-5 text-black dark:text-foreground" />
-              ) : (
-                <>
-                  <span className="text-xl font-semibold text-black dark:text-foreground leading-none">{k}</span>
-                  {sub && <span className="text-[9px] text-gray-400 dark:text-muted-foreground mt-0.5 tracking-wider">{sub}</span>}
-                </>
-              )}
-            </button>
-          ))}
+        {/* Keypad */}
+        <div className="px-4 pt-1">
+          <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
+            {KEYS.map(k => (
+              <button
+                key={k}
+                onClick={() => handleKey(k)}
+                className="h-12 rounded-xl bg-white dark:bg-card shadow-sm flex items-center justify-center active:bg-gray-100 dark:active:bg-muted transition"
+              >
+                {k === 'del' ? (
+                  <Delete className="w-5 h-5 text-black dark:text-foreground" />
+                ) : (
+                  <span className="text-lg font-semibold text-black dark:text-foreground">{k}</span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>,
