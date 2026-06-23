@@ -195,7 +195,7 @@ export default function Exercises() {
               className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition border ${
                 active
                   ? 'bg-white text-blue-500 border-blue-500 shadow-sm'
-                  : 'bg-white text-gray-500 border-gray-200 hover:text-gray-700'
+                  : 'bg-[#eef0f2] text-black border-transparent hover:bg-[#e4e6e8]'
               }`}
             >
               {m}
