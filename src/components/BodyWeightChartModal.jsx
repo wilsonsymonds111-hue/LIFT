@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, Plus, Trash2, Edit3, Check, Apple, Target, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, Edit3, Check, Apple, Target, AlertCircle, Zap, BicepsFlexed } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
 import { Slider } from '@/components/ui/slider';
 import { base44 } from '@/api/base44Client';
@@ -24,6 +24,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   const [importMsg, setImportMsg] = useState('');
   const [unit, setUnit] = useState(() => localStorage.getItem('weightUnit') || 'kg');
   const [showGoalModal, setShowGoalModal] = useState(false);
+  const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || 'cutting');
   const [goalWeight, setGoalWeight] = useState('');
   const [goalData, setGoalData] = useState(null);
   const [loadingGoal, setLoadingGoal] = useState(false);
@@ -225,6 +226,28 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
           <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-muted active:scale-95 transition">
             <Plus className="w-5 h-5 text-purple-500" />
           </button>
+        </div>
+
+        {/* Cutting / Bulking toggle */}
+        <div className="flex justify-center px-4 pb-2 flex-shrink-0">
+          <div className="inline-flex bg-gray-100 dark:bg-muted rounded-full p-0.5">
+            <button
+              onClick={() => { setGoalMode('cutting'); localStorage.setItem('goalMode', 'cutting'); }}
+              className={`flex items-center justify-center gap-1 px-3 py-1 rounded-full text-[10px] font-semibold transition ${
+                goalMode === 'cutting' ? 'bg-white dark:bg-card text-amber-500 shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
+              }`}
+            >
+              <Zap className="w-2.5 h-2.5" /> Cutting
+            </button>
+            <button
+              onClick={() => { setGoalMode('bulking'); localStorage.setItem('goalMode', 'bulking'); }}
+              className={`flex items-center justify-center gap-1 px-3 py-1 rounded-full text-[10px] font-semibold transition ${
+                goalMode === 'bulking' ? 'bg-white dark:bg-card text-blue-500 shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
+              }`}
+            >
+              <BicepsFlexed className="w-2.5 h-2.5" /> Bulking
+            </button>
+          </div>
         </div>
 
       {/* Metric section with unit toggle */}

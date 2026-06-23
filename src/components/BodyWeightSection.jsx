@@ -1,5 +1,5 @@
 import { useState, useEffect, memo, useMemo } from 'react';
-import { Scale, ChevronRight, Zap, Dumbbell } from 'lucide-react';
+import { Scale, ChevronRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import BodyWeightChartModal from './BodyWeightChartModal';
 
@@ -7,12 +7,6 @@ function BodyWeightSection() {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || 'cutting');
-
-  const handleGoalModeChange = (mode) => {
-    setGoalMode(mode);
-    localStorage.setItem('goalMode', mode);
-  };
 
   const fetchEntries = async () => {
     try {
@@ -62,26 +56,6 @@ function BodyWeightSection() {
           onClick={() => setShowModal(true)}
           className="bg-white dark:bg-card rounded-[20px] p-3.5 cursor-pointer active:scale-[0.98] transition"
         >
-          {/* Cutting / Bulking toggle */}
-          <div className="flex bg-gray-100 dark:bg-muted rounded-full p-0.5 mb-2.5" onClick={e => e.stopPropagation()}>
-            <button
-              onClick={() => handleGoalModeChange('cutting')}
-              className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-[11px] font-semibold transition ${
-                goalMode === 'cutting' ? 'bg-white dark:bg-card text-amber-500 shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
-              }`}
-            >
-              <Zap className="w-3 h-3" /> Cutting
-            </button>
-            <button
-              onClick={() => handleGoalModeChange('bulking')}
-              className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-[11px] font-semibold transition ${
-                goalMode === 'bulking' ? 'bg-white dark:bg-card text-blue-500 shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
-              }`}
-            >
-              <Dumbbell className="w-3 h-3" /> Bulking
-            </button>
-          </div>
-
           {/* Header */}
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
