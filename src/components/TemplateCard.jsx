@@ -29,10 +29,10 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
 
   return (
     <div
-      className={`relative bg-card rounded-xl p-4 shadow-[0_2px_10px_rgba(0,0,0,0.3)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.35)] hover:scale-[1.02] hover:border-emerald-500 transition-all duration-150 border-2 ${
+      className={`relative bg-white dark:bg-card rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border ${
         isCompleted
           ? 'border-emerald-400 bg-emerald-50/60 dark:bg-emerald-950/30'
-          : `border-border ${isTodayCard ? 'ring-2 ring-emerald-400/60' : ''}`
+          : `border-gray-200/70 dark:border-border ${isTodayCard ? 'ring-2 ring-emerald-400/60' : ''}`
       }`}
     >
       {/* Green checkmark — completed today */}

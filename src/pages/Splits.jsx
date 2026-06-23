@@ -316,14 +316,14 @@ export default function Splits() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen health-gradient flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="bg-background pb-20">
+    <div className="health-gradient pb-20">
       {/* Header */}
       <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
         <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workout Splits</h1>
@@ -332,12 +332,12 @@ export default function Splits() {
 
       {/* Top Tabs */}
       <div className="px-4 mb-5">
-        <div className="flex bg-muted rounded-xl p-1 gap-1">
+        <div className="flex bg-black/5 dark:bg-muted rounded-full p-1 gap-1">
           <button
             onClick={() => setActiveTab('mine')}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
+            className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
               activeTab === 'mine'
-                ? 'bg-blue-500 text-white shadow-md'
+                ? 'bg-white dark:bg-card text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -345,9 +345,9 @@ export default function Splits() {
           </button>
           <button
             onClick={() => setActiveTab('examples')}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${
+            className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
               activeTab === 'examples'
-                ? 'bg-blue-500 text-white shadow-md'
+                ? 'bg-white dark:bg-card text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -369,7 +369,7 @@ export default function Splits() {
             <div className="px-4">
               <button
                 onClick={() => setShowBuilder(true)}
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium text-sm py-1.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+                className="w-full bg-white dark:bg-card text-foreground font-medium text-sm py-2.5 rounded-2xl border border-gray-200/70 dark:border-border transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Create New Split

@@ -77,12 +77,22 @@
 
 
 
-/* Apple Health-style gradient background */
+/* Apple Health / MyFitnessPal-style gradient background */
 .health-gradient {
-  background: linear-gradient(135deg, #FFD1B3 0%, #F5DCE8 45%, #E0C3FC 100%);
+  background: linear-gradient(180deg, #BDD7E8 0%, #D8E3EB 12%, #ECEEF2 30%, #F2F2F7 100%);
 }
 .dark .health-gradient {
-  background: linear-gradient(135deg, #1a1520 0%, #1e1a2e 50%, #1a1520 100%);
+  background: linear-gradient(180deg, #1a2235 0%, #181a2a 25%, #15161f 100%);
+}
+
+/* Semi-transparent sticky header that blends with the gradient */
+.glass-header {
+  background: rgba(242, 242, 247, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.dark .glass-header {
+  background: rgba(21, 22, 31, 0.75);
 }
 
 /* Exercise detail shimmer – defined once, not injected per render */

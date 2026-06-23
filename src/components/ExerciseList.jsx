@@ -22,7 +22,7 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
             ref={el => sectionRefs.current[letter] = el}
             style={{ contentVisibility: 'auto', containIntrinsicSize: `auto ${exs.length * 56}px` }}
           >
-            <div className="py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest bg-background sticky top-0">
+            <div className="py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest glass-header sticky top-0">
               {letter}
             </div>
             {exs.map(ex => (

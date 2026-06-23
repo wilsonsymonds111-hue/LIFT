@@ -156,14 +156,14 @@ export default function Exercises() {
   }, []);
 
   return (
-    <div className="bg-background pb-24">
+    <div className="health-gradient pb-24">
       {/* Header */}
       <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
         <h1 className="text-3xl font-extrabold text-foreground leading-tight">Exercises</h1>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950/50 hover:scale-110 active:scale-95 transition-all duration-150 border-2 border-border hover:border-blue-400/30 flex-shrink-0"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-card text-blue-500 dark:text-blue-400 hover:scale-105 active:scale-95 transition-all duration-150 border border-gray-200/70 dark:border-border flex-shrink-0"
           >
             <Plus className="w-5 h-5" />
           </button>
