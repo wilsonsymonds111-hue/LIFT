@@ -1,12 +1,15 @@
 import { useState, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, Plus, Trash2, Edit3, Check, Apple } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts';
+import { ChevronLeft, Plus, Trash2, Edit3, Check, Apple, Target, AlertCircle } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
 import { Slider } from '@/components/ui/slider';
 import { base44 } from '@/api/base44Client';
 import WeightEntryKeypad from './WeightEntryKeypad';
 
 const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+const kgToLbs = (kg) => parseFloat((kg * 2.20462).toFixed(2));
+const lbsToKg = (lbs) => parseFloat((lbs / 2.20462).toFixed(2));
 
 export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   const [zoom, setZoom] = useState(() => {
@@ -19,6 +22,13 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   const [editDate, setEditDate] = useState('');
   const [importing, setImporting] = useState(false);
   const [importMsg, setImportMsg] = useState('');
+  const [unit, setUnit] = useState(() => localStorage.getItem('weightUnit') || 'kg');
+  const [showGoalModal, setShowGoalModal] = useState(false);
+  const [goalWeight, setGoalWeight] = useState('');
+  const [goalDate, setGoalDate] = useState('');
+  const [goalData, setGoalData] = useState(null);
+  const [loadingGoal, setLoadingGoal] = useState(false);
+  const [goalError, setGoalError] = useState('');
   const fileInputRef = useRef(null);
 
   const sorted = useMemo(() =>
@@ -37,13 +47,77 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
     localStorage.setItem('bodyWeightZoom', String(v));
   };
 
-  const chartData = useMemo(() =>
-    filtered.map(e => ({
+  const handleSetGoal = async () => {
+    if (!goalWeight || !goalDate) {
+      setGoalError('Please enter both weight and date');
+      return;
+    }
+    const latest = entries[0];
+    if (!latest) {
+      setGoalError('Log at least one entry first');
+      return;
+    }
+    const current = parseFloat(goalWeight);
+    if (current <= 0) {
+      setGoalError('Goal weight must be positive');
+      return;
+    }
+    const startDate = new Date(latest.date);
+    const endDate = new Date(goalDate);
+    const daysToGoal = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const changeKg = current - latest.weight;
+    const weeklyChangeKg = (changeKg / (daysToGoal / 7)).toFixed(2);
+    const isLosing = changeKg < 0;
+    const rate = Math.abs(weeklyChangeKg);
+
+    setLoadingGoal(true);
+    setGoalError('');
+    try {
+      const res = await base44.integrations.Core.InvokeLLM({
+        prompt: `A user is setting a fitness goal: current weight ${latest.weight}kg, goal weight ${current}kg by ${goalDate} (${daysToGoal} days, ${(daysToGoal / 7).toFixed(1)} weeks). This requires a weight change of ${changeKg}kg, or ${weeklyChangeKg}kg per week. Is this a safe and achievable goal? Respond in 1 sentence confirming if it's feasible and briefly explaining why (safe weight loss is ~0.5kg/week, safe gain is ~0.25kg/week).`,
+      });
+      setGoalData({ current: latest.weight, goal: current, weeklyChange: parseFloat(weeklyChangeKg), daysToGoal, goalDate, confirmation: res });
+    } catch (e) {
+      setGoalError('Failed to get AI confirmation. Try again.');
+      console.error(e);
+    } finally {
+      setLoadingGoal(false);
+    }
+  };
+
+  const chartData = useMemo(() => {
+    const data = filtered.map(e => ({
       date: new Date(e.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-      weight: e.weight,
+      weight: unit === 'lbs' ? kgToLbs(e.weight) : e.weight,
       id: e.id,
-    })),
-  [filtered]);
+    }));
+    
+    // Add AI goal projected points if set
+    if (goalData) {
+      const startDate = new Date(entries.find(en => en.date === entries.sort((a, b) => new Date(a.date) - new Date(b.date))[0].date).date);
+      const endDate = new Date(goalData.goalDate);
+      const weeks = (endDate - startDate) / (1000 * 60 * 60 * 24 * 7);
+      for (let w = 1; w <= Math.ceil(weeks); w++) {
+        const projDate = new Date(startDate.getTime() + w * 7 * 24 * 60 * 60 * 1000);
+        const projWeight = goalData.current + (goalData.weeklyChange * w);
+        data.push({
+          date: projDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+          weightProjection: unit === 'lbs' ? kgToLbs(projWeight) : projWeight,
+          isProjection: true,
+        });
+      }
+    }
+    return data.sort((a, b) => {
+      const aDate = new Date(a.date);
+      const bDate = new Date(b.date);
+      return aDate - bDate;
+    });
+  }, [filtered, unit, goalData, entries]);
+
+  const displayAverage = useMemo(() => {
+    if (!average) return null;
+    return unit === 'lbs' ? kgToLbs(parseFloat(average)).toFixed(2) : average;
+  }, [average, unit]);
 
   const average = filtered.length > 0
     ? (filtered.reduce((s, e) => s + e.weight, 0) / filtered.length).toFixed(2)
@@ -147,16 +221,28 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
           </button>
         </div>
 
-      {/* Metric section */}
-      <div className="px-4 pb-2 flex-shrink-0">
-        <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">AVERAGE</p>
-        {average ? (
-          <p className="text-3xl font-bold text-black dark:text-foreground mt-0.5">{average} <span className="text-lg font-medium text-gray-400 dark:text-muted-foreground">kg</span></p>
-        ) : (
-          <p className="text-3xl font-bold text-gray-300 dark:text-muted-foreground mt-0.5">—</p>
-        )}
-        {dateRange && <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{dateRange}</p>}
-      </div>
+      {/* Metric section with unit toggle */}
+       <div className="px-4 pb-2 flex-shrink-0">
+         <div className="flex items-center justify-between mb-2">
+           <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">AVERAGE</p>
+           <button
+             onClick={() => {
+               const newUnit = unit === 'kg' ? 'lbs' : 'kg';
+               setUnit(newUnit);
+               localStorage.setItem('weightUnit', newUnit);
+             }}
+             className="text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 dark:bg-muted text-gray-600 dark:text-muted-foreground hover:bg-gray-200 dark:hover:bg-muted/80 transition"
+           >
+             {unit === 'kg' ? 'kg' : 'lbs'}
+           </button>
+         </div>
+         {displayAverage ? (
+           <p className="text-3xl font-bold text-black dark:text-foreground mt-0.5">{displayAverage} <span className="text-lg font-medium text-gray-400 dark:text-muted-foreground">{unit}</span></p>
+         ) : (
+           <p className="text-3xl font-bold text-gray-300 dark:text-muted-foreground mt-0.5">—</p>
+         )}
+         {dateRange && <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{dateRange}</p>}
+       </div>
 
       {/* Chart */}
       <div className="px-4 pb-2 flex-shrink-0">
@@ -172,6 +258,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                   labelStyle={{ color: '#8E8E93' }}
                 />
                 <Line type="monotone" dataKey="weight" stroke="#A855F7" strokeWidth={2.5} dot={{ r: 3, fill: '#A855F7' }} activeDot={{ r: 5, fill: '#A855F7' }} />
+                {goalData && <Line type="monotone" dataKey="weightProjection" stroke="#A855F7" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 2.5, fill: '#A855F7', opacity: 0.5 }} activeDot={{ r: 4, fill: '#A855F7', opacity: 0.7 }} />}
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -199,8 +286,74 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
         </div>
       )}
 
+      {/* Goal section */}
+      {goalData && (
+        <div className="px-4 pb-3 flex-shrink-0">
+          <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl p-4 border border-emerald-200 dark:border-emerald-700/30">
+            <div className="flex items-start gap-3">
+              <Target className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">Goal: {goalData.goal} {unit} by {goalData.goalDate}</p>
+                <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 italic">{goalData.confirmation}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-4 pb-6">
+        {/* AI Goal setter */}
+        {entries.length > 0 && (
+          <button
+            onClick={() => setShowGoalModal(!showGoalModal)}
+            className="w-full flex items-center gap-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/40 dark:to-purple-950/40 rounded-2xl px-4 py-3.5 mb-4 border border-blue-200/50 dark:border-purple-700/30 transition active:opacity-70"
+          >
+            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Target className="w-4 h-4 text-white" />
+            </div>
+            <div className="text-left flex-1">
+              <p className="font-semibold text-black dark:text-foreground text-sm">Set AI Weight Goal</p>
+              <p className="text-xs text-gray-600 dark:text-muted-foreground mt-0.5">Get AI confirmation for your target</p>
+            </div>
+          </button>
+        )}
+
+        {showGoalModal && (
+          <div className="bg-white dark:bg-card rounded-2xl px-4 py-4 mb-4 border border-gray-200 dark:border-border">
+            <div className="space-y-3">
+              <input
+                type="number"
+                step="0.1"
+                placeholder={`Goal weight (${unit})`}
+                value={goalWeight}
+                onChange={e => setGoalWeight(e.target.value)}
+                className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-gray-400"
+              />
+              <input
+                type="date"
+                value={goalDate}
+                onChange={e => setGoalDate(e.target.value)}
+                className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              {goalError && (
+                <div className="flex items-start gap-2 bg-red-50 dark:bg-red-950/30 rounded-lg p-2.5 border border-red-200 dark:border-red-700/30">
+                  <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-red-700 dark:text-red-300">{goalError}</p>
+                </div>
+              )}
+              <button
+                onClick={handleSetGoal}
+                disabled={loadingGoal}
+                className="w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition"
+              >
+                {loadingGoal ? 'Getting AI confirmation...' : 'Set Goal & Confirm'}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Apple Health Import */}
         <button
           onClick={() => fileInputRef.current?.click()}
@@ -238,7 +391,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                 ) : (
                   <>
                     <div className="flex-1">
-                      <span className="font-semibold text-black dark:text-foreground text-sm">{entry.weight} kg</span>
+                      <span className="font-semibold text-black dark:text-foreground text-sm">{unit === 'lbs' ? kgToLbs(entry.weight).toFixed(2) : entry.weight} {unit}</span>
                     </div>
                     <span className="text-xs text-gray-500 dark:text-muted-foreground">{fmtDate(entry.date)}</span>
                     <button onClick={() => startEdit(entry)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-muted transition">
