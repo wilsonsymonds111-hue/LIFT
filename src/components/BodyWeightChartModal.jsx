@@ -133,17 +133,19 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 bg-[#F2F2F7] dark:bg-background flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-2 flex-shrink-0">
-        <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-muted active:scale-95 transition">
-          <ChevronLeft className="w-6 h-6 text-purple-500" />
-        </button>
-        <h1 className="text-base font-semibold text-black dark:text-foreground">Weight</h1>
-        <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-muted active:scale-95 transition">
-          <Plus className="w-5 h-5 text-purple-500" />
-        </button>
-      </div>
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={onClose}>
+      <div className="absolute inset-0" onClick={onClose} />
+      <div className="relative w-full max-w-2xl mx-auto mb-8 bg-white dark:bg-card rounded-3xl shadow-2xl flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
+          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-muted active:scale-95 transition">
+            <ChevronLeft className="w-6 h-6 text-purple-500" />
+          </button>
+          <h1 className="text-base font-semibold text-black dark:text-foreground">Weight</h1>
+          <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-muted active:scale-95 transition">
+            <Plus className="w-5 h-5 text-purple-500" />
+          </button>
+        </div>
 
       {/* Metric section */}
       <div className="px-4 pb-2 flex-shrink-0">
@@ -253,12 +255,13 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
         </div>
       </div>
 
-      {showKeypad && (
-        <WeightEntryKeypad
-          onClose={() => setShowKeypad(false)}
-          onSave={handleKeypadSave}
-        />
-      )}
+        {showKeypad && (
+          <WeightEntryKeypad
+            onClose={() => setShowKeypad(false)}
+            onSave={handleKeypadSave}
+          />
+        )}
+      </div>
     </div>,
     document.body
   );
