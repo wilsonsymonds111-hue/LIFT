@@ -25,6 +25,7 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
             <div className="pt-4 pb-1.5 px-1 text-lg font-bold text-black dark:text-foreground">
               {letter}
             </div>
+            <div className="bg-white dark:bg-card rounded-xl border border-gray-200/40 dark:border-border/40 overflow-hidden">
             {exs.map((ex, idx) => (
             <ExerciseRow
               key={ex.name}
@@ -35,6 +36,7 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
               isLast={idx === exs.length - 1}
             />
             ))}
+            </div>
           </div>
         ))}
         {grouped.length === 0 && (
