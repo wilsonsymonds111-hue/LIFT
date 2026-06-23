@@ -85,6 +85,7 @@
 /* Exercises page gradient: blue fades to grey */
 .exercises-gradient {
   background: linear-gradient(180deg, #B8E0FF 0%, #D4E9FF 10%, #E8EEF5 30%, #F5F5F5 100%);
+  background-attachment: fixed;
 }
 .dark .health-gradient {
   background: linear-gradient(180deg, #1a2235 0%, #181a2a 25%, #0f0f0f 100%);
