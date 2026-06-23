@@ -185,20 +185,24 @@ export default function Exercises() {
       </div>
 
       {/* Filter pills */}
-      <div className="px-4 pb-3 flex gap-2 overflow-x-auto overflow-y-hidden scrollbar-hide">
-        {MUSCLES.filter(m => m !== 'All').map(m => (
-          <button
-            key={m}
-            onClick={() => setMuscleFilter(m === muscleFilter ? 'All' : m)}
-            className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition whitespace-nowrap ${
-              muscleFilter === m
-                ? 'bg-blue-500 text-white'
-                : 'bg-white dark:bg-card text-foreground border border-gray-200 dark:border-border hover:bg-gray-50 dark:hover:bg-muted'
-            }`}
-          >
-            {m}
-          </button>
-        ))}
+      <div className="pb-3 relative">
+        <div className="px-4 flex gap-2 overflow-x-auto overflow-y-hidden scrollbar-hide">
+          {MUSCLES.filter(m => m !== 'All').map(m => (
+            <button
+              key={m}
+              onClick={() => setMuscleFilter(m === muscleFilter ? 'All' : m)}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition whitespace-nowrap ${
+                muscleFilter === m
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white dark:bg-card text-foreground border border-gray-200 dark:border-border hover:bg-gray-50 dark:hover:bg-muted'
+              }`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+        {/* Blur overlay on right to prevent overlap with alphabet legend */}
+        <div className="absolute top-0 right-0 bottom-0 w-20 pointer-events-none bg-gradient-to-l from-background dark:from-background to-transparent" />
       </div>
 
       {filtered.length === 0 && debouncedSearch.trim() ? (
