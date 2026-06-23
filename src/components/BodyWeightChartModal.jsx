@@ -114,14 +114,14 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
     });
   }, [filtered, unit, goalData, entries]);
 
+  const average = filtered.length > 0
+    ? (filtered.reduce((s, e) => s + e.weight, 0) / filtered.length).toFixed(2)
+    : null;
+
   const displayAverage = useMemo(() => {
     if (!average) return null;
     return unit === 'lbs' ? kgToLbs(parseFloat(average)).toFixed(2) : average;
   }, [average, unit]);
-
-  const average = filtered.length > 0
-    ? (filtered.reduce((s, e) => s + e.weight, 0) / filtered.length).toFixed(2)
-    : null;
 
   const dateRange = filtered.length > 0
     ? `${fmtDate(filtered[0].date)} – ${fmtDate(filtered[filtered.length - 1].date)}`
