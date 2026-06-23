@@ -186,7 +186,7 @@ export default function Exercises() {
 
       {/* Filter pills */}
       <div className="pb-3 relative">
-        <div className="px-4 flex gap-2 overflow-x-auto overflow-y-hidden scrollbar-hide">
+        <div className="px-4 flex gap-2 overflow-x-auto overflow-y-hidden scrollbar-hide" style={{ touchAction: 'pan-x', overscrollBehavior: 'contain' }}>
           {MUSCLES.filter(m => m !== 'All').map(m => (
             <button
               key={m}

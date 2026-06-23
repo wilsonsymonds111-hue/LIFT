@@ -186,7 +186,7 @@
   }
 
   /* iOS momentum scrolling for all scrollable containers */
-  .overflow-y-auto, .overflow-auto, .overflow-y-scroll, .overflow-scroll {
+  .overflow-y-auto, .overflow-auto, .overflow-y-scroll, .overflow-scroll, .overflow-x-auto, .overflow-x-scroll {
     -webkit-overflow-scrolling: touch;
   }
 
