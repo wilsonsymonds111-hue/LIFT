@@ -2,16 +2,23 @@ import { MoreHorizontal, Dumbbell, ChevronRight, Check } from 'lucide-react';
 import { memo } from 'react';
 
 const SPLIT_COLORS = {
-  'upper-lower': { icon: 'text-blue-500', iconBg: 'bg-blue-50 dark:bg-blue-950/40', title: 'text-blue-500', bars: ['#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'] },
-  'push-pull-legs': { icon: 'text-purple-500', iconBg: 'bg-purple-50 dark:bg-purple-950/40', title: 'text-purple-500', bars: ['#A855F7', '#C084FC', '#D8B4FE', '#E9D5FF'] },
-  'full-body': { icon: 'text-orange-500', iconBg: 'bg-orange-50 dark:bg-orange-950/40', title: 'text-orange-500', bars: ['#F97316', '#FB923C', '#FDBA74', '#FED7AA'] },
-  'ul-ppl': { icon: 'text-emerald-500', iconBg: 'bg-emerald-50 dark:bg-emerald-950/40', title: 'text-emerald-500', bars: ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0'] },
+  'upper-lower': { icon: 'text-blue-500', iconBg: 'bg-blue-50 dark:bg-blue-950/40', title: 'text-blue-500', bars: ['#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'], gradient: 'from-blue-600 to-blue-900' },
+  'push-pull-legs': { icon: 'text-purple-500', iconBg: 'bg-purple-50 dark:bg-purple-950/40', title: 'text-purple-500', bars: ['#A855F7', '#C084FC', '#D8B4FE', '#E9D5FF'], gradient: 'from-purple-600 to-purple-900' },
+  'full-body': { icon: 'text-orange-500', iconBg: 'bg-orange-50 dark:bg-orange-950/40', title: 'text-orange-500', bars: ['#F97316', '#FB923C', '#FDBA74', '#FED7AA'], gradient: 'from-orange-600 to-orange-900' },
+  'ul-ppl': { icon: 'text-emerald-500', iconBg: 'bg-emerald-50 dark:bg-emerald-950/40', title: 'text-emerald-500', bars: ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0'], gradient: 'from-emerald-600 to-emerald-900' },
 };
 
 const DEFAULT_COLORS = [
-  { icon: 'text-blue-500', iconBg: 'bg-blue-50 dark:bg-blue-950/40', title: 'text-blue-500', bars: ['#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'] },
-  { icon: 'text-rose-500', iconBg: 'bg-rose-50 dark:bg-rose-950/40', title: 'text-rose-500', bars: ['#F43F5E', '#FB7185', '#FDA4AF', '#FECDD3'] },
-  { icon: 'text-amber-500', iconBg: 'bg-amber-50 dark:bg-amber-950/40', title: 'text-amber-500', bars: ['#F59E0B', '#FBBF24', '#FCD34D', '#FDE68A'] },
+  { icon: 'text-blue-500', iconBg: 'bg-blue-50 dark:bg-blue-950/40', title: 'text-blue-500', bars: ['#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'], gradient: 'from-blue-600 to-blue-900' },
+  { icon: 'text-rose-500', iconBg: 'bg-rose-50 dark:bg-rose-950/40', title: 'text-rose-500', bars: ['#F43F5E', '#FB7185', '#FDA4AF', '#FECDD3'], gradient: 'from-rose-600 to-rose-900' },
+  { icon: 'text-amber-500', iconBg: 'bg-amber-50 dark:bg-amber-950/40', title: 'text-amber-500', bars: ['#F59E0B', '#FBBF24', '#FCD34D', '#FDE68A'], gradient: 'from-amber-600 to-amber-900' },
+];
+
+const EXERCISE_IMAGES = [
+  'https://images.unsplash.com/photo-1587280413256-afc9d30aede4?w=500&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1594381898411-84ec4f5cd234?w=500&h=300&fit=crop',
 ];
 
 function detectSplitType(workoutNames) {
@@ -51,24 +58,39 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
     return Math.min(base, 90);
   });
 
+  const imageUrl = EXERCISE_IMAGES[
+    imageIndex != null
+      ? imageIndex % EXERCISE_IMAGES.length
+      : splitKey
+        ? (parseInt(splitKey.match(/\d+/)?.[0] || '0', 10) || 0) % EXERCISE_IMAGES.length
+        : 0
+  ];
+
   return (
     <div ref={cardRef}>
       <div
         onClick={onCardClick}
         className="relative bg-white dark:bg-card rounded-[20px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-gray-100/80 dark:border-border shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
       >
-        <div className="p-4">
+        {/* Background image + gradient overlay */}
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-25 blur-sm"
+          style={{ backgroundImage: `url('${imageUrl}')` }}
+        />
+        <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} opacity-80`} />
+
+        <div className="relative p-4 z-10">
           {/* Header row */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${colors.iconBg}`}>
-                <Dumbbell className={`w-4 h-4 ${colors.icon}`} strokeWidth={2.5} />
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/30`}>
+                <Dumbbell className="w-4 h-4 text-white" strokeWidth={2.5} />
               </div>
-              <span className={`text-sm font-bold ${colors.title}`}>{displayName}</span>
+              <span className="text-sm font-bold text-white drop-shadow-md">{displayName}</span>
             </div>
             <div className="flex items-center gap-1">
               {isActive && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wide">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wide">
                   <Check className="w-2.5 h-2.5" strokeWidth={3} />
                   Current
                 </span>
@@ -77,12 +99,12 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
                 <button
                   ref={menuRef}
                   onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-muted transition"
+                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/20 transition"
                 >
-                  <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+                  <MoreHorizontal className="w-4 h-4 text-white/80" />
                 </button>
               ) : (
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <ChevronRight className="w-4 h-4 text-white/80" />
               )}
             </div>
           </div>
@@ -90,8 +112,8 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           {/* Content row: big value + mini bar chart */}
           <div className="flex items-end justify-between">
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-black dark:text-foreground leading-none">{workoutCount}</span>
-              <span className="text-xs text-gray-400 dark:text-muted-foreground font-medium">workout{workoutCount !== 1 ? 's' : ''}</span>
+              <span className="text-3xl font-bold text-white drop-shadow-md leading-none">{workoutCount}</span>
+              <span className="text-xs text-white/80 font-medium">workout{workoutCount !== 1 ? 's' : ''}</span>
             </div>
 
             {/* Mini bar chart */}
@@ -115,7 +137,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             {workouts.map((w, i) => (
               <span
                 key={i}
-                className="inline-flex items-center px-2.5 py-1 rounded-md bg-gray-50 dark:bg-muted text-gray-600 dark:text-muted-foreground text-[11px] font-medium"
+                className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/20 backdrop-blur-sm text-white text-[11px] font-medium border border-white/30"
               >
                 {w.name}
               </span>
