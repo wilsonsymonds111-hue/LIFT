@@ -263,8 +263,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                   contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
                   labelStyle={{ color: '#8E8E93' }}
                 />
-                <Line type="monotone" dataKey="weight" stroke="#A855F7" strokeWidth={2.5} dot={{ r: 3, fill: '#A855F7' }} activeDot={{ r: 5, fill: '#A855F7' }} />
-                {goalData && <Line type="monotone" dataKey="weightProjection" stroke="#A855F7" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 2.5, fill: '#A855F7', opacity: 0.5 }} activeDot={{ r: 4, fill: '#A855F7', opacity: 0.7 }} />}
+                <Line type="monotone" dataKey="weight" stroke="#A855F7" strokeWidth={2.5} dot={{ r: 4, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }} />
+                {goalData && <Line type="monotone" dataKey="weightProjection" stroke="#e9d5ff" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={{ r: 5, fill: '#fff', fillOpacity: 0.6, stroke: '#e9d5ff', strokeWidth: 1.5, strokeDasharray: '3 2' }} activeDot={{ r: 5, fill: '#c4b5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
               </LineChart>
             </ResponsiveContainer>
           </div>
