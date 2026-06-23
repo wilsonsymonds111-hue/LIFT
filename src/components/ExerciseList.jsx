@@ -49,8 +49,10 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
         className="fixed top-1/2 -translate-y-1/2 right-0 w-10 pointer-events-none z-20 backdrop-blur-sm bg-gradient-to-l from-background via-background/50 to-transparent dark:from-background dark:via-background/50"
         style={{
           height: '600px',
-          maskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)',
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to right, transparent 0%, black 45%, black 100%)',
+          maskComposite: 'intersect',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to right, transparent 0%, black 45%, black 100%)',
+          WebkitMaskComposite: 'source-in',
         }}
       />
 
