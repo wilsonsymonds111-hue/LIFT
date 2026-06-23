@@ -14,12 +14,12 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerc
       className={`flex items-center gap-3 py-3 px-3 cursor-pointer active:bg-black/5 dark:active:bg-muted/50 transition-colors duration-150 ${isLast ? '' : 'border-b border-gray-100 dark:border-border/50'}`}
     >
       {/* Exercise image or letter fallback */}
-      <div className="w-14 h-11 rounded-lg flex-shrink-0 overflow-hidden">
+      <div className="w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-muted">
         {imageUrl ? (
           <img src={imageUrl} alt={exercise.name} loading="lazy" decoding="async" className="w-full h-full object-contain" />
         ) : (
           <div className={`w-full h-full ${colors.bg} flex items-center justify-center`}>
-            <span className={`text-sm font-bold ${colors.text}`}>{exercise.name[0]}</span>
+            <span className={`text-base font-bold ${colors.text}`}>{exercise.name[0]}</span>
           </div>
         )}
       </div>

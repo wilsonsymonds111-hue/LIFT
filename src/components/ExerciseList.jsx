@@ -22,7 +22,7 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
             ref={el => sectionRefs.current[letter] = el}
             style={{ contentVisibility: 'auto', containIntrinsicSize: `auto ${exs.length * 56}px` }}
           >
-            <div className="pt-3 pb-1 px-1 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+            <div className="pt-4 pb-1.5 px-1 text-lg font-bold text-black dark:text-foreground">
               {letter}
             </div>
             <div className="bg-white dark:bg-card rounded-2xl shadow-sm overflow-hidden">
