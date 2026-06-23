@@ -156,7 +156,7 @@ export default function Exercises() {
   }, []);
 
   return (
-    <div className="health-gradient pb-24">
+    <div className="bg-gradient-to-br from-blue-400 via-cyan-300 to-emerald-200 dark:bg-gradient-to-br dark:from-blue-900 dark:via-cyan-800 dark:to-emerald-900 pb-24">
       {/* Header */}
       <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
         <h1 className="text-3xl font-extrabold text-foreground leading-tight">Exercises</h1>
@@ -184,24 +184,28 @@ export default function Exercises() {
         </div>
       </div>
 
-      {/* Muscle filter pills */}
-      <div className="pl-4 pr-10 pb-3 flex gap-2 overflow-x-auto">
-        {MUSCLES.map(m => {
-          const active = muscleFilter === m;
-          return (
-            <button
-              key={m}
-              onClick={() => setMuscleFilter(m)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${
-                active
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-muted text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {m}
-            </button>
-          );
-        })}
+      {/* Filter dropdowns */}
+      <div className="px-4 pb-3 flex gap-2">
+        <select
+          value={muscleFilter}
+          onChange={(e) => setMuscleFilter(e.target.value)}
+          className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-card text-sm font-medium text-foreground border border-gray-200 dark:border-border focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          <option>Any Body Part</option>
+          {MUSCLES.filter(m => m !== 'All').map(m => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
+        <select
+          className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-card text-sm font-medium text-foreground border border-gray-200 dark:border-border focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          <option>Any Category</option>
+        </select>
+        <button className="px-3 py-2.5 rounded-xl bg-white dark:bg-card border border-gray-200 dark:border-border flex items-center justify-center hover:bg-gray-50 dark:hover:bg-muted transition">
+          <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+        </button>
       </div>
 
       {filtered.length === 0 && debouncedSearch.trim() ? (
