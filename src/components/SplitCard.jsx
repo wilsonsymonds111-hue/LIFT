@@ -74,10 +74,10 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
       >
         {/* Blurred black and white gym background */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-8"
+          className="absolute inset-0 bg-cover bg-center opacity-12"
           style={{ 
             backgroundImage: `url('${imageUrl}')`,
-            filter: 'blur(18px) saturate(0)'
+            filter: 'blur(6px) saturate(0)'
           }}
         />
 
