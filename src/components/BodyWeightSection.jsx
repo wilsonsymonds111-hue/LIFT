@@ -54,7 +54,7 @@ function BodyWeightSection() {
       <div className="px-4 py-2">
         <div
           onClick={() => setShowModal(true)}
-          className="bg-white dark:bg-card rounded-2xl p-4 cursor-pointer active:scale-[0.98] transition border border-gray-200/70 dark:border-border"
+          className="relative bg-white dark:bg-card rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-gray-200/70 dark:border-border cursor-pointer active:scale-[0.98]"
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-1.5">
