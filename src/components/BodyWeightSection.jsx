@@ -54,13 +54,13 @@ function BodyWeightSection() {
       <div className="px-4 py-2">
         <div
           onClick={() => setShowModal(true)}
-          className="relative bg-white dark:bg-card rounded-2xl p-3 transition-all duration-150 hover:scale-[1.01] border border-gray-200/70 dark:border-border cursor-pointer active:scale-[0.98]"
+          className="relative bg-white dark:bg-card rounded-2xl p-2.5 transition-all duration-150 hover:scale-[1.01] border border-gray-200/70 dark:border-border cursor-pointer active:scale-[0.98]"
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between mb-0.5">
             <div className="flex items-center gap-1.5">
-              <div className="w-5 h-5 bg-purple-100 dark:bg-purple-900/40 rounded-md flex items-center justify-center">
-                <PersonStanding className="w-3 h-3 text-purple-500" />
+              <div className="w-4 h-4 bg-purple-100 dark:bg-purple-900/40 rounded-md flex items-center justify-center">
+                <PersonStanding className="w-2.5 h-2.5 text-purple-500" />
               </div>
               <span className="text-xs font-semibold text-gray-500 dark:text-muted-foreground">Bodyweight</span>
             </div>
@@ -74,11 +74,11 @@ function BodyWeightSection() {
           <div className="flex items-end justify-between">
             <div className="flex items-baseline gap-1">
               {loading ? (
-                <div className="h-6 w-16 bg-gray-100 dark:bg-muted rounded animate-pulse" />
+                <div className="h-5 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
               ) : latest ? (
                 <>
-                  <span className="text-2xl font-bold text-black dark:text-foreground">{latest.weight}</span>
-                  <span className="text-xs text-gray-400 dark:text-muted-foreground font-medium">kg</span>
+                  <span className="text-xl font-bold text-black dark:text-foreground">{latest.weight}</span>
+                  <span className="text-[11px] text-gray-400 dark:text-muted-foreground font-medium">kg</span>
                 </>
               ) : (
                 <span className="text-sm text-gray-400 dark:text-muted-foreground">Tap to log</span>
@@ -86,7 +86,7 @@ function BodyWeightSection() {
             </div>
 
             {sparkline && (
-              <svg width={64} height={24} viewBox="0 0 64 24" className="flex-shrink-0 block" overflow="visible">
+              <svg width={56} height={20} viewBox="0 0 64 24" className="flex-shrink-0 block" overflow="visible">
                 <polyline
                   points={sparkline.pts.map(p => `${p.x},${p.y}`).join(' ')}
                   fill="none"
