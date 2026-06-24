@@ -1,7 +1,6 @@
 export const ALL_EXERCISES = [
   { name: 'Ab Wheel Rollouts', muscle: 'Core' },
   { name: 'Arnold Press (Dumbbell)', muscle: 'Shoulders' },
-  { name: 'Around the World', muscle: 'Chest' },
   { name: 'Back Extension', muscle: 'Back' },
   { name: 'Back Extension (Machine)', muscle: 'Back' },
   { name: 'Ball Slams', muscle: 'Full Body' },
