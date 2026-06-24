@@ -93,10 +93,11 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   };
 
   const chartData = useMemo(() => {
-    const data = filtered.map(e => ({
+    const data = filtered.map((e, i) => ({
       date: new Date(e.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
       weight: unit === 'lbs' ? kgToLbs(e.weight) : e.weight,
       id: e.id,
+      isLatest: i === filtered.length - 1,
     }));
     
     // Add goal projection: a dotted line from the most recent recorded weight
@@ -225,7 +226,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   return createPortal(
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={onClose}>
       <div className="absolute inset-0" onClick={onClose} />
-      <div className="relative w-full max-w-2xl mx-auto mb-8 bg-white dark:bg-card rounded-3xl shadow-2xl flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+      <div className="relative w-full max-w-2xl mx-auto bg-white dark:bg-card rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-2.5rem)] mt-10" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
           <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-muted active:scale-95 transition">
@@ -297,8 +298,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                   contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
                   labelStyle={{ color: '#8E8E93' }}
                 />
-                <Line type="monotone" dataKey="weight" stroke="#A855F7" strokeWidth={2.5} dot={{ r: 4, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }} animationDuration={200} animationEasing="ease-out" />
-                {goalData && <Line type="linear" dataKey="weightProjection" stroke="#e9d5ff" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={{ r: 5, fill: '#fff', fillOpacity: 0.6, stroke: '#e9d5ff', strokeWidth: 1.5, strokeDasharray: '3 2' }} activeDot={{ r: 5, fill: '#c4b5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
+                <Line type="monotone" dataKey="weight" stroke="#A855F7" strokeWidth={2.5} dot={(props) => ({ r: props.payload.isLatest ? 5 : 4, fill: props.payload.isLatest ? '#6D28D9' : '#A855F7', stroke: '#fff', strokeWidth: 2 })} activeDot={{ r: 6, fill: '#6D28D9', stroke: '#fff', strokeWidth: 2 }} animationDuration={200} animationEasing="ease-out" />
+                {goalData && <Line type="linear" dataKey="weightProjection" stroke="#e9d5ff" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={(props) => props.payload.weight != null ? false : { r: 5, fill: '#fff', fillOpacity: 0.6, stroke: '#e9d5ff', strokeWidth: 1.5, strokeDasharray: '3 2' }} activeDot={{ r: 5, fill: '#c4b5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
               </LineChart>
             </ResponsiveContainer>
           </div>
