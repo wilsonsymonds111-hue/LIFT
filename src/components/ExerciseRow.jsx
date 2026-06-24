@@ -12,10 +12,10 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerc
   return (
     <div
       onClick={() => onSelect(exercise)}
-      className={`flex items-center gap-3 py-3 px-3 cursor-pointer bg-white/40 dark:bg-card/20 active:bg-black/5 dark:active:bg-muted/50 transition-colors duration-150 ${isLast ? '' : 'border-b border-gray-300/30 dark:border-gray-600/20'}`}
+      className={`flex items-center gap-3 py-3 px-3 cursor-pointer bg-white/70 dark:bg-card/40 active:bg-black/5 dark:active:bg-muted/50 transition-colors duration-150 ${isLast ? '' : 'border-b border-gray-300/30 dark:border-gray-600/20'}`}
     >
       {/* Exercise image or letter fallback */}
-      <div className="w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-muted">
+      <div className="w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden bg-gray-50 dark:bg-muted/60">
         {imageUrl ? (
           <img src={imageUrl} alt={exercise.name} loading="lazy" decoding="async" className="w-full h-full object-contain" />
         ) : (
