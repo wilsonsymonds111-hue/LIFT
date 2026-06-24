@@ -1,4 +1,6 @@
 import { memo, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import ExerciseRow from './ExerciseRow';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -11,7 +13,13 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
+  // The tab content div uses `contain: layout`, which makes it the containing
+  // block for fixed descendants — so a fixed legend scrolls with the content.
+  // Portal it to the body so it stays fixed to the viewport, and only show it
+  // on the exercises page (the list stays mounted on other tabs).
+  const isExercisesPage = useLocation().pathname === '/exercises';
   const availableLetters = grouped.map(([l]) => l);
+  const showLegend = isExercisesPage && availableLetters.length > 0;
 
   return (
     <div className="relative">
@@ -44,37 +52,39 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
         )}
       </div>
 
-      {/* Thin vertical fade strip — blurs content overlapping the alphabet legend, full height with soft top/bottom edges */}
-      <div
-        className="fixed top-1/2 -translate-y-1/2 right-0 w-10 pointer-events-none z-20 backdrop-blur-sm bg-gradient-to-l from-background via-background/50 to-transparent dark:from-background dark:via-background/50"
-        style={{
-          height: '600px',
-          maskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to right, transparent 0%, black 45%, black 100%)',
-          maskComposite: 'intersect',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to right, transparent 0%, black 45%, black 100%)',
-          WebkitMaskComposite: 'source-in',
-        }}
-      />
-
-      {availableLetters.length > 0 && (
-        <div className="fixed right-1 top-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 z-30">
-          {LETTERS.map(l => {
-            const exists = availableLetters.includes(l);
-            return (
-              <button
-                key={l}
-                onClick={() => exists && scrollToLetter(l)}
-                className={`text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-sm transition ${
-                  exists
-                    ? 'text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950'
-                    : 'text-muted-foreground/30'
-                }`}
-              >
-                {l}
-              </button>
-            );
-          })}
-        </div>
+      {showLegend && createPortal(
+        <>
+          {/* Thin vertical fade strip — blurs content overlapping the alphabet legend */}
+          <div
+            className="fixed top-1/2 -translate-y-1/2 right-0 w-10 pointer-events-none z-20 backdrop-blur-sm bg-gradient-to-l from-background via-background/50 to-transparent dark:from-background dark:via-background/50"
+            style={{
+              height: '600px',
+              maskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to right, transparent 0%, black 45%, black 100%)',
+              maskComposite: 'intersect',
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to right, transparent 0%, black 45%, black 100%)',
+              WebkitMaskComposite: 'source-in',
+            }}
+          />
+          <div className="fixed right-1 top-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 z-30">
+            {LETTERS.map(l => {
+              const exists = availableLetters.includes(l);
+              return (
+                <button
+                  key={l}
+                  onClick={() => exists && scrollToLetter(l)}
+                  className={`text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-sm transition ${
+                    exists
+                      ? 'text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950'
+                      : 'text-muted-foreground/30'
+                  }`}
+                >
+                  {l}
+                </button>
+              );
+            })}
+          </div>
+        </>,
+        document.body
       )}
     </div>
   );
