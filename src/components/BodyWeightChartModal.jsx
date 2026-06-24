@@ -99,17 +99,15 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
     }));
     
     // Add goal projection: a dotted line from the most recent recorded weight
-    // forward to the target, anchored on the last actual point so it connects.
+    // forward to the target. Attach the projection start to the last actual
+    // data point so the dotted line connects seamlessly to the solid history.
     if (goalData) {
       const recent = filtered[filtered.length - 1];
-      if (recent) {
+      if (recent && data.length > 0) {
         const rate = Math.abs(goalData.weeklyChange);
         const weeks = Math.max(1, Math.ceil(Math.abs(goalData.goal - recent.weight) / rate));
         const startDate = new Date(recent.date + 'T00:00:00');
-        data.push({
-          date: startDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-          weightProjection: unit === 'lbs' ? kgToLbs(recent.weight) : recent.weight,
-        });
+        data[data.length - 1].weightProjection = unit === 'lbs' ? kgToLbs(recent.weight) : recent.weight;
         for (let w = 1; w <= weeks; w++) {
           const projDate = new Date(startDate.getTime() + w * 7 * 24 * 60 * 60 * 1000);
           const projWeight = recent.weight + (goalData.weeklyChange * w);
@@ -303,7 +301,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                   labelStyle={{ color: '#8E8E93' }}
                 />
                 <Line type="monotone" dataKey="weight" stroke="#A855F7" strokeWidth={2.5} dot={{ r: 4, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }} animationDuration={400} animationEasing="ease-out" />
-                {goalData && <Line type="monotone" dataKey="weightProjection" stroke="#e9d5ff" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={{ r: 5, fill: '#fff', fillOpacity: 0.6, stroke: '#e9d5ff', strokeWidth: 1.5, strokeDasharray: '3 2' }} activeDot={{ r: 5, fill: '#c4b5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
+                {goalData && <Line type="linear" dataKey="weightProjection" stroke="#e9d5ff" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={{ r: 5, fill: '#fff', fillOpacity: 0.6, stroke: '#e9d5ff', strokeWidth: 1.5, strokeDasharray: '3 2' }} activeDot={{ r: 5, fill: '#c4b5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
               </LineChart>
             </ResponsiveContainer>
           </div>
