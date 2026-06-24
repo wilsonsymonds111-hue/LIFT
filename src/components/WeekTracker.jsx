@@ -7,13 +7,10 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
 
-  // Rotate so today is first
-  const rotatedSchedule = [...schedule.slice(todayMonSun), ...schedule.slice(0, todayMonSun)];
+  // schedule & workoutNames are already today-first; only the day letters need rotating
+  const rotatedSchedule = schedule;
   const rotatedLabels = [...DAY_LETTERS.slice(todayMonSun), ...DAY_LETTERS.slice(0, todayMonSun)];
-  const rawWorkoutNames = workoutNames || [];
-  const rotatedNames = rawWorkoutNames.length > 0
-    ? [...rawWorkoutNames.slice(todayMonSun), ...rawWorkoutNames.slice(0, todayMonSun)]
-    : [];
+  const rotatedNames = workoutNames || [];
 
   return (
     <div className="px-4 pb-2">

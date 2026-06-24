@@ -27,18 +27,36 @@ const SPLIT_CYCLES = {
 
 // --- Module-level schedule helpers (run fresh every render, no stale memo) ---
 
+// Build a 7-day schedule starting from TODAY (index 0 = today) using a continuous
+// cycle across real calendar days. This avoids the old Mon–Sun week model, which
+// forced pre-start days to rest and produced consecutive rest days at the week wrap.
 function cycleToSchedule(onDays, offDays, startDayIdx) {
   const cycleLength = onDays + offDays;
+  const now = new Date();
+  const todayMonSun = now.getDay() === 0 ? 6 : now.getDay() - 1;
+  const todayAbs = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  const startAbs = todayAbs - todayMonSun + startDayIdx;
   const schedule = [];
-  for (let i = 0; i < 7; i++) {
-    if (i < startDayIdx) {
-      schedule.push(0); // Before cycle start — rest day
-    } else {
-      const pos = (i - startDayIdx) % cycleLength;
-      schedule.push(pos < onDays ? 1 : 0);
-    }
+  for (let k = 0; k < 7; k++) {
+    const offset = (todayAbs + k) - startAbs;
+    const pos = ((offset % cycleLength) + cycleLength) % cycleLength;
+    schedule.push(pos < onDays ? 1 : 0);
   }
   return schedule;
+}
+
+// On-day index (0-based from the cycle start) for the k-th display day (0 = today).
+// Lets workouts rotate correctly across a continuous cycle that drifts past week boundaries.
+function onDayIndexForDisplay(k, startDayIdx, onDays, offDays) {
+  const cycleLength = onDays + offDays;
+  const now = new Date();
+  const todayMonSun = now.getDay() === 0 ? 6 : now.getDay() - 1;
+  const todayAbs = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  const startAbs = todayAbs - todayMonSun + startDayIdx;
+  const offset = (todayAbs + k) - startAbs;
+  const pos = ((offset % cycleLength) + cycleLength) % cycleLength;
+  const cycleNum = Math.floor(offset / cycleLength);
+  return cycleNum * onDays + pos;
 }
 
 function resolveSchedule(key, workoutCount, groupId) {
@@ -220,67 +238,52 @@ export default function Home() {
   const { schedule, startDayIndex, onDays, offDays } = splitDetection;
   const sorted = currentSplit;
 
-  // Map each on-day to a workout by counting only ON days (skip rest days in modulo).
+  // schedule is today-first (index 0 = today). Map each on-day to a workout by
+  // counting on-days from the cycle start across the continuous cycle.
   const dayWorkoutNames = useMemo(() => {
     const names = [];
-    for (let i = 0; i < 7; i++) {
-      if (schedule[i] && sorted.length > 0) {
-        let onDayCount = 0;
-        for (let j = startDayIndex; ; j++) {
-          const idx = j % 7;
-          if (schedule[idx]) onDayCount++;
-          if (idx === i) break;
-        }
-        const workoutIdx = (onDayCount - 1) % sorted.length;
+    for (let k = 0; k < 7; k++) {
+      if (schedule[k] && sorted.length > 0) {
+        const onDayIdx = onDayIndexForDisplay(k, startDayIndex, onDays, offDays);
+        const workoutIdx = ((onDayIdx % sorted.length) + sorted.length) % sorted.length;
         names.push(sorted[workoutIdx]?.name?.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '') || '');
       } else {
         names.push(null);
       }
     }
     return names;
-  }, [schedule, startDayIndex, sorted]);
+  }, [schedule, startDayIndex, sorted, onDays, offDays]);
 
-  const todayMonSun = useMemo(() => new Date().getDay() === 0 ? 6 : new Date().getDay() - 1, []);
-
-  // Enhance schedule with completion status (2 = today's workout completed)
+  // Enhance schedule with completion status (2 = today's workout completed).
+  // Today is display index 0.
   const scheduleWithCompletions = useMemo(() => {
     const _now = new Date();
     const todayStr = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`;
-    return schedule.map((status, i) => {
+    return schedule.map((status, k) => {
       if (status < 1 || sorted.length === 0) return status;
-      // Only today can be "completed"
-      if (i !== todayMonSun) return 1;
-      let onDayCount = 0;
-      for (let j = startDayIndex; ; j++) {
-        const idx = j % 7;
-        if (schedule[idx]) onDayCount++;
-        if (idx === i) break;
-      }
-      const workoutIdx = (onDayCount - 1) % sorted.length;
+      if (k !== 0) return 1; // only today can be "completed"
+      const onDayIdx = onDayIndexForDisplay(k, startDayIndex, onDays, offDays);
+      const workoutIdx = ((onDayIdx % sorted.length) + sorted.length) % sorted.length;
       const template = sorted[workoutIdx];
       const completed = template?.lastPerformed?.slice(0, 10) === todayStr;
       return completed ? 2 : 1;
     });
-  }, [schedule, startDayIndex, sorted, todayMonSun]);
+  }, [schedule, startDayIndex, sorted, onDays, offDays]);
 
-  // Which on-day index is today (0-based)
+  // Which workout (index into sorted) is today's; -1 if today is a rest day.
   const todayWorkoutIndex = useMemo(() => {
-    if (schedule[todayMonSun] < 1 || sorted.length === 0) return -1;
-    let onDayCount = 0;
-    for (let j = startDayIndex; ; j++) {
-      const idx = j % 7;
-      if (schedule[idx]) onDayCount++;
-      if (idx === todayMonSun) break;
-    }
-    return (onDayCount - 1) % sorted.length;
-  }, [schedule, todayMonSun, sorted, startDayIndex]);
+    if (schedule[0] < 1 || sorted.length === 0) return -1;
+    const onDayIdx = onDayIndexForDisplay(0, startDayIndex, onDays, offDays);
+    return ((onDayIdx % sorted.length) + sorted.length) % sorted.length;
+  }, [schedule, startDayIndex, sorted, onDays, offDays]);
 
   const handleCalendarSyncConfirm = useCallback((hour) => {
     setShowCalendarSync(false);
     const ics = generateWorkoutICS({
       splitName: currentSplitName,
       workouts: currentSplit.map(t => ({ name: t.name })),
-      schedule: splitDetection.schedule,
+      onDays: splitDetection.onDays,
+      offDays: splitDetection.offDays,
       startDayIndex: splitDetection.startDayIndex,
       workoutHour: hour,
     });

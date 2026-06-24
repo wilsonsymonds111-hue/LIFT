@@ -11,9 +11,15 @@ function toDateTimeUTC(date) {
 /**
  * Generate an ICS string from a workout split schedule.
  *
+ * The cycle (onDays on, offDays off) is treated as continuous across real
+ * calendar days, starting from startDayIndex (Mon=0 ... Sun=6 within the
+ * current week). This keeps the exported events consistent with the in-app
+ * week strip even though the cycle drifts relative to the 7-day week.
+ *
  * @param {string} splitName       e.g. "UPPER / LOWER"
  * @param {Array}  workouts        [{ name: "Upper Body Workout", ... }, ...]
- * @param {Array}  schedule        7-day monSun schedule [1,0,1,...], pre-rotated
+ * @param {number} onDays          consecutive on-days in the cycle
+ * @param {number} offDays         consecutive off-days in the cycle
  * @param {number} startDayIndex   Mon=0 ... Sun=6 — the day mapping to cycle pos 0
  * @param {number} daysAhead       how many days of events to generate (default 90)
  * @param {number} workoutHour     hour of day (0-23) for timed events (default 7)
@@ -21,7 +27,8 @@ function toDateTimeUTC(date) {
 export function generateWorkoutICS({
   splitName = 'Workout',
   workouts = [],
-  schedule = [],
+  onDays = 1,
+  offDays = 1,
   startDayIndex = 0,
   daysAhead = 90,
   workoutHour = 7,
@@ -37,40 +44,23 @@ export function generateWorkoutICS({
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
-  // Count the number of consecutive on-days from startDayIndex to determine cycle length
-  let onDays = 0, offDays = 0, counting = true;
-  for (let i = 0; i < 7; i++) {
-    const idx = (startDayIndex + i) % 7;
-    if (schedule[idx] >= 1) {
-      if (counting) onDays++; else break;
-    } else {
-      if (counting) { counting = false; offDays = 1; }
-      else if (schedule[idx] < 1) offDays++; else break;
-    }
-  }
+  const todayMonSun = today.getDay() === 0 ? 6 : today.getDay() - 1;
+  const todayAbs = Math.floor(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) / 86400000);
+  const startAbs = todayAbs - todayMonSun + startDayIndex;
   const cycleLength = onDays + offDays;
 
   for (let d = 0; d < daysAhead; d++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + d);
-    const dayOfWeek = date.getDay(); // 0=Sun
-    const monSun = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const offset = (todayAbs + d) - startAbs;
+    const pos = ((offset % cycleLength) + cycleLength) % cycleLength;
+    if (pos >= onDays) continue; // rest day
 
-    // schedule is already a 7-day monSun-indexed array — check directly
-    if ((schedule[monSun] || 0) < 1) continue; // rest day
-
-    // Compute which on-day this is within the cycle to pick the right workout
-    const cyclePos = ((monSun - startDayIndex) % cycleLength + cycleLength) % cycleLength;
-    // Count how many on-days appear before this position in the cycle
-    let onDayIdx = 0;
-    for (let p = 0; p < cyclePos; p++) {
-      const checkIdx = (startDayIndex + p) % 7;
-      if ((schedule[checkIdx] || 0) >= 1) onDayIdx++;
-    }
-    const workoutName = workouts[onDayIdx % workouts.length]?.name || `${splitName} Workout`;
+    const cycleNum = Math.floor(offset / cycleLength);
+    const onDayIdx = cycleNum * onDays + pos;
+    const workoutName = workouts[((onDayIdx % workouts.length) + workouts.length) % workouts.length]?.name || `${splitName} Workout`;
 
     // Timed event: workoutHour → workoutHour + 1
+    const date = new Date(today);
+    date.setDate(today.getDate() + d);
     const startDate = new Date(date);
     startDate.setHours(workoutHour, 0, 0, 0);
     const endDate = new Date(startDate);
@@ -78,7 +68,7 @@ export function generateWorkoutICS({
 
     const dtStart = toDateTimeUTC(startDate);
     const dtEnd = toDateTimeUTC(endDate);
-    const uid = `lift-${d}-${monSun}-${onDayIdx}@lift.app`;
+    const uid = `lift-${d}-${onDayIdx}@lift.app`;
 
     lines.push('BEGIN:VEVENT');
     lines.push(`UID:${uid}`);
