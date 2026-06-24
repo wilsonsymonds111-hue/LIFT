@@ -269,16 +269,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
        <div className="pb-2 pt-1">
          <div className="flex items-center justify-between mb-2">
            <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">AVERAGE</p>
-           <button
-             onClick={() => {
-               const newUnit = unit === 'kg' ? 'lbs' : 'kg';
-               setUnit(newUnit);
-               localStorage.setItem('weightUnit', newUnit);
-             }}
-             className="text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 dark:bg-muted text-gray-600 dark:text-muted-foreground hover:bg-gray-200 dark:hover:bg-muted/80 transition"
-           >
-             {unit === 'kg' ? 'kg' : 'lbs'}
-           </button>
+           <div className="inline-flex bg-gray-100 dark:bg-muted rounded-full p-0.5">
+             <button
+               onClick={() => { setUnit('kg'); localStorage.setItem('weightUnit', 'kg'); }}
+               className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition ${unit === 'kg' ? 'bg-white dark:bg-card text-gray-900 dark:text-foreground shadow-sm' : 'text-gray-400 dark:text-muted-foreground'}`}
+             >kg</button>
+             <button
+               onClick={() => { setUnit('lbs'); localStorage.setItem('weightUnit', 'lbs'); }}
+               className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition ${unit === 'lbs' ? 'bg-white dark:bg-card text-gray-900 dark:text-foreground shadow-sm' : 'text-gray-400 dark:text-muted-foreground'}`}
+             >lbs</button>
+           </div>
          </div>
          {displayAverage ? (
            <p className="text-3xl font-bold text-black dark:text-foreground mt-0.5">{displayAverage} <span className="text-lg font-medium text-gray-400 dark:text-muted-foreground">{unit}</span></p>
