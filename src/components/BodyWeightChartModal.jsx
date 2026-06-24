@@ -333,7 +333,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       {/* Goal section */}
       {goalData && (
         <div className="pb-3">
-          <div className="bg-blue-50 dark:bg-blue-950/30 rounded-2xl p-4 border border-blue-200/60 dark:border-blue-800/40">
+          <div className="relative bg-blue-50 dark:bg-blue-950/30 rounded-2xl p-4 border border-blue-200/60 dark:border-blue-800/40">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0">
                 <Flag className="w-5 h-5 text-white" />
@@ -345,12 +345,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                   <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
                   <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-200 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[10px] font-bold flex-shrink-0">?</button>
                 </div>
-                {showRateHelp && (
-                  <p className="text-[11px] text-gray-600 dark:text-muted-foreground bg-white dark:bg-blue-950/40 rounded-lg p-2.5 mt-1.5">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
-                )}
-                {showWeighInTip && (
-                  <p className="text-[11px] text-gray-600 dark:text-muted-foreground bg-white dark:bg-blue-950/40 rounded-lg p-2.5 mt-1.5">Weigh in once a week — daily readings swing with water weight &amp; hydration.</p>
-                )}
               </div>
               <div className="flex items-center gap-0.5 flex-shrink-0">
                 <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition">
@@ -364,6 +358,27 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                 </button>
               </div>
             </div>
+
+            {/* Tap-outside backdrop to dismiss popovers */}
+            {(showRateHelp || showWeighInTip) && (
+              <div className="fixed inset-0 z-20" onClick={() => { setShowRateHelp(false); setShowWeighInTip(false); }} />
+            )}
+
+            {/* Floating rate-help popover */}
+            {showRateHelp && (
+              <div className="absolute left-4 top-full mt-2 w-[260px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
+                <div className="absolute -top-1.5 left-6 w-3 h-3 bg-white dark:bg-card border-l border-t border-gray-100 dark:border-border rotate-45" />
+                <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
+              </div>
+            )}
+
+            {/* Floating weigh-in tip popover */}
+            {showWeighInTip && (
+              <div className="absolute right-4 top-full mt-2 w-[240px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
+                <div className="absolute -top-1.5 right-6 w-3 h-3 bg-white dark:bg-card border-r border-t border-gray-100 dark:border-border rotate-45" />
+                <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">Weigh in once a week — daily readings swing with water weight &amp; hydration.</p>
+              </div>
+            )}
           </div>
         </div>
       )}
