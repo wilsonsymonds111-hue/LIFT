@@ -71,7 +71,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
     }
     const rate = Math.max(0.1, parseFloat(goalRate) || 0.5);
     const changeKg = goalWeightKg - latest.weight;
-    const daysToGoal = Math.ceil(Math.abs(changeKg) / rate * 7);
+    const weeksToGoal = Math.ceil(Math.abs(changeKg) / rate);
+    const daysToGoal = weeksToGoal * 7;
     const goalDate = new Date(latest.date);
     goalDate.setDate(goalDate.getDate() + daysToGoal);
     const newGoal = {
@@ -138,10 +139,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
 
   let weeksAway = null;
   if (goalData) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const goal = new Date(goalData.goalDate + 'T00:00:00');
-    weeksAway = Math.max(0, Math.round((goal - today) / (7 * 24 * 60 * 60 * 1000)));
+    const rate = Math.abs(goalData.weeklyChange);
+    weeksAway = rate > 0 ? Math.max(0, Math.ceil(Math.abs(goalData.goal - goalData.current) / rate)) : 0;
   }
 
   const startEdit = (entry) => {
