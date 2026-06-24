@@ -27,6 +27,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || 'cutting');
   const [goalWeight, setGoalWeight] = useState('');
   const [goalRate, setGoalRate] = useState('0.5');
+  const [showRateHelp, setShowRateHelp] = useState(false);
   const [goalData, setGoalData] = useState(() => {
     try {
       const raw = localStorage.getItem('bodyWeightGoal');
@@ -97,19 +98,26 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       id: e.id,
     }));
     
-    // Add AI goal projected points if set
+    // Add goal projection: a dotted line from the most recent recorded weight
+    // forward to the target, anchored on the last actual point so it connects.
     if (goalData) {
-      const startDate = new Date(entries.find(en => en.date === entries.sort((a, b) => new Date(a.date) - new Date(b.date))[0].date).date);
-      const endDate = new Date(goalData.goalDate);
-      const weeks = (endDate - startDate) / (1000 * 60 * 60 * 24 * 7);
-      for (let w = 1; w <= Math.ceil(weeks); w++) {
-        const projDate = new Date(startDate.getTime() + w * 7 * 24 * 60 * 60 * 1000);
-        const projWeight = goalData.current + (goalData.weeklyChange * w);
+      const recent = filtered[filtered.length - 1];
+      if (recent) {
+        const rate = Math.abs(goalData.weeklyChange);
+        const weeks = Math.max(1, Math.ceil(Math.abs(goalData.goal - recent.weight) / rate));
+        const startDate = new Date(recent.date + 'T00:00:00');
         data.push({
-          date: projDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-          weightProjection: unit === 'lbs' ? kgToLbs(projWeight) : projWeight,
-          isProjection: true,
+          date: startDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+          weightProjection: unit === 'lbs' ? kgToLbs(recent.weight) : recent.weight,
         });
+        for (let w = 1; w <= weeks; w++) {
+          const projDate = new Date(startDate.getTime() + w * 7 * 24 * 60 * 60 * 1000);
+          const projWeight = recent.weight + (goalData.weeklyChange * w);
+          data.push({
+            date: projDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+            weightProjection: unit === 'lbs' ? kgToLbs(projWeight) : projWeight,
+          });
+        }
       }
     }
     return data.sort((a, b) => {
@@ -286,7 +294,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                   contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
                   labelStyle={{ color: '#8E8E93' }}
                 />
-                <Line type="monotone" dataKey="weight" stroke="#A855F7" strokeWidth={2.5} dot={{ r: 4, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }} animationDuration={700} animationEasing="ease-out" />
+                <Line type="monotone" dataKey="weight" stroke="#A855F7" strokeWidth={2.5} dot={{ r: 4, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }} animationDuration={400} animationEasing="ease-out" />
                 {goalData && <Line type="monotone" dataKey="weightProjection" stroke="#e9d5ff" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={{ r: 5, fill: '#fff', fillOpacity: 0.6, stroke: '#e9d5ff', strokeWidth: 1.5, strokeDasharray: '3 2' }} activeDot={{ r: 5, fill: '#c4b5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
               </LineChart>
             </ResponsiveContainer>
@@ -363,7 +371,13 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                 onChange={e => setGoalWeight(e.target.value)}
                 className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-gray-400"
               />
-              <p className="text-xs font-semibold text-gray-600 dark:text-muted-foreground">Rate per week ({unit})</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-semibold text-gray-600 dark:text-muted-foreground">Rate per week ({unit})</p>
+                <button type="button" onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-200 dark:bg-muted text-gray-500 dark:text-muted-foreground text-[10px] font-bold flex-shrink-0">?</button>
+              </div>
+              {showRateHelp && (
+                <p className="text-[11px] text-gray-500 dark:text-muted-foreground bg-blue-50 dark:bg-blue-950/30 rounded-lg p-2.5 -mt-1">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
+              )}
               <input
                 type="number"
                 step="0.1"
