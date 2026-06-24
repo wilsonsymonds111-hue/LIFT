@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, Flag, AlertCircle, Zap, BicepsFlexed, Info, Pencil } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
@@ -38,6 +38,17 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   const [goalError, setGoalError] = useState('');
   const fileInputRef = useRef(null);
 
+  // Persist the goal to the user entity so it survives across sessions and
+  // devices. localStorage is only a fallback for guest mode.
+  useEffect(() => {
+    base44.auth.me().then(user => {
+      if (user?.bodyWeightGoal) {
+        setGoalData(user.bodyWeightGoal);
+        localStorage.setItem('bodyWeightGoal', JSON.stringify(user.bodyWeightGoal));
+      }
+    }).catch(() => {});
+  }, []);
+
   const sorted = useMemo(() =>
     [...entries].sort((a, b) => new Date(a.date) - new Date(b.date)),
   [entries]);
@@ -59,7 +70,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       setGoalError('Please enter a goal weight');
       return;
     }
-    const latest = entries[entries.length - 1];
+    const latest = entries[0];
     if (!latest) {
       setGoalError('Log at least one entry first');
       return;
@@ -84,6 +95,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
     };
     setGoalData(newGoal);
     localStorage.setItem('bodyWeightGoal', JSON.stringify(newGoal));
+    base44.auth.updateMe({ bodyWeightGoal: newGoal }).catch(() => {});
     setShowGoalModal(false);
     setGoalWeight('');
   };
@@ -91,6 +103,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   const handleDeleteGoal = () => {
     setGoalData(null);
     localStorage.removeItem('bodyWeightGoal');
+    base44.auth.updateMe({ bodyWeightGoal: null }).catch(() => {});
   };
 
   const chartData = useMemo(() => {
@@ -138,9 +151,9 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   const latestDateLabel = latestEntry ? fmtDate(latestEntry.date) : '';
 
   let weeksAway = null;
-  if (goalData) {
+  if (goalData && latestEntry) {
     const rate = Math.abs(goalData.weeklyChange);
-    weeksAway = rate > 0 ? Math.max(0, Math.ceil(Math.abs(goalData.goal - goalData.current) / rate)) : 0;
+    weeksAway = rate > 0 ? Math.max(0, Math.ceil(Math.abs(goalData.goal - latestEntry.weight) / rate)) : 0;
   }
 
   const startEdit = (entry) => {
