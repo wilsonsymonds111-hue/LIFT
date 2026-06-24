@@ -264,7 +264,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       {/* Metric section with unit toggle */}
        <div className="pb-2 pt-1">
          <div className="flex items-center justify-between mb-2">
-           <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">LAST RECORDED BODYWEIGHT</p>
+           <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">LATEST</p>
            <div className="inline-flex bg-gray-100 dark:bg-muted rounded-full p-0.5">
              <button
                onClick={() => { setUnit('kg'); localStorage.setItem('weightUnit', 'kg'); }}
