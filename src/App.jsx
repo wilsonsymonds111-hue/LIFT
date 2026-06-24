@@ -36,6 +36,7 @@ const SplitDetail = lazy(() => lazyRetry(() => import('./pages/SplitDetail')));
 const SupportChat = lazy(() => lazyRetry(() => import('./pages/SupportChat')));
 const Terms = lazy(() => lazyRetry(() => import('./pages/Terms')));
 const Privacy = lazy(() => lazyRetry(() => import('./pages/Privacy')));
+import { usePrefetchData } from './hooks/usePrefetchData';
 
 const TABS = ['/', '/splits', '/exercises'];
 
@@ -161,6 +162,7 @@ const AnimatedRoutes = memo(() => {
   const location = useLocation();
   const isTabRoute = TABS.includes(location.pathname);
   usePreloadSubPages();
+  usePrefetchData();
   const tabDisplay = useMemo(() => ({ display: isTabRoute ? 'flex' : 'none' }), [isTabRoute]);
 
   return (

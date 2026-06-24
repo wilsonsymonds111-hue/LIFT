@@ -2,7 +2,7 @@ import { base44 } from '@/api/base44Client';
 
 // Simple in-memory cache with TTL to avoid redundant API calls
 const cache = {};
-const DEFAULT_TTL = 30000; // 30 seconds — exercise data changes rarely
+const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes — exercise data changes rarely
 
 function now() { return Date.now(); }
 
