@@ -23,17 +23,17 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
 
   return (
     <div className="relative">
-      <div className="pl-4 pr-2">
+      <div className="px-2">
         {grouped.map(([letter, exs]) => (
           <div
             key={letter}
             ref={el => sectionRefs.current[letter] = el}
-            style={{ contentVisibility: 'auto', containIntrinsicSize: `auto ${exs.length * 56}px` }}
+            style={{ contentVisibility: 'auto', containIntrinsicSize: `auto ${exs.length * 60}px` }}
           >
-            <div className="pt-4 pb-1.5 px-4 text-lg font-bold text-black dark:text-foreground">
+            <div className="pt-4 pb-1.5 px-3 text-lg font-bold text-black dark:text-foreground">
               {letter}
             </div>
-            <div className="mx-2">
+            <div className="mx-1">
             {exs.map((ex, idx) => (
             <ExerciseRow
               key={ex.name}
