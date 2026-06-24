@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, Plus, Trash2, Edit3, Check, Apple, Target, AlertCircle, Zap, BicepsFlexed, Info, Pencil } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, Flag, AlertCircle, Zap, BicepsFlexed, Info, Pencil } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
 import { Slider } from '@/components/ui/slider';
 import { base44 } from '@/api/base44Client';
@@ -264,7 +264,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
         </div>
 
       {/* Scrollable body: chart + lists scroll under the sticky header & toggle */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-6">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-6 bg-gray-50 dark:bg-background">
       {/* Metric section with unit toggle */}
        <div className="pb-2 pt-1">
          <div className="flex items-center justify-between mb-2">
@@ -333,30 +333,30 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       {/* Goal section */}
       {goalData && (
         <div className="pb-3">
-          <div className="bg-white dark:bg-card rounded-2xl p-4 border border-blue-100 dark:border-blue-900/30 shadow-sm">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center flex-shrink-0">
-                <Target className="w-5 h-5 text-blue-500" />
+          <div className="bg-blue-50 dark:bg-blue-950/30 rounded-2xl p-4 border border-blue-200/60 dark:border-blue-800/40">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0">
+                <Flag className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 dark:text-foreground">Goal: {goalData.goal} {unit}</p>
                 <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{weeksAway} weeks away</p>
                 <div className="flex items-center gap-1 mt-1">
                   <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
-                  <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 text-[10px] font-bold flex-shrink-0">?</button>
+                  <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-200 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[10px] font-bold flex-shrink-0">?</button>
                 </div>
                 {showRateHelp && (
-                  <p className="text-[11px] text-gray-600 dark:text-muted-foreground bg-blue-50 dark:bg-blue-950/30 rounded-lg p-2.5 mt-1.5">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
+                  <p className="text-[11px] text-gray-600 dark:text-muted-foreground bg-white dark:bg-blue-950/40 rounded-lg p-2.5 mt-1.5">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
                 )}
                 {showWeighInTip && (
-                  <p className="text-[11px] text-gray-600 dark:text-muted-foreground bg-blue-50 dark:bg-blue-950/30 rounded-lg p-2.5 mt-1.5">Weigh in once a week — daily readings swing with water weight &amp; hydration.</p>
+                  <p className="text-[11px] text-gray-600 dark:text-muted-foreground bg-white dark:bg-blue-950/40 rounded-lg p-2.5 mt-1.5">Weigh in once a week — daily readings swing with water weight &amp; hydration.</p>
                 )}
               </div>
               <div className="flex items-center gap-0.5 flex-shrink-0">
-                <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/30 transition">
+                <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition">
                   <Info className="w-4 h-4 text-blue-500" />
                 </button>
-                <button onClick={() => setShowGoalModal(true)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/30 transition">
+                <button onClick={() => setShowGoalModal(true)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition">
                   <Pencil className="w-4 h-4 text-blue-500" />
                 </button>
                 <button onClick={handleDeleteGoal} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition">
@@ -372,15 +372,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
         {!goalData && entries.length > 0 && (
           <button
             onClick={() => setShowGoalModal(!showGoalModal)}
-            className="w-full flex items-center gap-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/40 dark:to-purple-950/40 rounded-2xl px-4 py-3.5 mb-4 border border-blue-200/50 dark:border-purple-700/30 transition active:opacity-70"
+            className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-100 dark:border-border shadow-sm transition active:opacity-70"
           >
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Target className="w-4 h-4 text-white" />
+            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Flag className="w-5 h-5 text-white" />
             </div>
             <div className="text-left flex-1">
               <p className="font-semibold text-black dark:text-foreground text-sm">Set Weight Goal</p>
-              <p className="text-xs text-gray-600 dark:text-muted-foreground mt-0.5">Set your target &amp; weekly pace</p>
+              <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">Set your target &amp; weekly pace</p>
             </div>
+            <ChevronRight className="w-5 h-5 text-gray-300 dark:text-muted-foreground flex-shrink-0" />
           </button>
         )}
 
@@ -432,16 +433,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={importing}
-          className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 shadow-sm transition active:opacity-70 disabled:opacity-50"
+          className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-100 dark:border-border shadow-sm transition active:opacity-70 disabled:opacity-50"
         >
-          <div className="w-8 h-8 bg-gray-800 dark:bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-            <Apple className="w-4 h-4 text-white dark:text-gray-800" />
+          <div className="w-10 h-10 bg-gray-800 dark:bg-gray-200 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Apple className="w-5 h-5 text-white dark:text-gray-800" />
           </div>
           <div className="text-left flex-1">
             <p className="font-semibold text-black dark:text-foreground text-sm">Import from Apple Health</p>
             <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">Export your Body Mass data as CSV</p>
           </div>
-          {importing && <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />}
+          {importing ? <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin flex-shrink-0" /> : <ChevronRight className="w-5 h-5 text-gray-300 dark:text-muted-foreground flex-shrink-0" />}
         </button>
         <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleAppleHealthImport} />
         {importMsg && <p className="text-xs text-center text-gray-500 dark:text-muted-foreground mb-4 px-4">{importMsg}</p>}
