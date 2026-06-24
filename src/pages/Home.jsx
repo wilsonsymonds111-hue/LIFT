@@ -118,6 +118,7 @@ export default function Home() {
   const [splitMenuOpen, setSplitMenuOpen] = useState(false);
   const [showCalendarSync, setShowCalendarSync] = useState(false);
   const [showSplitEditor, setShowSplitEditor] = useState(false);
+  const [cycleVersion, setCycleVersion] = useState(0);
   const menuRef = useRef({});
   const splitMenuBtnRef = useRef(null);
 
@@ -213,7 +214,7 @@ export default function Home() {
 
   const splitDetection = useMemo(
     () => ({ key: splitKey, ...resolveSchedule(splitKey, workoutCount, groupId) }),
-    [splitKey, workoutCount, groupId]
+    [splitKey, workoutCount, groupId, cycleVersion]
   );
 
   const { schedule, startDayIndex, onDays, offDays } = splitDetection;
@@ -445,7 +446,9 @@ export default function Home() {
         <Suspense fallback={null}>
           <SplitModal
             splitKey={groupId}
+            isActiveSplit
             onClose={() => setShowSplitEditor(false)}
+            onCycleSaved={() => { setCycleVersion(v => v + 1); invalidateWorkoutTemplates(queryClient); }}
             onMakeCurrent={async () => {
               setShowSplitEditor(false);
               invalidateWorkoutTemplates(queryClient);

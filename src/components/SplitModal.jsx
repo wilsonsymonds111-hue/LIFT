@@ -86,12 +86,12 @@ function cycleToSchedule(onDays, offDays, startDayIndex) {
   return schedule;
 }
 
-export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
+export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveSplit, onCycleSaved }) {
   const navigate = useNavigate();
   const [applying, setApplying] = useState(false);
   const [customSplit, setCustomSplit] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(!!isActiveSplit);
   const [restConfirmed, setRestConfirmed] = useState(false);
   const scrollRef = useRef(null);
 
@@ -114,7 +114,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
     setOnDays(c.onDays);
     setOffDays(c.offDays);
     setStartDayIndex(c.startDayIndex);
-    setEditing(false);
+    setEditing(!!isActiveSplit);
     setRestConfirmed(false);
   }, [splitKey]);
 
@@ -423,7 +423,12 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                     <button
                       onClick={() => {
                         saveCycle(splitKey, { onDays, offDays, startDayIndex });
-                        setEditing(false);
+                        if (isActiveSplit) {
+                          onClose();
+                          if (onCycleSaved) onCycleSaved();
+                        } else {
+                          setEditing(false);
+                        }
                       }}
                       className="w-full mt-4 py-2 rounded-lg bg-blue-500 text-white text-xs font-bold hover:bg-blue-600 transition"
                     >
@@ -478,7 +483,8 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
               </div>
 
               </div>
-              {/* Make Current button */}
+              {/* Make Current button — hidden when editing the already-active split */}
+              {!isActiveSplit && (
               <div className="px-5 pb-4 pt-2">
                 <button
                   onClick={() => {
@@ -495,6 +501,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent }) {
                   {applying ? 'Applying...' : restConfirmed ? 'Make This My Current Split' : 'Confirm REST Frequency'}
                 </button>
               </div>
+              )}
 
 
             </>
