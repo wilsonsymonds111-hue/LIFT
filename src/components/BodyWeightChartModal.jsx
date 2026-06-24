@@ -450,8 +450,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
           disabled={importing}
           className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-100 dark:border-border shadow-sm transition active:opacity-70 disabled:opacity-50"
         >
-          <div className="w-10 h-10 bg-gray-800 dark:bg-gray-200 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Apple className="w-5 h-5 text-white dark:text-gray-800" />
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border border-gray-100 dark:border-border">
+            <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="appleHealthHeart" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#FF3B7F" />
+                  <stop offset="100%" stopColor="#FF003C" />
+                </linearGradient>
+              </defs>
+              <path d="M12 21s-7.5-4.6-10-9.3C0.3 8.4 2.2 5 5.5 5c2 0 3.3 1.1 4.5 2.5C11.2 6.1 12.5 5 14.5 5 17.8 5 19.7 8.4 18 11.7 15.5 16.4 12 21 12 21z" fill="url(#appleHealthHeart)" />
+            </svg>
           </div>
           <div className="text-left flex-1">
             <p className="font-semibold text-black dark:text-foreground text-sm">Import from Apple Health</p>
