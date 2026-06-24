@@ -444,7 +444,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={importing}
-          className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-100 dark:border-border shadow-sm transition active:opacity-70 disabled:opacity-50"
+          className="w-full flex items-center gap-3 bg-gray-100 dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-200 dark:border-border shadow-sm transition active:opacity-70 disabled:opacity-50"
         >
           <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/b393a622b_image.png" alt="Apple Health" className="w-10 h-10 rounded-[10px] object-cover flex-shrink-0 shadow-sm" />
           <div className="text-left flex-1">
