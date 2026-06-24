@@ -446,17 +446,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
           disabled={importing}
           className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-100 dark:border-border shadow-sm transition active:opacity-70 disabled:opacity-50"
         >
-          <div className="w-10 h-10 bg-white rounded-[10px] flex items-center justify-center flex-shrink-0 shadow-sm">
-            <svg viewBox="0 0 24 24" className="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="appleHealthHeart" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#FF5E89" />
-                  <stop offset="100%" stopColor="#FF2D55" />
-                </linearGradient>
-              </defs>
-              <path d="M12 20.5c-.35 0-.69-.16-.91-.44C9.4 17.9 4 12.4 4 8.7 4 6.1 6 4 8.6 4c1.4 0 2.6.7 3.4 1.8C12.8 4.7 14 4 15.4 4 18 4 20 6.1 20 8.7c0 3.7-5.4 9.2-7.09 11.36-.22.28-.56.44-.91.44z" fill="url(#appleHealthHeart)" />
-            </svg>
-          </div>
+          <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/b393a622b_image.png" alt="Apple Health" className="w-10 h-10 rounded-[10px] object-cover flex-shrink-0 shadow-sm" />
           <div className="text-left flex-1">
             <p className="font-semibold text-black dark:text-foreground text-sm">Import from Apple Health</p>
             <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">Export your Body Mass data as CSV</p>
