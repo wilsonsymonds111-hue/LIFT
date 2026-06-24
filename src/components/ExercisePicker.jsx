@@ -100,7 +100,7 @@ export default function ExercisePicker({ onClose, onAdd }) {
         </div>
 
         {/* Exercise List */}
-        <div className="flex-1 overflow-y-auto pb-6">
+        <div className="flex-1 overflow-y-auto pb-24">
           {grouped.map(([letter, exercises]) => (
             <div key={letter}>
               <div className="px-4 py-1 bg-muted text-xs font-bold text-muted-foreground uppercase tracking-widest">
