@@ -26,7 +26,12 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || 'cutting');
   const [goalWeight, setGoalWeight] = useState('');
-  const [goalData, setGoalData] = useState(null);
+  const [goalData, setGoalData] = useState(() => {
+    try {
+      const raw = localStorage.getItem('bodyWeightGoal');
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  });
   const [loadingGoal, setLoadingGoal] = useState(false);
   const [goalError, setGoalError] = useState('');
   const fileInputRef = useRef(null);
@@ -74,14 +79,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       const daysToGoal = Math.ceil(Math.abs(changeKg) / 0.5 * 7);
       const goalDate = new Date(latest.date);
       goalDate.setDate(goalDate.getDate() + daysToGoal);
-      setGoalData({ 
+      const newGoal = { 
         current: latest.weight, 
         goal: goalWeightKg, 
         weeklyChange: changeKg < 0 ? -0.5 : 0.5, 
         daysToGoal, 
         goalDate: goalDate.toISOString().split('T')[0], 
         confirmation: res 
-      });
+      };
+      setGoalData(newGoal);
+      localStorage.setItem('bodyWeightGoal', JSON.stringify(newGoal));
       setShowGoalModal(false);
       setGoalWeight('');
     } catch (e) {
@@ -90,6 +97,11 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
     } finally {
       setLoadingGoal(false);
     }
+  };
+
+  const handleDeleteGoal = () => {
+    setGoalData(null);
+    localStorage.removeItem('bodyWeightGoal');
   };
 
   const chartData = useMemo(() => {
@@ -250,8 +262,10 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
           </div>
         </div>
 
+      {/* Scrollable body: chart + lists scroll under the sticky header & toggle */}
+      <div className="flex-1 overflow-y-auto px-4 pb-6">
       {/* Metric section with unit toggle */}
-       <div className="px-4 pb-2 flex-shrink-0">
+       <div className="pb-2 pt-1">
          <div className="flex items-center justify-between mb-2">
            <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">AVERAGE</p>
            <button
@@ -274,7 +288,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
        </div>
 
       {/* Chart */}
-      <div className="px-4 pb-2 flex-shrink-0">
+      <div className="pb-2">
         {chartData.length > 1 ? (
           <div className="bg-white dark:bg-card rounded-2xl p-3">
             <ResponsiveContainer width="100%" height={200}>
@@ -300,7 +314,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
 
       {/* Zoom slider */}
       {sorted.length > 1 && (
-        <div className="px-6 pb-4 flex-shrink-0">
+        <div className="pb-4">
           <div className="flex items-center gap-3">
             <span className="text-[10px] font-semibold text-gray-400 dark:text-muted-foreground flex-shrink-0">All</span>
             <Slider
@@ -317,7 +331,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
 
       {/* Goal section */}
       {goalData && (
-        <div className="px-4 pb-3 flex-shrink-0">
+        <div className="pb-3">
           <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl p-4 border border-emerald-200 dark:border-emerald-700/30">
             <div className="flex items-start gap-3">
               <Target className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
@@ -326,13 +340,14 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
                 <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
                 <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 italic">{goalData.confirmation}</p>
               </div>
+              <button onClick={handleDeleteGoal} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition flex-shrink-0">
+                <Trash2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-4 pb-6">
         {/* AI Goal setter */}
         {entries.length > 0 && (
           <button
