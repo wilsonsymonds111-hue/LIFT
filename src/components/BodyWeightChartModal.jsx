@@ -140,6 +140,14 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
     ? `${fmtDate(filtered[0].date)} – ${fmtDate(filtered[filtered.length - 1].date)}`
     : '';
 
+  let weeksAway = null;
+  if (goalData) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const goal = new Date(goalData.goalDate + 'T00:00:00');
+    weeksAway = Math.max(0, Math.round((goal - today) / (7 * 24 * 60 * 60 * 1000)));
+  }
+
   const startEdit = (entry) => {
     setEditingId(entry.id);
     setEditWeight(String(entry.weight));
@@ -330,8 +338,15 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
             <div className="flex items-start gap-3">
               <Target className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">Goal: {goalData.goal} {unit} by {goalData.goalDate}</p>
-                <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
+                <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">Goal: {goalData.goal} {unit}</p>
+                <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">{weeksAway} weeks away</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <p className="text-xs text-emerald-700 dark:text-emerald-300">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
+                  <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-emerald-200 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold flex-shrink-0">?</button>
+                </div>
+                {showRateHelp && (
+                  <p className="text-[11px] text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg p-2.5 mt-1.5">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
+                )}
                 <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2">Weigh in once a week — daily readings swing with water weight &amp; hydration.</p>
                 <button onClick={() => setShowGoalModal(true)} className="mt-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 underline">Change goal</button>
               </div>
@@ -344,7 +359,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       )}
 
         {/* AI Goal setter */}
-        {entries.length > 0 && (
+        {!goalData && entries.length > 0 && (
           <button
             onClick={() => setShowGoalModal(!showGoalModal)}
             className="w-full flex items-center gap-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/40 dark:to-purple-950/40 rounded-2xl px-4 py-3.5 mb-4 border border-blue-200/50 dark:border-purple-700/30 transition active:opacity-70"
