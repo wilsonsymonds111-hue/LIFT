@@ -126,18 +126,14 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
     });
   }, [filtered, unit, goalData, entries]);
 
-  const average = filtered.length > 0
-    ? (filtered.reduce((s, e) => s + e.weight, 0) / filtered.length).toFixed(2)
-    : null;
+  const latestEntry = sorted.length > 0 ? sorted[sorted.length - 1] : null;
 
-  const displayAverage = useMemo(() => {
-    if (!average) return null;
-    return unit === 'lbs' ? kgToLbs(parseFloat(average)).toFixed(2) : average;
-  }, [average, unit]);
+  const displayLatest = useMemo(() => {
+    if (!latestEntry) return null;
+    return unit === 'lbs' ? kgToLbs(latestEntry.weight).toFixed(2) : String(latestEntry.weight);
+  }, [latestEntry, unit]);
 
-  const dateRange = filtered.length > 0
-    ? `${fmtDate(filtered[0].date)} – ${fmtDate(filtered[filtered.length - 1].date)}`
-    : '';
+  const latestDateLabel = latestEntry ? fmtDate(latestEntry.date) : '';
 
   let weeksAway = null;
   if (goalData) {
@@ -268,7 +264,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       {/* Metric section with unit toggle */}
        <div className="pb-2 pt-1">
          <div className="flex items-center justify-between mb-2">
-           <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">AVERAGE</p>
+           <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">LAST RECORDED BODYWEIGHT</p>
            <div className="inline-flex bg-gray-100 dark:bg-muted rounded-full p-0.5">
              <button
                onClick={() => { setUnit('kg'); localStorage.setItem('weightUnit', 'kg'); }}
@@ -280,12 +276,12 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
              >lbs</button>
            </div>
          </div>
-         {displayAverage ? (
-           <p className="text-3xl font-bold text-black dark:text-foreground mt-0.5">{displayAverage} <span className="text-lg font-medium text-gray-400 dark:text-muted-foreground">{unit}</span></p>
+         {displayLatest ? (
+           <p className="text-3xl font-bold text-black dark:text-foreground mt-0.5">{displayLatest} <span className="text-lg font-medium text-gray-400 dark:text-muted-foreground">{unit}</span></p>
          ) : (
            <p className="text-3xl font-bold text-gray-300 dark:text-muted-foreground mt-0.5">—</p>
          )}
-         {dateRange && <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{dateRange}</p>}
+         {latestDateLabel && <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{latestDateLabel}</p>}
        </div>
 
       {/* Chart */}
