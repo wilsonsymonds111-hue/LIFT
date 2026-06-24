@@ -24,3 +24,16 @@ export function getAllExercises() {
   const newOnes = custom.filter(e => !builtInNames.has(e.name.toLowerCase()));
   return [...ALL_EXERCISES, ...newOnes];
 }
+
+export function isCustomExercise(name) {
+  const builtInNames = new Set(ALL_EXERCISES.map(e => e.name.toLowerCase()));
+  return !builtInNames.has(name.toLowerCase());
+}
+
+export function deleteCustomExercise(name) {
+  try {
+    const custom = loadCustomExercises();
+    const filtered = custom.filter(e => e.name.toLowerCase() !== name.toLowerCase());
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  } catch {}
+}

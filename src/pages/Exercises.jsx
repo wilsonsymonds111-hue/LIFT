@@ -278,6 +278,7 @@ export default function Exercises() {
           <ExerciseDetailModal
             exercise={selectedExercise}
             onClose={() => setSelectedExercise(null)}
+            onExerciseDeleted={() => setCustomExercisesVersion(v => v + 1)}
           />
         </Suspense>
       )}

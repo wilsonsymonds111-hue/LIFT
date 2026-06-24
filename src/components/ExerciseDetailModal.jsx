@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Trash2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import { getExerciseDetailList } from '../lib/exerciseCache';
 import ProgressGraph, { getNextGoal } from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
+import { isCustomExercise, deleteCustomExercise } from '../lib/customExercises';
 
 const TABS = ['Charts', 'About'];
 
@@ -15,7 +16,7 @@ const parseInstructions = (text) => {
   return text.split('\n').filter(line => /^\d+\./.test(line.trim()));
 };
 
-export default function ExerciseDetailModal({ exercise, onClose, initialTab, initialHistory, initialImage }) {
+export default function ExerciseDetailModal({ exercise, onClose, initialTab, initialHistory, initialImage, onExerciseDeleted }) {
   const [tab, setTab] = useState(initialTab || 'Charts');
   const [history, setHistory] = useState(initialHistory || []);
   const [detail, setDetail] = useState(initialImage ? { image_url: initialImage } : null);
@@ -165,7 +166,22 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
             <X className="w-5 h-5 text-foreground" />
           </button>
           <h2 className="font-bold text-lg text-foreground tracking-tight">{exercise.name}</h2>
-          <div className="w-10" />
+          {isCustomExercise(exercise.name) ? (
+            <button
+              onClick={() => {
+                if (window.confirm(`Delete "${exercise.name}" from your exercise list?`)) {
+                  deleteCustomExercise(exercise.name);
+                  onExerciseDeleted?.();
+                  onClose();
+                }
+              }}
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-950/30 transition"
+            >
+              <Trash2 className="w-5 h-5 text-red-500" />
+            </button>
+          ) : (
+            <div className="w-10" />
+          )}
         </div>
 
         {/* Tabs */}
