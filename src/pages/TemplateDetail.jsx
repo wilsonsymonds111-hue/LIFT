@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -33,6 +33,15 @@ export default function TemplateDetail() {
   // Reuse React Query cache from Home page — data is already loaded, no refetch
   const { data: templates } = useWorkoutTemplates();
   const { data: exerciseData = {} } = useExerciseHistory();
+  // History is saved under the capitalised exercise name (WorkoutSheet
+  // title-cases names before saving), but the template may store the original
+  // (e.g. lowercase) name. Match case-insensitively so sparklines always find
+  // their data.
+  const exerciseDataByKey = useMemo(() => {
+    const m = {};
+    Object.entries(exerciseData).forEach(([k, v]) => { m[k.toLowerCase()] = v; });
+    return m;
+  }, [exerciseData]);
   const template = templates?.find(t => t.id === id);
 
   if (!template) {
@@ -91,7 +100,7 @@ export default function TemplateDetail() {
 
         <div className="px-5 py-3 space-y-3 overflow-y-auto flex-1">
           {template.exerciseList?.map((exercise, idx) => {
-            const history = exerciseData[exercise.name] || exercise.history || [];
+            const history = exerciseDataByKey[exercise.name.toLowerCase()] || exercise.history || [];
             return (
           <div key={idx} className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
