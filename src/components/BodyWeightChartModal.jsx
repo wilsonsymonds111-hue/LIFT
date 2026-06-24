@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, Plus, Trash2, Edit3, Check, Apple, Target, AlertCircle, Zap, BicepsFlexed } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, Edit3, Check, Apple, Target, AlertCircle, Zap, BicepsFlexed, Info, Pencil } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
 import { Slider } from '@/components/ui/slider';
 import { base44 } from '@/api/base44Client';
@@ -28,6 +28,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
   const [goalWeight, setGoalWeight] = useState('');
   const [goalRate, setGoalRate] = useState('0.5');
   const [showRateHelp, setShowRateHelp] = useState(false);
+  const [showWeighInTip, setShowWeighInTip] = useState(false);
   const [goalData, setGoalData] = useState(() => {
     try {
       const raw = localStorage.getItem('bodyWeightGoal');
@@ -332,25 +333,36 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
       {/* Goal section */}
       {goalData && (
         <div className="pb-3">
-          <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl p-4 border border-emerald-200 dark:border-emerald-700/30">
+          <div className="bg-white dark:bg-card rounded-2xl p-4 border border-blue-100 dark:border-blue-900/30 shadow-sm">
             <div className="flex items-start gap-3">
-              <Target className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">Goal: {goalData.goal} {unit}</p>
-                <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">{weeksAway} weeks away</p>
+              <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center flex-shrink-0">
+                <Target className="w-5 h-5 text-blue-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900 dark:text-foreground">Goal: {goalData.goal} {unit}</p>
+                <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{weeksAway} weeks away</p>
                 <div className="flex items-center gap-1 mt-1">
-                  <p className="text-xs text-emerald-700 dark:text-emerald-300">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
-                  <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-emerald-200 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold flex-shrink-0">?</button>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
+                  <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 text-[10px] font-bold flex-shrink-0">?</button>
                 </div>
                 {showRateHelp && (
-                  <p className="text-[11px] text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg p-2.5 mt-1.5">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
+                  <p className="text-[11px] text-gray-600 dark:text-muted-foreground bg-blue-50 dark:bg-blue-950/30 rounded-lg p-2.5 mt-1.5">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
                 )}
-                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2">Weigh in once a week — daily readings swing with water weight &amp; hydration.</p>
-                <button onClick={() => setShowGoalModal(true)} className="mt-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 underline">Change goal</button>
+                {showWeighInTip && (
+                  <p className="text-[11px] text-gray-600 dark:text-muted-foreground bg-blue-50 dark:bg-blue-950/30 rounded-lg p-2.5 mt-1.5">Weigh in once a week — daily readings swing with water weight &amp; hydration.</p>
+                )}
               </div>
-              <button onClick={handleDeleteGoal} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition flex-shrink-0">
-                <Trash2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              </button>
+              <div className="flex items-center gap-0.5 flex-shrink-0">
+                <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/30 transition">
+                  <Info className="w-4 h-4 text-blue-500" />
+                </button>
+                <button onClick={() => setShowGoalModal(true)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/30 transition">
+                  <Pencil className="w-4 h-4 text-blue-500" />
+                </button>
+                <button onClick={handleDeleteGoal} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition">
+                  <Trash2 className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
