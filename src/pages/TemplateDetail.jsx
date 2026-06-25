@@ -134,8 +134,8 @@ export default function TemplateDetail() {
                   })();
               return (
                 <div className="flex-shrink-0 text-right">
-                  <p className="text-sm font-bold text-foreground whitespace-nowrap">
-                    {isBodyweight ? `${pr.reps} reps` : `${pr.kg}kg × ${pr.reps}`}
+                  <p className="text-sm text-muted-foreground whitespace-nowrap">
+                    {isBodyweight ? `${pr.reps} reps` : `${pr.kg} kg (×${pr.reps})`}
                   </p>
                 </div>
               );
