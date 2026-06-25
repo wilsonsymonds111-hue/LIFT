@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, memo } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 
 // Exercise classification helpers — exported for use in ExerciseDetailModal
 const ISOLATION_KEYWORDS = ['leg extension', 'hamstring curl', 'calf raise', 'lateral raise', 'bicep curl', 'tricep extension', 'pec deck', 'cable fly', 'rear delt fly'];
@@ -63,7 +63,7 @@ export function getNextGoal(exerciseName, history) {
   return `${maxKg} kg × ${bestReps + 1}`;
 }
 
-const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact, exerciseName }) {
+const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact, exerciseName, goal, chartView }) {
   const [freshAnim, setFreshAnim] = useState(false);
   const prevAnimKeyRef = useRef(animKey);
   useEffect(() => {
@@ -265,6 +265,19 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
           <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
           <Line type="monotone" dataKey="projVal" stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={<GhostDot />} activeDot={{ r: 5, fill: '#a78bfa', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />
+          {goal && (() => {
+            const goalVal = chartView === 'reps' ? goal.reps : goal.kg;
+            if (!goalVal || goalVal <= 0) return null;
+            return (
+              <ReferenceLine
+                y={goalVal}
+                stroke="#22c55e"
+                strokeWidth={2}
+                strokeDasharray="6 3"
+                label={{ value: `🎯 ${goalVal}${chartView === 'reps' ? ' reps' : ' kg'}`, position: 'insideTopRight', fontSize: 10, fill: '#22c55e', fontWeight: 700 }}
+              />
+            );
+          })()}
         </LineChart>
       </ResponsiveContainer>
     </div>

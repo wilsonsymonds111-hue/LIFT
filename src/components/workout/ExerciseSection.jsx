@@ -3,7 +3,7 @@ import { MoreHorizontal, Target, Plus } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import { useExerciseGoals } from '../../hooks/useExerciseGoals';
 import ProgressGraph from '../ProgressGraph';
-import ExerciseGoalSetter from '../ExerciseGoalSetter';
+import GoalModal from './GoalModal';
 import SetRow from './SetRow';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
@@ -44,7 +44,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
   const [chartView, setChartView] = useState('weight');
-  const [showGoalSetter, setShowGoalSetter] = useState(false);
+  const [showGoalModal, setShowGoalModal] = useState(false);
   const { data: goalsData = {} } = useExerciseGoals();
   const [goal, setGoal] = useState(null);
   useEffect(() => {
@@ -187,7 +187,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       )}
       <div className="flex items-center mb-2">
         <button
-          onClick={() => setShowGoalSetter(s => !s)}
+          onClick={() => setShowGoalModal(true)}
           className={`w-7 h-7 flex items-center justify-center rounded-full transition flex-shrink-0 ${goal ? 'bg-green-500 text-white' : 'bg-green-100 dark:bg-green-900/30 text-green-500 hover:bg-green-200 dark:hover:bg-green-900/50'}`}
         >
           {goal ? <Target className="w-3.5 h-3.5" /> : <Plus className="w-4 h-4" />}
@@ -210,11 +210,14 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         <div className="w-7 flex-shrink-0" />
         </div>
       </div>
-      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact />
-      {showGoalSetter && (
-        <div className="mb-2">
-          <ExerciseGoalSetter exerciseName={exercise.name} goal={goal} onSaved={(g) => { setGoal(g); }} />
-        </div>
+      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact goal={goal} chartView={chartView} />
+      {showGoalModal && (
+        <GoalModal
+          exerciseName={exercise.name}
+          goal={goal}
+          onClose={() => setShowGoalModal(false)}
+          onSaved={(g) => { setGoal(g); }}
+        />
       )}
       <div className="grid grid-cols-[40px_1fr_80px_80px_44px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
