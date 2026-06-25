@@ -183,8 +183,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       tMin = Math.floor(rMin); tMax = Math.ceil(rMax);
       tStep = Math.max(1, Math.round((tMax - tMin || 1) / 4));
     } else {
-      const rough = (rMax - rMin) / 4;
-      tStep = [5, 10, 20].reduce((best, s) => Math.abs(s - rough) < Math.abs(best - rough) ? s : best, 5);
+      tStep = 5;
       tMin = Math.floor(rMin / tStep) * tStep;
       tMax = Math.ceil(rMax / tStep) * tStep;
     }
