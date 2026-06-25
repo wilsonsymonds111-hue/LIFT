@@ -122,10 +122,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const repCap = exerciseName ? getRepCap(exerciseName) : 0;
     const hasWeights = kgs.length > 0;
 
-    const goalVal = goal ? (chartView === 'reps' ? goal.reps : goal.kg) : 0;
-    const maxProj = goalVal > 0 ? 30 : 6;
-    let i = 1;
-    while (i <= maxProj) {
+    for (let i = 1; i <= 6; i++) {
       let projVal, projKg, projReps;
       if (isBodyweight) {
         if (hasWeights && repCap > 0) {
@@ -159,8 +156,6 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         ...(projReps != null ? { projReps } : {}),
         projected: true,
       });
-      if (goalVal > 0 && projVal >= goalVal) break;
-      i++;
     }
 
     // Y-axis ticks
