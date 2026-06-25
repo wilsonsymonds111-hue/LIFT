@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, memo } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts';
 
 // Exercise classification helpers — exported for use in ExerciseDetailModal
 const ISOLATION_KEYWORDS = ['leg extension', 'hamstring curl', 'calf raise', 'lateral raise', 'bicep curl', 'tricep extension', 'pec deck', 'cable fly', 'rear delt fly'];
@@ -265,9 +265,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         </p>
       )}
       <div className="overflow-x-auto overflow-y-hidden" style={{ touchAction: 'pan-x', WebkitOverflowScrolling: 'touch' }}>
-        <div style={{ width: chartWidth, height: compact ? 130 : 200 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
+          <LineChart width={chartWidth} height={compact ? 130 : 200} data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
           <YAxis domain={yDomain} ticks={yTicks} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
           <Tooltip content={<CustomTooltip />} />
@@ -288,8 +286,6 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
             );
           })()}
           </LineChart>
-          </ResponsiveContainer>
-        </div>
       </div>
     </div>
   );
