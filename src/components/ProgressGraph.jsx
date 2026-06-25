@@ -285,7 +285,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         onMouseLeave={handleDragEnd}
       >
           <LineChart width={chartWidth} height={compact ? 130 : 200} data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
-          <YAxis domain={yDomain} ticks={yTicks} tick={{ fontSize: 10, fill: '#9ca3af' }} />
+          <YAxis domain={yDomain} ticks={yTicks} interval={0} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
