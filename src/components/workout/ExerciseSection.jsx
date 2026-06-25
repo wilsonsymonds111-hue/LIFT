@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'react';
-import { MoreHorizontal, Target } from 'lucide-react';
+import { MoreHorizontal, Target, Plus } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import { useExerciseGoals } from '../../hooks/useExerciseGoals';
 import ProgressGraph from '../ProgressGraph';
@@ -185,12 +185,12 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
         />
       )}
-      <div className="flex items-center justify-center gap-2 mb-2">
+      <div className="flex items-center gap-2 mb-2">
         <button
           onClick={() => setShowGoalSetter(s => !s)}
-          className={`w-7 h-7 flex items-center justify-center rounded-full transition ${goal ? 'bg-green-500 text-white' : 'bg-green-100 dark:bg-green-900/30 text-green-500 hover:bg-green-200 dark:hover:bg-green-900/50'}`}
+          className={`w-7 h-7 flex items-center justify-center rounded-full transition flex-shrink-0 ${goal ? 'bg-green-500 text-white' : 'bg-green-100 dark:bg-green-900/30 text-green-500 hover:bg-green-200 dark:hover:bg-green-900/50'}`}
         >
-          <Target className="w-3.5 h-3.5" />
+          {goal ? <Target className="w-3.5 h-3.5" /> : <Plus className="w-4 h-4" />}
         </button>
         <div className="inline-flex bg-muted rounded-full p-0.5">
           <button
