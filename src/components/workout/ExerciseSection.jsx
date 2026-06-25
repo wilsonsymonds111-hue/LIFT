@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
+import { useExerciseGoals } from '../../hooks/useExerciseGoals';
 import ProgressGraph from '../ProgressGraph';
+import ExerciseGoalSetter from '../ExerciseGoalSetter';
 import SetRow from './SetRow';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
@@ -42,6 +44,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
   const [chartView, setChartView] = useState('weight');
+  const { data: goalsData = {} } = useExerciseGoals();
+  const [goal, setGoal] = useState(null);
+  useEffect(() => {
+    const key = exercise.name.toLowerCase();
+    const found = Object.entries(goalsData).find(([k]) => k.toLowerCase() === key)?.[1] || null;
+    setGoal(found);
+  }, [goalsData, exercise.name]);
   const lastEntry = exercise.history?.[exercise.history.length - 1];
   const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
   const sessionResults = Object.values(completedSets).filter(Boolean);
@@ -192,6 +201,9 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         </div>
       </div>
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact />
+      <div className="mt-2">
+        <ExerciseGoalSetter exerciseName={exercise.name} goal={goal} onSaved={setGoal} />
+      </div>
       <div className="grid grid-cols-[40px_1fr_80px_80px_44px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
