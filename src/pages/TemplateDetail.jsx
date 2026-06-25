@@ -1,12 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { ArrowLeft, Target } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { useQueryClient } from '@tanstack/react-query';
-import { useExerciseHistory } from '../hooks/useExerciseHistory';
-import { useExerciseGoals } from '../hooks/useExerciseGoals';
 import EditTemplateModal from '../components/EditTemplateModal';
 
 function relativeTime(dateStr) {
@@ -32,22 +30,6 @@ export default function TemplateDetail() {
 
   // Reuse React Query cache from Home page — data is already loaded, no refetch
   const { data: templates } = useWorkoutTemplates();
-  const { data: exerciseData = {} } = useExerciseHistory();
-  const { data: goalsData = {} } = useExerciseGoals();
-  // History is saved under the capitalised exercise name (WorkoutSheet
-  // title-cases names before saving), but the template may store the original
-  // (e.g. lowercase) name. Match case-insensitively so sparklines always find
-  // their data.
-  const exerciseDataByKey = useMemo(() => {
-    const m = {};
-    Object.entries(exerciseData).forEach(([k, v]) => { m[k.toLowerCase()] = v; });
-    return m;
-  }, [exerciseData]);
-  const goalsByKey = useMemo(() => {
-    const m = {};
-    Object.entries(goalsData).forEach(([k, v]) => { m[k.toLowerCase()] = v; });
-    return m;
-  }, [goalsData]);
   const template = templates?.find(t => t.id === id);
 
   if (!template) {
@@ -105,44 +87,14 @@ export default function TemplateDetail() {
         <p className="px-5 pt-3 pb-1 text-sm text-muted-foreground">{lastPerformed}</p>
 
         <div className="px-5 py-3 space-y-3 overflow-y-auto flex-1">
-          {template.exerciseList?.map((exercise, idx) => {
-            const history = exerciseDataByKey[exercise.name.toLowerCase()] || exercise.history || [];
-            const goal = goalsByKey[exercise.name.toLowerCase()];
-            return (
+          {template.exerciseList?.map((exercise, idx) => (
           <div key={idx} className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="font-bold text-foreground text-sm leading-snug">{exercise.sets || 2} × {exercise.name}</p>
-              <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-xs text-muted-foreground">{exercise.muscle}</p>
-                {goal && (
-                  <span className="text-[10px] text-blue-500 font-semibold flex items-center gap-0.5">
-                    <Target className="w-2.5 h-2.5" /> {goal.kg}kg × {goal.reps}
-                  </span>
-                )}
-              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
             </div>
-            {history.length > 0 && (() => {
-              const toKg = (h) => typeof h === 'object' ? (h.kg || 0) : (h || 0);
-              const toReps = (h) => typeof h === 'object' ? (h.reps || 0) : 8;
-              const isBodyweight = history.every(h => toKg(h) === 0);
-              const pr = isBodyweight
-                ? { kg: 0, reps: Math.max(...history.map(toReps)) }
-                : (() => {
-                    const maxKg = Math.max(...history.map(toKg));
-                    const maxReps = Math.max(...history.filter(h => toKg(h) === maxKg).map(toReps));
-                    return { kg: maxKg, reps: maxReps };
-                  })();
-              return (
-                <div className="flex-shrink-0 text-right">
-                  <p className="text-sm text-muted-foreground whitespace-nowrap">
-                    {isBodyweight ? `${pr.reps} reps` : `${pr.kg} kg (×${pr.reps})`}
-                  </p>
-                </div>
-              );
-            })()}
           </div>
-            );
-          })}
+          ))}
         </div>
 
         <div className="px-5 py-5">
