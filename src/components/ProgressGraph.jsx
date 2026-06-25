@@ -170,13 +170,8 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       });
     }
 
-    // Y-axis ticks
+    // Y-axis ticks — base domain on real data only for a steeper, well-spaced chart
     const vals = d.filter(x => !x.projected).map(x => x.valNew ?? x.valStatic).filter(v => v != null);
-    d.filter(x => x.projected).forEach(x => { if (x.projVal != null) vals.push(x.projVal); });
-    if (goal) {
-      const goalVal = chartView === 'reps' ? goal.reps : goal.kg;
-      if (goalVal > 0) vals.push(goalVal);
-    }
     const rMin = Math.min(...vals), rMax = Math.max(...vals);
     let tMin, tMax, tStep;
     if (isBodyweight) {
@@ -184,15 +179,21 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       tStep = Math.max(1, Math.round((tMax - tMin || 1) / 4));
     } else {
       tStep = 5;
-      tMin = Math.floor(rMin / tStep) * tStep;
-      tMax = Math.ceil(rMax / tStep) * tStep;
+      tMin = Math.floor(rMin / tStep) * tStep - tStep;
+      tMax = Math.ceil(rMax / tStep) * tStep + tStep;
+      // Ensure a minimum range of 4 intervals so small data ranges don't look flat
+      if (tMax - tMin < 4 * tStep) {
+        const mid = Math.round(((tMin + tMax) / 2) / tStep) * tStep;
+        tMin = mid - 2 * tStep;
+        tMax = mid + 2 * tStep;
+      }
     }
     const ticks = [];
     for (let i = tMin; i <= tMax; i += tStep) ticks.push(i);
     if (ticks[ticks.length - 1] < tMax) ticks.push(tMax);
 
     return { data: d, yTicks: ticks, yMin: tMin, yMax: tMax, yStep: tStep, lastRealIdx: idx };
-  }, [history, isBodyweight, exerciseName, goal, chartView]);
+  }, [history, isBodyweight, exerciseName]);
 
   if (result.empty) return null;
   const { data, yTicks, yMin, yMax, yStep, lastRealIdx } = result;
@@ -263,7 +264,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     );
   };
 
-  const yDomain = [yMin - yStep, yMax + yStep];
+  const yDomain = isBodyweight ? [yMin - yStep, yMax + yStep] : [yMin, yMax];
 
   const pointWidth = 50;
   const chartWidth = Math.max(280, data.length * pointWidth);
