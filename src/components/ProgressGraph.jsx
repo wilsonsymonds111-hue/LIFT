@@ -254,6 +254,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
 
   const yDomain = [yMin - yStep, yMax + yStep];
 
+  const pointWidth = 50;
+  const chartWidth = Math.max(280, data.length * pointWidth);
+
   return (
     <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '12px 4px 8px' }}>
       {!hideLabel && (
@@ -261,8 +264,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           {labelOverride || (isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)')}
         </p>
       )}
-      <ResponsiveContainer width="100%" height={compact ? 130 : 200}>
-        <LineChart data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
+      <div className="overflow-x-auto overflow-y-hidden" style={{ touchAction: 'pan-x', WebkitOverflowScrolling: 'touch' }}>
+        <ResponsiveContainer width={chartWidth} height={compact ? 130 : 200} minWidth={chartWidth}>
+          <LineChart data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
           <YAxis domain={yDomain} ticks={yTicks} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
           <Tooltip content={<CustomTooltip />} />
@@ -284,6 +288,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           })()}
         </LineChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 });
