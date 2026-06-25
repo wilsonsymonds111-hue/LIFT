@@ -161,6 +161,10 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     // Y-axis ticks
     const vals = d.filter(x => !x.projected).map(x => x.valNew ?? x.valStatic).filter(v => v != null);
     d.filter(x => x.projected).forEach(x => { if (x.projVal != null) vals.push(x.projVal); });
+    if (goal) {
+      const goalVal = chartView === 'reps' ? goal.reps : goal.kg;
+      if (goalVal > 0) vals.push(goalVal);
+    }
     const rMin = Math.min(...vals), rMax = Math.max(...vals);
     let tMin, tMax, tStep;
     if (isBodyweight) {
@@ -177,7 +181,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     if (ticks[ticks.length - 1] < tMax) ticks.push(tMax);
 
     return { data: d, yTicks: ticks, yMin: tMin, yMax: tMax, yStep: tStep, lastRealIdx: idx };
-  }, [history, isBodyweight, exerciseName]);
+  }, [history, isBodyweight, exerciseName, goal, chartView]);
 
   if (result.empty) return null;
   const { data, yTicks, yMin, yMax, yStep, lastRealIdx } = result;
