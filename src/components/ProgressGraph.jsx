@@ -66,6 +66,18 @@ export function getNextGoal(exerciseName, history) {
 const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact, exerciseName, goal, chartView }) {
   const [freshAnim, setFreshAnim] = useState(false);
   const prevAnimKeyRef = useRef(animKey);
+  const scrollRef = useRef(null);
+  const dragState = useRef({ dragging: false, startX: 0, startScroll: 0 });
+
+  const handleDragStart = (clientX) => {
+    if (!scrollRef.current) return;
+    dragState.current = { dragging: true, startX: clientX, startScroll: scrollRef.current.scrollLeft };
+  };
+  const handleDragMove = (clientX) => {
+    if (!dragState.current.dragging || !scrollRef.current) return;
+    scrollRef.current.scrollLeft = dragState.current.startScroll - (clientX - dragState.current.startX);
+  };
+  const handleDragEnd = () => { dragState.current.dragging = false; };
   useEffect(() => {
     if (animKey !== prevAnimKeyRef.current) {
       prevAnimKeyRef.current = animKey;
@@ -264,7 +276,15 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           {labelOverride || (isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)')}
         </p>
       )}
-      <div className="overflow-x-auto overflow-y-hidden" style={{ touchAction: 'pan-x', WebkitOverflowScrolling: 'touch' }}>
+      <div
+        ref={scrollRef}
+        className="overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing select-none"
+        style={{ touchAction: 'pan-x', WebkitOverflowScrolling: 'touch' }}
+        onMouseDown={(e) => handleDragStart(e.clientX)}
+        onMouseMove={(e) => handleDragMove(e.clientX)}
+        onMouseUp={handleDragEnd}
+        onMouseLeave={handleDragEnd}
+      >
           <LineChart width={chartWidth} height={compact ? 130 : 200} data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
           <YAxis domain={yDomain} ticks={yTicks} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
