@@ -24,6 +24,17 @@
           }
         }
       }
+    },
+    "goal": {
+      "type": "object",
+      "properties": {
+        "kg": {
+          "type": "number"
+        },
+        "reps": {
+          "type": "number"
+        }
+      }
     }
   },
   "required": [

@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Target } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { useQueryClient } from '@tanstack/react-query';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
+import { useExerciseGoals } from '../hooks/useExerciseGoals';
 import Sparkline from '../components/Sparkline';
 import EditTemplateModal from '../components/EditTemplateModal';
 
@@ -33,6 +34,7 @@ export default function TemplateDetail() {
   // Reuse React Query cache from Home page — data is already loaded, no refetch
   const { data: templates } = useWorkoutTemplates();
   const { data: exerciseData = {} } = useExerciseHistory();
+  const { data: goalsData = {} } = useExerciseGoals();
   // History is saved under the capitalised exercise name (WorkoutSheet
   // title-cases names before saving), but the template may store the original
   // (e.g. lowercase) name. Match case-insensitively so sparklines always find
@@ -42,6 +44,11 @@ export default function TemplateDetail() {
     Object.entries(exerciseData).forEach(([k, v]) => { m[k.toLowerCase()] = v; });
     return m;
   }, [exerciseData]);
+  const goalsByKey = useMemo(() => {
+    const m = {};
+    Object.entries(goalsData).forEach(([k, v]) => { m[k.toLowerCase()] = v; });
+    return m;
+  }, [goalsData]);
   const template = templates?.find(t => t.id === id);
 
   if (!template) {
@@ -101,11 +108,19 @@ export default function TemplateDetail() {
         <div className="px-5 py-3 space-y-3 overflow-y-auto flex-1">
           {template.exerciseList?.map((exercise, idx) => {
             const history = exerciseDataByKey[exercise.name.toLowerCase()] || exercise.history || [];
+            const goal = goalsByKey[exercise.name.toLowerCase()];
             return (
           <div key={idx} className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="font-bold text-foreground text-sm leading-snug">{exercise.sets || 2} × {exercise.name}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-xs text-muted-foreground">{exercise.muscle}</p>
+                {goal && (
+                  <span className="text-[10px] text-blue-500 font-semibold flex items-center gap-0.5">
+                    <Target className="w-2.5 h-2.5" /> {goal.kg}kg × {goal.reps}
+                  </span>
+                )}
+              </div>
             </div>
             {history.length > 0 && (
               <div className="w-16 h-8 flex-shrink-0 flex items-center justify-center">

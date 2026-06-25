@@ -8,6 +8,7 @@ import { getExerciseDetailList } from '../lib/exerciseCache';
 import ProgressGraph, { getNextGoal } from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
 import { isCustomExercise, deleteCustomExercise } from '../lib/customExercises';
+import ExerciseGoalSetter from './ExerciseGoalSetter';
 
 const TABS = ['Charts', 'About'];
 
@@ -22,6 +23,7 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
   const [detail, setDetail] = useState(initialImage ? { image_url: initialImage } : null);
   const [loadingDetail, setLoadingDetail] = useState(!initialImage);
   const [loadingHistory, setLoadingHistory] = useState(!initialHistory);
+  const [goal, setGoal] = useState(null);
   const [shimmer, setShimmer] = useState(false);
   const [chartView, setChartView] = useState('weight');
   const [swipeDir, setSwipeDir] = useState(0);
@@ -43,14 +45,15 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
 
   // Fetch workout history from the Exercise entity (only if not passed in)
   useEffect(() => {
-    if (initialHistory) return;
     base44.entities.Exercise.filter({ name: exercise.name }).then(results => {
       if (results.length > 0) {
-        setHistory(results[0].history || []);
+        setGoal(results[0].goal || null);
+        if (!initialHistory) setHistory(results[0].history || []);
       } else {
-        setHistory([]);
+        setGoal(null);
+        if (!initialHistory) setHistory([]);
       }
-      setLoadingHistory(false);
+      if (!initialHistory) setLoadingHistory(false);
     });
   }, [exercise.name, initialHistory]);
 
@@ -153,6 +156,9 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
         };
       })()
     : null;
+
+  // Override AI suggestion with the user's explicit goal if set
+  if (goal && stats) stats.suggestion = `${goal.kg} kg × ${goal.reps}`;
 
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>
@@ -342,6 +348,13 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
                 </>
               ) : (
                 <p className="text-center text-muted-foreground py-12">No workout history yet. Start a workout to see your progress!</p>
+              )}
+              {!loadingHistory && (
+                <ExerciseGoalSetter
+                  exerciseName={exercise.name}
+                  goal={goal}
+                  onSaved={setGoal}
+                />
               )}
             </div>
           )}
