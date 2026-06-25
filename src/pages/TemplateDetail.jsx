@@ -7,7 +7,6 @@ import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { useQueryClient } from '@tanstack/react-query';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
 import { useExerciseGoals } from '../hooks/useExerciseGoals';
-import Sparkline from '../components/Sparkline';
 import EditTemplateModal from '../components/EditTemplateModal';
 
 function relativeTime(dateStr) {
@@ -122,11 +121,25 @@ export default function TemplateDetail() {
                 )}
               </div>
             </div>
-            {history.length > 0 && (
-              <div className="w-16 h-8 flex-shrink-0 flex items-center justify-center">
-                <Sparkline data={history.map(h => ({ v: typeof h === 'object' ? h.reps : h }))} width={64} height={32} />
-              </div>
-            )}
+            {history.length > 0 && (() => {
+              const toKg = (h) => typeof h === 'object' ? (h.kg || 0) : (h || 0);
+              const toReps = (h) => typeof h === 'object' ? (h.reps || 0) : 8;
+              const isBodyweight = history.every(h => toKg(h) === 0);
+              const pr = isBodyweight
+                ? { kg: 0, reps: Math.max(...history.map(toReps)) }
+                : (() => {
+                    const maxKg = Math.max(...history.map(toKg));
+                    const maxReps = Math.max(...history.filter(h => toKg(h) === maxKg).map(toReps));
+                    return { kg: maxKg, reps: maxReps };
+                  })();
+              return (
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-sm font-bold text-foreground whitespace-nowrap">
+                    {isBodyweight ? `${pr.reps} reps` : `${pr.kg}kg × ${pr.reps}`}
+                  </p>
+                </div>
+              );
+            })()}
           </div>
             );
           })}
