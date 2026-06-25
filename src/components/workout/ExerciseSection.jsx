@@ -207,6 +207,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             Reps
           </button>
         </div>
+        <div className="w-7 flex-shrink-0" />
         </div>
       </div>
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact />
