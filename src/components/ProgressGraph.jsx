@@ -91,9 +91,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     if (!history || history.length === 0) return { empty: true };
     const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
     const allPoints = history.map(toPoint);
-    // Show a 9-point window: up to 5 real points (4 past + most recent PR) + projections to fill
-    const realPoints = allPoints.slice(-5);
-    const projectionCount = Math.max(1, 9 - realPoints.length);
+    // Show all real points + 4 projections; default scroll centers PR as the 5th dot
+    const realPoints = allPoints;
+    const projectionCount = Math.max(4, 9 - realPoints.length);
     const lastPoint = realPoints[realPoints.length - 1];
     const idx = realPoints.length - 1;
 
@@ -197,6 +197,12 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
 
     return { data: d, yTicks: ticks, yMin: tMin, yMax: tMax, yStep: tStep, lastRealIdx: idx };
   }, [history, isBodyweight, exerciseName]);
+
+  useEffect(() => {
+    if (!scrollRef.current || !result.data) return;
+    const realCount = result.data.filter(x => !x.projected).length;
+    scrollRef.current.scrollLeft = Math.max(0, (realCount - 5) * 50);
+  }, [result.data]);
 
   if (result.empty) return null;
   const { data, yTicks, yMin, yMax, yStep, lastRealIdx } = result;
