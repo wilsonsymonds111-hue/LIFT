@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { History } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
@@ -243,8 +242,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                   onClick={() => setRestMinimized(false)}
                 />
               ) : (
-                <button onClick={() => setShowRestTimerPicker(true)} className="w-11 h-11 flex items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-xl transition">
-                  <History className="w-5 h-5 text-white" />
+                <button onClick={() => setShowRestTimerPicker(true)} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-xl transition">
+                  Rest Timer
                 </button>
               )}
 
