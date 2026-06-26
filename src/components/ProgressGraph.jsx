@@ -395,14 +395,19 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   };
 
   const GhostDot = (props) => {
+    const { cx, cy, payload } = props;
+    if (!payload?.projected) return <g />;
+    return <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.7} stroke="#d4a017" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.8} />;
+  };
+
+  const RepCapActiveDot = (props) => {
     const { cx, cy, payload, index } = props;
     if (!payload?.projected) return <g />;
     const isRepCapDot = isBodyweight && payload.projVal === repCap;
-    // Only show the label on the first projected dot that reaches the rep cap
     const isFirstRepCap = isRepCapDot && (index === 0 || (data[index - 1]?.projVal ?? 0) < repCap);
     return (
       <g>
-        <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.7} stroke="#d4a017" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.8} />
+        <circle cx={cx} cy={cy} r={6} fill="#d4a017" stroke="#fff" strokeWidth={2} />
         {isFirstRepCap && (
           <text x={cx - 10} y={cy + 20} fontSize={9} fill="#B45309" fontWeight={600} textAnchor="end">
             <tspan x={cx - 10} dy="0">Studies recommend moving</tspan>
@@ -483,7 +488,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
             <Tooltip content={<CustomTooltip />} />
             <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
             <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
-            <Line type="monotone" dataKey="projVal" stroke="#d4a017" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.5} dot={<GhostDot />} activeDot={{ r: 5, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />
+            <Line type="monotone" dataKey="projVal" stroke="#d4a017" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.5} dot={<GhostDot />} activeDot={<RepCapActiveDot />} connectNulls={true} isAnimationActive={false} />
             {goal && (() => {
               if (chartView === 'reps') {
                 if (!goal.reps || goal.reps <= 0) return null;
