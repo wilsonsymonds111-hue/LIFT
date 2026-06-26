@@ -359,13 +359,6 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
               ) : (
                 <p className="text-center text-muted-foreground py-12">No workout history yet. Start a workout to see your progress!</p>
               )}
-              {!loadingHistory && (
-                <ExerciseGoalSetter
-                  exerciseName={exercise.name}
-                  goal={goal}
-                  onSaved={setGoal}
-                />
-              )}
             </div>
           )}
 
