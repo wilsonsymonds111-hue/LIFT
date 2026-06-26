@@ -178,7 +178,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       tMin = Math.floor(rMin); tMax = Math.ceil(rMax);
       tStep = Math.max(1, Math.round((tMax - tMin || 1) / 4));
     } else {
-      tStep = 5;
+      tStep = 2.5;
       tMin = Math.floor(rMin / tStep) * tStep - tStep;
       tMax = Math.ceil(rMax / tStep) * tStep + tStep;
       // Ensure a minimum range of 4 intervals so small data ranges don't look flat
