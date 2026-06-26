@@ -379,17 +379,17 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const isNewest = index === lastRealIdx;
     if (isNewest) {
       if (freshAnim && animDir === 'remove') {
-        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4.1} fill="#3b82f6" stroke="#3b82f6" strokeWidth={2.5} className="retract-dot" />;
+        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={3.5} fill="#3b82f6" stroke="#3b82f6" strokeWidth={2.5} className="retract-dot" />;
       }
       if (freshAnim && animDir === 'add') {
         return (
           <g key={`dot-${animKey}`}>
-            <circle cx={cx} cy={cy} r={4.1} fill="#3b82f6" stroke="#3b82f6" strokeWidth={2.5} className="snap-dot" />
+            <circle cx={cx} cy={cy} r={3.5} fill="#3b82f6" stroke="#3b82f6" strokeWidth={2.5} className="snap-dot" />
             <circle cx={cx} cy={cy} r={4} className="ripple-ring" />
           </g>
         );
       }
-      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4.1} fill="#3b82f6" stroke="#3b82f6" strokeWidth={2.5} />;
+      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={3.5} fill="#3b82f6" stroke="#3b82f6" strokeWidth={2.5} />;
     }
     return <g />;
   };
