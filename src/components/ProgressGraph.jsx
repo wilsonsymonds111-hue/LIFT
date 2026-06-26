@@ -312,17 +312,17 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const isNewest = index === lastRealIdx;
     if (isNewest) {
       if (freshAnim && animDir === 'remove') {
-        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4} fill="#d4a017" stroke="white" strokeWidth={2} className="retract-dot" />;
+        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} className="retract-dot" />;
       }
       if (freshAnim && animDir === 'add') {
         return (
           <g key={`dot-${animKey}`}>
-            <circle cx={cx} cy={cy} r={4} fill="#d4a017" stroke="white" strokeWidth={2} className="snap-dot" />
+            <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} className="snap-dot" />
             <circle cx={cx} cy={cy} r={4} className="ripple-ring" />
           </g>
         );
       }
-      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#d4a017" stroke="white" strokeWidth={2} />;
+      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
     }
     return <g />;
   };
@@ -407,7 +407,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
             <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
             <Tooltip content={<CustomTooltip />} />
             <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
-            <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
+            <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
             <Line type="monotone" dataKey="projVal" stroke="#d4a017" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.5} dot={<GhostDot />} activeDot={{ r: 5, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />
             {goal && (() => {
               const goalVal = chartView === 'reps' ? goal.reps : goal.kg;
