@@ -395,9 +395,22 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   };
 
   const GhostDot = (props) => {
-    const { cx, cy, payload } = props;
+    const { cx, cy, payload, index } = props;
     if (!payload?.projected) return <g />;
-    return <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.7} stroke="#d4a017" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.8} />;
+    const isRepCapDot = isBodyweight && payload.projVal === repCap;
+    // Only show the label on the first projected dot that reaches the rep cap
+    const isFirstRepCap = isRepCapDot && (index === 0 || (data[index - 1]?.projVal ?? 0) < repCap);
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.7} stroke="#d4a017" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.8} />
+        {isFirstRepCap && (
+          <text x={cx - 10} y={cy - 14} fontSize={9} fill="#B45309" fontWeight={600} textAnchor="end">
+            <tspan x={cx - 10} dy="0">Studies recommend moving</tspan>
+            <tspan x={cx - 10} dy="11">up in weight after {repCap} reps</tspan>
+          </text>
+        )}
+      </g>
+    );
   };
 
   const CustomTooltip = ({ active, payload }) => {
@@ -412,11 +425,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       } else {
         label = `Aim for: ${d.projVal} reps`;
       }
-      const showGoalNote = isBodyweight && d.projVal === repCap;
       return (
-        <div className="bg-amber-50 text-amber-700 border border-amber-300 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold max-w-[220px]">
-          <div className="whitespace-nowrap">{label}</div>
-          {showGoalNote && <div className="text-[10px] font-normal text-amber-600 mt-1 leading-snug">Studies recommend moving up in weight after hitting {repCap} reps for maximum muscle growth.</div>}
+        <div className="bg-amber-50 text-amber-700 border border-amber-300 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold whitespace-nowrap">
+          {label}
         </div>
       );
     }
