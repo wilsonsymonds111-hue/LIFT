@@ -490,6 +490,14 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
             <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
             <Line type="monotone" dataKey="projVal" stroke="#3b82f6" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.5} dot={<GhostDot />} activeDot={<RepCapActiveDot />} connectNulls={true} isAnimationActive={false} />
             {goal && (() => {
+              const FlagLabel = ({ viewBox }) => {
+                const { x, y } = viewBox;
+                return (
+                  <text x={x + 10} y={y - 5} fontSize={12} fill="#22c55e" fontWeight={700}>
+                    🏁
+                  </text>
+                );
+              };
               if (chartView === 'reps') {
                 if (!goal.reps || goal.reps <= 0) return null;
                 // Only show the reps goal line when the reps chart weight matches the goal weight
@@ -500,7 +508,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
                     stroke="#22c55e"
                     strokeWidth={2}
                     strokeDasharray="6 3"
-                    label={{ value: `🏁 ${goal.reps} reps`, position: 'right', fontSize: 10, fill: '#22c55e', fontWeight: 700, offset: 10 }}
+                    label={<FlagLabel />}
                   />
                 );
               }
@@ -511,7 +519,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
                   stroke="#22c55e"
                   strokeWidth={2}
                   strokeDasharray="6 3"
-                  label={{ value: `🏁 ${goal.kg} kg`, position: 'right', fontSize: 10, fill: '#22c55e', fontWeight: 700, offset: 10 }}
+                  label={<FlagLabel />}
                 />
               );
             })()}
