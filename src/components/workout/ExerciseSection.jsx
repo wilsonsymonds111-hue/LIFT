@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'reac
 import { MoreHorizontal, Target, Plus } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import { useExerciseGoals } from '../../hooks/useExerciseGoals';
-import ProgressGraph from '../ProgressGraph';
+import ProgressGraph, { getRepCap } from '../ProgressGraph';
+import { useToast } from '@/components/ui/use-toast';
 import GoalModal from './GoalModal';
 import SetRow from './SetRow';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
@@ -46,6 +47,9 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [chartView, setChartView] = useState('weight');
   const [showGoalModal, setShowGoalModal] = useState(false);
   const { data: goalsData = {} } = useExerciseGoals();
+  const { toast } = useToast();
+  const repCap = getRepCap(exercise.name);
+  const goalNoteShownRef = useRef(false);
   const [goal, setGoal] = useState(null);
   useEffect(() => {
     const key = exercise.name.toLowerCase();
@@ -237,6 +241,10 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
             if (result) {
               onBestSet?.(exercise.name, result.kg, result.reps);
+              if (result.reps >= repCap && !goalNoteShownRef.current) {
+                goalNoteShownRef.current = true;
+                toast({ description: `Studies recommend moving up in weight after hitting ${repCap} reps for maximum muscle growth.` });
+              }
               if (!wasCompleted) {
                 const currentSet = sets[setIndex];
                 const targetReps = currentSet.suggestedReps;

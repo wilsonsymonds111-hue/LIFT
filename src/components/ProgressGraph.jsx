@@ -83,6 +83,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
 
   const pointWidth = BASE_POINT_WIDTH * zoom;
   const chartHeight = compact ? 140 : 230;
+  const repCap = exerciseName ? getRepCap(exerciseName) : 12;
 
   // Mouse drag-to-scroll
   const handleDragStart = (clientX) => {
@@ -405,9 +406,11 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       } else {
         label = `Aim for: ${d.projVal} reps`;
       }
+      const showGoalNote = isBodyweight && d.projVal === repCap;
       return (
-        <div className="bg-amber-50 text-amber-700 border border-amber-300 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold whitespace-nowrap">
-          {label}
+        <div className="bg-amber-50 text-amber-700 border border-amber-300 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold max-w-[220px]">
+          <div className="whitespace-nowrap">{label}</div>
+          {showGoalNote && <div className="text-[10px] font-normal text-amber-600 mt-1 leading-snug">Studies recommend moving up in weight after hitting {repCap} reps for maximum muscle growth.</div>}
         </div>
       );
     }
