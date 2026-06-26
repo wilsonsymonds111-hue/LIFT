@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, memo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts';
 
 // Exercise classification helpers — exported for use in ExerciseDetailModal
@@ -42,7 +42,6 @@ export function getNextGoal(exerciseName, history) {
     const snap = (v) => Math.round(v / 2.5) * 2.5;
     const newKg = snap(maxKg + inc);
 
-    // Determine starting reps after weight increase from history transitions
     const byWeight = {};
     history.forEach(h => { const kg = h.kg || 0; if (!byWeight[kg]) byWeight[kg] = []; byWeight[kg].push(h.reps || 0); });
     const weights = Object.keys(byWeight).map(Number).sort((a, b) => a - b);
@@ -63,12 +62,25 @@ export function getNextGoal(exerciseName, history) {
   return `${maxKg} kg × ${bestReps + 1}`;
 }
 
+const CHART_MARGIN = { top: 12, right: 16, left: 36, bottom: 4 };
+const BASE_POINT_WIDTH = 50;
+const Y_AXIS_WIDTH = 36;
+
 const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact, exerciseName, goal, chartView }) {
   const [freshAnim, setFreshAnim] = useState(false);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [zoom, setZoom] = useState(1);
   const prevAnimKeyRef = useRef(animKey);
   const scrollRef = useRef(null);
   const dragState = useRef({ dragging: false, startX: 0, startScroll: 0 });
+  const pinchState = useRef({ pinching: false, startDist: 0, startZoom: 1 });
+  const rafRef = useRef(null);
 
+  const pointWidth = BASE_POINT_WIDTH * zoom;
+  const chartHeight = compact ? 140 : 230;
+
+  // Mouse drag-to-scroll
   const handleDragStart = (clientX) => {
     if (!scrollRef.current) return;
     dragState.current = { dragging: true, startX: clientX, startScroll: scrollRef.current.scrollLeft };
@@ -78,6 +90,34 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     scrollRef.current.scrollLeft = dragState.current.startScroll - (clientX - dragState.current.startX);
   };
   const handleDragEnd = () => { dragState.current.dragging = false; };
+
+  // Pinch-to-zoom
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      pinchState.current = { pinching: true, startDist: dist, startZoom: zoom };
+    }
+  };
+  const handleTouchMove = (e) => {
+    if (pinchState.current.pinching && e.touches.length === 2) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      if (pinchState.current.startDist > 0) {
+        const scale = dist / pinchState.current.startDist;
+        setZoom(Math.max(0.5, Math.min(3, pinchState.current.startZoom * scale)));
+      }
+    }
+  };
+  const handleTouchEnd = () => {
+    pinchState.current = { pinching: false, startDist: 0, startZoom: 1 };
+  };
+
+  // Animation trigger
   useEffect(() => {
     if (animKey !== prevAnimKeyRef.current) {
       prevAnimKeyRef.current = animKey;
@@ -87,11 +127,11 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     }
   }, [animKey]);
 
+  // Data computation (all real points + 4 projections)
   const result = useMemo(() => {
     if (!history || history.length === 0) return { empty: true };
     const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
     const allPoints = history.map(toPoint);
-    // Show all real points + 4 projections; default scroll centers PR as the 5th dot
     const realPoints = allPoints;
     const projectionCount = Math.max(4, 9 - realPoints.length);
     const lastPoint = realPoints[realPoints.length - 1];
@@ -116,7 +156,6 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       reps: p.reps,
     }));
 
-    // Deduplicate repeated month labels
     let lastShort = null;
     d.forEach(item => {
       if (item.dateShort) {
@@ -125,7 +164,6 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       }
     });
 
-    // Weight progression rate for projections (use full history for accuracy)
     const kgs = allPoints.map(p => p.kg || 0).filter(k => k > 0);
     let rate = 2.5;
     if (kgs.length >= 2) {
@@ -141,11 +179,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       let projVal, projKg, projReps;
       if (isBodyweight) {
         if (hasWeights && repCap > 0) {
-          // Reps chart for a weighted exercise — cap at repCap
           const nextRep = lastPoint.reps + i;
           projVal = Math.min(nextRep, repCap);
           if (nextRep > repCap) {
-            // After cap: project weight increase
             const inc = getWeightIncrement(allPoints);
             const newKg = snap((lastPoint.kg || kgs[kgs.length - 1] || 0) + inc * Math.ceil((nextRep - repCap) / (repCap - lastPoint.reps + 1)));
             projKg = snap(newKg);
@@ -154,7 +190,6 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           }
           projReps = projVal;
         } else {
-          // True bodyweight or no rep cap — just increase reps
           projVal = lastPoint.reps + i;
           if (repCap > 0) projVal = Math.min(projVal, repCap);
         }
@@ -173,18 +208,67 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       });
     }
 
-    // Y-axis ticks — include projections so all 9 points are visible
-    const vals = d.map(x => x.valNew ?? x.valStatic ?? x.projVal).filter(v => v != null);
+    return { data: d, lastRealIdx: idx };
+  }, [history, isBodyweight, exerciseName]);
+
+  // Measure container width
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setContainerWidth(el.clientWidth));
+    ro.observe(el);
+    setContainerWidth(el.clientWidth);
+    return () => ro.disconnect();
+  }, []);
+
+  // rAF-throttled scroll handler
+  const handleScroll = useCallback(() => {
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      if (scrollRef.current) setScrollLeft(scrollRef.current.scrollLeft);
+    });
+  }, []);
+
+  // Initial scroll — center PR as the 5th dot
+  useEffect(() => {
+    if (!scrollRef.current || !result.data) return;
+    const realCount = result.data.filter(x => !x.projected).length;
+    const scrollTo = Math.max(0, (realCount - 5) * pointWidth);
+    scrollRef.current.scrollLeft = scrollTo;
+    setScrollLeft(scrollTo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result.data]);
+
+  // Dynamic Y-axis domain based on visible data
+  const visibleY = useMemo(() => {
+    if (!result.data) return null;
+    const cw = Math.max(280, result.data.length * pointWidth);
+    const dataAreaWidth = cw - CHART_MARGIN.left - CHART_MARGIN.right;
+    const spacing = result.data.length > 1 ? dataAreaWidth / (result.data.length - 1) : 0;
+
+    let startIdx, endIdx;
+    if (containerWidth === 0 || spacing === 0) {
+      startIdx = 0;
+      endIdx = result.data.length;
+    } else {
+      startIdx = Math.max(0, Math.floor((scrollLeft - CHART_MARGIN.left) / spacing));
+      endIdx = Math.min(result.data.length, Math.ceil((scrollLeft + containerWidth - CHART_MARGIN.left) / spacing) + 1);
+    }
+
+    const visible = result.data.slice(startIdx, endIdx);
+    const vals = visible.map(x => x.valNew ?? x.valStatic ?? x.projVal).filter(v => v != null);
+    if (vals.length === 0) return null;
+
     const rMin = Math.min(...vals), rMax = Math.max(...vals);
     let tMin, tMax, tStep;
     if (isBodyweight) {
       tMin = Math.floor(rMin); tMax = Math.ceil(rMax);
-      tStep = Math.max(1, Math.round((tMax - tMin || 1) / 4));
+      tStep = Math.max(2, Math.round((tMax - tMin || 1) / 4));
     } else {
-      tStep = 2.5;
+      tStep = 5; // Bigger increments
       tMin = Math.floor(rMin / tStep) * tStep;
       tMax = Math.ceil(rMax / tStep) * tStep;
-      // Ensure a minimum range of 2 intervals so tiny data ranges don't look flat
       if (tMax - tMin < 2 * tStep) {
         const mid = Math.round(((tMin + tMax) / 2) / tStep) * tStep;
         tMin = mid - tStep;
@@ -194,18 +278,27 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const ticks = [];
     for (let i = tMin; i <= tMax; i += tStep) ticks.push(i);
     if (ticks[ticks.length - 1] < tMax) ticks.push(tMax);
-
-    return { data: d, yTicks: ticks, yMin: tMin, yMax: tMax, yStep: tStep, lastRealIdx: idx };
-  }, [history, isBodyweight, exerciseName]);
-
-  useEffect(() => {
-    if (!scrollRef.current || !result.data) return;
-    const realCount = result.data.filter(x => !x.projected).length;
-    scrollRef.current.scrollLeft = Math.max(0, (realCount - 5) * 50);
-  }, [result.data]);
+    return { yMin: tMin, yMax: tMax, yStep: tStep, ticks };
+  }, [result.data, scrollLeft, containerWidth, pointWidth, isBodyweight]);
 
   if (result.empty) return null;
-  const { data, yTicks, yMin, yMax, yStep, lastRealIdx } = result;
+  const { data, lastRealIdx } = result;
+
+  const yDomain = visibleY
+    ? isBodyweight
+      ? [visibleY.yMin - visibleY.yStep, visibleY.yMax + visibleY.yStep]
+      : [visibleY.yMin - visibleY.yStep / 2, visibleY.yMax + visibleY.yStep / 2]
+    : [0, 100];
+
+  // Map Y value → pixel position for sticky overlay
+  const chartAreaHeight = chartHeight - CHART_MARGIN.top - CHART_MARGIN.bottom;
+  const yToPixel = (v) => {
+    const [lo, hi] = yDomain;
+    if (hi === lo) return CHART_MARGIN.top + chartAreaHeight / 2;
+    return CHART_MARGIN.top + (1 - (v - lo) / (hi - lo)) * chartAreaHeight;
+  };
+
+  const chartWidth = Math.max(280, data.length * pointWidth);
 
   const StaticDot = (props) => {
     const { cx, cy, value } = props;
@@ -240,8 +333,6 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     return <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.7} stroke="#d4a017" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.8} />;
   };
 
-
-
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload;
@@ -273,11 +364,6 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     );
   };
 
-  const yDomain = isBodyweight ? [yMin - yStep, yMax + yStep] : [yMin - yStep / 2, yMax + yStep / 2];
-
-  const pointWidth = 50;
-  const chartWidth = Math.max(280, data.length * pointWidth);
-
   return (
     <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '12px 4px 8px' }}>
       {!hideLabel && (
@@ -285,36 +371,59 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           {labelOverride || (isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)')}
         </p>
       )}
-      <div
-        ref={scrollRef}
-        className="overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing select-none"
-        style={{ touchAction: 'pan-x', WebkitOverflowScrolling: 'touch' }}
-        onMouseDown={(e) => handleDragStart(e.clientX)}
-        onMouseMove={(e) => handleDragMove(e.clientX)}
-        onMouseUp={handleDragEnd}
-        onMouseLeave={handleDragEnd}
-      >
-          <LineChart width={chartWidth} height={compact ? 140 : 230} data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
-          <YAxis domain={yDomain} ticks={yTicks} interval={0} tick={{ fontSize: 10, fill: '#9ca3af' }} />
-          <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
-          <Tooltip content={<CustomTooltip />} />
-          <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
-          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
-          <Line type="monotone" dataKey="projVal" stroke="#d4a017" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.5} dot={<GhostDot />} activeDot={{ r: 5, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />
-          {goal && (() => {
-            const goalVal = chartView === 'reps' ? goal.reps : goal.kg;
-            if (!goalVal || goalVal <= 0) return null;
-            return (
-              <ReferenceLine
-                y={goalVal}
-                stroke="#22c55e"
-                strokeWidth={2}
-                strokeDasharray="6 3"
-                label={{ value: `🎯 ${goalVal}${chartView === 'reps' ? ' reps' : ' kg'}`, position: 'insideTopRight', fontSize: 10, fill: '#22c55e', fontWeight: 700 }}
-              />
-            );
-          })()}
+      <div className="relative">
+        {/* Sticky Y-axis overlay — stays fixed on the left while scrolling */}
+        {visibleY && (
+          <div
+            className="absolute left-0 top-0 z-10 pointer-events-none flex items-end justify-end pr-1"
+            style={{ width: `${Y_AXIS_WIDTH}px`, height: `${chartHeight}px`, background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)' }}
+          >
+            {visibleY.ticks.map(tick => (
+              <span
+                key={tick}
+                className="absolute text-[10px] text-gray-400 font-medium"
+                style={{ top: `${yToPixel(tick)}px`, right: '2px', transform: 'translateY(-50%)' }}
+              >
+                {tick}
+              </span>
+            ))}
+          </div>
+        )}
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing select-none"
+          style={{ touchAction: 'pan-x', WebkitOverflowScrolling: 'touch' }}
+          onMouseDown={(e) => handleDragStart(e.clientX)}
+          onMouseMove={(e) => handleDragMove(e.clientX)}
+          onMouseUp={handleDragEnd}
+          onMouseLeave={handleDragEnd}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <LineChart width={chartWidth} height={chartHeight} data={data} margin={CHART_MARGIN}>
+            <YAxis domain={yDomain} ticks={visibleY?.ticks || []} hide interval={0} />
+            <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
+            <Tooltip content={<CustomTooltip />} />
+            <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
+            <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
+            <Line type="monotone" dataKey="projVal" stroke="#d4a017" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.5} dot={<GhostDot />} activeDot={{ r: 5, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />
+            {goal && (() => {
+              const goalVal = chartView === 'reps' ? goal.reps : goal.kg;
+              if (!goalVal || goalVal <= 0) return null;
+              return (
+                <ReferenceLine
+                  y={goalVal}
+                  stroke="#22c55e"
+                  strokeWidth={2}
+                  strokeDasharray="6 3"
+                  label={{ value: `🎯 ${goalVal}${chartView === 'reps' ? ' reps' : ' kg'}`, position: 'insideTopRight', fontSize: 10, fill: '#22c55e', fontWeight: 700 }}
+                />
+              );
+            })()}
           </LineChart>
+        </div>
       </div>
     </div>
   );
