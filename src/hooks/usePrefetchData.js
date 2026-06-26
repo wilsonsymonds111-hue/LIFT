@@ -23,8 +23,7 @@ export function usePrefetchData() {
       });
       getExerciseDetailList();
     };
-    const hasRIC = typeof requestIdleCallback === 'function';
-    const id = hasRIC ? requestIdleCallback(prefetch, { timeout: 5000 }) : setTimeout(prefetch, 2000);
-    return () => (hasRIC ? cancelIdleCallback(id) : clearTimeout(id));
+    const id = setTimeout(prefetch, 200);
+    return () => clearTimeout(id);
   }, [queryClient]);
 }

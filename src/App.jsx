@@ -151,10 +151,10 @@ const usePreloadSubPages = () => {
       import('./pages/SupportChat');
       import('./pages/Terms');
       import('./pages/Privacy');
+      import('./components/ExerciseDetailModal');
     };
-    const hasRIC = typeof requestIdleCallback === 'function';
-    const id = hasRIC ? requestIdleCallback(preload, { timeout: 5000 }) : setTimeout(preload, 3000);
-    return () => (hasRIC ? cancelIdleCallback(id) : clearTimeout(id));
+    const id = setTimeout(preload, 200);
+    return () => clearTimeout(id);
   }, []);
 };
 
