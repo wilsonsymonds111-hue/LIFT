@@ -212,7 +212,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           </button>
         </div>
       </div>
-      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact goal={goal} chartView={chartView} labelOverride={repsWeightLabel} />
+      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact goal={goal} chartView={chartView} labelOverride={repsWeightLabel} repsChartWeight={repsMaxKg} />
       {showGoalModal && (
         <GoalModal
           exerciseName={exercise.name}

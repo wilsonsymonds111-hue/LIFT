@@ -66,7 +66,7 @@ const CHART_MARGIN = { top: 12, right: 16, left: 46, bottom: 4 };
 const BASE_POINT_WIDTH = 50;
 const Y_AXIS_WIDTH = 36;
 
-const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact, exerciseName, goal, chartView }) {
+const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact, exerciseName, goal, chartView, repsChartWeight }) {
   const [freshAnim, setFreshAnim] = useState(false);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -465,15 +465,28 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
             <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
             <Line type="monotone" dataKey="projVal" stroke="#d4a017" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.5} dot={<GhostDot />} activeDot={{ r: 5, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />
             {goal && (() => {
-              const goalVal = chartView === 'reps' ? goal.reps : goal.kg;
-              if (!goalVal || goalVal <= 0) return null;
+              if (chartView === 'reps') {
+                if (!goal.reps || goal.reps <= 0) return null;
+                // Only show the reps goal line when the reps chart weight matches the goal weight
+                if (goal.kg > 0 && repsChartWeight !== goal.kg) return null;
+                return (
+                  <ReferenceLine
+                    y={goal.reps}
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                    strokeDasharray="6 3"
+                    label={{ value: `🎯 ${goal.reps} reps`, position: 'insideTopRight', fontSize: 10, fill: '#22c55e', fontWeight: 700 }}
+                  />
+                );
+              }
+              if (!goal.kg || goal.kg <= 0) return null;
               return (
                 <ReferenceLine
-                  y={goalVal}
+                  y={goal.kg}
                   stroke="#22c55e"
                   strokeWidth={2}
                   strokeDasharray="6 3"
-                  label={{ value: `🎯 ${goalVal}${chartView === 'reps' ? ' reps' : ' kg'}`, position: 'insideTopRight', fontSize: 10, fill: '#22c55e', fontWeight: 700 }}
+                  label={{ value: `🎯 ${goal.kg} kg`, position: 'insideTopRight', fontSize: 10, fill: '#22c55e', fontWeight: 700 }}
                 />
               );
             })()}
