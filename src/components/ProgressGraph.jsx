@@ -137,7 +137,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
     const allPoints = history.map(toPoint);
     const realPoints = allPoints;
-    const projectionCount = Math.max(4, 9 - realPoints.length);
+    let projectionCount = Math.max(4, 9 - realPoints.length);
     const lastPoint = realPoints[realPoints.length - 1];
     const idx = realPoints.length - 1;
 
@@ -176,6 +176,15 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     }
     const snap = (v) => Math.round(v / 2.5) * 2.5;
 
+    // Extend projections to reach the goal if set
+    if (goal) {
+      const goalVal = isBodyweight ? goal.reps : goal.kg;
+      const lastVal = getValue(lastPoint);
+      if (goalVal && goalVal > lastVal && rate > 0) {
+        projectionCount = Math.max(projectionCount, Math.ceil((goalVal - lastVal) / rate));
+      }
+    }
+
     const repCap = exerciseName ? getRepCap(exerciseName) : 0;
     const hasWeights = kgs.length > 0;
 
@@ -213,7 +222,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     }
 
     return { data: d, lastRealIdx: idx };
-  }, [history, isBodyweight, exerciseName]);
+  }, [history, isBodyweight, exerciseName, goal]);
 
   // Measure container width
   useEffect(() => {
@@ -262,6 +271,11 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
 
     const visible = result.data.slice(startIdx, endIdx);
     const vals = visible.map(x => x.valNew ?? x.valStatic ?? x.projVal).filter(v => v != null);
+    // Include goal value so the green target line stays in view
+    if (goal) {
+      const goalVal = isBodyweight ? goal.reps : goal.kg;
+      if (goalVal && goalVal > 0) vals.push(goalVal);
+    }
     if (vals.length === 0) return null;
 
     const rMin = Math.min(...vals), rMax = Math.max(...vals);
@@ -283,7 +297,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     for (let i = tMin; i <= tMax; i += tStep) ticks.push(i);
     if (ticks[ticks.length - 1] < tMax) ticks.push(tMax);
     return { yMin: tMin, yMax: tMax, yStep: tStep, ticks };
-  }, [result.data, scrollLeft, containerWidth, pointWidth, isBodyweight]);
+  }, [result.data, scrollLeft, containerWidth, pointWidth, isBodyweight, goal]);
 
   // Smoothly animate Y-axis domain toward target on scroll
   useEffect(() => {
