@@ -500,7 +500,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
                     stroke="#22c55e"
                     strokeWidth={2}
                     strokeDasharray="6 3"
-                    label={{ value: `🏁 ${goal.reps} reps`, position: 'insideTopRight', fontSize: 10, fill: '#22c55e', fontWeight: 700 }}
+                    label={{ value: `🏁 ${goal.reps} reps`, position: 'right', fontSize: 10, fill: '#22c55e', fontWeight: 700, offset: 10 }}
                   />
                 );
               }
@@ -511,7 +511,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
                   stroke="#22c55e"
                   strokeWidth={2}
                   strokeDasharray="6 3"
-                  label={{ value: `🏁 ${goal.kg} kg`, position: 'insideTopRight', fontSize: 10, fill: '#22c55e', fontWeight: 700 }}
+                  label={{ value: `🏁 ${goal.kg} kg`, position: 'right', fontSize: 10, fill: '#22c55e', fontWeight: 700, offset: 10 }}
                 />
               );
             })()}
