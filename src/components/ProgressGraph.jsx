@@ -244,15 +244,21 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     });
   }, []);
 
-  // Initial scroll — center the most recent PR in the middle of the chart
+  // Keep latest data in a ref so the scroll effect can read it without re-running on every render
+  const dataRef = useRef(null);
+  dataRef.current = result.data || null;
+
+  // Initial scroll — center the most recent PR in the middle of the chart.
+  // Depends on data length (a stable primitive) instead of the array reference,
+  // so scrolling the chart doesn't trigger a re-center on every re-render.
   useEffect(() => {
-    if (!scrollRef.current || !result.data) return;
+    if (!scrollRef.current || !dataRef.current) return;
     const cw = scrollRef.current.clientWidth || containerWidth;
     if (cw === 0) return;
-    const realCount = result.data.filter(x => !x.projected).length;
+    const realCount = dataRef.current.filter(x => !x.projected).length;
     const lastRealIdx = realCount - 1;
-    const chartW = Math.max(280, result.data.length * pointWidth);
-    const dataLen = result.data.length;
+    const chartW = Math.max(280, dataRef.current.length * pointWidth);
+    const dataLen = dataRef.current.length;
     const spacing = dataLen > 1 ? (chartW - CHART_MARGIN.left - CHART_MARGIN.right) / (dataLen - 1) : 0;
     const prX = CHART_MARGIN.left + lastRealIdx * spacing;
     const maxScroll = Math.max(0, chartW - cw);
@@ -260,7 +266,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     scrollRef.current.scrollLeft = scrollTo;
     setScrollLeft(scrollTo);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result.data, pointWidth, containerWidth]);
+  }, [result.data?.length, isBodyweight, exerciseName, pointWidth, containerWidth]);
 
   // Dynamic Y-axis domain based on visible data
   const visibleY = useMemo(() => {
