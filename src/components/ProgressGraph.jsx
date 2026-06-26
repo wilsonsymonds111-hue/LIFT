@@ -76,6 +76,10 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   const dragState = useRef({ dragging: false, startX: 0, startScroll: 0 });
   const pinchState = useRef({ pinching: false, startDist: 0, startZoom: 1 });
   const rafRef = useRef(null);
+  const animYRafRef = useRef(null);
+  const animYRef = useRef(null);
+  const targetYRef = useRef(null);
+  const [animatedY, setAnimatedY] = useState(null);
 
   const pointWidth = BASE_POINT_WIDTH * zoom;
   const chartHeight = compact ? 140 : 230;
@@ -281,13 +285,47 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     return { yMin: tMin, yMax: tMax, yStep: tStep, ticks };
   }, [result.data, scrollLeft, containerWidth, pointWidth, isBodyweight]);
 
+  // Smoothly animate Y-axis domain toward target on scroll
+  useEffect(() => {
+    if (!visibleY) return;
+    targetYRef.current = visibleY;
+    if (animYRafRef.current) return; // animation loop already running — it'll pick up the new target
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const tick = () => {
+      const target = targetYRef.current;
+      if (!target) { animYRafRef.current = null; return; }
+      const cur = animYRef.current;
+      if (!cur) { animYRef.current = target; setAnimatedY(target); animYRafRef.current = null; return; }
+      const speed = 0.22;
+      let nyMin = lerp(cur.yMin, target.yMin, speed);
+      let nyMax = lerp(cur.yMax, target.yMax, speed);
+      const done = Math.abs(nyMin - target.yMin) < 0.3 && Math.abs(nyMax - target.yMax) < 0.3;
+      if (done) { nyMin = target.yMin; nyMax = target.yMax; }
+      const tStep = target.yStep;
+      const tMin = Math.round(nyMin / tStep) * tStep;
+      const tMax = Math.round(nyMax / tStep) * tStep;
+      const ticks = [];
+      for (let i = tMin; i <= tMax; i += tStep) ticks.push(i);
+      const next = { yMin: nyMin, yMax: nyMax, yStep: tStep, ticks };
+      animYRef.current = next;
+      setAnimatedY(next);
+      if (!done) animYRafRef.current = requestAnimationFrame(tick);
+      else animYRafRef.current = null;
+    };
+    animYRafRef.current = requestAnimationFrame(tick);
+  }, [visibleY]);
+
+  useEffect(() => {
+    return () => { if (animYRafRef.current) cancelAnimationFrame(animYRafRef.current); };
+  }, []);
+
   if (result.empty) return null;
   const { data, lastRealIdx } = result;
 
-  const yDomain = visibleY
+  const yDomain = animatedY
     ? isBodyweight
-      ? [visibleY.yMin - visibleY.yStep, visibleY.yMax + visibleY.yStep]
-      : [visibleY.yMin - visibleY.yStep / 2, visibleY.yMax + visibleY.yStep / 2]
+      ? [animatedY.yMin - animatedY.yStep, animatedY.yMax + animatedY.yStep]
+      : [animatedY.yMin - animatedY.yStep / 2, animatedY.yMax + animatedY.yStep / 2]
     : [0, 100];
 
   // Map Y value → pixel position for sticky overlay
@@ -373,12 +411,12 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       )}
       <div className="relative">
         {/* Sticky Y-axis overlay — stays fixed on the left while scrolling */}
-        {visibleY && (
+        {animatedY && (
           <div
             className="absolute left-0 top-0 z-10 pointer-events-none flex items-end justify-end pr-1"
             style={{ width: `${Y_AXIS_WIDTH}px`, height: `${chartHeight}px`, background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)' }}
           >
-            {visibleY.ticks.map(tick => (
+            {animatedY.ticks.map(tick => (
               <span
                 key={tick}
                 className="absolute text-[10px] text-gray-400 font-medium"
@@ -403,7 +441,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           onTouchEnd={handleTouchEnd}
         >
           <LineChart width={chartWidth} height={chartHeight} data={data} margin={CHART_MARGIN}>
-            <YAxis domain={yDomain} ticks={visibleY?.ticks || []} hide interval={0} />
+            <YAxis domain={yDomain} ticks={animatedY?.ticks || []} hide interval={0} />
             <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
             <Tooltip content={<CustomTooltip />} />
             <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
