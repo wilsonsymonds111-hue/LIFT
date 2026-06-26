@@ -379,17 +379,17 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const isNewest = index === lastRealIdx;
     if (isNewest) {
       if (freshAnim && animDir === 'remove') {
-        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4} fill="#d4a017" stroke="white" strokeWidth={2} className="retract-dot" />;
+        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="#d4a017" strokeWidth={2.5} className="retract-dot" />;
       }
       if (freshAnim && animDir === 'add') {
         return (
           <g key={`dot-${animKey}`}>
-            <circle cx={cx} cy={cy} r={4} fill="#d4a017" stroke="white" strokeWidth={2} className="snap-dot" />
+            <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="#d4a017" strokeWidth={2.5} className="snap-dot" />
             <circle cx={cx} cy={cy} r={4} className="ripple-ring" />
           </g>
         );
       }
-      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#d4a017" stroke="white" strokeWidth={2} />;
+      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="#d4a017" strokeWidth={2.5} />;
     }
     return <g />;
   };
@@ -397,7 +397,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   const GhostDot = (props) => {
     const { cx, cy, payload } = props;
     if (!payload?.projected) return <g />;
-    return <circle cx={cx} cy={cy} r={5} fill="white" stroke="#3b82f6" strokeWidth={2} />;
+    return <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.7} stroke="#d4a017" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.8} />;
   };
 
   const RepCapActiveDot = (props) => {
@@ -407,7 +407,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const isFirstRepCap = isRepCapDot && (index === 0 || (data[index - 1]?.projVal ?? 0) < repCap);
     return (
       <g>
-        <circle cx={cx} cy={cy} r={5} fill="white" stroke="#3b82f6" strokeWidth={2} />
+        <circle cx={cx} cy={cy} r={6} fill="#d4a017" stroke="#fff" strokeWidth={2} />
         {isFirstRepCap && (
           <text x={cx - 10} y={cy + 20} fontSize={9} fill="#B45309" fontWeight={600} textAnchor="end">
             <tspan x={cx - 10} dy="0">Studies recommend moving</tspan>
