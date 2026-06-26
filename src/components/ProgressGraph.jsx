@@ -62,7 +62,7 @@ export function getNextGoal(exerciseName, history) {
   return `${maxKg} kg × ${bestReps + 1}`;
 }
 
-const CHART_MARGIN = { top: 12, right: 16, left: 36, bottom: 4 };
+const CHART_MARGIN = { top: 12, right: 16, left: 46, bottom: 4 };
 const BASE_POINT_WIDTH = 50;
 const Y_AXIS_WIDTH = 36;
 
