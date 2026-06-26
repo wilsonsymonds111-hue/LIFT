@@ -90,7 +90,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   const result = useMemo(() => {
     if (!history || history.length === 0) return { empty: true };
     const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
-    const realPoints = history.map(toPoint);
+    const allPoints = history.map(toPoint);
+    // Show a ~7-point window: last 4 real points (3 past + most recent PR) + 3 projections
+    const realPoints = allPoints.slice(-4);
     const lastPoint = realPoints[realPoints.length - 1];
     const idx = realPoints.length - 1;
 
@@ -122,8 +124,8 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       }
     });
 
-    // Weight progression rate for projections
-    const kgs = realPoints.map(p => p.kg || 0).filter(k => k > 0);
+    // Weight progression rate for projections (use full history for accuracy)
+    const kgs = allPoints.map(p => p.kg || 0).filter(k => k > 0);
     let rate = 2.5;
     if (kgs.length >= 2) {
       const rawRate = (kgs[kgs.length - 1] - kgs[0]) / (kgs.length - 1);
@@ -134,7 +136,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const repCap = exerciseName ? getRepCap(exerciseName) : 0;
     const hasWeights = kgs.length > 0;
 
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 3; i++) {
       let projVal, projKg, projReps;
       if (isBodyweight) {
         if (hasWeights && repCap > 0) {
@@ -143,7 +145,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           projVal = Math.min(nextRep, repCap);
           if (nextRep > repCap) {
             // After cap: project weight increase
-            const inc = getWeightIncrement(realPoints);
+            const inc = getWeightIncrement(allPoints);
             const newKg = snap((lastPoint.kg || kgs[kgs.length - 1] || 0) + inc * Math.ceil((nextRep - repCap) / (repCap - lastPoint.reps + 1)));
             projKg = snap(newKg);
           } else {
@@ -285,7 +287,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
       >
-          <LineChart width={chartWidth} height={compact ? 130 : 200} data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
+          <LineChart width={chartWidth} height={compact ? 180 : 260} data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
           <YAxis domain={yDomain} ticks={yTicks} interval={0} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
           <Tooltip content={<CustomTooltip />} />
