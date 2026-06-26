@@ -91,8 +91,8 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     if (!history || history.length === 0) return { empty: true };
     const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
     const allPoints = history.map(toPoint);
-    // Show a ~7-point window: last 4 real points (3 past + most recent PR) + 3 projections
-    const realPoints = allPoints.slice(-4);
+    // Show a ~9-point window: last 5 real points (4 past + most recent PR) + 4 projections
+    const realPoints = allPoints.slice(-5);
     const lastPoint = realPoints[realPoints.length - 1];
     const idx = realPoints.length - 1;
 
@@ -136,7 +136,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const repCap = exerciseName ? getRepCap(exerciseName) : 0;
     const hasWeights = kgs.length > 0;
 
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 4; i++) {
       let projVal, projKg, projReps;
       if (isBodyweight) {
         if (hasWeights && repCap > 0) {
@@ -287,7 +287,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
       >
-          <LineChart width={chartWidth} height={compact ? 180 : 260} data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
+          <LineChart width={chartWidth} height={compact ? 160 : 230} data={data} margin={{ top: 12, right: 16, left: -24, bottom: 4 }}>
           <YAxis domain={yDomain} ticks={yTicks} interval={0} tick={{ fontSize: 10, fill: '#9ca3af' }} />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
           <Tooltip content={<CustomTooltip />} />
