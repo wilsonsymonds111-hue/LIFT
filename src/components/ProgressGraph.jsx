@@ -91,8 +91,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     if (!history || history.length === 0) return { empty: true };
     const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
     const allPoints = history.map(toPoint);
-    // Show a ~9-point window: last 5 real points (4 past + most recent PR) + 4 projections
+    // Show a 9-point window: up to 5 real points (4 past + most recent PR) + projections to fill
     const realPoints = allPoints.slice(-5);
+    const projectionCount = Math.max(1, 9 - realPoints.length);
     const lastPoint = realPoints[realPoints.length - 1];
     const idx = realPoints.length - 1;
 
@@ -136,7 +137,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const repCap = exerciseName ? getRepCap(exerciseName) : 0;
     const hasWeights = kgs.length > 0;
 
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= projectionCount; i++) {
       let projVal, projKg, projReps;
       if (isBodyweight) {
         if (hasWeights && repCap > 0) {
