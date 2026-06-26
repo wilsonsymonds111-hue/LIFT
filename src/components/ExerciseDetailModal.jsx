@@ -342,7 +342,14 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
                             : 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-blue-400'
                           }
                         >
-                          <p className={`text-xs font-semibold relative z-10 ${s.isAI ? 'text-foreground' : s.label === 'Best' ? 'text-foreground' : 'text-white'}`}>{s.value}</p>
+                          {s.label === 'Best' && s.value.includes(' × ') ? (
+                            <>
+                              <p className="text-xs font-semibold relative z-10 leading-tight text-foreground">{s.value.split(' × ')[0]}</p>
+                              <p className="text-xs font-semibold relative z-10 leading-tight text-foreground">× {s.value.split(' × ')[1]}</p>
+                            </>
+                          ) : (
+                            <p className={`text-xs font-semibold relative z-10 ${s.isAI ? 'text-foreground' : s.label === 'Best' ? 'text-foreground' : 'text-white'}`}>{s.value}</p>
+                          )}
                           <p className={`text-[9px] font-medium uppercase tracking-wider mt-0.5 relative z-10 text-center ${s.isAI ? 'text-muted-foreground' : s.label === 'Best' ? 'text-muted-foreground' : 'text-blue-50'}`}>{s.label}</p>
                         </div>
                       ))}
