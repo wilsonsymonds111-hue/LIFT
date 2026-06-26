@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback, memo, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
-import { MoreHorizontal, Flag, Plus } from 'lucide-react';
+import { MoreHorizontal, Plus } from 'lucide-react';
+import CheckeredFlagIcon from '../CheckeredFlagIcon';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import { useExerciseGoals } from '../../hooks/useExerciseGoals';
 import ProgressGraph, { getRepCap } from '../ProgressGraph';
@@ -209,7 +210,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           onClick={() => setShowGoalModal(true)}
           className={`absolute left-0 flex items-center gap-1 h-7 rounded-full transition ${goal ? 'bg-green-500 text-white px-2' : 'bg-green-100 dark:bg-green-900/30 text-green-500 hover:bg-green-200 dark:hover:bg-green-900/50 px-3'}`}
         >
-          {goal ? <Flag className="w-5 h-5" /> : <><Plus className="w-3.5 h-3.5" /><span className="text-xs font-semibold">Set a goal</span></>}
+          {goal ? <CheckeredFlagIcon className="w-5 h-5" /> : <><Plus className="w-3.5 h-3.5" /><span className="text-xs font-semibold">Set a goal</span></>}
         </button>
         <div className="inline-flex bg-muted rounded-full p-0.5">
           <button
