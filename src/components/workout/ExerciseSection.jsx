@@ -188,9 +188,9 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       <div className="flex items-center mb-2">
         <button
           onClick={() => setShowGoalModal(true)}
-          className={`w-7 h-7 flex items-center justify-center rounded-full transition flex-shrink-0 ${goal ? 'bg-green-500 text-white' : 'bg-green-100 dark:bg-green-900/30 text-green-500 hover:bg-green-200 dark:hover:bg-green-900/50'}`}
+          className={`flex items-center gap-1 h-7 rounded-full transition flex-shrink-0 ${goal ? 'bg-green-500 text-white px-2' : 'bg-green-100 dark:bg-green-900/30 text-green-500 hover:bg-green-200 dark:hover:bg-green-900/50 px-3'}`}
         >
-          {goal ? <Target className="w-3.5 h-3.5" /> : <Plus className="w-4 h-4" />}
+          {goal ? <Target className="w-3.5 h-3.5" /> : <><Plus className="w-3.5 h-3.5" /><span className="text-xs font-semibold">Set a goal</span></>}
         </button>
         <div className="flex-1 flex justify-center">
         <div className="inline-flex bg-muted rounded-full p-0.5">
