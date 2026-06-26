@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, memo, lazy, Suspense } from 'react';
+import { motion } from 'framer-motion';
 import { MoreHorizontal, Target, Plus } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import { useExerciseGoals } from '../../hooks/useExerciseGoals';
@@ -45,7 +46,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
   const [chartView, setChartView] = useState('weight');
+  const [swipeDir, setSwipeDir] = useState(0);
   const [showGoalModal, setShowGoalModal] = useState(false);
+  const switchView = useCallback((view) => {
+    setSwipeDir(view === 'reps' ? 1 : -1);
+    setChartView(view);
+  }, []);
+
   const { data: goalsData = {} } = useExerciseGoals();
   const { toast } = useToast();
   const repCap = getRepCap(exercise.name);
@@ -206,20 +213,27 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         </button>
         <div className="inline-flex bg-muted rounded-full p-0.5">
           <button
-            onClick={() => setChartView('weight')}
+            onClick={() => switchView('weight')}
             className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${chartView === 'weight' ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
           >
             Weight
           </button>
           <button
-            onClick={() => setChartView('reps')}
+            onClick={() => switchView('reps')}
             className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${chartView === 'reps' ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
           >
             Reps
           </button>
         </div>
       </div>
-      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} goal={goal} chartView={chartView} labelOverride={repsWeightLabel} repsChartWeight={repsMaxKg} />
+      <motion.div
+        key={chartView}
+        initial={{ x: swipeDir * 60, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+      >
+        <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} goal={goal} chartView={chartView} labelOverride={repsWeightLabel} repsChartWeight={repsMaxKg} />
+      </motion.div>
       {showGoalModal && (
         <GoalModal
           exerciseName={exercise.name}

@@ -303,9 +303,9 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
                   <div className="overflow-hidden touch-pan-y" style={{ touchAction: 'pan-y' }}>
                     <motion.div
                       key={chartView}
-                      initial={{ x: swipeDir * 80, opacity: 0.6 }}
+                      initial={{ x: swipeDir * 60, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
-                      transition={{ type: 'spring', stiffness: 350, damping: 30, mass: 0.8 }}
+                      transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
                       drag="x"
                       dragConstraints={{ left: 0, right: 0 }}
                       dragElastic={0.15}
