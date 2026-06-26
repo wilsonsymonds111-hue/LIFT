@@ -67,6 +67,9 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const animDir = sessionResults.length >= prevCountRef.current ? 'add' : 'remove';
   useEffect(() => { prevCountRef.current = sessionResults.length; }, [sessionResults.length]);
 
+  // Preload the detail modal chunk so it opens instantly when the image is clicked
+  useEffect(() => { import('../ExerciseDetailModal'); }, []);
+
   const allEntries = [...(exercise.history || []), ...sessionResults];
   const isBodyweight = allEntries.length === 0
     ? false
@@ -290,7 +293,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       </button>
     </div>
     {showExerciseDetail && (
-      <Suspense fallback={null}>
+      <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" /></div>}>
         <ExerciseDetailModal
           exercise={exercise}
           initialTab={exerciseDetailInitialTab}
