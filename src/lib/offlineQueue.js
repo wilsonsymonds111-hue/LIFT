@@ -64,6 +64,8 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
 export async function saveWorkout(templateId, snapshot, exerciseList) {
   try {
     await processWorkoutSave({ templateId, snapshot, exerciseList });
+    queryClientInstance.invalidateQueries({ queryKey: ['exercise-history'] });
+    queryClientInstance.invalidateQueries({ queryKey: ['workout-templates'] });
     return { saved: true, queued: false };
   } catch (e) {
     queueWorkoutSave({ templateId, snapshot, exerciseList });
