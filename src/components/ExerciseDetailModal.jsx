@@ -318,6 +318,9 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
                         animDir="add"
                         isBodyweight={chartIsBodyweight}
                         exerciseName={exercise.name}
+                        goal={goal}
+                        chartView={chartView}
+                        repsChartWeight={repsWeightLevel}
                         labelOverride={chartView === 'reps' && repsWeightLevel ? `Reps Progress of ${repsWeightLevel} kg` : null}
                       />
                     </motion.div>
