@@ -191,21 +191,20 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
 
     for (let i = 1; i <= projectionCount; i++) {
       let projVal, projKg, projReps;
+      let shouldBreak = false;
       if (isBodyweight) {
         if (hasWeights && repCap > 0) {
           const nextRep = lastPoint.reps + i;
           projVal = Math.min(nextRep, repCap);
-          if (nextRep > repCap) {
-            const inc = getWeightIncrement(allPoints);
-            const newKg = snap((lastPoint.kg || kgs[kgs.length - 1] || 0) + inc * Math.ceil((nextRep - repCap) / (repCap - lastPoint.reps + 1)));
-            projKg = snap(newKg);
-          } else {
-            projKg = kgs.length > 0 ? Math.max(...kgs) : 0;
-          }
+          projKg = kgs.length > 0 ? Math.max(...kgs) : 0;
           projReps = projVal;
+          if (nextRep >= repCap) shouldBreak = true;
         } else {
           projVal = lastPoint.reps + i;
-          if (repCap > 0) projVal = Math.min(projVal, repCap);
+          if (repCap > 0) {
+            projVal = Math.min(projVal, repCap);
+            if (projVal >= repCap) shouldBreak = true;
+          }
         }
       } else {
         projVal = snap(lastPoint.kg + rate * i);
@@ -220,6 +219,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         ...(projReps != null ? { projReps } : {}),
         projected: true,
       });
+      if (shouldBreak) break;
     }
 
     return { data: d, lastRealIdx: idx };
@@ -404,7 +404,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       <g>
         <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.7} stroke="#d4a017" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.8} />
         {isFirstRepCap && (
-          <text x={cx - 10} y={cy - 14} fontSize={9} fill="#B45309" fontWeight={600} textAnchor="end">
+          <text x={cx - 10} y={cy + 20} fontSize={9} fill="#B45309" fontWeight={600} textAnchor="end">
             <tspan x={cx - 10} dy="0">Studies recommend moving</tspan>
             <tspan x={cx - 10} dy="11">up in weight after {repCap} reps</tspan>
           </text>
