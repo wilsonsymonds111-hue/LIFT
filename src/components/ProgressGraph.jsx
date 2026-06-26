@@ -173,8 +173,8 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       });
     }
 
-    // Y-axis ticks — base domain on real data only for a steeper, well-spaced chart
-    const vals = d.filter(x => !x.projected).map(x => x.valNew ?? x.valStatic).filter(v => v != null);
+    // Y-axis ticks — include projections so all 9 points are visible
+    const vals = d.map(x => x.valNew ?? x.valStatic ?? x.projVal).filter(v => v != null);
     const rMin = Math.min(...vals), rMax = Math.max(...vals);
     let tMin, tMax, tStep;
     if (isBodyweight) {
@@ -231,7 +231,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   const GhostDot = (props) => {
     const { cx, cy, payload } = props;
     if (!payload?.projected) return <g />;
-    return <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.6} stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.7} />;
+    return <circle cx={cx} cy={cy} r={5} fill="white" fillOpacity={0.7} stroke="#d4a017" strokeWidth={1.5} strokeDasharray="3 2" opacity={0.8} />;
   };
 
 
@@ -249,7 +249,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         label = `Aim for: ${d.projVal} reps`;
       }
       return (
-        <div className="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold whitespace-nowrap">
+        <div className="bg-amber-50 text-amber-700 border border-amber-300 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold whitespace-nowrap">
           {label}
         </div>
       );
@@ -294,7 +294,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
           <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
-          <Line type="monotone" dataKey="projVal" stroke="#c4b5fd" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={<GhostDot />} activeDot={{ r: 5, fill: '#a78bfa', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />
+          <Line type="monotone" dataKey="projVal" stroke="#d4a017" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.5} dot={<GhostDot />} activeDot={{ r: 5, fill: '#d4a017', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />
           {goal && (() => {
             const goalVal = chartView === 'reps' ? goal.reps : goal.kg;
             if (!goalVal || goalVal <= 0) return null;
