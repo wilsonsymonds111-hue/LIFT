@@ -11,6 +11,8 @@ import { useTimer } from '../hooks/useTimer';
 import { notifyRestComplete } from '../lib/workoutSounds';
 import ExerciseSection from './workout/ExerciseSection';
 import SummaryScreen from './workout/SummaryScreen';
+import { isRestDayToday } from '../lib/restDayCheck';
+import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 
 export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [minimized, setMinimized] = useState(false);
@@ -18,6 +20,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [bestSets, setBestSets] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [finishTimer, setFinishTimer] = useState('00:00');
+  const [isRestDay, setIsRestDay] = useState(false);
+  const { data: allTemplates = [] } = useWorkoutTemplates();
   const [exercises, setExercises] = useState(() =>
     (template?.exerciseList || []).map(ex => ({
       ...ex,
@@ -179,8 +183,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     } catch (e) {
       console.error('Save failed:', e);
     }
+    setIsRestDay(isRestDayToday(allTemplates));
     setShowSummary(true);
-  }, [exercises, timer, onSaveHistory, template?.id]);
+  }, [exercises, timer, onSaveHistory, template?.id, allTemplates]);
 
   if (!template) return null;
 
@@ -193,6 +198,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
         bestSets={bestSets}
         durationDisplay={finishTimer}
         onDone={onFinish}
+        isRestDay={isRestDay}
+        allTemplates={allTemplates}
       />
     );
   }

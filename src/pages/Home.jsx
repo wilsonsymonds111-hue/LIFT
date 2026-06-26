@@ -140,6 +140,13 @@ export default function Home() {
   const menuRef = useRef({});
   const splitMenuBtnRef = useRef(null);
 
+  // Listen for schedule changes from outside Home (e.g., rest-day prompt after workout)
+  useEffect(() => {
+    const handler = () => setCycleVersion(v => v + 1);
+    window.addEventListener('scheduleChanged', handler);
+    return () => window.removeEventListener('scheduleChanged', handler);
+  }, []);
+
   // Re-fetch when navigating back to this tab (e.g., after changing split on Splits tab)
   useEffect(() => {
     if (location.pathname === '/') invalidateWorkoutTemplates(queryClient);

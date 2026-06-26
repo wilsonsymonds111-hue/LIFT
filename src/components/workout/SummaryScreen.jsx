@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Trophy, Clock, Share, X } from 'lucide-react';
 import { playCompleteChime } from '../../lib/workoutSounds';
+import RestDayPromptModal from '../RestDayPromptModal';
+import { makeTodayWorkoutDay } from '../../lib/restDayCheck';
 
 function InstagramIcon({ size = 20 }) {
   return (
@@ -22,15 +24,33 @@ function Star({ size = 24, delay = 0 }) {
   );
 }
 
-export default function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, onDone }) {
+export default function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, onDone, isRestDay, allTemplates }) {
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
   const cardRef = useRef(null);
   const igStickerRef = useRef(null);
   const [sharing, setSharing] = useState(false);
   const [igSharing, setIgSharing] = useState(false);
   const [shimmer, setShimmer] = useState(false);
+  const [showRestDayPrompt, setShowRestDayPrompt] = useState(false);
 
   const prSet = new Set(prs.map(p => p.name));
+
+  const handleDone = () => {
+    if (isRestDay && !showRestDayPrompt) {
+      setShowRestDayPrompt(true);
+      return;
+    }
+    onDone();
+  };
+
+  const handleConfirmRestDayChange = () => {
+    makeTodayWorkoutDay(allTemplates);
+    onDone();
+  };
+
+  const handleCancelRestDayChange = () => {
+    onDone();
+  };
 
   useEffect(() => {
     setTimeout(() => setShimmer(true), 200);
@@ -93,7 +113,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
           style={{ animation: 'none' }}>
 
           <div className="flex items-center justify-between px-4 pt-4 pb-1 flex-shrink-0">
-            <button onClick={onDone} className="w-11 h-11 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
+            <button onClick={handleDone} className="w-11 h-11 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
               <X className="w-5 h-5 text-gray-700" />
             </button>
             <div className="flex items-end gap-1">
@@ -169,7 +189,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
               {igSharing ? 'Preparing…' : 'Share to Instagram Story'}
             </button>
             <button
-              onClick={onDone}
+              onClick={handleDone}
               className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-2xl text-sm transition"
             >
               Done
@@ -274,6 +294,12 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
         </div>
       </div>
 
+      {showRestDayPrompt && (
+        <RestDayPromptModal
+          onConfirm={handleConfirmRestDayChange}
+          onCancel={handleCancelRestDayChange}
+        />
+      )}
     </>
   );
 }
