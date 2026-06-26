@@ -413,18 +413,13 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         {/* Sticky Y-axis overlay — stays fixed on the left while scrolling */}
         {animatedY && (
           <div
-            className="absolute left-0 top-0 z-10 pointer-events-none flex items-end justify-end pr-1"
+            className="absolute left-0 top-0 z-10 pointer-events-none"
             style={{ width: `${Y_AXIS_WIDTH}px`, height: `${chartHeight}px`, background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)' }}
           >
-            {animatedY.ticks.map(tick => (
-              <span
-                key={tick}
-                className="absolute text-[10px] text-gray-400 font-medium"
-                style={{ top: `${yToPixel(tick)}px`, right: '2px', transform: 'translateY(-50%)' }}
-              >
-                {tick}
-              </span>
-            ))}
+            <LineChart width={Y_AXIS_WIDTH} height={chartHeight} margin={{ top: CHART_MARGIN.top, right: 0, left: 0, bottom: CHART_MARGIN.bottom }}>
+              <YAxis domain={yDomain} ticks={animatedY.ticks} interval={0} tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} width={Y_AXIS_WIDTH} allowDataOverflow />
+              <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: 'transparent' }} axisLine={false} tickLine={false} interval={0} />
+            </LineChart>
           </div>
         )}
         <div
@@ -441,7 +436,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           onTouchEnd={handleTouchEnd}
         >
           <LineChart width={chartWidth} height={chartHeight} data={data} margin={CHART_MARGIN}>
-            <YAxis domain={yDomain} ticks={animatedY?.ticks || []} interval={0} tick={{ fill: 'transparent' }} axisLine={false} tickLine={false} width={Y_AXIS_WIDTH} allowDataOverflow />
+            <YAxis domain={yDomain} hide allowDataOverflow />
             <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
             <Tooltip content={<CustomTooltip />} />
             <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
