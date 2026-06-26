@@ -179,13 +179,13 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       tStep = Math.max(1, Math.round((tMax - tMin || 1) / 4));
     } else {
       tStep = 2.5;
-      tMin = Math.floor(rMin / tStep) * tStep - tStep;
-      tMax = Math.ceil(rMax / tStep) * tStep + tStep;
-      // Ensure a minimum range of 4 intervals so small data ranges don't look flat
-      if (tMax - tMin < 4 * tStep) {
+      tMin = Math.floor(rMin / tStep) * tStep;
+      tMax = Math.ceil(rMax / tStep) * tStep;
+      // Ensure a minimum range of 2 intervals so tiny data ranges don't look flat
+      if (tMax - tMin < 2 * tStep) {
         const mid = Math.round(((tMin + tMax) / 2) / tStep) * tStep;
-        tMin = mid - 2 * tStep;
-        tMax = mid + 2 * tStep;
+        tMin = mid - tStep;
+        tMax = mid + tStep;
       }
     }
     const ticks = [];
@@ -264,7 +264,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     );
   };
 
-  const yDomain = isBodyweight ? [yMin - yStep, yMax + yStep] : [yMin, yMax];
+  const yDomain = isBodyweight ? [yMin - yStep, yMax + yStep] : [yMin - yStep / 2, yMax + yStep / 2];
 
   const pointWidth = 50;
   const chartWidth = Math.max(280, data.length * pointWidth);
