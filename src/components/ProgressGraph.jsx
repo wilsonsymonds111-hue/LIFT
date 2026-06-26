@@ -441,7 +441,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           onTouchEnd={handleTouchEnd}
         >
           <LineChart width={chartWidth} height={chartHeight} data={data} margin={CHART_MARGIN}>
-            <YAxis domain={yDomain} ticks={animatedY?.ticks || []} hide interval={0} />
+            <YAxis domain={yDomain} ticks={animatedY?.ticks || []} interval={0} tick={{ fill: 'transparent' }} axisLine={false} tickLine={false} width={Y_AXIS_WIDTH} allowDataOverflow />
             <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} />
             <Tooltip content={<CustomTooltip />} />
             <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
