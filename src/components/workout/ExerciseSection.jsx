@@ -185,14 +185,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
         />
       )}
-      <div className="flex items-center mb-2">
+      <div className="relative flex items-center justify-center mb-2">
         <button
           onClick={() => setShowGoalModal(true)}
-          className={`flex items-center gap-1 h-7 rounded-full transition flex-shrink-0 ${goal ? 'bg-green-500 text-white px-2' : 'bg-green-100 dark:bg-green-900/30 text-green-500 hover:bg-green-200 dark:hover:bg-green-900/50 px-3'}`}
+          className={`absolute left-0 flex items-center gap-1 h-7 rounded-full transition ${goal ? 'bg-green-500 text-white px-2' : 'bg-green-100 dark:bg-green-900/30 text-green-500 hover:bg-green-200 dark:hover:bg-green-900/50 px-3'}`}
         >
           {goal ? <Target className="w-3.5 h-3.5" /> : <><Plus className="w-3.5 h-3.5" /><span className="text-xs font-semibold">Set a goal</span></>}
         </button>
-        <div className="flex-1 flex justify-center">
         <div className="inline-flex bg-muted rounded-full p-0.5">
           <button
             onClick={() => setChartView('weight')}
@@ -206,8 +205,6 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           >
             Reps
           </button>
-        </div>
-        <div className="w-7 flex-shrink-0" />
         </div>
       </div>
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact goal={goal} chartView={chartView} />
