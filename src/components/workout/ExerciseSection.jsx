@@ -70,6 +70,11 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         const kg = typeof h === 'object' ? (h.kg ?? 0) : (h ?? 0);
         return kg === 0 || kg == null;
       });
+  const repsMaxKg = (() => {
+    const kgs = allEntries.map(h => (typeof h === 'object' ? h.kg || 0 : h || 0)).filter(k => k > 0);
+    return kgs.length > 0 ? Math.max(...kgs) : 0;
+  })();
+  const repsWeightLabel = chartView === 'reps' && repsMaxKg > 0 ? `Reps Progress (${repsMaxKg} kg)` : undefined;
 
   const repsHistory = (() => {
     const fullHistory = exercise.history || [];
@@ -207,7 +212,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           </button>
         </div>
       </div>
-      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact goal={goal} chartView={chartView} />
+      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact goal={goal} chartView={chartView} labelOverride={repsWeightLabel} />
       {showGoalModal && (
         <GoalModal
           exerciseName={exercise.name}
