@@ -243,15 +243,23 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     });
   }, []);
 
-  // Initial scroll — center PR as the 5th dot
+  // Initial scroll — center the most recent PR in the middle of the chart
   useEffect(() => {
     if (!scrollRef.current || !result.data) return;
+    const cw = scrollRef.current.clientWidth || containerWidth;
+    if (cw === 0) return;
     const realCount = result.data.filter(x => !x.projected).length;
-    const scrollTo = Math.max(0, (realCount - 5) * pointWidth);
+    const lastRealIdx = realCount - 1;
+    const chartW = Math.max(280, result.data.length * pointWidth);
+    const dataLen = result.data.length;
+    const spacing = dataLen > 1 ? (chartW - CHART_MARGIN.left - CHART_MARGIN.right) / (dataLen - 1) : 0;
+    const prX = CHART_MARGIN.left + lastRealIdx * spacing;
+    const maxScroll = Math.max(0, chartW - cw);
+    const scrollTo = Math.max(0, Math.min(maxScroll, prX - cw / 2));
     scrollRef.current.scrollLeft = scrollTo;
     setScrollLeft(scrollTo);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result.data]);
+  }, [result.data, pointWidth, containerWidth]);
 
   // Dynamic Y-axis domain based on visible data
   const visibleY = useMemo(() => {
