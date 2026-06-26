@@ -88,7 +88,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   return (
     <>
     <div className="mb-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
-      <div className="flex items-start justify-between mb-1 relative">
+      <div className="flex items-center justify-between relative">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing truncate" {...dragHandleProps}>{exercise.name}</h3>
           <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 transition flex-shrink-0">
