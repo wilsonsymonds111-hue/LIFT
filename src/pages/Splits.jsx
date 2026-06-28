@@ -335,7 +335,7 @@ export default function Splits() {
         <div className="flex bg-blue-100 dark:bg-blue-950/30 rounded-full p-1 gap-1">
           <button
             onClick={() => setActiveTab('mine')}
-            className={`flex-1 py-2 rounded-full text-sm font-display font-semibold transition-all duration-150 ${
+            className={`flex-1 py-2 rounded-full text-sm font-display uppercase tracking-wide font-semibold transition-all duration-150 ${
               activeTab === 'mine'
                 ? 'bg-white dark:bg-card text-blue-600 dark:text-blue-400 shadow-sm'
                 : 'text-blue-600 dark:text-blue-400/70 hover:text-blue-700 dark:hover:text-blue-300'
@@ -345,7 +345,7 @@ export default function Splits() {
           </button>
           <button
             onClick={() => setActiveTab('examples')}
-            className={`flex-1 py-2 rounded-full text-sm font-display font-semibold transition-all duration-150 ${
+            className={`flex-1 py-2 rounded-full text-sm font-display uppercase tracking-wide font-semibold transition-all duration-150 ${
               activeTab === 'examples'
                 ? 'bg-white dark:bg-card text-blue-600 dark:text-blue-400 shadow-sm'
                 : 'text-blue-600 dark:text-blue-400/70 hover:text-blue-700 dark:hover:text-blue-300'

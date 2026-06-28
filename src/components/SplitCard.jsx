@@ -99,7 +99,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           {/* Header row */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-lg font-bold font-display text-foreground dark:text-white leading-tight">{displayName}</span>
+              <span className="text-lg font-bold font-display uppercase tracking-wide text-foreground dark:text-white leading-tight">{displayName}</span>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               {isActive && (
@@ -133,7 +133,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             {workouts.map((w, i) => (
               <span
                 key={i}
-                className="inline-flex items-center px-3 py-1.5 rounded-full bg-muted dark:bg-white/10 backdrop-blur-sm text-foreground dark:text-gray-300 text-[12px] font-display font-medium border border-border dark:border-white/10"
+                className="inline-flex items-center px-3 py-1.5 rounded-full bg-muted dark:bg-white/10 backdrop-blur-sm text-foreground dark:text-gray-300 text-[12px] font-display uppercase tracking-wide font-medium border border-border dark:border-white/10"
               >
                 {w.name}
               </span>
