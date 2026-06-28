@@ -99,7 +99,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           {/* Header row */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className={`text-lg font-bold ${cardColors.title} dark:text-white leading-tight`}>{displayName}</span>
+              <span className="text-lg font-bold font-display text-foreground dark:text-white leading-tight">{displayName}</span>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               {isActive && (
@@ -124,8 +124,8 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
 
           {/* Workout count */}
           <div className="flex items-baseline gap-2">
-            <span className={`text-3xl font-bold ${cardColors.title} dark:text-white leading-none`}>{workoutCount}</span>
-            <span className={`text-sm ${cardColors.subtitle} dark:text-gray-400 font-normal`}>workout{workoutCount !== 1 ? 's' : ''}</span>
+            <span className="text-3xl font-bold font-display text-foreground dark:text-white leading-none">{workoutCount}</span>
+            <span className="text-sm font-display text-muted-foreground font-normal">workout{workoutCount !== 1 ? 's' : ''}</span>
           </div>
 
           {/* Workout name pills */}
@@ -133,7 +133,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             {workouts.map((w, i) => (
               <span
                 key={i}
-                className={`inline-flex items-center px-3 py-1.5 rounded-full ${cardColors.accent} dark:bg-white/10 backdrop-blur-sm dark:text-gray-300 text-[12px] font-medium border border-current/20 dark:border-white/10`}
+                className="inline-flex items-center px-3 py-1.5 rounded-full bg-muted dark:bg-white/10 backdrop-blur-sm text-foreground dark:text-gray-300 text-[12px] font-display font-medium border border-border dark:border-white/10"
               >
                 {w.name}
               </span>
