@@ -5,7 +5,7 @@ module.exports = {
   theme: {
   	extend: {
   		fontFamily: {
-  			display: ['Oswald', 'sans-serif'],
+  			display: ['Outfit', 'sans-serif'],
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
