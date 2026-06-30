@@ -14,6 +14,10 @@ const DEFAULT_COLORS = [
   {},
 ];
 
+const SPLIT_IMAGES = {
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/47d58aec0_image.png',
+};
+
 const EXERCISE_IMAGES = [
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/0e890b4e6_generated_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6c19ca21c_generated_image.png',
@@ -65,7 +69,8 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
     return Math.min(base, 90);
   });
 
-  const imageUrl = EXERCISE_IMAGES[
+  const detectedType = detectSplitType(workouts.map(w => w.name));
+  const imageUrl = SPLIT_IMAGES[isExampleSplit ? splitKey : detectedType] || EXERCISE_IMAGES[
     imageIndex != null
       ? imageIndex % EXERCISE_IMAGES.length
       : splitKey
