@@ -16,6 +16,12 @@ const DEFAULT_COLORS = [
 
 const SPLIT_IMAGES = {
   'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e8cb3e56c_image.png',
+  'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a9ff09fcf_image.png',
+};
+
+const SPLIT_LABELS = {
+  'upper-lower': 'Mikey T split',
+  'push-pull-legs': 'CBUM Split',
 };
 
 const EXERCISE_IMAGES = [
@@ -86,7 +92,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
   const cardColors = TEXT_COLORS[colorIndex];
 
   const isPhotoBackground = !!SPLIT_IMAGES[isExampleSplit ? splitKey : detectedType];
-  const isMikeyTSplit = isExampleSplit && splitKey === 'upper-lower';
+  const splitLabel = isExampleSplit ? SPLIT_LABELS[splitKey] : null;
 
   return (
     <div ref={cardRef}>
@@ -143,8 +149,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             {/* Bottom-left content */}
             <div className="absolute bottom-0 left-0 p-4 z-10">
               <span className="text-lg font-extrabold font-display leading-tight text-white drop-shadow-lg uppercase">
-                {isMikeyTSplit ? `${displayName.toUpperCase()} ` : displayName.toUpperCase()}
-                {isMikeyTSplit && <span className="normal-case">(Mikey T split)</span>}
+                {displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}
               </span>
             </div>
           </>
