@@ -142,7 +142,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
 
             {/* Bottom-left content */}
             <div className="absolute bottom-0 left-0 p-4 z-10">
-              <span className="text-2xl font-extrabold font-display leading-tight text-white drop-shadow-lg">
+              <span className="text-lg font-bold font-display leading-tight text-white drop-shadow-lg">
                 {titleText}
               </span>
             </div>
