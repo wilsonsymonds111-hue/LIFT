@@ -86,7 +86,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
   const cardColors = TEXT_COLORS[colorIndex];
 
   const isPhotoBackground = !!SPLIT_IMAGES[isExampleSplit ? splitKey : detectedType];
-  const titleText = (isExampleSplit && splitKey === 'upper-lower') ? `${displayName} (Mikey T split)` : displayName;
+  const isMikeyTSplit = isExampleSplit && splitKey === 'upper-lower';
 
   return (
     <div ref={cardRef}>
@@ -142,8 +142,9 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
 
             {/* Bottom-left content */}
             <div className="absolute bottom-0 left-0 p-4 z-10">
-              <span className="text-lg font-extrabold font-display leading-tight text-white drop-shadow-lg">
-                {titleText}
+              <span className="text-lg font-extrabold font-display leading-tight text-white drop-shadow-lg uppercase">
+                {isMikeyTSplit ? `${displayName.toUpperCase()} ` : displayName.toUpperCase()}
+                {isMikeyTSplit && <span className="normal-case">(Mikey T split)</span>}
               </span>
             </div>
           </>
@@ -153,7 +154,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             {/* Header row */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <span className="text-lg font-bold font-display uppercase tracking-wide leading-tight text-foreground dark:text-white">{titleText}</span>
+                <span className="text-lg font-bold font-display uppercase tracking-wide leading-tight text-foreground dark:text-white">{displayName}</span>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
                 {isActive && (
