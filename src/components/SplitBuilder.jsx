@@ -4,6 +4,7 @@ import { X, ChevronLeft, ChevronRight, Plus, Dumbbell, Check, Sparkles, Pencil }
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import WorkoutBuilder from './WorkoutBuilder';
+import BackgroundImagePicker from './BackgroundImagePicker';
 
 const WORKOUT_LABELS = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -32,6 +33,8 @@ export default function SplitBuilder({ onClose, onSaved }) {
     const today = new Date().getDay();
     return today === 0 ? 6 : today - 1;
   });
+  const [backgroundImage, setBackgroundImage] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const handlePickCount = (count) => {
     setWorkoutCount(count);
@@ -80,6 +83,15 @@ export default function SplitBuilder({ onClose, onSaved }) {
   const allWorkoutsNamed = workouts.every(w => w.name.trim());
   const allWorkoutsHaveExercises = workouts.every(w => w.exercises.length > 0);
 
+  const handleUploadImage = async (file) => {
+    setUploadingImage(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setBackgroundImage(file_url);
+    } catch (_) {}
+    setUploadingImage(false);
+  };
+
   const handleSave = async () => {
     if (!allWorkoutsNamed || !allWorkoutsHaveExercises) return;
     setSaving(true);
@@ -95,6 +107,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
         isActiveSplit: false,
         splitGroup: groupId,
         splitName: splitDisplayName,
+        backgroundImage: backgroundImage || null,
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(templates);
       // Save the rest day cycle so it's available when the split is made current
@@ -194,12 +207,25 @@ export default function SplitBuilder({ onClose, onSaved }) {
                 Next <ChevronRight className="w-4 h-4" />
               </button>
             </>
-          ) : (
+          ) : step === 3 ? (
             <>
               <button onClick={() => setStep(2)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
                 <ChevronLeft className="w-4 h-4 text-foreground" />
               </button>
               <span className="flex-1 text-center font-extrabold text-foreground text-base">Rest Frequency</span>
+              <button
+                onClick={() => setStep(4)}
+                className="flex items-center gap-1 px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl text-sm transition"
+              >
+                Next <ChevronRight className="w-4 h-4" />
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => setStep(3)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
+                <ChevronLeft className="w-4 h-4 text-foreground" />
+              </button>
+              <span className="flex-1 text-center font-extrabold text-foreground text-base">Background</span>
               <button
                 onClick={handleSave}
                 disabled={saving || saved}
@@ -408,6 +434,21 @@ export default function SplitBuilder({ onClose, onSaved }) {
             </div>
           );
         })()}
+
+        {/* Step 4: Background Image */}
+        {step === 4 && (
+          <div className="flex-1 overflow-y-auto px-5 py-6">
+            <p className="text-sm text-muted-foreground mb-5 text-center">
+              Choose a background image for your split card — or upload your own.
+            </p>
+            <BackgroundImagePicker
+              selectedImage={backgroundImage}
+              onSelect={setBackgroundImage}
+              onUpload={handleUploadImage}
+              uploading={uploadingImage}
+            />
+          </div>
+        )}
 
         {/* Workout Builder */}
         {editingWorkoutIdx !== null && (

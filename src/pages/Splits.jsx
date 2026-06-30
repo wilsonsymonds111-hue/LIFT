@@ -386,6 +386,7 @@ export default function Splits() {
                       workouts={group.templates.map(t => ({ name: t.name }))}
                       isActive={isActive}
                       imageIndex={idx}
+                      backgroundImage={group.templates[0]?.backgroundImage}
                       onCardClick={() => setActiveSplit(group.groupId)}
                       onMenuToggle={() => setMenuOpen(menuOpen === group.groupId ? null : group.groupId)}
                       menuRef={el => menuRef.current[group.groupId] = el}

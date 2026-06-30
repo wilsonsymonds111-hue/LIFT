@@ -45,6 +45,9 @@
     },
     "isActiveSplit": {
       "type": "boolean"
+    },
+    "backgroundImage": {
+      "type": "string"
     }
   },
   "required": [

@@ -59,7 +59,7 @@ function detectSplitType(workoutNames) {
   return 'upper-lower';
 }
 
-const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef, isActive, imageIndex }) {
+const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef, isActive, imageIndex, backgroundImage }) {
   const isExampleSplit = !!SPLIT_COLORS[splitKey];
   const colorKey = isExampleSplit ? splitKey : detectSplitType(workouts.map(w => w.name));
   const colors = SPLIT_COLORS[colorKey] || DEFAULT_COLORS[
@@ -80,13 +80,14 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
   });
 
   const detectedType = detectSplitType(workouts.map(w => w.name));
-  const imageUrl = SPLIT_IMAGES[isExampleSplit ? splitKey : detectedType] || EXERCISE_IMAGES[
+  const fallbackImage = SPLIT_IMAGES[isExampleSplit ? splitKey : detectedType] || EXERCISE_IMAGES[
     imageIndex != null
       ? imageIndex % EXERCISE_IMAGES.length
       : splitKey
         ? (parseInt(splitKey.match(/\d+/)?.[0] || '0', 10) || 0) % EXERCISE_IMAGES.length
         : 0
   ];
+  const imageUrl = backgroundImage || fallbackImage;
 
   const colorIndex = imageIndex != null
     ? imageIndex % TEXT_COLORS.length
@@ -95,7 +96,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
       : 0;
   const cardColors = TEXT_COLORS[colorIndex];
 
-  const isPhotoBackground = !!SPLIT_IMAGES[isExampleSplit ? splitKey : detectedType];
+  const isPhotoBackground = !!backgroundImage || !!SPLIT_IMAGES[isExampleSplit ? splitKey : detectedType];
   const splitLabel = isExampleSplit ? SPLIT_LABELS[splitKey] : null;
 
   return (
