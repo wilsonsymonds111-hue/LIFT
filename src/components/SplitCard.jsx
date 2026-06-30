@@ -103,19 +103,17 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
           }}
         />
         {isPhotoBackground && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/25" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
         )}
 
-        <div className="relative p-5 z-10">
-          {/* Header row */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className={`text-lg font-bold font-display uppercase tracking-wide leading-tight ${isPhotoBackground ? 'text-white' : 'text-foreground dark:text-white'}`}>{titleText}</span>
-            </div>
-            <div className="flex items-center gap-1 flex-shrink-0">
+        {/* Photo layout: all text bottom-left, title case, smaller */}
+        {isPhotoBackground ? (
+          <>
+            {/* Top-right controls */}
+            <div className="absolute top-3 right-3 z-10 flex items-center gap-1">
               {isActive && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100/50 dark:bg-emerald-900/30 backdrop-blur-sm text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold uppercase tracking-wide border border-emerald-200/50 dark:border-emerald-700/30">
-                  <Check className="w-3 h-3" strokeWidth={2.5} />
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/80 backdrop-blur-sm text-white text-[9px] font-semibold tracking-wide border border-emerald-300/40">
+                  <Check className="w-2.5 h-2.5" strokeWidth={2.5} />
                   Current
                 </span>
               )}
@@ -123,34 +121,82 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
                 <button
                   ref={menuRef}
                   onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full transition ${isPhotoBackground ? 'hover:bg-white/20' : 'hover:bg-gray-400/20 dark:hover:bg-white/10'}`}
+                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/20 transition"
                 >
-                  <MoreHorizontal className={`w-4 h-4 ${isPhotoBackground ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
+                  <MoreHorizontal className="w-4 h-4 text-white" />
                 </button>
               ) : (
-                <ChevronRight className={`w-4 h-4 ${isPhotoBackground ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`} />
+                <ChevronRight className="w-4 h-4 text-white" />
               )}
             </div>
-          </div>
 
-          {/* Workout count */}
-          <div className="flex items-baseline gap-2">
-            <span className={`text-3xl font-bold font-display leading-none ${isPhotoBackground ? 'text-white' : 'text-foreground dark:text-white'}`}>{workoutCount}</span>
-            <span className={`text-sm font-display font-normal ${isPhotoBackground ? 'text-white/70' : 'text-muted-foreground'}`}>workout{workoutCount !== 1 ? 's' : ''}</span>
-          </div>
+            {/* Bottom-left content */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+              <div className="flex items-baseline gap-1.5 mb-2">
+                <span className="text-xl font-bold font-display leading-tight text-white">{workoutCount}</span>
+                <span className="text-xs font-display font-normal text-white/70">workout{workoutCount !== 1 ? 's' : ''}</span>
+              </div>
+              <span className="block text-sm font-bold font-display leading-tight text-white mb-2">{titleText}</span>
+              <div className="flex flex-wrap gap-1.5">
+                {workouts.map((w, i) => (
+                  <span
+                    key={i}
+                    className="inline-flex items-center px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white text-[10px] font-display font-medium border border-white/10"
+                  >
+                    {w.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          /* Original layout for non-photo cards */
+          <div className="relative p-5 z-10">
+            {/* Header row */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <span className="text-lg font-bold font-display uppercase tracking-wide leading-tight text-foreground dark:text-white">{titleText}</span>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                {isActive && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100/50 dark:bg-emerald-900/30 backdrop-blur-sm text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold uppercase tracking-wide border border-emerald-200/50 dark:border-emerald-700/30">
+                    <Check className="w-3 h-3" strokeWidth={2.5} />
+                    Current
+                  </span>
+                )}
+                {onMenuToggle ? (
+                  <button
+                    ref={menuRef}
+                    onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-400/20 dark:hover:bg-white/10 transition"
+                  >
+                    <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  </button>
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                )}
+              </div>
+            </div>
 
-          {/* Workout name pills */}
-          <div className="flex flex-wrap gap-2 mt-4">
-            {workouts.map((w, i) => (
-              <span
-                key={i}
-                className={`inline-flex items-center px-3 py-1.5 rounded-full backdrop-blur-sm text-[12px] font-display uppercase tracking-wide font-medium border ${isPhotoBackground ? 'bg-black/40 text-white border-white/15' : 'bg-muted dark:bg-white/10 text-foreground dark:text-gray-300 border-border dark:border-white/10'}`}
-              >
-                {w.name}
-              </span>
-            ))}
+            {/* Workout count */}
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold font-display leading-none text-foreground dark:text-white">{workoutCount}</span>
+              <span className="text-sm font-display font-normal text-muted-foreground">workout{workoutCount !== 1 ? 's' : ''}</span>
+            </div>
+
+            {/* Workout name pills */}
+            <div className="flex flex-wrap gap-2 mt-4">
+              {workouts.map((w, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center px-3 py-1.5 rounded-full bg-muted dark:bg-white/10 backdrop-blur-sm text-foreground dark:text-gray-300 text-[12px] font-display uppercase tracking-wide font-medium border border-border dark:border-white/10"
+                >
+                  {w.name}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
