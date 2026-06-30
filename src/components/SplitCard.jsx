@@ -15,7 +15,7 @@ const DEFAULT_COLORS = [
 ];
 
 const SPLIT_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/113fe8f3b_generated_image.png',
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e0569a1ad_image.png',
 };
 
 const EXERCISE_IMAGES = [
