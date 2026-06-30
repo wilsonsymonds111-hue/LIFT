@@ -15,7 +15,7 @@ const DEFAULT_COLORS = [
 ];
 
 const SPLIT_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e0569a1ad_image.png',
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/60a7ecad1_image.png',
 };
 
 const EXERCISE_IMAGES = [
@@ -85,26 +85,32 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
       : 0;
   const cardColors = TEXT_COLORS[colorIndex];
 
+  const isPhotoBackground = !!SPLIT_IMAGES[isExampleSplit ? splitKey : detectedType];
+  const titleText = (isExampleSplit && splitKey === 'upper-lower') ? `${displayName} (Mikey T split)` : displayName;
+
   return (
     <div ref={cardRef}>
       <div
         onClick={onCardClick}
         className="relative bg-white dark:bg-card rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-gray-100/80 dark:border-border shadow-[0_2px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
       >
-        {/* Slightly blurred black and white gym background */}
+        {/* Background image — full color for photo splits, blurred B&W for others */}
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ 
             backgroundImage: `url('${imageUrl}')`,
-            filter: 'blur(3px) saturate(0) contrast(1.1)'
+            filter: isPhotoBackground ? 'none' : 'blur(3px) saturate(0) contrast(1.1)'
           }}
         />
+        {isPhotoBackground && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/25" />
+        )}
 
         <div className="relative p-5 z-10">
           {/* Header row */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-lg font-bold font-display uppercase tracking-wide text-foreground dark:text-white leading-tight">{displayName}</span>
+              <span className={`text-lg font-bold font-display uppercase tracking-wide leading-tight ${isPhotoBackground ? 'text-white' : 'text-foreground dark:text-white'}`}>{titleText}</span>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               {isActive && (
@@ -117,20 +123,20 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
                 <button
                   ref={menuRef}
                   onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-400/20 dark:hover:bg-white/10 transition"
+                  className={`w-8 h-8 flex items-center justify-center rounded-full transition ${isPhotoBackground ? 'hover:bg-white/20' : 'hover:bg-gray-400/20 dark:hover:bg-white/10'}`}
                 >
-                  <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <MoreHorizontal className={`w-4 h-4 ${isPhotoBackground ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
                 </button>
               ) : (
-                <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <ChevronRight className={`w-4 h-4 ${isPhotoBackground ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`} />
               )}
             </div>
           </div>
 
           {/* Workout count */}
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-display text-foreground dark:text-white leading-none">{workoutCount}</span>
-            <span className="text-sm font-display text-muted-foreground font-normal">workout{workoutCount !== 1 ? 's' : ''}</span>
+            <span className={`text-3xl font-bold font-display leading-none ${isPhotoBackground ? 'text-white' : 'text-foreground dark:text-white'}`}>{workoutCount}</span>
+            <span className={`text-sm font-display font-normal ${isPhotoBackground ? 'text-white/70' : 'text-muted-foreground'}`}>workout{workoutCount !== 1 ? 's' : ''}</span>
           </div>
 
           {/* Workout name pills */}
@@ -138,7 +144,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             {workouts.map((w, i) => (
               <span
                 key={i}
-                className="inline-flex items-center px-3 py-1.5 rounded-full bg-muted dark:bg-white/10 backdrop-blur-sm text-foreground dark:text-gray-300 text-[12px] font-display uppercase tracking-wide font-medium border border-border dark:border-white/10"
+                className={`inline-flex items-center px-3 py-1.5 rounded-full backdrop-blur-sm text-[12px] font-display uppercase tracking-wide font-medium border ${isPhotoBackground ? 'bg-black/40 text-white border-white/15' : 'bg-muted dark:bg-white/10 text-foreground dark:text-gray-300 border-border dark:border-white/10'}`}
               >
                 {w.name}
               </span>
