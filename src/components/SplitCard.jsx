@@ -15,7 +15,7 @@ const DEFAULT_COLORS = [
 ];
 
 const SPLIT_IMAGES = {
-  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/60a7ecad1_image.png',
+  'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e8cb3e56c_image.png',
 };
 
 const EXERCISE_IMAGES = [
@@ -142,16 +142,20 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
 
             {/* Bottom-left content */}
             <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-              <div className="flex items-baseline gap-1.5 mb-2">
-                <span className="text-xl font-bold font-display leading-tight text-white">{workoutCount}</span>
-                <span className="text-xs font-display font-normal text-white/70">workout{workoutCount !== 1 ? 's' : ''}</span>
+              <div className="flex flex-wrap items-end gap-1.5 mb-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/15">
+                  <span className="text-sm font-bold font-display leading-none text-white">{workoutCount}</span>
+                  <span className="text-[10px] font-display font-normal text-white/80 leading-none">workout{workoutCount !== 1 ? 's' : ''}</span>
+                </span>
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-xs font-bold font-display leading-none text-white">
+                  {titleText}
+                </span>
               </div>
-              <span className="block text-sm font-bold font-display leading-tight text-white mb-2">{titleText}</span>
               <div className="flex flex-wrap gap-1.5">
                 {workouts.map((w, i) => (
                   <span
                     key={i}
-                    className="inline-flex items-center px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white text-[10px] font-display font-medium border border-white/10"
+                    className="inline-flex items-center px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-white text-[10px] font-display font-medium border border-white/15"
                   >
                     {w.name}
                   </span>
