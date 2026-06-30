@@ -94,16 +94,25 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
         onClick={onCardClick}
         className={`relative bg-white dark:bg-card rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-gray-100/80 dark:border-border shadow-[0_2px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] ${isPhotoBackground ? 'h-[220px]' : ''}`}
       >
-        {/* Background image — full color for photo splits, blurred B&W for others */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ 
-            backgroundImage: `url('${imageUrl}')`,
-            filter: isPhotoBackground ? 'none' : 'blur(3px) saturate(0) contrast(1.1)'
-          }}
-        />
-        {isPhotoBackground && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        {/* Background image — full color <img> for photo splits, blurred B&W div for others */}
+        {isPhotoBackground ? (
+          <>
+            <img
+              src={imageUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              draggable={false}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+          </>
+        ) : (
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ 
+              backgroundImage: `url('${imageUrl}')`,
+              filter: 'blur(3px) saturate(0) contrast(1.1)'
+            }}
+          />
         )}
 
         {/* Photo layout: all text bottom-left, title case, smaller */}
