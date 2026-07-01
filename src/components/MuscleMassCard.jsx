@@ -179,9 +179,9 @@ Analyze the data and return your prediction. Be conservative and evidence-based.
               ) : prediction ? (
                 <>
                   <span className="text-xl font-bold text-black dark:text-foreground">
-                    {prediction.predicted_muscle_mass_kg?.toFixed(1)}
+                    {Math.round((prediction.predicted_muscle_mass_kg || 0) * 1000)}
                   </span>
-                  <span className="text-[11px] text-gray-400 dark:text-muted-foreground font-medium">kg</span>
+                  <span className="text-[11px] text-gray-400 dark:text-muted-foreground font-medium">g</span>
                 </>
               ) : (
                 <span className="text-sm text-gray-400 dark:text-muted-foreground">Tap to analyze</span>
@@ -215,13 +215,13 @@ Analyze the data and return your prediction. Be conservative and evidence-based.
             <div className="text-center mb-5">
               <div className="flex items-baseline justify-center gap-1">
                 <span className="text-4xl font-extrabold text-blue-500">
-                  {prediction.predicted_muscle_mass_kg?.toFixed(1)}
+                  {Math.round((prediction.predicted_muscle_mass_kg || 0) * 1000)}
                 </span>
-                <span className="text-lg text-muted-foreground font-medium">kg</span>
+                <span className="text-lg text-muted-foreground font-medium">g</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">predicted muscle gained</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Range: {prediction.confidence_low_kg?.toFixed(1)}–{prediction.confidence_high_kg?.toFixed(1)} kg
+                Range: {Math.round((prediction.confidence_low_kg || 0) * 1000)}–{Math.round((prediction.confidence_high_kg || 0) * 1000)} g
               </p>
             </div>
 
@@ -229,7 +229,7 @@ Analyze the data and return your prediction. Be conservative and evidence-based.
               <div className="flex justify-between text-sm py-2 border-t border-border">
                 <span className="text-muted-foreground">Body fat change</span>
                 <span className={`font-semibold ${prediction.estimated_body_fat_gained_kg < 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
-                  {prediction.estimated_body_fat_gained_kg > 0 ? '+' : ''}{prediction.estimated_body_fat_gained_kg?.toFixed(1)} kg
+                  {prediction.estimated_body_fat_gained_kg > 0 ? '+' : ''}{Math.round(prediction.estimated_body_fat_gained_kg * 1000)} g
                 </span>
               </div>
             )}
