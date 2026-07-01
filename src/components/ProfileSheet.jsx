@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, Shield, Download } from 'lucide-react';
+import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, Shield, Download, LogOut } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
 import CreateAccountModal from './CreateAccountModal';
 import ImportStrongModal from './ImportStrongModal';
+import ImageCropper from './ImageCropper';
 import { useNavVisibility } from '@/lib/NavContext';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -27,6 +28,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
   const [confirmText, setConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [pendingCropFile, setPendingCropFile] = useState(null);
   const fileInputRef = useRef(null);
 
   const handleDeleteAccount = async () => {
@@ -41,12 +43,19 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
     }
   };
 
-  const handlePhotoUpload = async (e) => {
+  const handlePhotoSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setPendingCropFile(file);
+    // Reset input so selecting the same file again still triggers onChange
+    e.target.value = '';
+  };
+
+  const handleCropComplete = async (croppedFile) => {
+    setPendingCropFile(null);
     setUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: croppedFile });
       localStorage.setItem('profilePhoto', file_url);
       if (isAuthenticated) {
         await base44.auth.updateMe({ profilePhoto: file_url });
@@ -78,7 +87,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         </div>
 
         {/* Guest mode badge */}
-        {isAuthenticated && (
+        {isGuest && (
           <div className="flex justify-center">
             <span className="text-muted-foreground text-xs font-semibold">
               You are in guest mode
@@ -118,7 +127,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={handlePhotoUpload}
+            onChange={handlePhotoSelect}
           />
         </div>
 
@@ -209,31 +218,18 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         )}
 
         {isAuthenticated && (
-          <>
-            <div className="bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-4 h-4 text-blue-500" />
-                </div>
-                <div className="text-left flex-1">
-                  <p className="font-semibold text-foreground text-sm">Data stored on this device</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Create an account to save a copy to the cloud and sync across devices</p>
-                </div>
-              </div>
+          <button
+            onClick={() => base44.auth.logout(window.location.href)}
+            className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+          >
+            <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <LogOut className="w-4 h-4 text-foreground" />
             </div>
-            <button
-              onClick={() => setShowCreateAccount(true)}
-              className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
-            >
-              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <UserPlus className="w-4 h-4 text-white" />
-              </div>
-              <div className="text-left flex-1">
-                <p className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">Create Account</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Set a username and password to sync your data to the cloud</p>
-              </div>
-            </button>
-          </>
+            <div className="text-left">
+              <p className="font-semibold text-foreground text-sm">Log Out</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Sign out of your account</p>
+            </div>
+          </button>
         )}
 
         {/* Legal */}
@@ -329,6 +325,14 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
 
         {showImportStrong && (
           <ImportStrongModal onClose={() => setShowImportStrong(false)} />
+        )}
+
+        {pendingCropFile && (
+          <ImageCropper
+            file={pendingCropFile}
+            onCancel={() => setPendingCropFile(null)}
+            onCrop={handleCropComplete}
+          />
         )}
       </div>
     </div>,
