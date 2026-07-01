@@ -3,7 +3,7 @@ import { PersonStanding, ChevronRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import BodyWeightChartModal from './BodyWeightChartModal';
 
-function BodyWeightSection() {
+function BodyWeightSection({ compact }) {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -51,7 +51,7 @@ function BodyWeightSection() {
 
   return (
     <>
-      <div className="px-4 py-2">
+      <div className={compact ? '' : 'px-4 py-2'}>
         <div
           onClick={() => setShowModal(true)}
           className="relative bg-white dark:bg-card rounded-2xl p-2.5 transition-all duration-150 hover:scale-[1.01] border border-gray-200/70 dark:border-border cursor-pointer active:scale-[0.98]"

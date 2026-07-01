@@ -11,6 +11,7 @@ import ProfileButton from '../components/ProfileButton';
 import SyncBanner from '../components/SyncBanner';
 import WeekTracker from '../components/WeekTracker';
 import BodyWeightSection from '../components/BodyWeightSection';
+import MuscleMassCard from '../components/MuscleMassCard';
 import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
@@ -352,8 +353,15 @@ export default function Home() {
       {/* Weekly Tracker */}
       <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
 
-      {/* Body Weight Tracker */}
-      <BodyWeightSection />
+      {/* Body Weight + Muscle Gain Prediction */}
+      <div className="px-4 py-2 flex gap-3">
+        <div className="flex-1 min-w-0">
+          <BodyWeightSection compact />
+        </div>
+        <div className="flex-1 min-w-0">
+          <MuscleMassCard templates={currentSplit} compact />
+        </div>
+      </div>
 
       {/* Sync Banner */}
       <SyncBanner />
