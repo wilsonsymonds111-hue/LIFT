@@ -1,15 +1,20 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Dumbbell, RefreshCw, TrendingUp, ChevronRight, X } from 'lucide-react';
+import { Dumbbell, RefreshCw, TrendingUp, ChevronRight, X, BookOpen } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import {
+  calculateMuscleMass,
+  generateSummary,
+  determineTrainingStatus,
+  est1RM,
+  isCompoundLift,
+  EVIDENCE_STUDIES,
+} from '@/lib/muscleMassModel';
 
-const CACHE_KEY = 'muscleMassPrediction';
+const CACHE_KEY = 'muscleMassPrediction_v2';
 const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 
-// Epley formula: estimated 1RM = weight × (1 + reps/30)
-const est1RM = (kg, reps) => (kg ? kg * (1 + (reps || 1) / 30) : null);
-
-export default function MuscleMassCard({ templates, compact }) {
+export default function MuscleMassCard({ templates, compact, targetSessionsPerWeek }) {
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -55,6 +60,7 @@ export default function MuscleMassCard({ templates, compact }) {
         return;
       }
 
+      // Body weight data
       const sortedWeights = [...weightEntries].sort(
         (a, b) => new Date(a.date) - new Date(b.date)
       );
@@ -63,81 +69,81 @@ export default function MuscleMassCard({ templates, compact }) {
       const weightChange = (startingWeight != null && currentWeight != null)
         ? currentWeight - startingWeight : null;
 
-      const firstDate = sortedWeights[0]?.date ? new Date(sortedWeights[0].date) : null;
-      const lastDate = sortedWeights[sortedWeights.length - 1]?.date ? new Date(sortedWeights[sortedWeights.length - 1].date) : null;
+      // Collect all dates for timespan & session count
+      const allDates = new Set();
+      sortedWeights.forEach(e => { if (e.date) allDates.add(e.date.slice(0, 10)); });
+      splitExercises.forEach(ex => {
+        (ex.history || []).forEach(h => { if (h.date) allDates.add(h.date.slice(0, 10)); });
+      });
+
+      const dateStrings = [...allDates].sort();
+      const firstDate = dateStrings[0] ? new Date(dateStrings[0]) : null;
+      const lastDate = dateStrings[dateStrings.length - 1] ? new Date(dateStrings[dateStrings.length - 1]) : null;
       const weeksTrained = firstDate && lastDate
         ? Math.max(1, Math.round((lastDate - firstDate) / (7 * 24 * 60 * 60 * 1000)))
-        : null;
+        : 1;
 
-      const strengthData = splitExercises.map(ex => {
+      // Count unique workout sessions (exercise history dates only)
+      const workoutDates = new Set();
+      splitExercises.forEach(ex => {
+        (ex.history || []).forEach(h => { if (h.date) workoutDates.add(h.date.slice(0, 10)); });
+      });
+      const sessionsPerWeek = weeksTrained > 0 ? workoutDates.size / weeksTrained : 0;
+
+      // Build exercise strength data
+      const exercisesData = splitExercises.map(ex => {
         const sorted = [...(ex.history || [])].sort(
           (a, b) => new Date(a.date) - new Date(b.date)
         );
         const first = sorted[0];
         const latest = sorted[sorted.length - 1];
+        const starting1RM = est1RM(first?.kg, first?.reps);
+        const latest1RM = est1RM(latest?.kg, latest?.reps);
+        const percentIncrease = (starting1RM && starting1RM > 0)
+          ? (latest1RM - starting1RM) / starting1RM
+          : 0;
         return {
           name: ex.name,
-          muscle: ex.muscle || 'unknown',
-          starting_top_set: first ? { kg: first.kg, reps: first.reps } : null,
-          latest_top_set: latest ? { kg: latest.kg, reps: latest.reps } : null,
-          starting_est_1rm: est1RM(first?.kg, first?.reps),
-          latest_est_1rm: est1RM(latest?.kg, latest?.reps),
-          sessions_logged: sorted.length,
+          isCompound: isCompoundLift(ex.name),
+          starting_est_1rm: starting1RM,
+          latest_est_1rm: latest1RM,
+          percentIncrease,
         };
-      }).filter(s => s.starting_top_set && s.latest_top_set);
+      }).filter(s => s.starting_est_1rm && s.latest_est_1rm);
 
-      const payload = {
-        starting_weight_kg: startingWeight,
-        current_weight_kg: currentWeight,
-        total_weight_gained_kg: weightChange,
-        weeks_tracked: weeksTrained,
-        exercises_tracked: strengthData.length,
-        strength_progression: strengthData,
-      };
+      // Avg 1RM-to-bodyweight ratio for training status determination
+      const bw = currentWeight || startingWeight || 70;
+      const compoundRatios = exercisesData
+        .filter(e => e.isCompound && e.latest_est_1rm)
+        .map(e => e.latest_est_1rm / bw);
+      const avg1RMRatio = compoundRatios.length > 0
+        ? compoundRatios.reduce((a, b) => a + b, 0) / compoundRatios.length
+        : null;
 
-      const res = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an expert exercise physiologist specializing in body composition analysis. Based on the user's body weight log and strength progression data from their current workout split, predict how much skeletal muscle mass (in kg) the user has most likely gained.
+      const trainingStatus = determineTrainingStatus(workoutDates.size, avg1RMRatio);
 
-Apply these research-backed principles:
-
-1. BODY COMPOSITION PARTITIONING: In a caloric surplus with resistance training, approximately 50-70% of weight gained is lean body mass (muscle + water/glycogen), with the remainder being fat. For trained individuals, ~40-50% of total weight gain is actual contractile muscle tissue; for beginners (first 6-12 months), it can be 60-70% (Helms et al., 2014; muscle gain partitioning literature).
-
-2. RATES OF MUSCLE GAIN: Trained individuals gain roughly 0.5-1% of body weight per month in muscle mass during a lean bulk. Beginners can gain 1-2% per month (Lyle McDonald model; Schoenfeld, 2017). For a 75kg person: 0.4-0.75 kg/month (trained), 0.75-1.5 kg/month (beginner).
-
-3. STRENGTH-HYPERTROPHY CORRELATION: Increases in working weight and estimated 1RM strongly correlate with muscle cross-sectional area increases, especially in compound movements. A 10-20% increase in top-set load over weeks typically indicates measurable hypertrophy (Bickel et al., 2011; Schoenfeld, 2010). Use the Epley formula for 1RM: 1RM = weight × (1 + reps/30).
-
-4. MUSCLE TISSUE COMPOSITION: Skeletal muscle is ~70% water. DEXA-measured lean mass includes water, glycogen, and connective tissue, so distinguish "lean mass gain" from "contractile tissue gain." Actual muscle protein accretion is ~30-40% of lean mass gain (Verscheijden et al., 2022).
-
-5. WEIGHT GAIN INFERENCE: If body weight has increased, estimate the muscle portion using the partitioning ratios above, adjusted by the magnitude of strength gains (more strength gain = higher muscle fraction). If body weight has decreased but strength increased, the user may be recomposing (simultaneous fat loss + muscle gain), which typically yields 0.25-1 kg muscle gain per month depending on training status.
-
-6. If the user has LOST weight but gained strength, predict muscle gain based on recomp rates (typically 0.25-0.5 kg/month for trained, up to 1 kg/month for beginners in a deficit).
-
-Here is the user's data (all weights in kg):
-${JSON.stringify(payload, null, 2)}
-
-Analyze the data and return your prediction. Be conservative and evidence-based.`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            predicted_muscle_mass_kg: { type: "number", description: "Estimated kg of skeletal muscle mass gained, rounded to 1 decimal" },
-            confidence_low_kg: { type: "number", description: "Lower bound of the estimate" },
-            confidence_high_kg: { type: "number", description: "Upper bound of the estimate" },
-            estimated_body_fat_gained_kg: { type: "number", description: "Estimated kg of body fat gained or lost (negative = lost)" },
-            training_status: { type: "string", description: "Beginner, Intermediate, or Advanced based on strength levels" },
-            summary: { type: "string", description: "1-2 sentence explanation citing the key reasoning and studies applied" }
-          },
-          required: ["predicted_muscle_mass_kg", "confidence_low_kg", "confidence_high_kg", "summary"]
-        }
+      const result = calculateMuscleMass({
+        startingWeight,
+        currentWeight,
+        weightChange,
+        weeksTrained,
+        exercises: exercisesData,
+        sessionsPerWeek,
+        targetSessionsPerWeek: targetSessionsPerWeek || 4,
+        trainingStatus,
       });
 
-      localStorage.setItem(CACHE_KEY, JSON.stringify({ data: res, timestamp: Date.now() }));
-      setPrediction(res);
+      const summary = generateSummary(result);
+      const data = { ...result, summary };
+
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+      setPrediction(data);
       setLoading(false);
     } catch {
       setLoading(false);
     }
     setRefreshing(false);
-  }, [splitExerciseNames]);
+  }, [splitExerciseNames, targetSessionsPerWeek]);
 
   useEffect(() => { compute(); }, [compute]);
 
@@ -179,7 +185,7 @@ Analyze the data and return your prediction. Be conservative and evidence-based.
               ) : prediction ? (
                 <>
                   <span className="text-xl font-bold text-black dark:text-foreground">
-                    {Math.round((prediction.predicted_muscle_mass_kg || 0) * 1000)}
+                    {prediction.muscleGainG}
                   </span>
                   <span className="text-[11px] text-gray-400 dark:text-muted-foreground font-medium">g</span>
                 </>
@@ -203,7 +209,7 @@ Analyze the data and return your prediction. Be conservative and evidence-based.
         >
           <div
             onClick={e => e.stopPropagation()}
-            className="bg-card rounded-2xl p-6 mx-5 max-w-sm w-full shadow-2xl border border-border"
+            className="bg-card rounded-2xl p-6 mx-5 max-w-sm w-full shadow-2xl border border-border max-h-[85vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-extrabold text-foreground">Muscle Mass Estimate</h3>
@@ -215,34 +221,47 @@ Analyze the data and return your prediction. Be conservative and evidence-based.
             <div className="text-center mb-5">
               <div className="flex items-baseline justify-center gap-1">
                 <span className="text-4xl font-extrabold text-blue-500">
-                  {Math.round((prediction.predicted_muscle_mass_kg || 0) * 1000)}
+                  {prediction.muscleGainG}
                 </span>
                 <span className="text-lg text-muted-foreground font-medium">g</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">predicted muscle gained</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Range: {Math.round((prediction.confidence_low_kg || 0) * 1000)}–{Math.round((prediction.confidence_high_kg || 0) * 1000)} g
+                Range: {prediction.confidenceLowG}–{prediction.confidenceHighG} g
               </p>
             </div>
 
-            {prediction.estimated_body_fat_gained_kg != null && (
-              <div className="flex justify-between text-sm py-2 border-t border-border">
-                <span className="text-muted-foreground">Body fat change</span>
-                <span className={`font-semibold ${prediction.estimated_body_fat_gained_kg < 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
-                  {prediction.estimated_body_fat_gained_kg > 0 ? '+' : ''}{Math.round(prediction.estimated_body_fat_gained_kg * 1000)} g
-                </span>
-              </div>
-            )}
+            <div className="flex justify-between text-sm py-2 border-t border-border">
+              <span className="text-muted-foreground">Body fat change</span>
+              <span className={`font-semibold ${prediction.fatGainG < 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                {prediction.fatGainG > 0 ? '+' : ''}{prediction.fatGainG} g
+              </span>
+            </div>
 
-            {prediction.training_status && (
+            {prediction.trainingStatus && (
               <div className="flex justify-between text-sm py-2 border-t border-border">
                 <span className="text-muted-foreground">Training level</span>
-                <span className="font-semibold text-foreground">{prediction.training_status}</span>
+                <span className="font-semibold text-foreground capitalize">{prediction.trainingStatus}</span>
               </div>
             )}
 
             <div className="py-3 border-t border-border">
               <p className="text-xs text-muted-foreground leading-relaxed">{prediction.summary}</p>
+            </div>
+
+            {/* Evidence section */}
+            <div className="py-3 border-t border-border">
+              <div className="flex items-center gap-1.5 mb-2">
+                <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
+                <p className="text-xs font-semibold text-muted-foreground uppercase">Evidence</p>
+              </div>
+              <div className="space-y-1.5">
+                {EVIDENCE_STUDIES.map((study, i) => (
+                  <div key={i} className="text-xs text-muted-foreground leading-relaxed">
+                    <span className="font-medium">{study.citation}</span> — <span className="italic">{study.title}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <button

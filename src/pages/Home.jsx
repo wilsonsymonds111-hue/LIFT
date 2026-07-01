@@ -359,7 +359,7 @@ export default function Home() {
           <BodyWeightSection compact />
         </div>
         <div className="flex-1 min-w-0">
-          <MuscleMassCard templates={currentSplit} compact />
+          <MuscleMassCard templates={currentSplit} compact targetSessionsPerWeek={Math.round((onDays || 3) * 7 / ((onDays || 3) + (offDays || 1)))} />
         </div>
       </div>
 
