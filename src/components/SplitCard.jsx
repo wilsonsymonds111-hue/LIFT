@@ -96,7 +96,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
       : 0;
   const cardColors = TEXT_COLORS[colorIndex];
 
-  const isPhotoBackground = !!backgroundImage || !!SPLIT_IMAGES[isExampleSplit ? splitKey : detectedType];
+  const isPhotoBackground = isExampleSplit || !!backgroundImage;
   const splitLabel = isExampleSplit ? SPLIT_LABELS[splitKey] : null;
 
   return (
