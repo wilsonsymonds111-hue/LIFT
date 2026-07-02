@@ -44,7 +44,7 @@ const BottomNav = memo(function BottomNav() {
               className="relative flex-1 flex items-center justify-center transition-all duration-200"
             >
               <div
-                className="flex items-center justify-center rounded-[20px] transition-all duration-200 w-full h-[52px]"
+                className="flex items-center justify-center rounded-full transition-all duration-200 w-full h-[52px]"
                 style={{
                   backgroundColor: active ? 'rgba(229, 229, 234, 1)' : 'transparent',
                 }}
