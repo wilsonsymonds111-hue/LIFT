@@ -12,7 +12,7 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerc
   return (
     <div
       onClick={() => onSelect(exercise)}
-      className="flex items-center gap-3 py-3 px-3 mb-1.5 cursor-pointer bg-white/60 dark:bg-card/40 rounded-xl active:bg-black/5 dark:active:bg-muted/50 transition-colors duration-150"
+      className="flex items-center gap-3 py-3 px-3 mb-1.5 cursor-pointer bg-white/60 dark:bg-card/40 rounded-xl border border-white/80 dark:border-white/20 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] active:bg-black/5 dark:active:bg-muted/50 transition-colors duration-150"
     >
       {/* Exercise image or letter fallback */}
       <div className="w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden bg-gray-50 dark:bg-muted/60">
