@@ -103,7 +103,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
     <div ref={cardRef}>
       <div
         onClick={onCardClick}
-        className={`relative bg-white dark:bg-card rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border border-white/80 dark:border-white/20 shadow-[0_2px_16px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12),inset_0_0_0_1px_rgba(255,255,255,0.5)] ${isPhotoBackground ? 'h-[180px]' : ''}`}
+        className={`relative bg-white dark:bg-card rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all duration-150 hover:scale-[1.01] overflow-hidden focus:outline-none border-2 border-white shadow-[0_2px_16px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.8)] dark:border-white/30 dark:shadow-[0_2px_16px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.15)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12),inset_0_0_0_1px_rgba(255,255,255,0.8)] ${isPhotoBackground ? 'h-[180px]' : ''}`}
       >
         {/* Background image — full color <img> for photo splits, blurred B&W div for others */}
         {isPhotoBackground ? (

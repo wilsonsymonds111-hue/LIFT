@@ -29,7 +29,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
 
   return (
     <div
-      className={`relative bg-white dark:bg-card rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] ${
+      className={`relative bg-white dark:bg-card rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border-2 border-white dark:border-white/30 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.15)] ${
         isCompleted
           ? 'bg-emerald-50/60 dark:bg-emerald-950/30'
           : isTodayCard ? 'ring-2 ring-emerald-400/60' : ''
