@@ -18,7 +18,7 @@ const BottomNav = memo(function BottomNav() {
   return (
     <div
       className="fixed left-4 right-4 z-50"
-      style={{ bottom: 'calc(24px + env(safe-area-inset-bottom))' }}
+      style={{ bottom: 'calc(8px + env(safe-area-inset-bottom))' }}
     >
       <nav
         className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden border border-white/80 dark:border-white/20"
