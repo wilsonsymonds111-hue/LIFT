@@ -21,11 +21,11 @@ const BottomNav = memo(function BottomNav() {
       style={{ bottom: 'calc(8px + env(safe-area-inset-bottom))' }}
     >
       <nav
-        className="relative flex items-center justify-around h-[64px] px-2 rounded-[28px] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] ring-1 ring-white/50 dark:ring-white/10 bg-white/55 dark:bg-gray-800/45"
-        style={{ backdropFilter: 'blur(30px) saturate(200%)', WebkitBackdropFilter: 'blur(30px) saturate(200%)' }}
+        className="relative flex items-center justify-around h-[64px] px-3 rounded-full overflow-hidden shadow-[0_12px_48px_rgba(0,0,0,0.22),0_4px_16px_rgba(0,0,0,0.10)] dark:shadow-[0_12px_48px_rgba(0,0,0,0.6),0_4px_16px_rgba(0,0,0,0.3)] ring-1 ring-white/60 dark:ring-white/10 bg-white/65 dark:bg-gray-800/50"
+        style={{ backdropFilter: 'blur(35px) saturate(200%)', WebkitBackdropFilter: 'blur(35px) saturate(200%)' }}
       >
         {/* Glossy sheen overlay */}
-        <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-gradient-to-b from-white/50 via-transparent to-white/10 dark:from-white/10 dark:to-transparent" />
+        <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/50 via-transparent to-white/10 dark:from-white/10 dark:to-transparent" />
         {/* Top highlight edge */}
         <div className="pointer-events-none absolute top-0 left-3 right-3 h-px rounded-full bg-white/80 dark:bg-white/20" />
         {tabs.map(({ path, Icon, label }) => {
@@ -37,19 +37,19 @@ const BottomNav = memo(function BottomNav() {
               className="flex items-center justify-center transition-all duration-200"
             >
               <div
-                className={`flex items-center justify-center rounded-full transition-all duration-200 w-[56px] h-[38px] ${
+                className={`flex items-center justify-center rounded-full transition-all duration-200 w-[56px] h-[40px] ${
                   active
-                    ? 'bg-black/[0.10] dark:bg-white/[0.16]'
+                    ? 'bg-black/[0.08] dark:bg-white/[0.14]'
                     : ''
                 }`}
               >
                 <Icon
-                  className={`transition-all duration-200 w-[21px] h-[21px] ${
+                  className={`transition-all duration-200 w-[22px] h-[22px] ${
                     active
-                      ? 'text-gray-900 dark:text-white'
-                      : 'text-gray-500 dark:text-white/45'
+                      ? 'text-black dark:text-white'
+                      : 'text-black/60 dark:text-white/45'
                   }`}
-                  strokeWidth={active ? 2.5 : 1.5}
+                  strokeWidth={active ? 2.2 : 1.6}
                 />
               </div>
             </Link>
