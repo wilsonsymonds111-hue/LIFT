@@ -21,13 +21,13 @@ const BottomNav = memo(function BottomNav() {
       style={{ bottom: 'calc(24px + env(safe-area-inset-bottom))' }}
     >
       <nav
-        className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden ring-1 ring-white/40 dark:ring-white/15"
+        className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden border border-white/80 dark:border-white/20"
         style={{
           backgroundColor: 'rgba(249, 249, 249, 0.85)',
           backdropFilter: 'blur(40px) saturate(180%)',
           WebkitBackdropFilter: 'blur(40px) saturate(180%)',
           boxShadow:
-            '0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.04)',
+            '0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(255,255,255,0.5)',
         }}
       >
         {/* Dark mode tint */}
