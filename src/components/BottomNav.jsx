@@ -47,6 +47,11 @@ const BottomNav = memo(function BottomNav() {
                 className="flex items-center justify-center rounded-full transition-all duration-200 w-full h-[52px]"
                 style={{
                   backgroundColor: active ? 'rgba(165, 165, 172, 0.96)' : 'transparent',
+                  backdropFilter: active ? 'blur(20px) saturate(180%)' : 'none',
+                  WebkitBackdropFilter: active ? 'blur(20px) saturate(180%)' : 'none',
+                  boxShadow: active
+                    ? '0 2px 12px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.5)'
+                    : 'none',
                 }}
               >
                 <Icon
