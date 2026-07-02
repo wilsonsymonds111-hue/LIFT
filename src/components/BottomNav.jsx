@@ -44,9 +44,7 @@ const BottomNav = memo(function BottomNav() {
               className="relative flex items-center justify-center transition-all duration-200"
             >
               <div
-                className={`flex flex-col items-center justify-center gap-0.5 rounded-full transition-all duration-200 ${
-                  active ? 'px-4 py-1.5' : 'px-4 py-1.5'
-                }`}
+                className="flex items-center justify-center rounded-full transition-all duration-200 w-[52px] h-[40px]"
                 style={{
                   backgroundColor: active ? 'rgba(229, 229, 234, 1)' : 'transparent',
                 }}
@@ -56,12 +54,6 @@ const BottomNav = memo(function BottomNav() {
                   style={{ color: active ? '#007aff' : '#000000' }}
                   strokeWidth={active ? 2.2 : 1.8}
                 />
-                <span
-                  className="text-[10px] font-medium leading-none transition-colors duration-200"
-                  style={{ color: active ? '#007aff' : '#8e8e93' }}
-                >
-                  {label}
-                </span>
               </div>
             </Link>
           );
