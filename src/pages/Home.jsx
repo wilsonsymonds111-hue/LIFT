@@ -8,7 +8,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
-import SyncBanner from '../components/SyncBanner';
 import WeekTracker from '../components/WeekTracker';
 import BodyWeightSection from '../components/BodyWeightSection';
 import MuscleMassCard from '../components/MuscleMassCard';
@@ -362,9 +361,6 @@ export default function Home() {
           <MuscleMassCard templates={currentSplit} compact targetSessionsPerWeek={Math.round((onDays || 3) * 7 / ((onDays || 3) + (offDays || 1)))} />
         </div>
       </div>
-
-      {/* Sync Banner */}
-      <SyncBanner />
 
       {/* ==================== CURRENT SPLIT ==================== */}
       <div className="px-4 py-2">
