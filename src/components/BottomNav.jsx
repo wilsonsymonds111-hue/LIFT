@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { Dumbbell, Layers, List } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useNavVisibility } from '@/lib/NavContext';
 
 const tabs = [
@@ -41,25 +42,27 @@ const BottomNav = memo(function BottomNav() {
             <Link
               key={path}
               to={path}
-              className="relative flex-1 flex items-center justify-center transition-all duration-200"
+              className="relative flex-1 flex items-center justify-center"
             >
-              <div
-                className="flex items-center justify-center rounded-full transition-all duration-200 w-full h-[52px]"
-                style={{
-                  backgroundColor: active ? 'rgba(165, 165, 172, 0.96)' : 'transparent',
-                  backdropFilter: active ? 'blur(20px) saturate(180%)' : 'none',
-                  WebkitBackdropFilter: active ? 'blur(20px) saturate(180%)' : 'none',
-                  boxShadow: active
-                    ? '0 2px 12px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.5)'
-                    : 'none',
-                }}
-              >
-                <Icon
-                  className="w-[23px] h-[23px] transition-colors duration-200"
-                  style={{ color: active ? '#007aff' : '#000000' }}
-                  strokeWidth={active ? 2.2 : 1.8}
+              {active && (
+                <motion.div
+                  layoutId="navBubble"
+                  className="absolute inset-1 rounded-full"
+                  style={{
+                    backgroundColor: 'rgba(165, 165, 172, 0.96)',
+                    backdropFilter: 'blur(20px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.5)',
+                    transform: 'translateZ(0)',
+                  }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 30, mass: 0.6 }}
                 />
-              </div>
+              )}
+              <Icon
+                className="relative z-10 w-[23px] h-[23px] transition-colors duration-200"
+                style={{ color: active ? '#007aff' : '#000000' }}
+                strokeWidth={active ? 2.2 : 1.8}
+              />
             </Link>
           );
         })}
