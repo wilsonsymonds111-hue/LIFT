@@ -21,37 +21,47 @@ const BottomNav = memo(function BottomNav() {
       style={{ bottom: 'calc(8px + env(safe-area-inset-bottom))' }}
     >
       <nav
-        className="relative flex items-center justify-around h-[64px] px-3 rounded-full overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.18),0_2px_12px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.55),0_2px_12px_rgba(0,0,0,0.3)] ring-1 ring-white/50 dark:ring-white/10"
+        className="relative flex items-center justify-around h-[64px] px-2 rounded-full overflow-hidden ring-1 ring-black/[0.06] dark:ring-white/10"
         style={{
-          backgroundColor: 'rgba(242, 242, 247, 0.72)',
+          backgroundColor: 'rgba(249, 249, 249, 0.85)',
           backdropFilter: 'blur(40px) saturate(180%)',
           WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+          boxShadow:
+            '0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.04)',
         }}
       >
-        <div
-          className="pointer-events-none absolute inset-0 rounded-full dark:bg-gray-900/40"
-          style={{ backgroundColor: 'rgba(255,255,255,0.35)' }}
-        />
+        {/* Dark mode tint */}
+        <div className="pointer-events-none absolute inset-0 rounded-full dark:bg-gray-900/50 hidden dark:block" />
         {/* Top highlight edge */}
-        <div className="pointer-events-none absolute top-0 left-4 right-4 h-px rounded-full bg-white/70 dark:bg-white/15" />
-        {tabs.map(({ path, Icon }) => {
+        <div className="pointer-events-none absolute top-0 left-4 right-4 h-px rounded-full bg-white/60 dark:bg-white/10" />
+
+        {tabs.map(({ path, Icon, label }) => {
           const active = location.pathname === path;
           return (
             <Link
               key={path}
               to={path}
-              className="flex items-center justify-center transition-all duration-200"
+              className="relative flex items-center justify-center transition-all duration-200"
             >
               <div
-                className={`flex items-center justify-center rounded-full transition-all duration-200 w-[54px] h-[40px] ${
-                  active ? 'bg-[#e5e5ea] dark:bg-white/15' : ''
+                className={`flex flex-col items-center justify-center gap-0.5 rounded-full transition-all duration-200 ${
+                  active ? 'px-4 py-1.5' : 'px-4 py-1.5'
                 }`}
+                style={{
+                  backgroundColor: active ? 'rgba(229, 229, 234, 1)' : 'transparent',
+                }}
               >
                 <Icon
-                  className="w-[22px] h-[22px] transition-colors duration-200"
-                  style={{ color: active ? '#007aff' : '#8e8e93' }}
-                  strokeWidth={active ? 2.2 : 1.6}
+                  className="w-[23px] h-[23px] transition-colors duration-200"
+                  style={{ color: active ? '#007aff' : '#000000' }}
+                  strokeWidth={active ? 2.2 : 1.8}
                 />
+                <span
+                  className="text-[10px] font-medium leading-none transition-colors duration-200"
+                  style={{ color: active ? '#007aff' : '#8e8e93' }}
+                >
+                  {label}
+                </span>
               </div>
             </Link>
           );
