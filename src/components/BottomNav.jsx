@@ -21,14 +21,20 @@ const BottomNav = memo(function BottomNav() {
       style={{ bottom: 'calc(8px + env(safe-area-inset-bottom))' }}
     >
       <nav
-        className="relative flex items-center justify-around h-[64px] px-3 rounded-full overflow-hidden shadow-[0_12px_48px_rgba(0,0,0,0.22),0_4px_16px_rgba(0,0,0,0.10)] dark:shadow-[0_12px_48px_rgba(0,0,0,0.6),0_4px_16px_rgba(0,0,0,0.3)] ring-1 ring-white/60 dark:ring-white/10 bg-white/65 dark:bg-gray-800/50"
-        style={{ backdropFilter: 'blur(35px) saturate(200%)', WebkitBackdropFilter: 'blur(35px) saturate(200%)' }}
+        className="relative flex items-center justify-around h-[64px] px-3 rounded-full overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.18),0_2px_12px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.55),0_2px_12px_rgba(0,0,0,0.3)] ring-1 ring-white/50 dark:ring-white/10"
+        style={{
+          backgroundColor: 'rgba(242, 242, 247, 0.72)',
+          backdropFilter: 'blur(40px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+        }}
       >
-        {/* Glossy sheen overlay */}
-        <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/50 via-transparent to-white/10 dark:from-white/10 dark:to-transparent" />
+        <div
+          className="pointer-events-none absolute inset-0 rounded-full dark:bg-gray-900/40"
+          style={{ backgroundColor: 'rgba(255,255,255,0.35)' }}
+        />
         {/* Top highlight edge */}
-        <div className="pointer-events-none absolute top-0 left-3 right-3 h-px rounded-full bg-white/80 dark:bg-white/20" />
-        {tabs.map(({ path, Icon, label }) => {
+        <div className="pointer-events-none absolute top-0 left-4 right-4 h-px rounded-full bg-white/70 dark:bg-white/15" />
+        {tabs.map(({ path, Icon }) => {
           const active = location.pathname === path;
           return (
             <Link
@@ -37,18 +43,13 @@ const BottomNav = memo(function BottomNav() {
               className="flex items-center justify-center transition-all duration-200"
             >
               <div
-                className={`flex items-center justify-center rounded-full transition-all duration-200 w-[56px] h-[40px] ${
-                  active
-                    ? 'bg-black/[0.08] dark:bg-white/[0.14]'
-                    : ''
+                className={`flex items-center justify-center rounded-full transition-all duration-200 w-[54px] h-[40px] ${
+                  active ? 'bg-[#e5e5ea] dark:bg-white/15' : ''
                 }`}
               >
                 <Icon
-                  className={`transition-all duration-200 w-[22px] h-[22px] ${
-                    active
-                      ? 'text-black dark:text-white'
-                      : 'text-black/60 dark:text-white/45'
-                  }`}
+                  className="w-[22px] h-[22px] transition-colors duration-200"
+                  style={{ color: active ? '#007aff' : '#8e8e93' }}
                   strokeWidth={active ? 2.2 : 1.6}
                 />
               </div>
