@@ -41,7 +41,7 @@ const BottomNav = memo(function BottomNav() {
             <Link
               key={path}
               to={path}
-              className="relative flex items-center justify-center transition-all duration-200"
+              className="relative flex-1 flex items-center justify-center transition-all duration-200"
             >
               <div
                 className="flex items-center justify-center rounded-[20px] transition-all duration-200 w-full h-[52px]"
