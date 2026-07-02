@@ -21,7 +21,7 @@ const BottomNav = memo(function BottomNav() {
       style={{ bottom: 'calc(8px + env(safe-area-inset-bottom))' }}
     >
       <nav
-        className="relative flex items-center justify-around h-[64px] px-2 rounded-full overflow-hidden ring-1 ring-black/[0.06] dark:ring-white/10"
+        className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden ring-1 ring-black/[0.06] dark:ring-white/10"
         style={{
           backgroundColor: 'rgba(249, 249, 249, 0.85)',
           backdropFilter: 'blur(40px) saturate(180%)',
@@ -44,7 +44,7 @@ const BottomNav = memo(function BottomNav() {
               className="relative flex items-center justify-center transition-all duration-200"
             >
               <div
-                className="flex items-center justify-center rounded-full transition-all duration-200 w-[52px] h-[40px]"
+                className="flex items-center justify-center rounded-[20px] transition-all duration-200 w-full h-[52px]"
                 style={{
                   backgroundColor: active ? 'rgba(229, 229, 234, 1)' : 'transparent',
                 }}
