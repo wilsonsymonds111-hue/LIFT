@@ -18,7 +18,7 @@ const BottomNav = memo(function BottomNav() {
   return (
     <div
       className="fixed left-3 right-3 z-50"
-      style={{ bottom: '0px', paddingBottom: 'min(env(safe-area-inset-bottom), 8px)' }}
+      style={{ bottom: '0px' }}
     >
       <nav className="relative flex items-center justify-around h-[50px] px-2 rounded-full overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] ring-1 ring-white/60 dark:ring-white/10 bg-white/50 dark:bg-gray-800/40" style={{ backdropFilter: 'blur(20px) saturate(180%)', WebkitBackdropFilter: 'blur(20px) saturate(180%)' }}>
         {/* Glossy sheen overlay */}
