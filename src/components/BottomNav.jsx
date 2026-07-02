@@ -37,25 +37,20 @@ const BottomNav = memo(function BottomNav() {
               className="flex items-center justify-center transition-all duration-200"
             >
               <div
-                className={`flex items-center gap-1.5 rounded-full transition-all duration-200 ${
+                className={`flex items-center justify-center rounded-full transition-all duration-200 w-[56px] h-[38px] ${
                   active
-                    ? 'bg-black/[0.10] dark:bg-white/[0.16] px-3.5 py-2'
-                    : 'px-3.5 py-2'
+                    ? 'bg-black/[0.10] dark:bg-white/[0.16]'
+                    : ''
                 }`}
               >
                 <Icon
-                  className={`transition-all duration-200 ${
+                  className={`transition-all duration-200 w-[21px] h-[21px] ${
                     active
-                      ? 'w-[21px] h-[21px] text-gray-900 dark:text-white'
-                      : 'w-[21px] h-[21px] text-gray-500 dark:text-white/45'
+                      ? 'text-gray-900 dark:text-white'
+                      : 'text-gray-500 dark:text-white/45'
                   }`}
                   strokeWidth={active ? 2.5 : 1.5}
                 />
-                {active && (
-                  <span className="text-[13px] font-semibold text-gray-900 dark:text-white whitespace-nowrap">
-                    {label}
-                  </span>
-                )}
               </div>
             </Link>
           );
