@@ -154,17 +154,15 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
 
             {/* Bottom-left content with feathered blur behind text */}
             <div className="absolute bottom-0 left-0 right-0 p-4 z-10" style={{ transform: 'translateZ(0)' }}>
-              <span className="relative inline-block text-lg font-extrabold font-display leading-tight text-white uppercase" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
+              <span className="relative inline-block text-lg font-extrabold font-display leading-tight text-white uppercase" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>
                 <span
                   className="absolute"
                   style={{
-                    inset: '-12px -16px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(0,0,0,0.25)',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    WebkitMaskImage: 'radial-gradient(ellipse 90% 120% at 50% 50%, rgba(0,0,0,1) 20%, rgba(0,0,0,0.6) 55%, transparent 85%)',
-                    maskImage: 'radial-gradient(ellipse 90% 120% at 50% 50%, rgba(0,0,0,1) 20%, rgba(0,0,0,0.6) 55%, transparent 85%)',
+                    inset: '-10px -14px',
+                    backgroundColor: 'rgba(0,0,0,0.45)',
+                    filter: 'blur(18px)',
+                    WebkitFilter: 'blur(18px)',
+                    borderRadius: '8px',
                   }}
                 />
                 <span className="relative">{displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}</span>
