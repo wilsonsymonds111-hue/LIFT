@@ -158,13 +158,10 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
                 <div
                   className="absolute"
                   style={{
-                    top: '-14px', bottom: '-14px', left: '-16px', right: '-16px',
-                    borderRadius: '14px',
-                    backdropFilter: 'blur(14px)',
-                    WebkitBackdropFilter: 'blur(14px)',
-                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                    WebkitMaskImage: 'radial-gradient(ellipse 65% 80% at center, black 55%, transparent 100%)',
-                    maskImage: 'radial-gradient(ellipse 65% 80% at center, black 55%, transparent 100%)',
+                    top: '-6px', bottom: '-6px', left: '-10px', right: '-10px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+                    filter: 'blur(18px)',
+                    WebkitFilter: 'blur(18px)',
                     zIndex: 0,
                   }}
                 />
