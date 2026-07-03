@@ -152,23 +152,25 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
               )}
             </div>
 
-            {/* Feathered backdrop blur over bottom of card */}
-            <div
-              className="absolute bottom-0 left-0 right-0 z-[5]"
-              style={{
-                height: '90px',
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
-                backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                WebkitMaskImage: 'linear-gradient(to top, black 20%, transparent 100%)',
-                maskImage: 'linear-gradient(to top, black 20%, transparent 100%)',
-              }}
-            />
-            {/* Bottom-left content */}
+            {/* Bottom-left content with feathered blur behind text */}
             <div className="absolute bottom-0 left-0 right-0 p-4 z-10" style={{ transform: 'translateZ(0)' }}>
-              <span className="text-lg font-extrabold font-display leading-tight text-white uppercase" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
-                {displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}
-              </span>
+              <div className="relative inline-block">
+                <div
+                  className="absolute"
+                  style={{
+                    top: '-16px', bottom: '-14px', left: '-20px', right: '-20px',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 35%, black 100%)',
+                    maskImage: 'linear-gradient(to bottom, transparent 0%, black 35%, black 100%)',
+                    zIndex: 0,
+                  }}
+                />
+                <span className="relative text-lg font-extrabold font-display leading-tight text-white uppercase" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)', zIndex: 1 }}>
+                  {displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}
+                </span>
+              </div>
             </div>
           </>
         ) : (
