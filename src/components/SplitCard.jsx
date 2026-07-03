@@ -157,9 +157,9 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
               <div
                 className="inline-block px-3 py-1.5 rounded-2xl"
                 style={{
-                  backgroundColor: 'rgba(0,0,0,0.15)',
-                  backdropFilter: 'blur(16px) saturate(120%)',
-                  WebkitBackdropFilter: 'blur(16px) saturate(120%)',
+                  backgroundColor: 'rgba(0,0,0,0.28)',
+                  backdropFilter: 'blur(20px) saturate(130%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(130%)',
                 }}
               >
                 <span className="text-lg font-extrabold font-display leading-tight text-white uppercase">
