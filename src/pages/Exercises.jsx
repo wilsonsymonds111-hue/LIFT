@@ -9,7 +9,6 @@ import { Plus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { getExerciseDetailList } from '../lib/exerciseCache';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
-import ProfileButton from '../components/ProfileButton';
 import ExerciseList from '../components/ExerciseList';
 
 const ExerciseDetailModal = lazy(() => import('../components/ExerciseDetailModal'));
@@ -212,7 +211,6 @@ export default function Exercises() {
           >
             <Plus className="w-6 h-6" />
           </button>
-          <ProfileButton />
         </div>
       </div>
 

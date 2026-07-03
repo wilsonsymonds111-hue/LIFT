@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import ProfileButton from '../components/ProfileButton';
 import SplitCard from '../components/SplitCard';
 import RestFrequencyConfirmModal from '../components/RestFrequencyConfirmModal';
 
@@ -327,7 +326,6 @@ export default function Splits() {
       {/* Header */}
       <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
         <h1 className="text-4xl font-extrabold text-foreground leading-tight">Splits</h1>
-        <ProfileButton />
       </div>
 
       {/* Top Tabs */}
