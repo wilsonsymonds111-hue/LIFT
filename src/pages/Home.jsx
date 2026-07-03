@@ -9,8 +9,7 @@ import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
 import WeekTracker from '../components/WeekTracker';
-import BodyWeightSection from '../components/BodyWeightSection';
-import MuscleMassCard from '../components/MuscleMassCard';
+import BodyStatsCard from '../components/BodyStatsCard';
 import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
@@ -352,15 +351,8 @@ export default function Home() {
       {/* Weekly Tracker */}
       <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
 
-      {/* Body Weight + Muscle Gain Prediction */}
-      <div className="px-4 py-2 flex gap-3">
-        <div className="flex-1 min-w-0">
-          <BodyWeightSection compact />
-        </div>
-        <div className="flex-1 min-w-0">
-          <MuscleMassCard templates={currentSplit} compact targetSessionsPerWeek={Math.round((onDays || 3) * 7 / ((onDays || 3) + (offDays || 1)))} />
-        </div>
-      </div>
+      {/* Body Stats — Bodyweight + Muscle Gain + Fat Loss */}
+      <BodyStatsCard templates={currentSplit} targetSessionsPerWeek={Math.round((onDays || 3) * 7 / ((onDays || 3) + (offDays || 1)))} />
 
       {/* ==================== CURRENT SPLIT ==================== */}
       <div className="px-4 py-2">
