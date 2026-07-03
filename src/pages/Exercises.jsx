@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import { createPortal } from 'react-dom';
 import { Search } from 'lucide-react';
 import { MUSCLES } from '../lib/exercises';
 import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
@@ -214,18 +215,26 @@ export default function Exercises() {
         </div>
       </div>
 
-      {/* Search */}
-      <div className="px-4 pb-3 relative" style={{ zIndex: 40 }}>
-        <div className="flex items-center gap-2 bg-white/30 dark:bg-white/10 rounded-full px-4 py-3.5 backdrop-filter backdrop-blur-md border border-white/40 dark:border-white/20 shadow-sm">
-          <Search className="w-4 h-4 text-blue-400 flex-shrink-0" />
-          <input
-            value={search}
-            onChange={handleSearchChange}
-            placeholder="Search exercises"
-            className="bg-transparent text-sm flex-1 focus:outline-none text-foreground placeholder:text-gray-400 dark:placeholder:text-gray-500 font-medium"
-          />
-        </div>
-      </div>
+      {/* Search — portaled to body so it sits above the alphabet blur strip */}
+      {createPortal(
+        <div
+          className="fixed left-4 right-4 z-[35]"
+          style={{ top: 'calc(env(safe-area-inset-top) + 4.5rem)' }}
+        >
+          <div className="flex items-center gap-2 bg-white/30 dark:bg-white/10 rounded-full px-4 py-3.5 backdrop-filter backdrop-blur-md border border-white/40 dark:border-white/20 shadow-sm">
+            <Search className="w-4 h-4 text-blue-400 flex-shrink-0" />
+            <input
+              value={search}
+              onChange={handleSearchChange}
+              placeholder="Search exercises"
+              className="bg-transparent text-sm flex-1 focus:outline-none text-foreground placeholder:text-gray-400 dark:placeholder:text-gray-500 font-medium"
+            />
+          </div>
+        </div>,
+        document.body
+      )}
+      {/* Spacer to preserve layout flow */}
+      <div className="px-4 pb-3" style={{ height: 'calc(1rem + 3.5rem)' }} />
 
       {/* Filter pills */}
       <div className="pb-3 relative">
