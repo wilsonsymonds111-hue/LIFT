@@ -158,9 +158,9 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
                 <span
                   className="absolute"
                   style={{
-                    inset: '-24px -32px',
-                    backgroundColor: 'rgba(0,0,0,0.65)',
-                    filter: 'blur(28px)',
+                    inset: '-32px -44px',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    filter: 'blur(34px)',
                     WebkitFilter: 'blur(18px)',
                     borderRadius: '8px',
                   }}
