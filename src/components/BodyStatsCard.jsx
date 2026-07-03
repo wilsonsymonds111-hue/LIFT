@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { RefreshCw, TrendingUp, X, BookOpen, Flame } from 'lucide-react';
+import { RefreshCw, X, BookOpen } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import {
   calculateMuscleMass,
@@ -170,89 +170,39 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
     <>
       <div className="px-4 py-2">
         <div
+          onClick={() => setShowWeightModal(true)}
           style={{ backgroundColor: 'rgba(249, 249, 249, 0.85)', backdropFilter: 'blur(40px) saturate(180%)', WebkitBackdropFilter: 'blur(40px) saturate(180%)' }}
-          className="relative rounded-2xl px-4 py-2.5 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)]"
+          className="relative rounded-2xl px-4 py-2.5 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] cursor-pointer active:scale-[0.98]"
         >
-          <div className="flex items-center justify-between gap-1">
-            {/* Bodyweight */}
-            <div
-              onClick={() => setShowWeightModal(true)}
-              className="flex flex-col cursor-pointer active:scale-95 transition-transform flex-1"
-            >
-              <span className="text-sm font-semibold text-gray-500 dark:text-muted-foreground">Bodyweight</span>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                {weightLoading ? (
-                  <div className="h-6 w-16 bg-gray-100 dark:bg-muted rounded animate-pulse" />
-                ) : latest ? (
-                  <>
-                    <span className="text-2xl font-bold text-black dark:text-foreground">{latest.weight}</span>
-                    <span className="text-xs text-gray-400 dark:text-muted-foreground font-medium">kg</span>
-                  </>
-                ) : (
-                  <span className="text-sm text-gray-400 dark:text-muted-foreground">Tap to log</span>
-                )}
-              </div>
-            </div>
-
-            <div className="w-px h-10 bg-gray-200 dark:bg-border" />
-
-            {/* Muscle Gain */}
-            <div
-              onClick={handleMuscleClick}
-              className="flex flex-col cursor-pointer active:scale-95 transition-transform flex-1 items-center"
-            >
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-semibold text-gray-500 dark:text-muted-foreground">Muscle Gain</span>
-                {refreshing && <RefreshCw className="w-3 h-3 text-blue-400 animate-spin" />}
-              </div>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                {muscleLoading ? (
-                  <div className="h-6 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
-                ) : prediction ? (
-                  <>
-                    <span className="text-2xl font-bold text-blue-500">{prediction.muscleGainG}</span>
-                    <span className="text-xs text-gray-400 dark:text-muted-foreground font-medium">g</span>
-                  </>
-                ) : (
-                  <span className="text-sm text-gray-400 dark:text-muted-foreground">Tap to analyze</span>
-                )}
-              </div>
-            </div>
-
-            <div className="w-px h-10 bg-gray-200 dark:bg-border" />
-
-            {/* Fat Loss */}
-            <div
-              onClick={handleMuscleClick}
-              className="flex flex-col cursor-pointer active:scale-95 transition-transform flex-1 items-end"
-            >
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-semibold text-gray-500 dark:text-muted-foreground">Fat Loss</span>
-                <Flame className="w-3 h-3 text-orange-400" />
-              </div>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                {muscleLoading ? (
-                  <div className="h-6 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
-                ) : prediction ? (
-                  <>
-                    <span className="text-2xl font-bold text-orange-500">{fatLossG}</span>
-                    <span className="text-xs text-gray-400 dark:text-muted-foreground font-medium">g</span>
-                  </>
-                ) : (
-                  <span className="text-sm text-gray-400 dark:text-muted-foreground">—</span>
-                )}
-              </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-gray-500 dark:text-muted-foreground">Bodyweight</span>
+            <div className="flex items-baseline gap-1">
+              {weightLoading ? (
+                <div className="h-6 w-16 bg-gray-100 dark:bg-muted rounded animate-pulse" />
+              ) : latest ? (
+                <>
+                  <span className="text-2xl font-bold text-black dark:text-foreground">{latest.weight}</span>
+                  <span className="text-xs text-gray-400 dark:text-muted-foreground font-medium">kg</span>
+                </>
+              ) : (
+                <span className="text-sm text-gray-400 dark:text-muted-foreground">Tap to log</span>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Weight Chart Modal */}
+      {/* Weight Chart Modal — shows bodyweight history, muscle gain, and fat loss */}
       {showWeightModal && (
         <BodyWeightChartModal
           entries={weightEntries}
           onClose={() => setShowWeightModal(false)}
           onChanged={fetchEntries}
+          prediction={prediction}
+          muscleLoading={muscleLoading}
+          refreshing={refreshing}
+          fatLossG={fatLossG}
+          onRecalculate={() => compute(true)}
         />
       )}
 

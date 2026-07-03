@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, Flag, AlertCircle, Zap, BicepsFlexed, Info, Pencil } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, Flag, AlertCircle, Zap, BicepsFlexed, Info, Pencil, Dumbbell, Flame, RefreshCw } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
 import { Slider } from '@/components/ui/slider';
 import { base44 } from '@/api/base44Client';
@@ -11,7 +11,7 @@ const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { d
 const kgToLbs = (kg) => parseFloat((kg * 2.20462).toFixed(2));
 const lbsToKg = (lbs) => parseFloat((lbs / 2.20462).toFixed(2));
 
-export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
+export default function BodyWeightChartModal({ entries, onClose, onChanged, prediction, muscleLoading, refreshing, fatLossG, onRecalculate }) {
   const [zoom, setZoom] = useState(() => {
     const stored = localStorage.getItem('bodyWeightZoom');
     return stored ? Number(stored) : 0;
@@ -295,9 +295,53 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged }) {
            <p className="text-3xl font-bold text-gray-300 dark:text-muted-foreground mt-0.5">—</p>
          )}
          {latestDateLabel && <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{latestDateLabel}</p>}
-       </div>
+         </div>
 
-      {/* Chart */}
+         {/* Muscle Gain + Fat Loss */}
+         <div className="pb-3">
+         <div className="flex gap-2">
+         <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm">
+           <div className="flex items-center gap-1.5 mb-1">
+             <Dumbbell className="w-3.5 h-3.5 text-blue-500" />
+             <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground">Muscle Gain</p>
+           </div>
+           {muscleLoading ? (
+             <div className="h-6 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
+           ) : prediction ? (
+             <p className="text-xl font-bold text-blue-500">{prediction.muscleGainG}<span className="text-xs font-medium text-gray-400 dark:text-muted-foreground"> g</span></p>
+           ) : (
+             <p className="text-sm text-gray-400 dark:text-muted-foreground">No data</p>
+           )}
+         </div>
+         <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm">
+           <div className="flex items-center gap-1.5 mb-1">
+             <Flame className="w-3.5 h-3.5 text-orange-500" />
+             <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground">Fat Loss</p>
+           </div>
+           {muscleLoading ? (
+             <div className="h-6 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
+           ) : prediction ? (
+             <p className="text-xl font-bold text-orange-500">{fatLossG}<span className="text-xs font-medium text-gray-400 dark:text-muted-foreground"> g</span></p>
+           ) : (
+             <p className="text-sm text-gray-400 dark:text-muted-foreground">No data</p>
+           )}
+         </div>
+         </div>
+         {prediction && (
+         <p className="text-[11px] text-gray-400 dark:text-muted-foreground mt-1.5 px-1 leading-relaxed">{prediction.summary}</p>
+         )}
+         {prediction && (
+         <button
+           onClick={onRecalculate}
+           className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-blue-500 px-1"
+         >
+           <RefreshCw className={`w-3 h-3 ${refreshing ? 'animate-spin' : ''}`} />
+           Recalculate
+         </button>
+         )}
+         </div>
+
+         {/* Chart */}
       <div className="pb-2">
         {chartData.length > 1 ? (
           <div className="bg-white dark:bg-card rounded-2xl p-3">
