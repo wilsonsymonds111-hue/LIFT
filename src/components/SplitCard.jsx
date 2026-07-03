@@ -153,10 +153,19 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
             </div>
 
             {/* Bottom-left content */}
-            <div className="absolute bottom-0 left-0 p-4 z-10" style={{ transform: 'translateZ(0)' }}>
-              <span className="text-lg font-extrabold font-display leading-tight text-white drop-shadow-lg uppercase">
-                {displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}
-              </span>
+            <div className="absolute bottom-0 left-0 right-0 p-4 z-10" style={{ transform: 'translateZ(0)' }}>
+              <div
+                className="inline-block px-3 py-1.5 rounded-lg"
+                style={{
+                  backgroundColor: 'rgba(0,0,0,0.35)',
+                  backdropFilter: 'blur(12px) saturate(150%)',
+                  WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+                }}
+              >
+                <span className="text-lg font-extrabold font-display leading-tight text-white uppercase">
+                  {displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}
+                </span>
+              </div>
             </div>
           </>
         ) : (
