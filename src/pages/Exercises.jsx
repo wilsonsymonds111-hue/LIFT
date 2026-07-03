@@ -26,6 +26,31 @@ export default function Exercises() {
   const [customExercisesVersion, setCustomExercisesVersion] = useState(0);
   const [creating, setCreating] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const pageRef = useRef(null);
+  const searchBarRef = useRef(null);
+
+  // Sticky search bar: track the scroll container's scrollY to transition the
+  // portaled search bar from its natural position (below the title) to pinned
+  // at the very top — simulating position:sticky while keeping it above the
+  // alphabet blur via the body portal.
+  useEffect(() => {
+    let el = pageRef.current?.parentElement;
+    while (el) {
+      const style = getComputedStyle(el);
+      if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) break;
+      el = el.parentElement;
+    }
+    if (!el) return;
+    const onScroll = () => {
+      if (!searchBarRef.current) return;
+      const naturalTop = 72; // 4.5rem — below the title
+      const stuckTop = 8;    // 0.5rem — pinned at the very top
+      const top = Math.max(stuckTop, naturalTop - el.scrollTop);
+      searchBarRef.current.style.top = `calc(env(safe-area-inset-top) + ${top}px)`;
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Drag-to-scroll for the muscle filter pills. The swipeable-tab container
   // (App.jsx) sets touch-action: pan-y and captures horizontal drags for
@@ -200,7 +225,7 @@ export default function Exercises() {
   }, []);
 
   return (
-    <div className="exercises-gradient pb-24">
+    <div ref={pageRef} className="exercises-gradient pb-24">
       {/* Header */}
       <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
         <h1 className="text-4xl font-extrabold text-foreground leading-tight">Exercises</h1>
@@ -217,6 +242,7 @@ export default function Exercises() {
       {/* Search — portaled to body so it sits above the alphabet blur strip */}
       {createPortal(
         <div
+          ref={searchBarRef}
           className="fixed left-4 right-4 z-[35]"
           style={{ top: 'calc(env(safe-area-inset-top) + 4.5rem)' }}
         >
