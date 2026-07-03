@@ -18,7 +18,7 @@ const parseInstructions = (text) => {
 };
 
 export default function ExerciseDetailModal({ exercise, onClose, initialTab, initialHistory, initialImage, onExerciseDeleted }) {
-  const [tab, setTab] = useState(initialTab || 'Charts');
+  const [tab, setTab] = useState(initialTab || 'About');
   const [history, setHistory] = useState(initialHistory || []);
   const [detail, setDetail] = useState(initialImage ? { image_url: initialImage } : null);
   const [loadingDetail, setLoadingDetail] = useState(!initialImage);
