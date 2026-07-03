@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Plus, Loader2 } from 'lucide-react';
 
 export default function CreateExerciseModal({ onClose, onCreate }) {
@@ -12,7 +13,7 @@ export default function CreateExerciseModal({ onClose, onCreate }) {
     setCreating(false);
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>
       <div
         className="bg-card rounded-3xl w-[88%] max-w-sm p-5 shadow-2xl"
@@ -48,6 +49,7 @@ export default function CreateExerciseModal({ onClose, onCreate }) {
           )}
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
