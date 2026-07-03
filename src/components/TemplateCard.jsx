@@ -3,19 +3,23 @@ import { createPortal } from 'react-dom';
 import { MoreHorizontal, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 const relativeTime = (dateStr) => {
   if (!dateStr) return null;
   const date = new Date(dateStr);
   const now = new Date();
-  const diffMs = now - date;
-  if (diffMs < 60000) return 'Just now';
-  if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
-  if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h ago`;
-  const diffDays = Math.floor(diffMs / 86400000);
+
+  // Calendar-day comparison
+  const dateMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.round((nowMidnight - dateMidnight) / 86400000);
+
+  if (diffDays <= 0) return 'Today';
   if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-  return `${Math.floor(diffDays / 30)}mo ago`;
+  if (diffDays < 7) return DAY_NAMES[date.getDay()];
+  if (diffDays < 14) return 'Last week';
+  return `${Math.floor(diffDays / 7)}w ago`;
 };
 
 const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompleted, accent, isMenuOpen, onToggleMenu, menuRef, onRemove }) {
