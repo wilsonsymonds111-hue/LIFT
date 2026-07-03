@@ -36,8 +36,8 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
     >
       {/* Green checkmark — completed today */}
       {isCompleted && (
-        <div className="absolute top-2 left-2 w-5 h-5 flex items-center justify-center rounded-full bg-emerald-500 text-white z-10 shadow-sm">
-          <Check className="w-3 h-3" strokeWidth={3} />
+        <div className="absolute top-2 left-2 w-6 h-6 flex items-center justify-center rounded-full bg-emerald-500 text-white z-10 shadow-sm">
+          <Check className="w-4 h-4" strokeWidth={3} />
         </div>
       )}
 
@@ -50,14 +50,14 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
       </button>
 
       <div onClick={() => navigate(`/template/${template.id}`)} className={`cursor-pointer ${isCompleted ? 'pl-6' : ''}`}>
-        <h4 className="font-bold text-foreground pr-8">{template.name}</h4>
-        <p className="text-xs text-muted-foreground mt-1.5 line-clamp-1">
+        <h4 className="text-base font-bold text-foreground pr-8">{template.name}</h4>
+        <p className="text-sm text-muted-foreground mt-1.5 line-clamp-1">
           {(template.exerciseList?.length > 0
             ? template.exerciseList.map(e => e.name).join(', ')
             : (template.exercises || '').split(',').map(s => s.trim()).filter(Boolean).join(', ')
           )}
         </p>
-        <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
+        <p className="text-sm text-muted-foreground mt-1.5 flex items-center gap-1">
           ⏱ {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
         </p>
       </div>

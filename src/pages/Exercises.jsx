@@ -208,9 +208,9 @@ export default function Exercises() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-card text-blue-500 dark:text-blue-400 hover:scale-105 active:scale-95 transition-all duration-150 border border-gray-200/70 dark:border-border flex-shrink-0"
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-white dark:bg-card text-blue-500 dark:text-blue-400 hover:scale-105 active:scale-95 transition-all duration-150 border border-gray-200/70 dark:border-border flex-shrink-0"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-6 h-6" />
           </button>
           <ProfileButton />
         </div>

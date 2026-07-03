@@ -340,10 +340,10 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/active-workout/empty-' + Date.now())}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-500 hover:bg-blue-600 text-white transition"
+            className="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500 hover:bg-blue-600 text-white transition"
             aria-label="Start an Empty Workout"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-6 h-6" />
           </button>
           <ProfileButton />
         </div>

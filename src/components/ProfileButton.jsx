@@ -37,13 +37,13 @@ const ProfileButton = memo(function ProfileButton() {
     <>
       <button
         onClick={() => setShowProfile(true)}
-        className="w-10 h-10 rounded-full overflow-hidden shadow-md hover:shadow-lg hover:scale-110 hover:ring-2 hover:ring-blue-400/50 active:scale-95 transition-all duration-150 flex-shrink-0 border-2 border-border hover:border-blue-400/30"
+        className="w-12 h-12 rounded-full overflow-hidden shadow-md hover:shadow-lg hover:scale-110 hover:ring-2 hover:ring-blue-400/50 active:scale-95 transition-all duration-150 flex-shrink-0 border-2 border-border hover:border-blue-400/30"
       >
         {profilePhoto ? (
           <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" decoding="async" />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-primary">
-            <UserCircle className="w-5 h-5 text-primary-foreground" />
+            <UserCircle className="w-6 h-6 text-primary-foreground" />
           </div>
         )}
       </button>
