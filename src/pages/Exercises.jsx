@@ -10,6 +10,7 @@ import { Plus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { getExerciseDetailList } from '../lib/exerciseCache';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
+import { useLocation } from 'react-router-dom';
 import ExerciseList from '../components/ExerciseList';
 
 const ExerciseDetailModal = lazy(() => import('../components/ExerciseDetailModal'));
@@ -17,6 +18,7 @@ const ExerciseDetailModal = lazy(() => import('../components/ExerciseDetailModal
 const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
 
 export default function Exercises() {
+  const location = useLocation();
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const debounceRef = useRef(null);
@@ -243,7 +245,7 @@ export default function Exercises() {
       {createPortal(
         <div
           ref={searchBarRef}
-          className="fixed left-4 right-4 z-[35]"
+          className={`fixed left-4 right-4 z-[35] ${location.pathname === '/exercises' ? '' : 'hidden'}`}
           style={{ top: 'calc(env(safe-area-inset-top) + 4.5rem)' }}
         >
           <div className="flex items-center gap-2 bg-white/30 dark:bg-white/10 rounded-full px-4 py-3.5 backdrop-filter backdrop-blur-md border border-white/40 dark:border-white/20 shadow-sm">

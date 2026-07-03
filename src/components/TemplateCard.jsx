@@ -64,8 +64,8 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
             : (template.exercises || '').split(',').map(s => s.trim()).filter(Boolean).join(', ')
           )}
         </p>
-        <p className="text-sm text-muted-foreground mt-1.5 flex items-center gap-1">
-          ⏱ {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
+        <p className="text-sm text-muted-foreground mt-1.5">
+          {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
         </p>
       </div>
 
