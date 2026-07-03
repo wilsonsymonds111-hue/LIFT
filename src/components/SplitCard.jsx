@@ -152,10 +152,20 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
               )}
             </div>
 
-            {/* Bottom-left content with fading gradient backdrop */}
+            {/* Bottom-left content with fading blur backdrop */}
             <div className="absolute bottom-0 left-0 right-0 p-4 z-10" style={{ transform: 'translateZ(0)' }}>
-              <span className="text-lg font-extrabold font-display leading-tight text-white uppercase" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>
-                {displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}
+              <span className="relative text-lg font-extrabold font-display leading-tight text-white uppercase" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+                <span
+                  className="absolute inset-0 -inset-x-2 -inset-y-1 rounded-lg"
+                  style={{
+                    backgroundColor: 'rgba(0,0,0,0.12)',
+                    backdropFilter: 'blur(6px)',
+                    WebkitBackdropFilter: 'blur(6px)',
+                    WebkitMaskImage: 'radial-gradient(ellipse 60% 80% at 50% 50%, black 40%, transparent 100%)',
+                    maskImage: 'radial-gradient(ellipse 60% 80% at 50% 50%, black 40%, transparent 100%)',
+                  }}
+                />
+                <span className="relative">{displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}</span>
               </span>
             </div>
           </>
