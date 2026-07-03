@@ -33,8 +33,11 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
 
   return (
     <div
-      style={{ backgroundColor: isCompleted ? 'rgb(209, 250, 229)' : 'rgb(249, 249, 249)' }}
       className={`relative rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] ${
+        isCompleted
+          ? 'bg-emerald-50 dark:bg-emerald-950/40'
+          : 'bg-[rgb(249,249,249)] dark:bg-card'
+      } ${
         isTodayCard ? 'ring-2 ring-emerald-400/60' : ''
       }`}
     >
