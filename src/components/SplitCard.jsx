@@ -116,7 +116,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
               draggable={false}
               style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', imageRendering: '-webkit-optimize-contrast' }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 35%, transparent 60%)' }} />
           </>
         ) : (
           <div
@@ -152,20 +152,11 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
               )}
             </div>
 
-            {/* Bottom-left content */}
+            {/* Bottom-left content with fading gradient backdrop */}
             <div className="absolute bottom-0 left-0 right-0 p-4 z-10" style={{ transform: 'translateZ(0)' }}>
-              <div
-                className="inline-block px-3 py-1.5 rounded-2xl"
-                style={{
-                  backgroundColor: 'rgba(0,0,0,0.28)',
-                  backdropFilter: 'blur(20px) saturate(130%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(130%)',
-                }}
-              >
-                <span className="text-lg font-extrabold font-display leading-tight text-white uppercase">
-                  {displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}
-                </span>
-              </div>
+              <span className="text-lg font-extrabold font-display leading-tight text-white uppercase" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>
+                {displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}
+              </span>
             </div>
           </>
         ) : (
