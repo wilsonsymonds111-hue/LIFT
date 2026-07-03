@@ -17,14 +17,14 @@ const DEFAULT_COLORS = [
 const SPLIT_IMAGES = {
   'upper-lower': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e8cb3e56c_image.png',
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a9ff09fcf_image.png',
-  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/1f3b4e760_image.png',
+  'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5e854ea52_image.png',
   'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/831e29602_image.png',
 };
 
 const SPLIT_LABELS = {
   'upper-lower': 'Mikey T split',
   'push-pull-legs': 'CBUM Split',
-  'full-body': 'Reg Park Split',
+  'full-body': '',
   'ul-ppl': 'Jeff Nippard Split',
 };
 
