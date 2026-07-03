@@ -165,6 +165,7 @@
   html, body, #root {
     height: 100%;
     overflow: hidden;
+    background: #000;
   }
   #root {
     display: flex;
