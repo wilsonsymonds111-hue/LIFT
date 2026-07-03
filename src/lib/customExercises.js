@@ -2,6 +2,9 @@ import { ALL_EXERCISES } from './exercises';
 
 const STORAGE_KEY = 'custom_exercises';
 
+// Module-level Set — avoids rebuilding from ALL_EXERCISES on every call
+const BUILTIN_NAMES = new Set(ALL_EXERCISES.map(e => e.name.toLowerCase()));
+
 export function loadCustomExercises() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -20,14 +23,12 @@ export function saveCustomExercise(exercise) {
 
 export function getAllExercises() {
   const custom = loadCustomExercises();
-  const builtInNames = new Set(ALL_EXERCISES.map(e => e.name.toLowerCase()));
-  const newOnes = custom.filter(e => !builtInNames.has(e.name.toLowerCase()));
+  const newOnes = custom.filter(e => !BUILTIN_NAMES.has(e.name.toLowerCase()));
   return [...ALL_EXERCISES, ...newOnes];
 }
 
 export function isCustomExercise(name) {
-  const builtInNames = new Set(ALL_EXERCISES.map(e => e.name.toLowerCase()));
-  return !builtInNames.has(name.toLowerCase());
+  return !BUILTIN_NAMES.has(name.toLowerCase());
 }
 
 export function deleteCustomExercise(name) {

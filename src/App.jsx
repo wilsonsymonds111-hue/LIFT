@@ -153,8 +153,9 @@ const usePreloadSubPages = () => {
       import('./pages/Privacy');
       import('./components/ExerciseDetailModal');
     };
-    const id = setTimeout(preload, 200);
-    return () => clearTimeout(id);
+    const ric = window.requestIdleCallback || ((cb) => setTimeout(cb, 500));
+    const id = ric(preload);
+    return () => (window.cancelIdleCallback ? window.cancelIdleCallback(id) : clearTimeout(id));
   }, []);
 };
 

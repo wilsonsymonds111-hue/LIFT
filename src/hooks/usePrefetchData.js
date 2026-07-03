@@ -23,7 +23,8 @@ export function usePrefetchData() {
       });
       getExerciseDetailList();
     };
-    const id = setTimeout(prefetch, 200);
-    return () => clearTimeout(id);
+    const ric = window.requestIdleCallback || ((cb) => setTimeout(cb, 300));
+    const id = ric(prefetch);
+    return () => (window.cancelIdleCallback ? window.cancelIdleCallback(id) : clearTimeout(id));
   }, [queryClient]);
 }

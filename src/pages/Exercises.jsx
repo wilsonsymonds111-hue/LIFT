@@ -22,7 +22,6 @@ export default function Exercises() {
   const debounceRef = useRef(null);
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selectedExercise, setSelectedExercise] = useState(null);
-  const [exerciseHistory, setExerciseHistory] = useState({});
   const [exerciseImages, setExerciseImages] = useState({});
   const [customExercisesVersion, setCustomExercisesVersion] = useState(0);
   const [creating, setCreating] = useState(false);
@@ -86,7 +85,7 @@ export default function Exercises() {
 
   const { data: exerciseHistoryData = {} } = useExerciseHistory();
 
-  useEffect(() => {
+  const exerciseHistory = useMemo(() => {
     const historyMap = {};
     Object.entries(exerciseHistoryData).forEach(([name, history]) => {
       if (history?.length > 0) {
@@ -95,7 +94,7 @@ export default function Exercises() {
           .sort((a, b) => (a.date || 0) - (b.date || 0));
       }
     });
-    setExerciseHistory(historyMap);
+    return historyMap;
   }, [exerciseHistoryData]);
 
   useEffect(() => {
@@ -284,6 +283,7 @@ export default function Exercises() {
         <Suspense fallback={null}>
           <ExerciseDetailModal
             exercise={selectedExercise}
+            initialHistory={exerciseHistory[selectedExercise.name]?.map(h => ({ kg: h.kg, reps: h.v, date: h.date?.toISOString() })) || null}
             onClose={() => setSelectedExercise(null)}
             onExerciseDeleted={() => setCustomExercisesVersion(v => v + 1)}
           />

@@ -1,25 +1,21 @@
 import { useState, useEffect, memo } from 'react';
 import { UserCircle } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import ProfileSheet from './ProfileSheet';
 
 const ProfileButton = memo(function ProfileButton({ bodyStatsProps }) {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
-  const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
-  const [loaded, setLoaded] = useState(true);
+  const { user } = useAuth();
+  const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || user?.profilePhoto || null);
 
+  // Sync cloud photo when auth user becomes available
   useEffect(() => {
-    // Try to get cloud profile photo, fall back to local
-    base44.auth.me().then(user => {
-      if (user?.profilePhoto) {
-        setProfilePhoto(user.profilePhoto);
-        localStorage.setItem('profilePhoto', user.profilePhoto);
-      }
-    }).catch(() => {
-      // Guest mode – use localStorage photo (already loaded)
-    });
-  }, []);
+    if (user?.profilePhoto) {
+      setProfilePhoto(user.profilePhoto);
+      localStorage.setItem('profilePhoto', user.profilePhoto);
+    }
+  }, [user?.profilePhoto]);
 
   const handleToggleDark = () => {
     const next = !darkMode;

@@ -145,10 +145,7 @@ export default function Home() {
     return () => window.removeEventListener('scheduleChanged', handler);
   }, []);
 
-  // Re-fetch when navigating back to this tab (e.g., after changing split on Splits tab)
-  useEffect(() => {
-    if (location.pathname === '/') invalidateWorkoutTemplates(queryClient);
-  }, [location.pathname, queryClient]);
+
 
   // Close menus on outside click
   useEffect(() => {

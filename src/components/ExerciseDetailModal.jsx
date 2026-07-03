@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { X, Trash2 } from 'lucide-react';
@@ -61,104 +61,104 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
   useEffect(() => {
     // Use cached ExerciseDetail list (already warmed by parent pages) to avoid a fresh API call
     getExerciseDetailList().then(async (cached) => {
-      const results = (cached || []).filter(d => d.name === exercise.name);
-      // If we already have image from parent, keep it; otherwise use cached
-      if (results?.length > 0 && results[0].instructions) {
-        setDetail(prev => ({ ...results[0], image_url: prev?.image_url || results[0].image_url }));
+      const cachedDetail = (cached || []).find(d => d.name === exercise.name);
+      // If we already have instructions in cache, use them immediately
+      if (cachedDetail?.instructions) {
+        setDetail(prev => ({ ...cachedDetail, image_url: prev?.image_url || cachedDetail.image_url }));
         setLoadingDetail(false);
         return;
       }
-      // No instructions in cache — check if we at least have the image cached
-      const cachedDetail = results?.[0];
+      // Set partial detail (image/muscles) if available
       if (cachedDetail?.image_url || initialImage) {
         setDetail(prev => ({ ...prev, image_url: initialImage || cachedDetail?.image_url }));
       }
-      // Generate via shared utility (image + muscles), then add instructions
+      // Parallelize: fetch detail record + generate instructions at the same time
       try {
-        const generated = await ensureExerciseDetail(exercise.name);
-        const llmRes = await base44.integrations.Core.InvokeLLM({
-          prompt: `Write 4 short, numbered step-by-step instructions for how to perform the "${exercise.name}" exercise at the gym. Keep each step to 1-2 sentences. Be clear and concise. Output format: plain text with each step on a new line starting with the number and a period.`,
-        });
+        const [generated, llmRes] = await Promise.all([
+          ensureExerciseDetail(exercise.name),
+          base44.integrations.Core.InvokeLLM({
+            prompt: `Write 4 short, numbered step-by-step instructions for how to perform the "${exercise.name}" exercise at the gym. Keep each step to 1-2 sentences. Be clear and concise. Output format: plain text with each step on a new line starting with the number and a period.`,
+          }),
+        ]);
         const instructions = llmRes?.data || llmRes || '';
-        const fresh = await base44.entities.ExerciseDetail.filter({ name: exercise.name });
-        if (fresh?.length > 0) {
-          await base44.entities.ExerciseDetail.update(fresh[0].id, { instructions });
-          setDetail({ ...fresh[0], image_url: generated.image_url || initialImage, instructions, muscles_worked: generated.muscles_worked || fresh[0].muscles_worked });
+        // Update the existing record with instructions — no need for another filter() call
+        if (generated.id) {
+          await base44.entities.ExerciseDetail.update(generated.id, { instructions });
         }
+        setDetail(prev => ({
+          ...prev,
+          image_url: generated.image_url || initialImage || prev?.image_url,
+          muscles_worked: generated.muscles_worked || prev?.muscles_worked,
+          instructions,
+        }));
       } catch (_) {}
       setLoadingDetail(false);
     });
   }, [exercise.name, initialImage]);
 
-  const allEntries = history.length > 0 ? history : [];
-  const isBodyweight = allEntries.length > 0
-    ? allEntries.every(h => { const kg = h.kg ?? 0; return kg === 0 || kg == null; })
-    : false;
+  const { isBodyweight, repsHistory, repsWeightLevel, stats } = useMemo(() => {
+    const allEntries = history.length > 0 ? history : [];
+    const isBw = allEntries.length > 0
+      ? allEntries.every(h => { const kg = h.kg ?? 0; return kg === 0 || kg == null; })
+      : false;
+
+    // Reps chart: filter to current max weight level
+    const rHistory = history.length > 0
+      ? (() => {
+          const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
+          const maxKg = kgs.length > 0 ? Math.max(...kgs) : 0;
+          const filtered = maxKg > 0
+            ? history.filter(h => (h.kg || 0) === maxKg)
+            : history;
+          return filtered.map(h => ({ kg: 0, reps: h.reps || 0, date: h.date }));
+        })()
+      : [];
+
+    const kgVals = history.map(h => h.kg || 0).filter(k => k > 0);
+    const rWeightLevel = kgVals.length > 0 ? Math.max(...kgVals) : null;
+
+    const s = history.length > 0
+      ? (() => {
+          const isRepsView = chartView === 'reps' && !isBw;
+          if (isRepsView) {
+            const entries = rHistory;
+            const allReps = entries.map(h => h.reps || 0);
+            const firstReps = entries[0]?.reps || 0;
+            const bestReps = Math.max(...allReps);
+            const suggestion = getNextGoal(exercise.name, history) || `${bestReps + 1} reps`;
+            return { start: firstReps + ' reps', best: bestReps + ' reps', increase: `+${bestReps - firstReps} reps`, suggestion };
+          }
+          const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
+          const reps = history.map(h => h.reps || 0);
+          const bestKg = Math.max(...kgs);
+          const bestEntry = history
+            .filter(h => (h.kg || 0) === bestKg)
+            .sort((a, b) => (b.reps || 0) - (a.reps || 0))[0];
+          const bestReps = bestEntry?.reps || 0;
+          const firstKg = history[0]?.kg || 0;
+          const firstReps = history[0]?.reps || 0;
+          const increase = bestKg - firstKg;
+          const suggestion = getNextGoal(exercise.name, history) || (isBw
+            ? (Math.max(...reps) + 1) + ' reps'
+            : `${bestKg} kg × ${bestReps + 1}`);
+          return {
+            start: isBw ? firstReps + ' reps' : firstKg + ' kg',
+            best: isBw ? Math.max(...reps) + ' reps' : `${bestKg} kg × ${bestReps}`,
+            increase: isBw ? (Math.max(...reps) - firstReps) + ' reps' : `+${increase} kg`,
+            suggestion,
+          };
+        })()
+      : null;
+
+    if (goal && s) s.suggestion = `${goal.kg} kg × ${goal.reps}`;
+
+    return { isBodyweight: isBw, repsHistory: rHistory, repsWeightLevel: rWeightLevel, stats: s };
+  }, [history, chartView, exercise.name, goal]);
 
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
 
-  // Reps chart: filter to current max weight level, showing rep progression within that weight plateau
-  const repsHistory = history.length > 0
-    ? (() => {
-        const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
-        const maxKg = kgs.length > 0 ? Math.max(...kgs) : 0;
-        const filtered = maxKg > 0
-          ? history.filter(h => (h.kg || 0) === maxKg)
-          : history;
-        return filtered.map(h => ({ kg: 0, reps: h.reps || 0, date: h.date }));
-      })()
-    : [];
-
   const chartData = chartView === 'reps' ? repsHistory : history;
   const chartIsBodyweight = chartView === 'reps' ? true : isBodyweight;
-
-  // Current weight level for the reps chart
-  const kgVals = history.map(h => h.kg || 0).filter(k => k > 0);
-  const repsWeightLevel = kgVals.length > 0 ? Math.max(...kgVals) : null;
-
-  // Compute stats from the active chart data so they always match the graph
-  const stats = history.length > 0
-    ? (() => {
-        const isRepsView = chartView === 'reps' && !isBodyweight;
-        if (isRepsView) {
-          // Reps chart for weighted exercise — stats reflect rep progression at current max weight
-          const entries = repsHistory;
-          const allReps = entries.map(h => h.reps || 0);
-          const firstReps = entries[0]?.reps || 0;
-          const bestReps = Math.max(...allReps);
-          const suggestion = getNextGoal(exercise.name, history) || `${bestReps + 1} reps`;
-          return {
-            start: firstReps + ' reps',
-            best: bestReps + ' reps',
-            increase: `+${bestReps - firstReps} reps`,
-            suggestion,
-          };
-        }
-        // Weight chart (or true bodyweight) — full history stats
-        const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
-        const reps = history.map(h => h.reps || 0);
-        const bestKg = Math.max(...kgs);
-        const bestEntry = history
-          .filter(h => (h.kg || 0) === bestKg)
-          .sort((a, b) => (b.reps || 0) - (a.reps || 0))[0];
-        const bestReps = bestEntry?.reps || 0;
-        const firstKg = history[0]?.kg || 0;
-        const firstReps = history[0]?.reps || 0;
-        const increase = bestKg - firstKg;
-        const suggestion = getNextGoal(exercise.name, history) || (isBodyweight
-          ? (Math.max(...reps) + 1) + ' reps'
-          : `${bestKg} kg × ${bestReps + 1}`);
-        return {
-          start: isBodyweight ? firstReps + ' reps' : firstKg + ' kg',
-          best: isBodyweight ? Math.max(...reps) + ' reps' : `${bestKg} kg × ${bestReps}`,
-          increase: isBodyweight ? (Math.max(...reps) - firstReps) + ' reps' : `+${increase} kg`,
-          suggestion,
-        };
-      })()
-    : null;
-
-  // Override AI suggestion with the user's explicit goal if set
-  if (goal && stats) stats.suggestion = `${goal.kg} kg × ${goal.reps}`;
 
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>

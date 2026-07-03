@@ -7,11 +7,11 @@ export async function ensureExerciseDetail(exerciseName) {
     const allDetails = await getExerciseDetailList();
     const existing = allDetails?.find(d => d.name.toLowerCase() === exerciseName.toLowerCase());
     if (existing?.image_url) {
-      return { image_url: existing.image_url, muscles_worked: existing.muscles_worked, existed: true };
+      return { id: existing.id, image_url: existing.image_url, muscles_worked: existing.muscles_worked, existed: true };
     }
     // No image generation — return empty to fall back to placeholder
-    return { image_url: '', muscles_worked: existing?.muscles_worked || '', existed: !!existing };
+    return { id: existing?.id, image_url: '', muscles_worked: existing?.muscles_worked || '', existed: !!existing };
   } catch {
-    return { image_url: '', muscles_worked: '', existed: false };
+    return { id: null, image_url: '', muscles_worked: '', existed: false };
   }
 }
