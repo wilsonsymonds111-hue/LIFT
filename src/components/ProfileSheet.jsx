@@ -7,12 +7,13 @@ import FeedbackModal from './FeedbackModal';
 import CreateAccountModal from './CreateAccountModal';
 import ImportStrongModal from './ImportStrongModal';
 import ImageCropper from './ImageCropper';
+import BodyStatsCard from './BodyStatsCard';
 import { useNavVisibility } from '@/lib/NavContext';
 import { useAuth } from '@/lib/AuthContext';
 
 import { memo } from 'react';
 
-const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange }) {
+const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange, bodyStatsProps }) {
   const [showFeedback, setShowFeedback] = useState(false);
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [showImportStrong, setShowImportStrong] = useState(false);
@@ -130,6 +131,14 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             onChange={handlePhotoSelect}
           />
         </div>
+
+        {/* Body Stats — Bodyweight + Muscle Gain + Fat Loss */}
+        {bodyStatsProps && (
+          <BodyStatsCard
+            templates={bodyStatsProps.templates}
+            targetSessionsPerWeek={bodyStatsProps.targetSessionsPerWeek}
+          />
+        )}
 
         {/* Import from Strong */}
         <button

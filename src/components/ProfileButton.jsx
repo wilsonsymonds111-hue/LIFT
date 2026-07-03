@@ -3,7 +3,7 @@ import { UserCircle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ProfileSheet from './ProfileSheet';
 
-const ProfileButton = memo(function ProfileButton() {
+const ProfileButton = memo(function ProfileButton({ bodyStatsProps }) {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || null);
@@ -55,6 +55,7 @@ const ProfileButton = memo(function ProfileButton() {
           onToggleDark={handleToggleDark}
           profilePhoto={profilePhoto}
           onPhotoChange={handlePhotoChange}
+          bodyStatsProps={bodyStatsProps}
         />
       )}
     </>

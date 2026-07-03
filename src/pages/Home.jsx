@@ -9,7 +9,6 @@ import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
 import WeekTracker from '../components/WeekTracker';
-import BodyStatsCard from '../components/BodyStatsCard';
 import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
@@ -344,15 +343,12 @@ export default function Home() {
           >
             <Plus className="w-6 h-6" />
           </button>
-          <ProfileButton />
+          <ProfileButton bodyStatsProps={{ templates: currentSplit, targetSessionsPerWeek: Math.round((onDays || 3) * 7 / ((onDays || 3) + (offDays || 1))) }} />
         </div>
       </div>
 
       {/* Weekly Tracker */}
       <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
-
-      {/* Body Stats — Bodyweight + Muscle Gain + Fat Loss */}
-      <BodyStatsCard templates={currentSplit} targetSessionsPerWeek={Math.round((onDays || 3) * 7 / ((onDays || 3) + (offDays || 1)))} />
 
       {/* ==================== CURRENT SPLIT ==================== */}
       <div className="px-4 py-2">
