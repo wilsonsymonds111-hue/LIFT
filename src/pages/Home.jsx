@@ -335,7 +335,7 @@ export default function Home() {
       {/* Page Title */}
       <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
         <div>
-          <h1 className="text-3xl font-extrabold text-foreground leading-tight">Workouts</h1>
+          <h1 className="text-4xl font-extrabold text-foreground leading-tight">Workouts</h1>
         </div>
         <div className="flex items-center gap-2">
           <button

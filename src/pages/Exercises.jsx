@@ -204,7 +204,7 @@ export default function Exercises() {
     <div className="exercises-gradient pb-24">
       {/* Header */}
       <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
-        <h1 className="text-3xl font-extrabold text-foreground leading-tight">Exercises</h1>
+        <h1 className="text-4xl font-extrabold text-foreground leading-tight">Exercises</h1>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCreateModal(true)}
