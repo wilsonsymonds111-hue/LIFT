@@ -1,4 +1,4 @@
-import { MoreHorizontal, Dumbbell, ChevronRight, Check } from 'lucide-react';
+import { MoreHorizontal, Dumbbell, Check } from 'lucide-react';
 import { memo } from 'react';
 
 const SPLIT_COLORS = {
@@ -147,9 +147,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
                 >
                   <MoreHorizontal className="w-4 h-4 text-white" />
                 </button>
-              ) : (
-                <ChevronRight className="w-4 h-4 text-white" />
-              )}
+              ) : null}
             </div>
 
             {/* Bottom-left content with feathered blur behind text */}
@@ -194,9 +192,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
                   >
                     <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                   </button>
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                )}
+                ) : null}
               </div>
             </div>
 
