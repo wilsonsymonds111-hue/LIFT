@@ -239,7 +239,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
                 onClose();
                 logout();
                 window.location.reload();
-              }, 600);
+              }, 150);
             }}
             className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
           >
