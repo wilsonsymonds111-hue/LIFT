@@ -132,7 +132,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           />
         </div>
 
-        {/* Body Stats — Bodyweight + Muscle Gain + Fat Loss */}
+        {/* Bodyweight */}
         {bodyStatsProps && (
           <BodyStatsCard
             templates={bodyStatsProps.templates}
@@ -140,51 +140,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           />
         )}
 
-        {/* Import from Strong */}
-        <button
-          onClick={() => setShowImportStrong(true)}
-          className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
-        >
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <Download className="w-4 h-4 text-white" />
-          </div>
-          <div className="text-left flex-1">
-            <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Import from Strong</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Bring your workout history from the Strong app</p>
-          </div>
-        </button>
-
-        {/* Feedback & Support */}
-        <button
-          onClick={() => setShowFeedback(true)}
-          className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
-        >
-          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
-            <MessageSquare className="w-4 h-4 text-blue-500" />
-          </div>
-          <div className="text-left">
-            <p className="font-semibold text-foreground text-sm">Feedback & Support</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Chat with AI or message the developer</p>
-          </div>
-        </button>
-
-        {/* Dark mode toggle */}
-        <div className="flex items-center justify-between bg-muted rounded-2xl px-4 py-3.5">
-          <div className="flex items-center gap-3">
-            {darkMode ? <Moon className="w-5 h-5 text-foreground" /> : <Sun className="w-5 h-5 text-foreground" />}
-            <span className="font-semibold text-foreground text-sm">Dark Mode</span>
-          </div>
-          <button
-            onClick={onToggleDark}
-            className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${darkMode ? 'bg-blue-500' : 'bg-gray-300'}`}
-          >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${darkMode ? 'translate-x-6' : 'translate-x-0'}`}
-            />
-          </button>
-        </div>
-
-        {/* Account section */}
+        {/* Create Account — guest only */}
         {isGuest && (
           <>
             <div className="bg-muted rounded-2xl px-4 py-3.5">
@@ -211,6 +167,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               </div>
             </button>
 
+            {/* Log In — guest only */}
             <button
               onClick={() => setShowCreateAccount(true)}
               className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
@@ -218,7 +175,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
                 <LogIn className="w-4 h-4 text-foreground" />
               </div>
-              <div className="text-left flex-1">
+              <div className="text-left">
                 <p className="font-semibold text-foreground text-sm">Log In</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Access your synced data from another device</p>
               </div>
@@ -226,20 +183,49 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           </>
         )}
 
-        {isAuthenticated && (
+        {/* Import from Strong */}
+        <button
+          onClick={() => setShowImportStrong(true)}
+          className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+        >
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <Download className="w-4 h-4 text-white" />
+          </div>
+          <div className="text-left flex-1">
+            <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Import from Strong</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Bring your workout history from the Strong app</p>
+          </div>
+        </button>
+
+        {/* Dark mode toggle */}
+        <div className="flex items-center justify-between bg-muted rounded-2xl px-4 py-3.5">
+          <div className="flex items-center gap-3">
+            {darkMode ? <Moon className="w-5 h-5 text-foreground" /> : <Sun className="w-5 h-5 text-foreground" />}
+            <span className="font-semibold text-foreground text-sm">Dark Mode</span>
+          </div>
           <button
-            onClick={() => base44.auth.logout(window.location.href)}
-            className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+            onClick={onToggleDark}
+            className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${darkMode ? 'bg-blue-500' : 'bg-gray-300'}`}
           >
-            <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <LogOut className="w-4 h-4 text-foreground" />
-            </div>
-            <div className="text-left">
-              <p className="font-semibold text-foreground text-sm">Log Out</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Sign out of your account</p>
-            </div>
+            <span
+              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${darkMode ? 'translate-x-6' : 'translate-x-0'}`}
+            />
           </button>
-        )}
+        </div>
+
+        {/* Feedback & Support */}
+        <button
+          onClick={() => setShowFeedback(true)}
+          className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+        >
+          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+            <MessageSquare className="w-4 h-4 text-blue-500" />
+          </div>
+          <div className="text-left">
+            <p className="font-semibold text-foreground text-sm">Feedback & Support</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Chat with AI or message the developer</p>
+          </div>
+        </button>
 
         {/* Legal */}
         <Link
@@ -254,7 +240,21 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           </div>
         </Link>
 
-
+        {/* Log Out — authenticated only */}
+        {isAuthenticated && (
+          <button
+            onClick={() => base44.auth.logout(window.location.href)}
+            className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+          >
+            <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <LogOut className="w-4 h-4 text-foreground" />
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-foreground text-sm">Log Out</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Sign out of your account</p>
+            </div>
+          </button>
+        )}
 
         {/* Delete account — only show when authenticated */}
         {isAuthenticated && !showDeleteConfirm && (
