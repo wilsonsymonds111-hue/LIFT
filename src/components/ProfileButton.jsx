@@ -6,19 +6,19 @@ import ProfileSheet from './ProfileSheet';
 const ProfileButton = memo(function ProfileButton({ bodyStatsProps }) {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
-  const { user } = useAuth();
-  const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || user?.profilePhoto || null);
+  const { user, isAuthenticated } = useAuth();
+  const [profilePhoto, setProfilePhoto] = useState(() => isAuthenticated ? (localStorage.getItem('profilePhoto') || user?.profilePhoto || null) : null);
 
   // Sync cloud photo when auth user becomes available; clear when logged out
   useEffect(() => {
-    if (user?.profilePhoto) {
+    if (isAuthenticated && user?.profilePhoto) {
       setProfilePhoto(user.profilePhoto);
       localStorage.setItem('profilePhoto', user.profilePhoto);
-    } else if (!user) {
+    } else if (!isAuthenticated) {
       setProfilePhoto(null);
       localStorage.removeItem('profilePhoto');
     }
-  }, [user]);
+  }, [user, isAuthenticated]);
 
   const handleToggleDark = () => {
     const next = !darkMode;
