@@ -120,6 +120,11 @@ export const AuthProvider = ({ children }) => {
     setIsGuest(true);
     setCloudMode(false);
 
+    // Clear all local data so it doesn't persist after logout
+    localStorage.removeItem('lift_user_data');
+    localStorage.removeItem('profilePhoto');
+    localStorage.removeItem('muscleMassPrediction_v2');
+
     if (shouldRedirect) {
       base44.auth.logout(window.location.href);
     } else {
