@@ -159,14 +159,14 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             {/* Log In — guest only */}
             <button
               onClick={() => setShowCreateAccount(true)}
-              className="flex items-center gap-3 bg-blue-500 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+              className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
-              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <LogIn className="w-4 h-4 text-white" />
               </div>
               <div className="text-left">
-                <p className="font-semibold text-white text-sm">Log In</p>
-                <p className="text-xs text-blue-100 mt-0.5">Access your synced data from another device</p>
+                <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Log In</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Access your synced data from another device</p>
               </div>
             </button>
           </>
