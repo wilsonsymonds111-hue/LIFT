@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, Shield, Download, LogOut } from 'lucide-react';
+import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, Download, LogOut } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
 import CreateAccountModal from './CreateAccountModal';
@@ -143,17 +143,6 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Create Account — guest only */}
         {isGuest && (
           <>
-            <div className="bg-muted rounded-2xl px-4 py-3.5">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-4 h-4 text-muted-foreground" />
-                </div>
-                <div className="text-left flex-1">
-                  <p className="font-semibold text-foreground text-sm">You are in guest mode</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Create an account to access your data on other devices</p>
-                </div>
-              </div>
-            </div>
             <button
               onClick={() => setShowCreateAccount(true)}
               className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
@@ -170,14 +159,14 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             {/* Log In — guest only */}
             <button
               onClick={() => setShowCreateAccount(true)}
-              className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+              className="flex items-center gap-3 bg-blue-500 rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
-              <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <LogIn className="w-4 h-4 text-foreground" />
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <LogIn className="w-4 h-4 text-white" />
               </div>
               <div className="text-left">
-                <p className="font-semibold text-foreground text-sm">Log In</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Access your synced data from another device</p>
+                <p className="font-semibold text-white text-sm">Log In</p>
+                <p className="text-xs text-blue-100 mt-0.5">Access your synced data from another device</p>
               </div>
             </button>
           </>
@@ -186,13 +175,13 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Import from Strong */}
         <button
           onClick={() => setShowImportStrong(true)}
-          className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+          className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
         >
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 bg-gray-400 dark:bg-gray-500 rounded-full flex items-center justify-center flex-shrink-0">
             <Download className="w-4 h-4 text-white" />
           </div>
           <div className="text-left flex-1">
-            <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">Import from Strong</p>
+            <p className="font-semibold text-foreground text-sm">Import from Strong</p>
             <p className="text-xs text-muted-foreground mt-0.5">Bring your workout history from the Strong app</p>
           </div>
         </button>
