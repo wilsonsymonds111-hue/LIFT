@@ -115,9 +115,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // Soft logout: clear token + local data, stay in guest mode without redirect
-    localStorage.removeItem('base44_access_token');
-    localStorage.removeItem('token');
+    // Clear local data first
     localStorage.removeItem('lift_user_data');
     localStorage.removeItem('profilePhoto');
     localStorage.removeItem('muscleMassPrediction_v2');
@@ -126,6 +124,11 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     setIsGuest(true);
     setCloudMode(false);
+
+    // SDK logout clears localStorage tokens AND HTTP-only auth cookies via server endpoint,
+    // then redirects back to from_url. Use clean URL without query params to avoid loops.
+    const cleanUrl = window.location.origin + window.location.pathname;
+    base44.auth.logout(cleanUrl);
   };
 
   const navigateToLogin = () => {
