@@ -313,7 +313,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               <Trash2 className="w-4 h-4 text-red-500" />
             </div>
             <div className="text-left">
-              <p className="font-semibold text-red-500 text-sm">Clear Local Data</p>
+              <p className="font-semibold text-red-500 text-sm">Delete Account</p>
               <p className="text-xs text-muted-foreground mt-0.5">Remove all data stored on this device</p>
             </div>
           </button>
