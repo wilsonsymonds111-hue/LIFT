@@ -324,7 +324,7 @@ export default function Home() {
   }
 
   return (
-    <div className="health-gradient pb-28">
+    <div className="health-gradient min-h-screen pb-28">
       <PullToRefreshIndicator pullY={pullY} refreshing={refreshing} />
 
       {/* Page Title */}
