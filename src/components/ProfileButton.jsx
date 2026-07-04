@@ -9,13 +9,16 @@ const ProfileButton = memo(function ProfileButton({ bodyStatsProps }) {
   const { user } = useAuth();
   const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('profilePhoto') || user?.profilePhoto || null);
 
-  // Sync cloud photo when auth user becomes available
+  // Sync cloud photo when auth user becomes available; clear when logged out
   useEffect(() => {
     if (user?.profilePhoto) {
       setProfilePhoto(user.profilePhoto);
       localStorage.setItem('profilePhoto', user.profilePhoto);
+    } else if (!user) {
+      setProfilePhoto(null);
+      localStorage.removeItem('profilePhoto');
     }
-  }, [user?.profilePhoto]);
+  }, [user]);
 
   const handleToggleDark = () => {
     const next = !darkMode;
