@@ -9,7 +9,7 @@ export default function CreateAccountModal({ onClose }) {
 
   const handleEmailSignUp = () => {
     if (!email.trim() || !password.trim()) return;
-    base44.auth.redirectToLogin(window.location.href);
+    base44.auth.redirectToLogin();
   };
 
   return createPortal(
@@ -36,7 +36,7 @@ export default function CreateAccountModal({ onClose }) {
 
         <div className="flex flex-col gap-3">
           <button
-            onClick={() => base44.auth.redirectToLogin(window.location.href)}
+            onClick={() => base44.auth.redirectToLogin()}
             className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-semibold text-sm transition active:opacity-80"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -46,7 +46,7 @@ export default function CreateAccountModal({ onClose }) {
           </button>
 
           <button
-            onClick={() => base44.auth.redirectToLogin(window.location.href)}
+            onClick={() => base44.auth.redirectToLogin()}
             className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl border-2 border-border bg-card hover:bg-muted text-foreground font-semibold text-sm transition active:opacity-80"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
