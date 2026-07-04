@@ -114,21 +114,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    // Clear local data first
+  const logout = async () => {
+    // Clear local data
     localStorage.removeItem('lift_user_data');
     localStorage.removeItem('profilePhoto');
     localStorage.removeItem('muscleMassPrediction_v2');
+    localStorage.removeItem('base44_access_token');
+    localStorage.removeItem('token');
 
     setUser(null);
     setIsAuthenticated(false);
     setIsGuest(true);
     setCloudMode(false);
 
-    // SDK logout clears localStorage tokens AND HTTP-only auth cookies via server endpoint,
-    // then redirects back to from_url. Use clean URL without query params to avoid loops.
-    const cleanUrl = window.location.origin + window.location.pathname;
-    base44.auth.logout(cleanUrl);
+    // Hit server logout endpoint to clear HTTP-only auth cookies.
+    // Use fetch with redirect:'manual' so we don't get redirected/reloaded —
+    // the Set-Cookie header still takes effect, and we stay in-place as guest.
+    try {
+      const base = appParams.appBaseUrl || '';
+      await fetch(`${base}/api/apps/auth/logout?from_url=${encodeURIComponent(window.location.origin + window.location.pathname)}`, {
+        method: 'GET',
+        credentials: 'include',
+        redirect: 'manual',
+      });
+    } catch {}
   };
 
   const navigateToLogin = () => {

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, Download, LogOut } from 'lucide-react';
+import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, LogOut } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
 import CreateAccountModal from './CreateAccountModal';
@@ -178,8 +178,8 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           onClick={() => setShowImportStrong(true)}
           className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
         >
-          <div className="w-8 h-8 bg-gray-400 dark:bg-gray-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <Download className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+            <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/dbc22ac3c_image.png" alt="Strong" className="w-full h-full object-cover" />
           </div>
           <div className="text-left flex-1">
             <p className="font-semibold text-foreground text-sm">Import from Strong</p>
@@ -233,12 +233,11 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Log Out — authenticated only */}
         {isAuthenticated && (
           <button
-            onClick={() => {
+            onClick={async () => {
               setLoggingOut(true);
-              setTimeout(() => {
-                onClose();
-                logout();
-              }, 150);
+              await logout();
+              setLoggingOut(false);
+              onClose();
             }}
             className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
           >
