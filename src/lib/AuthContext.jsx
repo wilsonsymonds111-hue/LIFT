@@ -114,22 +114,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = (shouldRedirect = true) => {
-    setUser(null);
-    setIsAuthenticated(false);
-    setIsGuest(true);
-    setCloudMode(false);
-
-    // Clear all local data so it doesn't persist after logout
+  const logout = () => {
+    // Soft logout: clear token + local data, stay in guest mode without redirect
+    localStorage.removeItem('base44_access_token');
+    localStorage.removeItem('token');
     localStorage.removeItem('lift_user_data');
     localStorage.removeItem('profilePhoto');
     localStorage.removeItem('muscleMassPrediction_v2');
 
-    if (shouldRedirect) {
-      base44.auth.logout(window.location.href);
-    } else {
-      base44.auth.logout();
-    }
+    setUser(null);
+    setIsAuthenticated(false);
+    setIsGuest(true);
+    setCloudMode(false);
   };
 
   const navigateToLogin = () => {

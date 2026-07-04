@@ -232,7 +232,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Log Out — authenticated only */}
         {isAuthenticated && (
           <button
-            onClick={() => { onClose(); logout(); }}
+            onClick={() => { onClose(); logout(); window.location.reload(); }}
             className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
           >
             <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
