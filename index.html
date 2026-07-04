@@ -1,6 +1,24 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      // Guard: normalize non-Error unhandled rejections (undefined, string, plain object)
+      // so the vite plugin's error handler doesn't crash on `stack.match` of undefined.
+      window.addEventListener('unhandledrejection', function (event) {
+        var reason = event.reason;
+        if (!reason || typeof reason.stack !== 'string') {
+          var msg = typeof reason === 'string'
+            ? reason
+            : (reason && reason.message) ? reason.message : 'Unhandled promise rejection';
+          var normalized = new Error(msg);
+          try {
+            Object.defineProperty(event, 'reason', { value: normalized, configurable: true, writable: true });
+          } catch (e) {
+            event.stopImmediatePropagation();
+          }
+        }
+      }, true);
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a2a7b0991_generated_image.png" />
     <link rel="apple-touch-icon" href="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a2a7b0991_generated_image.png" />
