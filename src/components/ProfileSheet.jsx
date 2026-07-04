@@ -30,6 +30,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
   const [deleting, setDeleting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [pendingCropFile, setPendingCropFile] = useState(null);
+  const [loggingOut, setLoggingOut] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleDeleteAccount = async () => {
@@ -232,7 +233,14 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Log Out — authenticated only */}
         {isAuthenticated && (
           <button
-            onClick={() => { onClose(); logout(); window.location.reload(); }}
+            onClick={() => {
+              setLoggingOut(true);
+              setTimeout(() => {
+                onClose();
+                logout();
+                window.location.reload();
+              }, 600);
+            }}
             className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
           >
             <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
@@ -333,6 +341,15 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           />
         )}
       </div>
+
+      {loggingOut && createPortal(
+        <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black">
+          <span className="text-white text-2xl font-extrabold font-display tracking-widest">LIFT</span>
+          <div className="mt-4 w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <p className="mt-3 text-white/70 text-sm font-medium">Logging you out…</p>
+        </div>,
+        document.body
+      )}
     </div>,
     document.body
   );
