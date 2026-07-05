@@ -13,6 +13,28 @@
     "profilePhoto": {
       "type": "string",
       "description": "URL of the user's profile photo"
+    },
+    "bodyWeightGoal": {
+      "type": "object",
+      "description": "The user's body weight goal including target, weekly rate, and projected date",
+      "properties": {
+        "current": {
+          "type": "number"
+        },
+        "goal": {
+          "type": "number"
+        },
+        "weeklyChange": {
+          "type": "number"
+        },
+        "daysToGoal": {
+          "type": "number"
+        },
+        "goalDate": {
+          "type": "string",
+          "format": "date"
+        }
+      }
     }
   },
   "required": [

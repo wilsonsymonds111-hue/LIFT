@@ -1,11 +1,10 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, Flag, AlertCircle, Zap, BicepsFlexed, Info, Pencil, Dumbbell, Flame, RefreshCw, TrendingDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, Flag, AlertCircle, Zap, BicepsFlexed, Info, Pencil, RefreshCw, TrendingDown } from 'lucide-react';
 import { TouchHold } from '@/lib/useTouchHold';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
 import { base44 } from '@/api/base44Client';
 import WeightEntryKeypad from './WeightEntryKeypad';
-import CheckeredFlagIcon from './CheckeredFlagIcon';
 import TargetArrowIcon from './TargetArrowIcon';
 
 const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -54,8 +53,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   const [showRateHelp, setShowRateHelp] = useState(false);
   const [showGoalRateHelp, setShowGoalRateHelp] = useState(false);
   const [showWeighInTip, setShowWeighInTip] = useState(false);
-  const [showMuscleInfo, setShowMuscleInfo] = useState(false);
-  const [showFatInfo, setShowFatInfo] = useState(false);
   const [goalData, setGoalData] = useState(() => {
     try {
       const raw = localStorage.getItem('bodyWeightGoal');
@@ -476,8 +473,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         <div className="pb-3">
           <div className="relative bg-white dark:bg-zinc-800 rounded-2xl p-4 border border-gray-200 dark:border-border shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-white dark:bg-zinc-800">
-                <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/09465d902_image.png" alt="Goal" className="w-7 h-7 object-contain" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50 dark:bg-red-950/30">
+                <TargetArrowIcon className="w-6 h-6" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-lg font-bold text-gray-900 dark:text-foreground">Goal: {goalData.goal} {unit}</p>
@@ -567,8 +564,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             onClick={() => setShowGoalModal(!showGoalModal)}
             className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-200 dark:border-border shadow-sm transition active:opacity-70"
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-900 dark:bg-primary">
-              <CheckeredFlagIcon className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50 dark:bg-red-950/30">
+              <TargetArrowIcon className="w-6 h-6" />
             </div>
             <div className="text-left flex-1">
               <p className="font-semibold text-black dark:text-foreground text-sm">Set Weight Goal</p>
@@ -621,76 +618,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             </div>
           </div>
         )}
-
-        {/* Muscle Gain + Fat Loss */}
-        <div className="pb-3">
-          <div className="flex gap-2">
-          <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm relative">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1.5">
-                <Dumbbell className="w-3.5 h-3.5 text-gray-400 dark:text-muted-foreground" />
-                <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground">Muscle Gain</p>
-              </div>
-              {prediction && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); setShowMuscleInfo(v => !v); }}
-                  className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-muted transition flex-shrink-0"
-                >
-                  <Info className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                </button>
-              )}
-            </div>
-            {muscleLoading ? (
-              <div className="h-6 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
-            ) : prediction ? (
-              <p className="text-xl font-bold text-gray-900 dark:text-foreground">{prediction.muscleGainG}<span className="text-xs font-medium text-gray-400 dark:text-muted-foreground"> g</span></p>
-            ) : (
-              <p className="text-sm text-gray-400 dark:text-muted-foreground">No data</p>
-            )}
-            {showMuscleInfo && prediction && (
-              <>
-                <div className="fixed inset-0 z-20" onClick={() => setShowMuscleInfo(false)} />
-                <div className="absolute left-2 top-full mt-2 w-[200px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
-                  <div className="absolute -top-1.5 left-3 w-3 h-3 bg-white dark:bg-card border-l border-t border-gray-100 dark:border-border rotate-45" />
-                  <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">An estimate of how much muscle you've gained, based on your bodyweight trend, strength progress on compound lifts, and training consistency. This is an approximation, not a precise measurement.</p>
-                </div>
-              </>
-            )}
-          </div>
-          <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm relative">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-gray-400 dark:text-muted-foreground" />
-                <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground">Fat Loss</p>
-              </div>
-              {prediction && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); setShowFatInfo(v => !v); }}
-                  className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-muted transition flex-shrink-0"
-                >
-                  <Info className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                </button>
-              )}
-            </div>
-            {muscleLoading ? (
-              <div className="h-6 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
-            ) : prediction ? (
-              <p className="text-xl font-bold text-gray-900 dark:text-foreground">{fatLossG}<span className="text-xs font-medium text-gray-400 dark:text-muted-foreground"> g</span></p>
-            ) : (
-              <p className="text-sm text-gray-400 dark:text-muted-foreground">No data</p>
-            )}
-            {showFatInfo && prediction && (
-              <>
-                <div className="fixed inset-0 z-20" onClick={() => setShowFatInfo(false)} />
-                <div className="absolute right-2 top-full mt-2 w-[200px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
-                  <div className="absolute -top-1.5 right-3 w-3 h-3 bg-white dark:bg-card border-r border-t border-gray-100 dark:border-border rotate-45" />
-                  <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">An estimate of how much fat you've lost, based on your bodyweight trend and training data. This is an approximation — actual fat loss depends on diet, consistency, and other lifestyle factors.</p>
-                </div>
-              </>
-            )}
-            </div>
-          </div>
-          </div>
 
         {/* History list */}
         <p className="font-semibold text-black dark:text-foreground text-sm mb-2 px-1">History</p>
