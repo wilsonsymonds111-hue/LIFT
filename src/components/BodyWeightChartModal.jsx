@@ -47,7 +47,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
     return lbsRegions.some(r => region.includes(r)) ? 'lbs' : 'kg';
   });
   const [showGoalModal, setShowGoalModal] = useState(false);
-  const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || 'cutting');
+  const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || null);
   const [goalWeight, setGoalWeight] = useState('');
   const [goalRate, setGoalRate] = useState('0.5');
   const [showRateHelp, setShowRateHelp] = useState(false);

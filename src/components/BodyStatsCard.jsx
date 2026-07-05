@@ -163,7 +163,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
 
   // Goal mode: 'cutting' (gold) or 'bulking' (blue)
   const goalMode = (() => {
-    try { return localStorage.getItem('goalMode') || 'cutting'; } catch { return 'cutting'; }
+    try { return localStorage.getItem('goalMode') || null; } catch { return null; }
   })();
 
   // Last 5 weight entries in chronological order for the mini sparkline
@@ -214,12 +214,13 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
                 <span className="text-base font-semibold text-gray-900 dark:text-foreground">Body Weight</span>
-                {goalMode === 'bulking' ? (
+                {goalMode === 'bulking' && (
                   <span className="flex items-center gap-1 bg-blue-500 rounded-full px-1.5 py-0.5">
                     <BicepsFlexed className="w-2.5 h-2.5 text-white" />
                     <span className="text-[9px] font-bold text-white uppercase">Bulking</span>
                   </span>
-                ) : (
+                )}
+                {goalMode === 'cutting' && (
                   <span className="flex items-center gap-1 bg-[#F59E0B] rounded-full px-1.5 py-0.5">
                     <Flame className="w-2.5 h-2.5 text-white" />
                     <span className="text-[9px] font-bold text-white uppercase">Cutting</span>

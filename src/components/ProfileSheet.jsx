@@ -147,7 +147,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           <>
             <button
               onClick={() => setShowCreateAccount(true)}
-              className="relative z-10 flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+              className="relative z-10 flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70 border border-emerald-200/60 dark:border-emerald-800/40 shadow-sm"
             >
               <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <UserPlus className="w-4 h-4 text-white" />
@@ -161,7 +161,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             {/* Log In — guest only */}
             <button
               onClick={() => setShowCreateAccount(true)}
-              className="relative z-10 flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+              className="relative z-10 flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70 border border-blue-200/60 dark:border-blue-800/40 shadow-sm"
             >
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <LogIn className="w-4 h-4 text-white" />

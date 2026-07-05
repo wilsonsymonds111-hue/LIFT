@@ -16,7 +16,7 @@ export default function CreateAccountModal({ onClose }) {
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div
-        className="relative bg-card rounded-t-3xl w-full px-5 pt-5 shadow-2xl flex flex-col gap-6 overflow-y-auto"
+        className="relative bg-card rounded-t-3xl w-full px-5 pt-5 shadow-2xl flex flex-col gap-6 overflow-y-auto border-t border-gray-200 dark:border-border"
         style={{ maxHeight: '80vh', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}
       >
         {/* X close button — top left */}

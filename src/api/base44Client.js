@@ -71,7 +71,9 @@ export const base44 = {
   entities: {
     WorkoutTemplate: wrapEntity('WorkoutTemplate', rawClient.entities.WorkoutTemplate),
     Exercise: wrapEntity('Exercise', rawClient.entities.Exercise),
-    ExerciseDetail: wrapEntity('ExerciseDetail', rawClient.entities.ExerciseDetail),
+    // ExerciseDetail is static reference data (images, instructions) — always
+    // fetch from cloud, even in guest mode, so images show for new users.
+    ExerciseDetail: rawClient.entities.ExerciseDetail,
     BodyWeight: wrapEntity('BodyWeight', rawClient.entities.BodyWeight),
     User: rawClient.entities.User,
   },
