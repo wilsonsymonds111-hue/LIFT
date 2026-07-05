@@ -29,6 +29,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   const [goalRate, setGoalRate] = useState('0.5');
   const [showRateHelp, setShowRateHelp] = useState(false);
   const [showWeighInTip, setShowWeighInTip] = useState(false);
+  const [showMuscleInfo, setShowMuscleInfo] = useState(false);
   const [goalData, setGoalData] = useState(() => {
     try {
       const raw = localStorage.getItem('bodyWeightGoal');
@@ -300,10 +301,20 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          {/* Muscle Gain + Fat Loss */}
          <div className="pb-3">
          <div className="flex gap-2">
-         <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm">
-           <div className="flex items-center gap-1.5 mb-1">
-             <Dumbbell className="w-3.5 h-3.5 text-blue-500" />
-             <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground">Muscle Gain</p>
+         <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm relative">
+           <div className="flex items-center justify-between mb-1">
+             <div className="flex items-center gap-1.5">
+               <Dumbbell className="w-3.5 h-3.5 text-blue-500" />
+               <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground">Muscle Gain</p>
+             </div>
+             {prediction && (
+               <button
+                 onClick={(e) => { e.stopPropagation(); setShowMuscleInfo(v => !v); }}
+                 className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-muted transition flex-shrink-0"
+               >
+                 <Info className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
+               </button>
+             )}
            </div>
            {muscleLoading ? (
              <div className="h-6 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
@@ -311,6 +322,15 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
              <p className="text-xl font-bold text-blue-500">{prediction.muscleGainG}<span className="text-xs font-medium text-gray-400 dark:text-muted-foreground"> g</span></p>
            ) : (
              <p className="text-sm text-gray-400 dark:text-muted-foreground">No data</p>
+           )}
+           {showMuscleInfo && prediction && (
+             <>
+               <div className="fixed inset-0 z-20" onClick={() => setShowMuscleInfo(false)} />
+               <div className="absolute right-2 top-full mt-2 w-[240px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
+                 <div className="absolute -top-1.5 right-3 w-3 h-3 bg-white dark:bg-card border-l border-t border-gray-100 dark:border-border rotate-45" />
+                 <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">{prediction.summary}</p>
+               </div>
+             </>
            )}
          </div>
          <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm">
@@ -327,18 +347,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
            )}
          </div>
          </div>
-         {prediction && (
-         <p className="text-[11px] text-gray-400 dark:text-muted-foreground mt-1.5 px-1 leading-relaxed">{prediction.summary}</p>
-         )}
-         {prediction && (
-         <button
-           onClick={onRecalculate}
-           className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-blue-500 px-1"
-         >
-           <RefreshCw className={`w-3 h-3 ${refreshing ? 'animate-spin' : ''}`} />
-           Recalculate
-         </button>
-         )}
          </div>
 
          {/* Chart */}

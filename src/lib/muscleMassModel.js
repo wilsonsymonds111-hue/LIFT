@@ -155,13 +155,13 @@ export function generateSummary(result) {
   const consistencyPct = Math.round(consistencyScore * 100);
   const sessPerWeek = sessionsPerWeek ? sessionsPerWeek.toFixed(1) : '0';
 
-  let summary = `This evidence-informed estimate (not a direct scientific measurement) combines your body weight change, ${strengthPct}% average strength progression on compound lifts, an inferred ${calorieBalance} calorie balance, and ${consistencyPct}% training consistency (${sessPerWeek}/${targetSessionsPerWeek || 0} sessions per week). `;
-  summary += `As a ${statusLabel} lifter, your predicted muscle gain is approximately ${muscleGainG}g. `;
+  let summary = `This is an evidence-informed estimate, not a direct measurement. It weighs four factors: your body weight trend, ~${strengthPct}% strength progression on compound lifts, an inferred ${calorieBalance} calorie balance, and ${consistencyPct}% training consistency (${sessPerWeek}/${targetSessionsPerWeek || 0} sessions per week). `;
+  summary += `As a ${statusLabel} lifter, you've gained approximately ${muscleGainG}g of muscle. `;
 
   if (fatGainG > 0) {
-    summary += `An estimated ${fatGainG}g of fat was also gained alongside muscle tissue.`;
+    summary += `An estimated ${fatGainG}g of fat was gained alongside it.`;
   } else if (fatGainG < 0) {
-    summary += `An estimated ${Math.abs(fatGainG)}g of fat was likely lost, suggesting body recomposition.`;
+    summary += `An estimated ${Math.abs(fatGainG)}g of fat was likely lost — suggesting body recomposition.`;
   } else {
     summary += `Minimal fat change was detected.`;
   }
