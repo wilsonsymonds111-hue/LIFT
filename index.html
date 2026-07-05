@@ -35,13 +35,7 @@
     <!-- Apply dark mode instantly, before React loads, to prevent flash -->
     <script>
       (function() {
-        var auto = localStorage.getItem('autoDarkMode');
-        if (auto !== 'false') {
-          var h = new Date().getHours();
-          document.documentElement.classList.toggle('dark', h >= 19 || h < 7);
-        } else {
-          document.documentElement.classList.toggle('dark', localStorage.getItem('darkMode') === 'true');
-        }
+        document.documentElement.classList.toggle('dark', localStorage.getItem('darkMode') === 'true');
       })();
     </script>
   </head>
