@@ -11,6 +11,24 @@ const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { d
 const kgToLbs = (kg) => parseFloat((kg * 2.20462).toFixed(2));
 const lbsToKg = (lbs) => parseFloat((lbs / 2.20462).toFixed(2));
 
+const downsample = (data, maxPoints) => {
+  if (!data || data.length <= maxPoints) return data;
+  const result = [];
+  const bucketSize = data.length / maxPoints;
+  for (let i = 0; i < maxPoints; i++) {
+    const start = Math.floor(i * bucketSize);
+    const end = Math.max(Math.floor((i + 1) * bucketSize), start + 1);
+    const bucket = data.slice(start, end);
+    if (bucket.length === 0) continue;
+    const avgWeight = bucket.reduce((sum, e) => sum + e.weight, 0) / bucket.length;
+    result.push({
+      ...bucket[bucket.length - 1],
+      weight: parseFloat(avgWeight.toFixed(2)),
+    });
+  }
+  return result;
+};
+
 export default function BodyWeightChartModal({ entries, onClose, onChanged, prediction, muscleLoading, refreshing, fatLossG, onRecalculate }) {
   const [timeFrame, setTimeFrame] = useState(() => localStorage.getItem('bodyWeightTimeFrame') || '6M');
   const [showKeypad, setShowKeypad] = useState(false);
@@ -36,6 +54,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   });
   const [goalError, setGoalError] = useState('');
   const fileInputRef = useRef(null);
+  const [projectionReveal, setProjectionReveal] = useState(1);
+  const dragStartX = useRef(null);
 
   // Persist the goal to the user entity so it survives across sessions and
   // devices. localStorage is only a fallback for guest mode.
@@ -47,6 +67,11 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       }
     }).catch(() => {});
   }, []);
+
+  // Reset projection reveal when time frame or goal changes
+  useEffect(() => {
+    setProjectionReveal(1);
+  }, [timeFrame, goalData]);
 
   const sorted = useMemo(() =>
     [...entries].sort((a, b) => new Date(a.date) - new Date(b.date)),
@@ -114,31 +139,45 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       : timeFrame === 'Y'
         ? { month: 'narrow' }
         : { month: 'short' };
-    const data = filtered.map((e, i) => ({
+    // Downsample to ~13 points so the chart isn't overloaded with data.
+    // Each point is the average weight of its bucket (Apple Health style).
+    const downsampled = downsample(filtered, 13);
+    // Use actual latest entry for the last point so the projection connects seamlessly
+    if (downsampled.length > 0 && filtered.length > 0) {
+      const latestFiltered = filtered[filtered.length - 1];
+      downsampled[downsampled.length - 1] = {
+        ...downsampled[downsampled.length - 1],
+        weight: latestFiltered.weight,
+        date: latestFiltered.date,
+        id: latestFiltered.id,
+      };
+    }
+    const data = downsampled.map((e, i) => ({
       date: e.date,
       dateLabel: new Date(e.date + 'T00:00:00').toLocaleDateString('en-GB', dateFmt),
       weight: unit === 'lbs' ? kgToLbs(e.weight) : e.weight,
       id: e.id,
-      isLatest: i === filtered.length - 1,
+      isLatest: i === downsampled.length - 1,
     }));
     
-    // Add goal projection: a dotted line from the most recent recorded weight
-    // forward to the target. Attach the projection start to the last actual
-    // data point so the dotted line connects seamlessly to the solid history.
+    // Goal projection: show only `projectionReveal` points ahead by default.
+    // User can drag right on the chart to reveal more, up to the final goal.
     if (goalData) {
       const recent = filtered[filtered.length - 1];
       if (recent && data.length > 0) {
         const rate = Math.abs(goalData.weeklyChange);
-        const weeks = Math.max(1, Math.ceil(Math.abs(goalData.goal - recent.weight) / rate));
+        const totalWeeks = Math.max(1, Math.ceil(Math.abs(goalData.goal - recent.weight) / rate));
+        const weeksToShow = Math.min(projectionReveal, totalWeeks);
         const startDate = new Date(recent.date + 'T00:00:00');
         data[data.length - 1].weightProjection = unit === 'lbs' ? kgToLbs(recent.weight) : recent.weight;
-        for (let w = 1; w <= weeks; w++) {
+        for (let w = 1; w <= weeksToShow; w++) {
           const projDate = new Date(startDate.getTime() + w * 7 * 24 * 60 * 60 * 1000);
           const projWeight = recent.weight + (goalData.weeklyChange * w);
           data.push({
             date: projDate.toISOString().split('T')[0],
             dateLabel: projDate.toLocaleDateString('en-GB', dateFmt),
             weightProjection: unit === 'lbs' ? kgToLbs(projWeight) : projWeight,
+            isFinalGoal: w === totalWeeks,
           });
         }
       }
@@ -148,7 +187,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       const bDate = new Date(b.date);
       return aDate - bDate;
     });
-  }, [filtered, unit, goalData, entries, timeFrame]);
+  }, [filtered, unit, goalData, timeFrame, projectionReveal]);
 
   const latestEntry = sorted.length > 0 ? sorted[sorted.length - 1] : null;
 
@@ -197,6 +236,14 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
     const rate = Math.abs(goalData.weeklyChange);
     weeksAway = rate > 0 ? Math.max(0, Math.ceil(Math.abs(goalData.goal - latestEntry.weight) / rate)) : 0;
   }
+
+  const handleChartDragMove = (clientX) => {
+    if (dragStartX.current === null) return;
+    const delta = clientX - dragStartX.current;
+    if (delta > 60) { setProjectionReveal(p => p + 1); dragStartX.current = clientX; }
+    else if (delta < -60) { setProjectionReveal(p => Math.max(1, p - 1)); dragStartX.current = clientX; }
+  };
+  const handleChartDragEnd = () => { dragStartX.current = null; };
 
   const startEdit = (entry) => {
     setEditingId(entry.id);
@@ -365,7 +412,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          {/* Chart */}
          <div className="pb-2">
         {chartData.length > 1 ? (
-          <div className="bg-white dark:bg-card rounded-2xl px-1 py-3">
+          <div
+            className="bg-white dark:bg-card rounded-2xl px-1 py-3 relative"
+            onTouchStart={(e) => { dragStartX.current = e.touches[0].clientX; }}
+            onTouchMove={(e) => handleChartDragMove(e.touches[0].clientX)}
+            onTouchEnd={handleChartDragEnd}
+            onMouseDown={(e) => { dragStartX.current = e.clientX; }}
+            onMouseMove={(e) => { if (dragStartX.current !== null) handleChartDragMove(e.clientX); }}
+            onMouseUp={handleChartDragEnd}
+            onMouseLeave={handleChartDragEnd}
+          >
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" opacity={0.7} />
@@ -379,7 +435,10 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                 {goalData && <Line type="linear" dataKey="weightProjection" stroke={goalMode === 'cutting' ? '#fde68a' : '#bfdbfe'} strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={(props) => { if (props.payload.weight != null) return false; return <circle cx={props.cx} cy={props.cy} r={5} fill="#fff" fillOpacity={0.6} stroke={goalMode === 'cutting' ? '#fde68a' : '#bfdbfe'} strokeWidth={1.5} strokeDasharray="3 2" />; }} activeDot={{ r: 5, fill: goalMode === 'cutting' ? '#fcd34d' : '#93c5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
               </LineChart>
             </ResponsiveContainer>
-          </div>
+            {goalData && weeksAway > projectionReveal && (
+              <p className="text-center text-[10px] text-gray-400 dark:text-muted-foreground mt-1">Drag right to see goal projection →</p>
+            )}
+            </div>
         ) : (
           <div className="bg-white dark:bg-card rounded-2xl p-8 text-center">
             <p className="text-sm text-gray-500 dark:text-muted-foreground">Log at least 2 entries to see your trend chart.</p>
