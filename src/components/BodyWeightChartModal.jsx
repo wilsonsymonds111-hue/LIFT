@@ -148,7 +148,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         : { month: 'short' };
     // Downsample to ~13 points so the chart isn't overloaded with data.
     // Each point is the average weight of its bucket (Apple Health style).
-    const maxPoints = timeFrame === 'M' ? 31 : timeFrame === '6M' ? 24 : 13;
+    const maxPoints = timeFrame === 'M' ? 31 : timeFrame === '6M' ? 15 : 13;
     const downsampled = downsample(filtered, maxPoints);
     // Use actual latest entry for the last point so the projection connects seamlessly
     if (downsampled.length > 0 && filtered.length > 0) {
