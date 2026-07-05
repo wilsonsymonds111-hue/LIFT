@@ -197,8 +197,8 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
   const textMuted = isCutting ? 'text-gray-500' : 'text-gray-500';
   const chipBg = isCutting ? 'bg-black/10' : 'bg-black/10';
   const skeletonBg = isCutting ? 'bg-black/10' : 'bg-black/10';
-  const sparkStroke = isCutting ? '#facc15' : '#3b82f6';
-  const sparkFill = isCutting ? '#facc15' : '#2563eb';
+  const sparkStroke = '#3b82f6';
+  const sparkFill = '#2563eb';
   const emeraldIcon = isCutting ? 'text-emerald-600' : 'text-emerald-600';
   const orangeIcon = isCutting ? 'text-orange-600' : 'text-orange-600';
 
@@ -207,11 +207,11 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
       <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] border border-gray-300/70 dark:border-zinc-700 shadow-[0_10px_30px_rgba(0,0,0,0.12),0_3px_8px_rgba(0,0,0,0.06),0_0_24px_rgba(253,224,71,0.18)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.4),0_3px_8px_rgba(0,0,0,0.25),0_0_24px_rgba(253,224,71,0.12)]"
-          style={{ background: 'linear-gradient(145deg, #fffef8 0%, #fffaee 40%, #fdf6e3 100%)' }}
+          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] border border-gray-300/70 dark:border-zinc-700 shadow-[0_10px_30px_rgba(0,0,0,0.12),0_3px_8px_rgba(0,0,0,0.06),0_0_24px_rgba(59,130,246,0.18)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.4),0_3px_8px_rgba(0,0,0,0.25),0_0_24px_rgba(59,130,246,0.12)]"
+          style={{ background: 'linear-gradient(145deg, #f8fbff 0%, #eff6ff 40%, #e0f2fe 100%)' }}
         >
           {/* Decorative glow */}
-          <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+          <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-blue-300/20 blur-2xl pointer-events-none" />
 
           <div className="relative p-5">
             {/* Top row: label + status pill + arrow */}
@@ -225,7 +225,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                     <span className="text-[10px] font-bold text-white uppercase">Bulking</span>
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 bg-amber-400 rounded-full px-2 py-0.5 shadow-sm">
+                  <span className="flex items-center gap-1 bg-blue-500 rounded-full px-2 py-0.5 shadow-sm">
                     <Flame className="w-3 h-3 text-white" />
                     <span className="text-[10px] font-bold text-white uppercase">Cutting</span>
                   </span>
