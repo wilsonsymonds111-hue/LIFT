@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, LogOut } from 'lucide-react';
+import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, LogOut, FileText } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
 import CreateAccountModal from './CreateAccountModal';
@@ -223,7 +223,9 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           onClick={onClose}
           className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70 mt-2"
         >
-          <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0" />
+          <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
+            <FileText className="w-4 h-4 text-foreground" />
+          </div>
           <div className="text-left">
             <p className="font-semibold text-foreground text-sm">Terms & Privacy</p>
             <p className="text-xs text-muted-foreground mt-0.5">Terms of Service & Privacy Policy</p>
