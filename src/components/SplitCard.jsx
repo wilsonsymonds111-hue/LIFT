@@ -164,7 +164,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
                   }}
                 />
                 <span className="relative text-lg font-extrabold font-display leading-tight text-white uppercase" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)', zIndex: 1 }}>
-                  {displayName.toUpperCase()}{splitLabel && <span className="normal-case"> ({splitLabel})</span>}
+                  {displayName.toUpperCase()}
                 </span>
               </div>
             </div>
