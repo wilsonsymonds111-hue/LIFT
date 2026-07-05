@@ -365,7 +365,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     return CHART_MARGIN.top + (1 - (v - lo) / (hi - lo)) * chartAreaHeight;
   };
 
-  const chartWidth = Math.max(280, data.length * pointWidth);
+  const chartWidth = containerWidth || 320;
 
   const StaticDot = (props) => {
     const { cx, cy, value } = props;
@@ -472,15 +472,8 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing select-none"
-          style={{ touchAction: 'pan-x', WebkitOverflowScrolling: 'touch' }}
-          onMouseDown={(e) => handleDragStart(e.clientX)}
-          onMouseMove={(e) => handleDragMove(e.clientX)}
-          onMouseUp={handleDragEnd}
-          onMouseLeave={handleDragEnd}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          className="overflow-hidden"
+          style={{ touchAction: 'pan-y' }}
         >
           <LineChart width={chartWidth} height={chartHeight} data={data} margin={CHART_MARGIN}>
             <YAxis domain={yDomain} hide allowDataOverflow />
