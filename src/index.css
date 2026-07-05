@@ -134,6 +134,9 @@
   position: relative;
   z-index: 1;
 }
+.dark .exercises-gradient {
+  background: #000000;
+}
 .dark .exercises-gradient::before {
   display: none;
 }
