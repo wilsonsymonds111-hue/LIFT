@@ -207,8 +207,8 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
       <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] border border-gray-300/70 dark:border-zinc-700 shadow-[0_10px_30px_rgba(0,0,0,0.12),0_3px_8px_rgba(0,0,0,0.06),0_0_24px_rgba(253,224,71,0.55)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.4),0_3px_8px_rgba(0,0,0,0.25),0_0_24px_rgba(253,224,71,0.35)]"
-          style={{ background: 'linear-gradient(145deg, #fffdf5 0%, #fff9e6 40%, #fef3c7 100%)' }}
+          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] border border-gray-300/70 dark:border-zinc-700 shadow-[0_10px_30px_rgba(0,0,0,0.12),0_3px_8px_rgba(0,0,0,0.06),0_0_24px_rgba(253,224,71,0.18)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.4),0_3px_8px_rgba(0,0,0,0.25),0_0_24px_rgba(253,224,71,0.12)]"
+          style={{ background: 'linear-gradient(145deg, #fffef8 0%, #fffaee 40%, #fdf6e3 100%)' }}
         >
           {/* Decorative glow */}
           <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" />
