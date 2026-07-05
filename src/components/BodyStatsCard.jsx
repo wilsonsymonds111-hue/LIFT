@@ -207,7 +207,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
       <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] bg-white dark:bg-card border border-gray-100 dark:border-border shadow-sm"
+          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] border border-gray-200/60 dark:border-border shadow-[0_8px_24px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.3),0_2px_6px_rgba(0,0,0,0.2)] body-stats-card-bg"
         >
           {/* Decorative glow */}
           <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" />
