@@ -54,7 +54,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
 
   const filtered = useMemo(() => {
     if (sorted.length === 0) return sorted;
-    const ranges = { 'D': 1, 'W': 7, 'M': 30, '6M': 180, 'Y': 365 };
+    const ranges = { 'M': 30, '6M': 180, 'Y': 365 };
     const days = ranges[timeFrame] || 180;
     const cutoff = new Date();
     cutoff.setHours(0, 0, 0, 0);
@@ -109,9 +109,14 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   };
 
   const chartData = useMemo(() => {
+    const dateFmt = timeFrame === 'M'
+      ? { day: 'numeric', month: 'short' }
+      : timeFrame === 'Y'
+        ? { month: 'narrow' }
+        : { month: 'short' };
     const data = filtered.map((e, i) => ({
       date: e.date,
-      dateLabel: new Date(e.date + 'T00:00:00').toLocaleDateString('en-GB', { month: 'short' }),
+      dateLabel: new Date(e.date + 'T00:00:00').toLocaleDateString('en-GB', dateFmt),
       weight: unit === 'lbs' ? kgToLbs(e.weight) : e.weight,
       id: e.id,
       isLatest: i === filtered.length - 1,
@@ -132,7 +137,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
           const projWeight = recent.weight + (goalData.weeklyChange * w);
           data.push({
             date: projDate.toISOString().split('T')[0],
-            dateLabel: projDate.toLocaleDateString('en-GB', { month: 'short' }),
+            dateLabel: projDate.toLocaleDateString('en-GB', dateFmt),
             weightProjection: unit === 'lbs' ? kgToLbs(projWeight) : projWeight,
           });
         }
@@ -143,16 +148,34 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       const bDate = new Date(b.date);
       return aDate - bDate;
     });
-  }, [filtered, unit, goalData, entries]);
+  }, [filtered, unit, goalData, entries, timeFrame]);
 
   const latestEntry = sorted.length > 0 ? sorted[sorted.length - 1] : null;
 
-  const displayLatest = useMemo(() => {
-    if (!latestEntry) return null;
-    return unit === 'lbs' ? kgToLbs(latestEntry.weight).toFixed(2) : String(latestEntry.weight);
-  }, [latestEntry, unit]);
+  const displayAverage = useMemo(() => {
+    if (filtered.length === 0) return null;
+    const sum = filtered.reduce((acc, e) => acc + e.weight, 0);
+    const avg = sum / filtered.length;
+    return unit === 'lbs' ? kgToLbs(avg).toFixed(2) : avg.toFixed(2);
+  }, [filtered, unit]);
 
-  const latestDateLabel = latestEntry ? fmtDate(latestEntry.date) : '';
+  const dateRangeLabel = useMemo(() => {
+    if (filtered.length === 0) return '';
+    const first = filtered[0];
+    const last = filtered[filtered.length - 1];
+    const fmtShort = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    if (first.date === last.date) return fmtShort(first.date);
+    return `${fmtShort(first.date)} – ${fmtShort(last.date)}`;
+  }, [filtered]);
+
+  const yDomain = useMemo(() => {
+    const values = chartData.map(d => d.weight).filter(v => v != null);
+    if (values.length === 0) return null;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const padding = Math.max((max - min) * 0.15, 1);
+    return [Math.floor(min - padding), Math.ceil(max + padding)];
+  }, [chartData]);
 
   let weeksAway = null;
   if (goalData && latestEntry) {
@@ -285,7 +308,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       {/* Metric section with unit toggle */}
        <div className="pb-2 pt-1">
          <div className="flex items-center justify-between mb-2">
-           <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">LATEST</p>
+           <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">AVERAGE</p>
            <div className="inline-flex bg-gray-200 dark:bg-zinc-800 rounded-full p-0.5">
              <button
                onClick={() => { setUnit('kg'); localStorage.setItem('weightUnit', 'kg'); }}
@@ -297,12 +320,12 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
              >lbs</button>
            </div>
          </div>
-         {displayLatest ? (
-           <p className="text-3xl font-bold text-black dark:text-foreground mt-0.5">{displayLatest} <span className="text-lg font-medium text-gray-400 dark:text-muted-foreground">{unit}</span></p>
+         {displayAverage ? (
+           <p className="text-3xl font-bold text-black dark:text-foreground mt-0.5">{displayAverage} <span className="text-lg font-medium text-gray-400 dark:text-muted-foreground">{unit}</span></p>
          ) : (
            <p className="text-3xl font-bold text-gray-300 dark:text-muted-foreground mt-0.5">—</p>
          )}
-         {latestDateLabel && <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{latestDateLabel}</p>}
+         {dateRangeLabel && <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{dateRangeLabel}</p>}
          </div>
 
          {/* Muscle Gain + Fat Loss */}
@@ -378,7 +401,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          {/* Time frame pills — full-width Apple Health style */}
          <div className="pb-3">
            <div className="flex bg-gray-200 dark:bg-zinc-800 rounded-full p-0.5 gap-0.5">
-             {['D', 'W', 'M', '6M', 'Y'].map(tf => (
+             {['M', '6M', 'Y'].map(tf => (
                <button
                  key={tf}
                  onClick={() => { setTimeFrame(tf); localStorage.setItem('bodyWeightTimeFrame', tf); }}
@@ -402,7 +425,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
               <LineChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" opacity={0.7} />
                 <XAxis dataKey="dateLabel" tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} interval="equidistantPreserveStartEnd" minTickGap={25} />
-                <YAxis orientation="right" allowDecimals={false} tickCount={5} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={32} />
+                <YAxis orientation="right" domain={yDomain || [0, 100]} allowDecimals={false} tickCount={5} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip
                   contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
                   labelStyle={{ color: '#8E8E93' }}
