@@ -34,7 +34,7 @@ export default function TemplateDetail() {
 
   if (!template) {
     return createPortal(
-      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
         <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
       </div>,
       document.body
@@ -60,7 +60,7 @@ export default function TemplateDetail() {
     : 'Not performed yet';
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
       <div className="relative bg-card rounded-3xl w-[90%] max-w-sm max-h-[85vh] flex flex-col shadow-2xl">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">

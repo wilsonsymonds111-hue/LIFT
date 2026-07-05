@@ -61,6 +61,9 @@ const LOADING_SPINNER = (
   </div>
 );
 
+// For modal routes (template detail) — dim background instead of solid black
+const MODAL_FALLBACK = <div className="fixed inset-0 bg-black/40" />;
+
 const SlideIn = memo(({ children, transparent }) => (
   <motion.div
     className={`w-full min-h-screen ${transparent ? '' : 'bg-background'}`}
@@ -177,7 +180,7 @@ const AnimatedRoutes = memo(() => {
       {/* Sub-page routes with slide-in transitions */}
       {!isTabRoute && (
         <div className={`w-full ${isModalRoute ? 'absolute inset-0 pointer-events-none' : 'flex-1'}`}>
-          <Suspense fallback={LOADING_SPINNER}>
+          <Suspense fallback={isModalRoute ? MODAL_FALLBACK : LOADING_SPINNER}>
             <AnimatePresence mode="wait">
               <Routes location={location} key={location.pathname}>
                 <Route path="/template/new" element={<SlideIn><NewTemplate /></SlideIn>} />
