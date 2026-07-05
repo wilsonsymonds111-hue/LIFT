@@ -79,7 +79,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     <>
     <div className="mb-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
       <div className="flex items-start gap-3">
-        <h3 className="text-blue-500 font-semibold text-sm select-none cursor-grab active:cursor-grabbing flex-1 leading-snug" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
+        <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing flex-1 leading-snug" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
         {exerciseImage ? (
           <img
             src={exerciseImage}
@@ -94,7 +94,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           </div>
         )}
       </div>
-      <div className="relative mt-1">
+      <div className="relative -mt-1">
         <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
           <MoreHorizontal className="w-4 h-4 text-gray-700 dark:text-gray-200" />
         </button>
@@ -134,7 +134,6 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         />
       )}
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
-      <div className="h-3" />
       {sets.map((s, i) => (
         <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
         <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg ?? (i === 0 && prev ? prev.kg : null)} initialReps={s.suggestedReps ?? (i === 0 && prev ? prev.reps + 1 : null)} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
