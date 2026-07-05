@@ -169,12 +169,27 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   }, [filtered]);
 
   const yDomain = useMemo(() => {
-    const values = chartData.map(d => d.weight).filter(v => v != null);
+    const values = chartData.flatMap(d => [d.weight, d.weightProjection]).filter(v => v != null);
     if (values.length === 0) return null;
     const min = Math.min(...values);
     const max = Math.max(...values);
-    const padding = Math.max((max - min) * 0.15, 1);
-    return [Math.floor(min - padding), Math.ceil(max + padding)];
+    const padding = Math.max((max - min) * 0.1, 1);
+    const rangeMin = min - padding;
+    const rangeMax = max + padding;
+    // Pick a "nice" step (1, 2, 5, 10, 20, 50 …) so ticks land on round numbers
+    const rawStep = (rangeMax - rangeMin) / 4;
+    const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const normalized = rawStep / magnitude;
+    let step;
+    if (normalized < 1.5) step = magnitude;
+    else if (normalized < 3) step = 2 * magnitude;
+    else if (normalized < 7) step = 5 * magnitude;
+    else step = 10 * magnitude;
+    const niceMin = Math.floor(rangeMin / step) * step;
+    const niceMax = Math.ceil(rangeMax / step) * step;
+    const ticks = [];
+    for (let v = niceMin; v <= niceMax + step / 2; v += step) ticks.push(v);
+    return { domain: [niceMin, niceMax], ticks };
   }, [chartData]);
 
   let weeksAway = null;
@@ -425,7 +440,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
               <LineChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" opacity={0.7} />
                 <XAxis dataKey="dateLabel" tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} interval="equidistantPreserveStartEnd" minTickGap={25} />
-                <YAxis orientation="right" domain={yDomain || [0, 100]} allowDecimals={false} tickCount={5} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={32} />
+                <YAxis orientation="right" domain={yDomain?.domain || [0, 100]} ticks={yDomain?.ticks} allowDecimals={false} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip
                   contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
                   labelStyle={{ color: '#8E8E93' }}
