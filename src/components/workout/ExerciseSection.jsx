@@ -151,6 +151,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         />
       )}
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
+      <div className="h-3" />
       {sets.map((s, i) => (
         <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
         <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg ?? (i === 0 && prev ? prev.kg : null)} initialReps={s.suggestedReps ?? (i === 0 && prev ? prev.reps + 1 : null)} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
