@@ -27,7 +27,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
     try { return localStorage.getItem('goalMode') || null; } catch { return null; }
   });
 
-  // Load goalMode from the cloud user entity so it syncs across devices
+  // Load goalMode from the cloud user entity so it syncs across devices.
   useEffect(() => {
     base44.auth.me().then(user => {
       if (user?.goalMode) {
