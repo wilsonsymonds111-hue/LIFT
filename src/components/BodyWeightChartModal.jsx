@@ -250,7 +250,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
           <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-muted active:scale-95 transition">
             <ChevronLeft className="w-6 h-6 text-purple-500" />
           </button>
-          <h1 className="text-base font-semibold text-black dark:text-foreground">Bodyweight</h1>
+          <h1 className="text-xl font-bold text-black dark:text-foreground">Bodyweight</h1>
           <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-muted active:scale-95 transition">
             <Plus className="w-5 h-5 text-purple-500" />
           </button>
