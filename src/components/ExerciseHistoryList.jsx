@@ -45,12 +45,10 @@ export default function ExerciseHistoryList({ history, exerciseName, onEntryDele
               key={idx}
               className="flex items-center justify-between bg-muted/60 rounded-lg px-3 py-2"
             >
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-foreground">
-                  {isBodyweight ? `${reps} reps` : `${kg} kg × ${reps}`}
-                </span>
-                <span className="text-xs text-muted-foreground">{formatDate(entry.date)}</span>
-              </div>
+              <span className="text-sm font-semibold text-foreground">
+                {isBodyweight ? `${reps} reps` : `${kg} kg × ${reps}`}
+              </span>
+              <span className="text-xs text-muted-foreground text-center flex-1">{formatDate(entry.date)}</span>
               <button
                 onClick={() => handleDelete(idx)}
                 disabled={deletingIdx === idx}
