@@ -64,7 +64,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   });
   const [goalError, setGoalError] = useState('');
   const fileInputRef = useRef(null);
-  const [projectionReveal, setProjectionReveal] = useState(1);
+  const [projectionReveal, setProjectionReveal] = useState(2);
   const dragStartX = useRef(null);
 
   // Persist the goal to the user entity so it survives across sessions and
@@ -80,7 +80,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
 
   // Reset projection reveal when time frame or goal changes
   useEffect(() => {
-    setProjectionReveal(1);
+    setProjectionReveal(2);
   }, [timeFrame, goalData]);
 
   const sorted = useMemo(() =>
@@ -360,18 +360,18 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={onClose}>
       <div className="absolute inset-0" onClick={onClose} />
       <div
-        className="relative w-full max-w-2xl mx-auto bg-gray-100 dark:bg-zinc-900 rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-2.5rem)] mt-10"
+        className="relative w-full max-w-2xl mx-auto bg-gray-100 dark:bg-zinc-900 rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-4rem)] mt-16"
         style={{}}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
-          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-zinc-800 ring-1 ring-gray-200 dark:ring-white/20 shadow-sm active:scale-95 transition">
-            <ChevronLeft className="w-5 h-5 text-gray-900 dark:text-foreground" />
+          <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full bg-white dark:bg-zinc-800 ring-1 ring-gray-200 dark:ring-white/20 shadow-sm active:scale-95 transition">
+            <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-foreground" />
           </button>
           <h1 className="text-2xl font-bold text-black dark:text-foreground">Bodyweight</h1>
-          <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-zinc-800 ring-1 ring-gray-200 dark:ring-white/20 shadow-sm active:scale-95 transition">
-            <Plus className="w-5 h-5 text-gray-900 dark:text-foreground" />
+          <button onClick={() => setShowKeypad(true)} className="w-11 h-11 flex items-center justify-center rounded-full bg-white dark:bg-zinc-800 ring-1 ring-gray-200 dark:ring-white/20 shadow-sm active:scale-95 transition">
+            <Plus className="w-6 h-6 text-gray-900 dark:text-foreground" />
           </button>
         </div>
 
