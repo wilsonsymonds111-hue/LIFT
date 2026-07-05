@@ -81,7 +81,25 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   const result = useMemo(() => {
     if (!history || history.length === 0) return { empty: true };
     const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
-    const allPoints = history.map(toPoint);
+    let allPoints = history.map(toPoint);
+
+    // Limit to 15 data points — aggregate into evenly distributed buckets
+    const MAX_POINTS = 15;
+    if (allPoints.length > MAX_POINTS) {
+      const bucketSize = allPoints.length / MAX_POINTS;
+      const aggregated = [];
+      for (let i = 0; i < MAX_POINTS; i++) {
+        const start = Math.floor(i * bucketSize);
+        const end = Math.floor((i + 1) * bucketSize);
+        const bucket = allPoints.slice(start, Math.max(end, start + 1));
+        if (bucket.length === 0) continue;
+        const avgKg = bucket.reduce((s, p) => s + (p.kg || 0), 0) / bucket.length;
+        const avgReps = bucket.reduce((s, p) => s + (p.reps || 0), 0) / bucket.length;
+        aggregated.push({ kg: Math.round(avgKg * 10) / 10, reps: Math.round(avgReps), date: bucket[bucket.length - 1].date });
+      }
+      allPoints = aggregated;
+    }
+
     const getValue = (p) => isBodyweight ? p.reps : p.kg;
     const idx = allPoints.length - 1;
 
@@ -112,24 +130,30 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     return { data: d, lastRealIdx: idx };
   }, [history, isBodyweight]);
 
-  // Y-axis domain — auto-fit to data with padding so nothing is cut off
-  const yDomain = useMemo(() => {
-    if (!result.data || result.data.length === 0) return [0, 100];
+  // Y-axis domain — "nice" rounded ticks (1, 2, 5, 10, 20, 50 …) like the body weight chart
+  const { domain: yDomain, ticks: yTicks } = useMemo(() => {
+    if (!result.data || result.data.length === 0) return { domain: [0, 100], ticks: [] };
     const vals = result.data.map(x => x.valStatic ?? x.valNew).filter(v => v != null);
-    if (vals.length === 0) return [0, 100];
+    if (vals.length === 0) return { domain: [0, 100], ticks: [] };
     const min = Math.min(...vals);
     const max = Math.max(...vals);
-    if (isBodyweight) {
-      const step = Math.max(2, Math.round((max - min || 2) / 4));
-      const yMin = Math.max(0, Math.floor(min / step) * step - step);
-      const yMax = Math.ceil(max / step) * step + step;
-      return [yMin, yMax];
-    }
-    const step = 5;
-    const yMin = Math.max(0, Math.floor(min / step) * step - step);
-    const yMax = Math.ceil(max / step) * step + step;
-    return [yMin, yMax];
-  }, [result.data, isBodyweight]);
+    const padding = Math.max((max - min) * 0.1, 2.5);
+    const rangeMin = min - padding;
+    const rangeMax = max + padding;
+    const rawStep = (rangeMax - rangeMin) / 4;
+    const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
+    const normalized = rawStep / magnitude;
+    let step;
+    if (normalized < 1.5) step = magnitude;
+    else if (normalized < 3) step = 2 * magnitude;
+    else if (normalized < 7) step = 5 * magnitude;
+    else step = 10 * magnitude;
+    const niceMin = Math.floor(rangeMin / step) * step;
+    const niceMax = Math.ceil(rangeMax / step) * step;
+    const ticks = [];
+    for (let v = niceMin; v <= niceMax + step / 2; v += step) ticks.push(v);
+    return { domain: [niceMin, niceMax], ticks };
+  }, [result.data]);
 
   if (result.empty) return null;
   const { data, lastRealIdx } = result;
@@ -137,7 +161,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   const StaticDot = (props) => {
     const { cx, cy, value } = props;
     if (value == null) return <g />;
-    return <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
+    return <circle cx={cx} cy={cy} r={4} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
   };
 
   const NewDot = (props) => {
@@ -146,19 +170,19 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const isNewest = index === lastRealIdx;
     if (isNewest) {
       if (freshAnim && animDir === 'remove') {
-        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} className="retract-dot" />;
+        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={5} fill="#fff" stroke="#3b82f6" strokeWidth={2} className="retract-dot" />;
       }
       if (freshAnim && animDir === 'add') {
         return (
           <g key={`dot-${animKey}`}>
-            <circle cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} className="snap-dot" />
+            <circle cx={cx} cy={cy} r={5} fill="#fff" stroke="#3b82f6" strokeWidth={2} className="snap-dot" />
             <circle cx={cx} cy={cy} r={4} className="ripple-ring" />
           </g>
         );
       }
-      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#3b82f6" stroke="white" strokeWidth={2} />;
+      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={5} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
     }
-    return <g />;
+    return <circle cx={cx} cy={cy} r={4} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
   };
 
   const CustomTooltip = ({ active, payload }) => {
@@ -186,11 +210,11 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       )}
       <ResponsiveContainer width="100%" height={chartHeight}>
         <LineChart data={data} margin={{ top: 20, right: 12, left: 0, bottom: 4 }}>
-          <YAxis domain={yDomain} tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} width={36} allowDataOverflow />
+          <YAxis domain={yDomain} ticks={yTicks} tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} width={36} allowDataOverflow />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval="equidistantPreserveStartEnd" minTickGap={20} />
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
-          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
+          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#fff', stroke: '#3b82f6', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
         </LineChart>
       </ResponsiveContainer>
     </div>
