@@ -28,7 +28,7 @@ const STEPS = [
     subtitle: 'Hit the blue Export button to generate your CSV file',
     image: SCREENSHOTS.export,
     // Blue export button near bottom of modal
-    highlight: { top: '64%', left: '15%', width: '70%', height: '6%' },
+    highlight: { top: '61%', left: '15%', width: '70%', height: '6%' },
   },
   {
     title: 'Save to Files',
