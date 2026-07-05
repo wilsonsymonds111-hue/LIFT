@@ -558,22 +558,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
           </div>
         )}
 
-        {/* Apple Health Import */}
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={importing}
-          className="w-full flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 mb-4 border border-gray-200 dark:border-border shadow-sm transition active:opacity-70 disabled:opacity-50"
-        >
-          <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/b393a622b_image.png" alt="Apple Health" className="w-10 h-10 rounded-[10px] object-cover flex-shrink-0 shadow-sm" />
-          <div className="text-left flex-1">
-            <p className="font-semibold text-black dark:text-foreground text-sm">Import from Apple Health</p>
-            <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">Export your Body Mass data as CSV</p>
-          </div>
-          {importing ? <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin flex-shrink-0" /> : <ChevronRight className="w-5 h-5 text-gray-300 dark:text-muted-foreground flex-shrink-0" />}
-        </button>
-        <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleAppleHealthImport} />
-        {importMsg && <p className="text-xs text-center text-gray-500 dark:text-muted-foreground mb-4 px-4">{importMsg}</p>}
-
         {/* History list */}
         <p className="font-semibold text-black dark:text-foreground text-sm mb-2 px-1">History</p>
         <div className="bg-white dark:bg-card rounded-2xl shadow-sm overflow-hidden">
