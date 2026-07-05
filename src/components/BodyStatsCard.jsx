@@ -254,7 +254,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                   <div className="h-14 w-28 bg-gray-100 dark:bg-muted rounded-lg animate-pulse" />
                 ) : latest ? (
                   <>
-                    <span className="text-5xl font-bold text-gray-900 dark:text-foreground leading-none">{latest.weight}</span>
+                    <span className="text-4xl font-bold text-gray-900 dark:text-foreground leading-none">{latest.weight}</span>
                     <span className="text-lg text-gray-500 dark:text-muted-foreground font-medium mb-1">kg</span>
                   </>
                 ) : (
