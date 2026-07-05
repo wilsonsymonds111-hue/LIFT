@@ -37,7 +37,7 @@ const EXERCISE_IMAGES = [
 
 const TEXT_COLORS = [
   { title: 'text-blue-600', subtitle: 'text-blue-500', accent: 'bg-blue-100/50 text-blue-700' },
-  { title: 'text-amber-600', subtitle: 'text-amber-500', accent: 'bg-amber-100/50 text-amber-700' },
+  { title: 'text-amber-600', subtitle: 'text-amber-400', accent: 'bg-amber-100/50 text-amber-700' },
   { title: 'text-emerald-600', subtitle: 'text-emerald-500', accent: 'bg-emerald-100/50 text-emerald-700' },
   { title: 'text-rose-600', subtitle: 'text-rose-500', accent: 'bg-rose-100/50 text-rose-700' },
 ];
