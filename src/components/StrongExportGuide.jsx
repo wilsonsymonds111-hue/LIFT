@@ -60,22 +60,18 @@ export default function StrongExportGuide({ onComplete }) {
 
       {/* Screenshot in phone frame */}
       <div className="relative mx-auto" style={{ width: 150, height: 315 }}>
-        {/* Phone body */}
-        <div className="absolute inset-0 rounded-[2.2rem] bg-[#1A1A1A] shadow-2xl" />
-        {/* Side buttons - left */}
-        <div className="absolute left-[-2px] top-[14%] w-[2px] h-[7%] rounded-l bg-[#8C8C8C]" />
-        <div className="absolute left-[-2px] top-[23%] w-[2px] h-[4%] rounded-l bg-[#8C8C8C]" />
-        <div className="absolute left-[-2px] top-[29%] w-[2px] h-[4%] rounded-l bg-[#8C8C8C]" />
-        {/* Side button - right */}
-        <div className="absolute right-[-2px] top-[22%] w-[2px] h-[9%] rounded-r bg-[#8C8C8C]" />
-        {/* Dynamic Island */}
-        <div className="absolute top-[6px] left-1/2 -translate-x-1/2 w-[50px] h-[14px] bg-black rounded-full z-20" />
-        {/* Screen */}
-        <div className="absolute inset-[3px] rounded-[2rem] overflow-hidden z-10 bg-white">
+        {/* Phone frame PNG (transparent screen) */}
+        <img
+          src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/69b193eac_image.png"
+          alt="iPhone frame"
+          className="absolute inset-0 w-full h-full object-contain z-30 pointer-events-none"
+        />
+        {/* Screen content */}
+        <div className="absolute rounded-[2rem] overflow-hidden z-10 bg-white" style={{ top: '1.5%', left: '4%', right: '4%', bottom: '1.5%' }}>
           <img
-          src={current.image}
-          alt={`Step ${step + 1}: ${current.title}`}
-          className="w-full h-full object-cover object-top"
+            src={current.image}
+            alt={`Step ${step + 1}: ${current.title}`}
+            className="w-full h-full object-cover object-top"
           />
           {/* Pulsing highlight overlay */}
           <div
@@ -90,8 +86,6 @@ export default function StrongExportGuide({ onComplete }) {
             <div className="absolute inset-0 rounded-lg bg-blue-500/20 animate-ping" />
             <div className="absolute inset-0 rounded-lg border-[3px] border-blue-500 bg-blue-500/10" />
           </div>
-          {/* Home indicator */}
-          <div className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[40px] h-[3px] bg-black/30 rounded-full z-20" />
         </div>
       </div>
 
