@@ -176,7 +176,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         />
       )}
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
-      <div className="grid grid-cols-[40px_1fr_80px_80px_44px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
+      <div className="grid grid-cols-[36px_1fr_72px_72px_40px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-2 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
         <span className="text-center">kg</span>
