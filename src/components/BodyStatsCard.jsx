@@ -282,12 +282,10 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                       <span className={`text-[11px] font-semibold ${textPrimary}`}>+{prediction.muscleGainG}g muscle</span>
                     </div>
                   )}
-                  {fatLossG > 0 && (
-                    <div className={`flex items-center gap-1 ${chipBg} rounded-full px-2.5 py-1`}>
-                      <TrendingDown className={`w-3 h-3 ${orangeIcon}`} />
-                      <span className={`text-[11px] font-semibold ${textPrimary}`}>{fatLossG}g fat lost</span>
-                    </div>
-                  )}
+                  <div className={`flex items-center gap-1 ${chipBg} rounded-full px-2.5 py-1`}>
+                    <TrendingDown className={`w-3 h-3 ${orangeIcon}`} />
+                    <span className={`text-[11px] font-semibold ${textPrimary}`}>{fatLossG || 0}g fat lost</span>
+                  </div>
                 </>
               ) : muscleLoading ? (
                 <div className={`h-6 w-28 ${chipBg} rounded-full animate-pulse`} />
