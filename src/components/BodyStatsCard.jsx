@@ -272,7 +272,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                     strokeLinejoin="round"
                   />
                   {sparklinePoints.map((p, i) => (
-                    <circle key={i} cx={p.x} cy={p.y} r="1.5" fill={sparkFill} />
+                    <circle key={i} cx={p.x} cy={p.y} r="2" fill="#fff" stroke={sparkStroke} strokeWidth="1.5" />
                   ))}
                 </svg>
               )}
