@@ -4,11 +4,13 @@ import { X, Upload, CheckCircle2, AlertCircle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { queryClientInstance } from '@/lib/query-client';
 import { invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
+import StrongExportGuide from './StrongExportGuide';
 
 export default function ImportStrongModal({ onClose }) {
   const [status, setStatus] = useState('idle'); // idle | uploading | importing | success | error
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [showGuide, setShowGuide] = useState(true);
   const fileInputRef = useRef(null);
 
   const handleFile = async (e) => {
@@ -91,19 +93,21 @@ export default function ImportStrongModal({ onClose }) {
               Try Again
             </button>
           </div>
+        ) : showGuide ? (
+          <>
+            <p className="text-xs text-muted-foreground text-center -mt-1">
+              Follow these steps in the Strong app to get your export file.
+            </p>
+            <StrongExportGuide onComplete={() => { setShowGuide(false); setTimeout(() => fileInputRef.current?.click(), 100); }} />
+            <button
+              onClick={() => setShowGuide(false)}
+              className="text-xs text-muted-foreground text-center w-full pt-1"
+            >
+              Skip guide — I already have my file
+            </button>
+          </>
         ) : (
           <>
-            <div className="bg-muted rounded-2xl p-4 space-y-3">
-              <p className="text-sm font-semibold text-foreground">How to export from Strong:</p>
-              <ol className="text-xs text-muted-foreground space-y-1.5 list-decimal list-inside">
-                <li>Open the <strong>Strong</strong> app</li>
-                <li>Go to <strong>Settings</strong></li>
-                <li>Tap <strong>Export CSV</strong></li>
-                <li>Save the file to your device</li>
-                <li>Upload it below</li>
-              </ol>
-            </div>
-
             <input
               ref={fileInputRef}
               type="file"
@@ -128,6 +132,13 @@ export default function ImportStrongModal({ onClose }) {
                   Select CSV File
                 </>
               )}
+            </button>
+
+            <button
+              onClick={() => setShowGuide(true)}
+              className="text-xs text-blue-500 text-center w-full"
+            >
+              Show the guide again
             </button>
 
             <p className="text-xs text-muted-foreground text-center">
