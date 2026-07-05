@@ -53,14 +53,6 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
                 {isCompleted && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
                 {isGymDay && !isCompleted && <Dumbbell className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />}
               </div>
-              {/* Workout name beneath */}
-              <span
-                className={`text-[10px] font-semibold mt-1.5 leading-tight text-center whitespace-nowrap max-w-[56px] truncate ${
-                  isToday ? 'text-blue-500 dark:text-blue-400' : 'text-muted-foreground'
-                }`}
-              >
-                {rotatedNames[i] || (isGymDay ? '' : 'Rest')}
-              </span>
             </div>
           );
         })}
