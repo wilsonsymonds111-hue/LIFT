@@ -213,17 +213,14 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             {/* Header: icon + label + status | date + chevron */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-red-50 dark:bg-red-950/30">
-                  <Activity className="w-5 h-5 text-red-500" />
-                </div>
-                <span className="text-base font-semibold text-gray-900 dark:text-foreground">Body Stats</span>
+                <span className="text-base font-semibold text-gray-900 dark:text-foreground">Body Weight</span>
                 {goalMode === 'bulking' ? (
                   <span className="flex items-center gap-1 bg-blue-500 rounded-full px-1.5 py-0.5">
                     <BicepsFlexed className="w-2.5 h-2.5 text-white" />
                     <span className="text-[9px] font-bold text-white uppercase">Bulking</span>
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 bg-blue-500 rounded-full px-1.5 py-0.5">
+                  <span className="flex items-center gap-1 bg-[#F59E0B] rounded-full px-1.5 py-0.5">
                     <Flame className="w-2.5 h-2.5 text-white" />
                     <span className="text-[9px] font-bold text-white uppercase">Cutting</span>
                   </span>
