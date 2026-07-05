@@ -78,73 +78,71 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   return (
     <>
     <div className="mb-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
-      <div className="relative mb-1.5">
-        <div className="relative flex-shrink-0">
-          <button onClick={() => setShowMenu(m => !m)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-            <MoreHorizontal className="w-4 h-4 text-gray-400" />
-          </button>
-          {showMenu && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute left-0 top-9 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 min-w-[190px]">
-                <button
-                  onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
-                >
-                  {showNote ? 'Hide Note' : 'Add a Note'}
-                </button>
-                <button
-                  onClick={() => setShowCustomRest(c => !c)}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
-                >
-                  Change Default Rest Time
-                </button>
-                {showCustomRest && (
-                  <div className="px-4 pb-2 flex items-center gap-2">
-                    <input
-                      type="number"
-                      value={customRestInput}
-                      onChange={e => setCustomRestInput(e.target.value)}
-                      placeholder="sec"
-                      className="w-16 text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <button
-                      onClick={() => {
-                        const s = parseInt(customRestInput);
-                        if (s > 0) { setRestDuration(s); setRestEnabled(true); }
-                        setShowCustomRest(false); setShowMenu(false);
-                      }}
-                      className="text-xs bg-blue-500 text-white px-2 py-1 rounded-lg font-semibold"
-                    >Set</button>
-                  </div>
-                )}
-                <button
-                  onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
-                >
-                  Remove Exercise
-                </button>
-              </div>
-            </>
-            )}
+      <div className="flex items-start gap-3 mb-1">
+        <h3 className="text-blue-500 font-semibold text-sm select-none cursor-grab active:cursor-grabbing flex-1 leading-snug" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
+        {exerciseImage ? (
+          <img
+            src={exerciseImage}
+            alt={exercise.name}
+            className="w-28 h-20 rounded-xl object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
+            decoding="async"
+            onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
+          />
+        ) : (
+          <div className="w-28 h-20 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+            <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
+          </div>
+        )}
+      </div>
+      <div className="relative flex-shrink-0">
+        <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+          <MoreHorizontal className="w-4 h-4 text-gray-400" />
+        </button>
+        {showMenu && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+            <div className="absolute left-0 top-8 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 min-w-[190px]">
+              <button
+                onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
+                className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
+              >
+                {showNote ? 'Hide Note' : 'Add a Note'}
+              </button>
+              <button
+                onClick={() => setShowCustomRest(c => !c)}
+                className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
+              >
+                Change Default Rest Time
+              </button>
+              {showCustomRest && (
+                <div className="px-4 pb-2 flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={customRestInput}
+                    onChange={e => setCustomRestInput(e.target.value)}
+                    placeholder="sec"
+                    className="w-16 text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  />
+                  <button
+                    onClick={() => {
+                      const s = parseInt(customRestInput);
+                      if (s > 0) { setRestDuration(s); setRestEnabled(true); }
+                      setShowCustomRest(false); setShowMenu(false);
+                    }}
+                    className="text-xs bg-blue-500 text-white px-2 py-1 rounded-lg font-semibold"
+                  >Set</button>
+                </div>
+              )}
+              <button
+                onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
+                className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
+              >
+                Remove Exercise
+              </button>
             </div>
-            <div className="flex items-start gap-3">
-            <h3 className="text-blue-500 font-semibold text-sm select-none cursor-grab active:cursor-grabbing flex-1 leading-snug" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
-            {exerciseImage ? (
-              <img
-                src={exerciseImage}
-                alt={exercise.name}
-                className="w-28 h-20 rounded-xl object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
-                decoding="async"
-                onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
-              />
-            ) : (
-              <div className="w-28 h-20 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
-              </div>
-            )}
-            </div>
-            </div>
+          </>
+        )}
+      </div>
             {showNote && (
         <textarea
           value={note}
