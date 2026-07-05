@@ -195,6 +195,10 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
     }));
   }, [sparkData]);
 
+  const handleGoalModeChange = useCallback((mode) => {
+    setGoalMode(mode);
+  }, []);
+
   const handleMuscleClick = () => {
     if (prediction) setShowMuscleModal(true);
     else if (!muscleLoading) compute(true);
@@ -293,6 +297,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
           refreshing={refreshing}
           fatLossG={fatLossG}
           onRecalculate={() => compute(true)}
+          onGoalModeChange={handleGoalModeChange}
         />
       )}
 

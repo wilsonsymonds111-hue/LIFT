@@ -41,38 +41,38 @@
   }
 
   .dark {
-    --background: 225 10% 8%;
-    --foreground: 225 10% 90%;
-    --card: 225 8% 15%;
-    --card-foreground: 225 10% 90%;
-    --popover: 225 8% 18%;
-    --popover-foreground: 225 10% 90%;
-    --primary: 225 10% 90%;
-    --primary-foreground: 225 10% 10%;
-    --secondary: 225 6% 20%;
-    --secondary-foreground: 225 10% 90%;
-    --muted: 225 6% 22%;
-    --muted-foreground: 225 8% 65%;
-    --accent: 225 6% 20%;
-    --accent-foreground: 225 10% 90%;
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 17%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 17%;
+    --muted-foreground: 0 0% 56%;
+    --accent: 0 0% 17%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 65% 48%;
     --destructive-foreground: 0 0% 98%;
-    --border: 225 6% 24%;
-    --input: 225 6% 24%;
-    --ring: 225 8% 60%;
+    --border: 0 0% 20%;
+    --input: 0 0% 17%;
+    --ring: 0 0% 56%;
     --chart-1: 220 80% 60%;
     --chart-2: 160 70% 50%;
     --chart-3: 35 85% 58%;
     --chart-4: 280 70% 62%;
     --chart-5: 340 80% 58%;
-    --sidebar-background: 225 10% 10%;
-    --sidebar-foreground: 225 10% 90%;
-    --sidebar-primary: 224 76% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 225 6% 17%;
-    --sidebar-accent-foreground: 225 10% 90%;
-    --sidebar-border: 225 6% 22%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 11%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 0 0% 56%;
     --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, 'SF Pro Rounded', 'Helvetica Neue', sans-serif;
   }
 }
@@ -84,7 +84,7 @@
   background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
 }
 .dark .body-stats-card-bg {
-  background: linear-gradient(145deg, hsl(225 8% 18%) 0%, hsl(225 8% 14%) 100%);
+  background: linear-gradient(145deg, hsl(0 0% 11%) 0%, hsl(0 0% 8%) 100%);
 }
 
 /* Apple Health-style neutral grey gradient background */
@@ -108,10 +108,10 @@
   z-index: 1;
 }
 .dark .health-gradient {
-  background: #0f0f12;
+  background: #000000;
 }
 .dark .health-gradient::before {
-  background: linear-gradient(180deg, hsl(225 8% 16%) 0%, hsl(225 8% 14%) 25%, hsl(225 8% 12%) 50%, hsl(225 8% 10%) 75%, transparent 100%);
+  background: linear-gradient(180deg, hsl(0 0% 17%) 0%, hsl(0 0% 14%) 25%, hsl(0 0% 11%) 50%, hsl(0 0% 8%) 75%, transparent 100%);
 }
 
 /* Exercises page gradient: blue fades to grey by ~60%, then stays grey */
@@ -135,7 +135,7 @@
   z-index: 1;
 }
 .dark .exercises-gradient::before {
-  background: linear-gradient(180deg, hsl(225 8% 16%) 0%, hsl(225 8% 14%) 25%, hsl(225 8% 12%) 50%, hsl(225 8% 10%) 75%, transparent 100%);
+  background: linear-gradient(180deg, hsl(0 0% 17%) 0%, hsl(0 0% 14%) 25%, hsl(0 0% 11%) 50%, hsl(0 0% 8%) 75%, transparent 100%);
 }
 
 /* Semi-transparent sticky header that blends with the gradient */
@@ -145,7 +145,7 @@
   -webkit-backdrop-filter: blur(10px);
 }
 .dark .glass-header {
-  background: rgba(21, 22, 31, 0.75);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 /* Exercise detail shimmer – defined once, not injected per render */

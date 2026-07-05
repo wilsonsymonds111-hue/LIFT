@@ -31,7 +31,7 @@ const downsample = (data, maxPoints) => {
   return result;
 };
 
-export default function BodyWeightChartModal({ entries, onClose, onChanged, prediction, muscleLoading, refreshing, fatLossG, onRecalculate }) {
+export default function BodyWeightChartModal({ entries, onClose, onChanged, prediction, muscleLoading, refreshing, fatLossG, onRecalculate, onGoalModeChange }) {
   const [timeFrame, setTimeFrame] = useState(() => localStorage.getItem('bodyWeightTimeFrame') || '6M');
   const [showKeypad, setShowKeypad] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
@@ -68,6 +68,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
     setGoalMode(mode);
     localStorage.setItem('goalMode', mode);
     base44.auth.updateMe({ goalMode: mode }).catch(() => {});
+    onGoalModeChange?.(mode);
   };
   const [goalWeight, setGoalWeight] = useState('');
   const [goalRate, setGoalRate] = useState('0.5');
@@ -232,7 +233,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
 
   const displayLatest = useMemo(() => {
     if (!latestEntry) return null;
-    return unit === 'lbs' ? kgToLbs(latestEntry.weight).toFixed(2) : latestEntry.weight.toFixed(2);
+    const val = unit === 'lbs' ? kgToLbs(latestEntry.weight) : latestEntry.weight;
+    return parseFloat(val.toFixed(2)).toString();
   }, [latestEntry, unit]);
 
   const dateRangeLabel = useMemo(() => {
@@ -358,13 +360,13 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={onClose}>
       <div className="absolute inset-0" onClick={onClose} />
       <div
-        className="relative w-full max-w-2xl mx-auto bg-gray-100 dark:bg-zinc-900 rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-4rem)] mt-16"
+        className="relative w-full max-w-2xl mx-auto bg-gray-100 dark:bg-background rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-4rem)] mt-16"
         style={{}}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
-          <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full bg-white dark:bg-zinc-800 ring-2 ring-white shadow-sm active:scale-95 transition">
+          <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full bg-white dark:bg-muted ring-2 ring-white shadow-sm active:scale-95 transition">
             <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-foreground" />
           </button>
           <h1 className="text-2xl font-bold text-black dark:text-foreground">Bodyweight</h1>
@@ -375,7 +377,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
 
         {/* Cutting / Bulking toggle */}
         <div className="flex justify-center px-4 pb-2 flex-shrink-0">
-          <div className="inline-flex bg-gray-200 dark:bg-zinc-800 rounded-full p-0.5">
+          <div className="inline-flex bg-gray-200 dark:bg-muted rounded-full p-0.5">
             <button
               onClick={() => changeGoalMode('cutting')}
               className={`flex items-center justify-center gap-1.5 px-5 py-1.5 rounded-full text-xs font-bold uppercase transition ${
@@ -412,7 +414,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
 
          {/* Time frame pills — full-width Apple Health style */}
          <div className="pb-3">
-           <div className="flex bg-gray-200 dark:bg-zinc-800 rounded-full p-0.5 gap-0.5">
+           <div className="flex bg-gray-200 dark:bg-muted rounded-full p-0.5 gap-0.5">
              {['M', '6M', 'Y', 'ALL'].map(tf => (
                <button
                  key={tf}
@@ -478,7 +480,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       {/* Goal section */}
       {goalData && (
         <div className="pb-3">
-          <div className="relative bg-white dark:bg-zinc-800 rounded-2xl p-4 border border-gray-200 dark:border-border shadow-sm">
+          <div className="relative bg-white dark:bg-muted rounded-2xl p-4 border border-gray-200 dark:border-border shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-white overflow-hidden">
                 <TargetArrowIcon className="w-10 h-10" />
@@ -645,7 +647,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                 onMouseLeave={() => setPressedId(null)}
               >
                 <div className="flex-1">
-                  <span className="font-semibold text-black dark:text-foreground text-sm">{unit === 'lbs' ? kgToLbs(entry.weight).toFixed(2) : entry.weight} {unit}</span>
+                  <span className="font-semibold text-black dark:text-foreground text-sm">{parseFloat((unit === 'lbs' ? kgToLbs(entry.weight) : entry.weight).toFixed(2)).toString()} {unit}</span>
                 </div>
                 <span className="text-xs text-gray-500 dark:text-muted-foreground">{fmtDate(entry.date)}</span>
               </div>
