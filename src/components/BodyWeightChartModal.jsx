@@ -362,7 +362,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
           <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 shadow-sm active:scale-95 transition">
             <ChevronLeft className="w-5 h-5 text-gray-900 dark:text-foreground" />
           </button>
-          <h1 className="text-xl font-bold text-black dark:text-foreground">Bodyweight</h1>
+          <h1 className="text-2xl font-bold text-black dark:text-foreground">Bodyweight</h1>
           <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 shadow-sm active:scale-95 transition">
             <Plus className="w-5 h-5 text-gray-900 dark:text-foreground" />
           </button>
@@ -469,16 +469,11 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         <div className="pb-3">
           <div className="relative bg-white dark:bg-zinc-800 rounded-2xl p-4 border border-gray-200 dark:border-border shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-900 dark:bg-primary">
-                <CheckeredFlagIcon className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-400">
+                <Target className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 dark:text-foreground">Goal: {goalData.goal} {unit}</p>
-                <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{weeksAway} weeks away</p>
-                <div className="flex items-center gap-1 mt-1">
-                  <p className="text-xs text-gray-600 dark:text-muted-foreground font-medium">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
-                  <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-200 dark:bg-muted text-gray-500 dark:text-muted-foreground text-[10px] font-bold flex-shrink-0">?</button>
-                </div>
+                <p className="text-lg font-bold text-gray-900 dark:text-foreground">Goal: {goalData.goal} {unit}</p>
               </div>
               <div className="flex items-center gap-0.5 flex-shrink-0">
                 <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-muted transition">
@@ -506,11 +501,15 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
               </div>
             )}
 
-            {/* Floating weigh-in tip popover */}
+            {/* Floating info popover */}
             {showWeighInTip && (
               <div className="absolute right-4 top-full mt-2 w-[240px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
                 <div className="absolute -top-1.5 right-6 w-3 h-3 bg-white dark:bg-card border-r border-t border-gray-100 dark:border-border rotate-45" />
-                <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">Weigh in once a week — daily readings swing with water weight &amp; hydration.</p>
+                <div className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative space-y-1">
+                  <p className="font-semibold text-gray-900 dark:text-foreground">{weeksAway} weeks away</p>
+                  <p>{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
+                  <p className="pt-1 border-t border-gray-100 dark:border-border mt-1 pt-2">Weigh in once a week — daily readings swing with water weight &amp; hydration.</p>
+                </div>
               </div>
             )}
           </div>
