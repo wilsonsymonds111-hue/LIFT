@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, Flag, AlertCircle, Zap, BicepsFlexed, Info, Pencil, Dumbbell, Flame, RefreshCw, TrendingDown } from 'lucide-react';
+import { TouchHold } from '@/lib/useTouchHold';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
 import { base44 } from '@/api/base44Client';
 import WeightEntryKeypad from './WeightEntryKeypad';
@@ -694,7 +695,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             <p className="text-sm text-gray-500 dark:text-muted-foreground text-center py-6">No entries yet</p>
           ) : (
             entries.map((entry, idx) => (
-              <div key={entry.id} className={`flex items-center gap-3 px-4 py-3 ${idx < entries.length - 1 ? 'border-b border-gray-100 dark:border-border' : ''}`}>
+              <div key={entry.id} className={`flex items-center gap-3 px-4 py-3 ${idx < entries.length - 1 ? 'border-b border-gray-100 dark:border-border' : ''}`} {...TouchHold(() => startEdit(entry))}>
                 {editingId === entry.id ? (
                   <>
                     <input type="number" step="0.1" value={editWeight} onChange={e => setEditWeight(e.target.value)} className="w-20 border border-gray-200 dark:border-border rounded-lg px-2 py-1 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-purple-400" />
@@ -709,10 +710,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                       <span className="font-semibold text-black dark:text-foreground text-sm">{unit === 'lbs' ? kgToLbs(entry.weight).toFixed(2) : entry.weight} {unit}</span>
                     </div>
                     <span className="text-xs text-gray-500 dark:text-muted-foreground">{fmtDate(entry.date)}</span>
-                    <button onClick={() => startEdit(entry)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-muted transition">
-                      <Edit3 className="w-3.5 h-3.5 text-gray-500 dark:text-muted-foreground" />
-                    </button>
-
                   </>
                 )}
               </div>
