@@ -61,9 +61,9 @@ const LOADING_SPINNER = (
   </div>
 );
 
-const SlideIn = memo(({ children }) => (
+const SlideIn = memo(({ children, transparent }) => (
   <motion.div
-    className="w-full min-h-screen bg-background"
+    className={`w-full min-h-screen ${transparent ? '' : 'bg-background'}`}
     variants={pageVariants}
     initial="initial"
     animate="animate"
@@ -164,7 +164,8 @@ const AnimatedRoutes = memo(() => {
   const isTabRoute = TABS.includes(location.pathname);
   usePreloadSubPages();
   usePrefetchData();
-  const tabDisplay = useMemo(() => ({ display: isTabRoute ? 'flex' : 'none' }), [isTabRoute]);
+  const isModalRoute = location.pathname.startsWith('/template/');
+  const tabDisplay = useMemo(() => ({ display: isTabRoute || isModalRoute ? 'flex' : 'none' }), [isTabRoute, isModalRoute]);
 
   return (
     <>
@@ -175,12 +176,12 @@ const AnimatedRoutes = memo(() => {
 
       {/* Sub-page routes with slide-in transitions */}
       {!isTabRoute && (
-        <div className="w-full flex-1">
+        <div className={`w-full ${isModalRoute ? 'absolute inset-0 pointer-events-none' : 'flex-1'}`}>
           <Suspense fallback={LOADING_SPINNER}>
             <AnimatePresence mode="wait">
               <Routes location={location} key={location.pathname}>
                 <Route path="/template/new" element={<SlideIn><NewTemplate /></SlideIn>} />
-                <Route path="/template/:id" element={<SlideIn><TemplateDetail /></SlideIn>} />
+                <Route path="/template/:id" element={<SlideIn transparent><TemplateDetail /></SlideIn>} />
                 <Route path="/split/:key" element={<SlideIn><SplitDetail /></SlideIn>} />
                 <Route path="/active-workout/:id" element={<SlideIn><ActiveWorkout /></SlideIn>} />
                 <Route path="/support-chat/:id" element={<SlideIn><SupportChat /></SlideIn>} />
