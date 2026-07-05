@@ -484,8 +484,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                 <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-muted transition">
                   <Info className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                 </button>
-                <button onClick={() => setShowGoalModal(true)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-muted transition">
-                  <Pencil className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
+                <button onClick={() => setShowGoalModal(v => !v)} className={`w-7 h-7 flex items-center justify-center rounded-lg transition ${showGoalModal ? 'bg-gray-100 dark:bg-muted' : 'hover:bg-gray-100 dark:hover:bg-muted'}`}>
+                  <Pencil className={`w-4 h-4 ${showGoalModal ? 'text-gray-900 dark:text-foreground' : 'text-gray-400 dark:text-muted-foreground'}`} />
                 </button>
                 <button onClick={handleDeleteGoal} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition">
                   <Trash2 className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
@@ -572,7 +572,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                 onClick={handleSetGoal}
                 className="w-full bg-gray-900 dark:bg-primary hover:bg-gray-800 dark:hover:bg-primary/90 text-white font-semibold py-2.5 rounded-lg transition"
               >
-                Set Goal
+                {goalData ? 'Update Goal' : 'Set Goal'}
               </button>
             </div>
           </div>
