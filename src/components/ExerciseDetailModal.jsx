@@ -91,11 +91,11 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-4 pb-2 flex-shrink-0">
-          <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full bg-muted hover:bg-muted/70 transition">
+        <div className="relative flex items-center justify-between px-5 pt-4 pb-2 flex-shrink-0">
+          <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full bg-muted hover:bg-muted/70 transition flex-shrink-0">
             <X className="w-5 h-5 text-foreground" />
           </button>
-          <h2 className="font-bold text-lg text-foreground tracking-tight">{exercise.name}</h2>
+          <h2 className="font-bold text-lg text-foreground tracking-tight text-center flex-1 px-2 truncate">{exercise.name}</h2>
           {isCustomExercise(exercise.name) ? (
             <button
               onClick={() => {
