@@ -91,21 +91,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                   onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
                   className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
                 >
-                  {showNote ? 'Remove Note' : 'Add Note'}
-                </button>
-                <div className="border-t border-gray-100 mx-3 my-1" />
-                <p className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rest Timer</p>
-                <button
-                  onClick={() => { setRestEnabled(true); setRestDuration(getDefaultRestDuration(exercise.name)); setShowCustomRest(false); setShowMenu(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration === getDefaultRestDuration(exercise.name) ? 'text-blue-500' : 'text-gray-700'}`}
-                >
-                  Default ({getDefaultRestDuration(exercise.name) / 60} min)
+                  {showNote ? 'Hide Note' : 'Add a Note'}
                 </button>
                 <button
                   onClick={() => setShowCustomRest(c => !c)}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${restEnabled && restDuration !== getDefaultRestDuration(exercise.name) ? 'text-blue-500' : 'text-gray-700'}`}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
                 >
-                  Custom…
+                  Change Default Rest Time
                 </button>
                 {showCustomRest && (
                   <div className="px-4 pb-2 flex items-center gap-2">
@@ -126,19 +118,6 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                     >Set</button>
                   </div>
                 )}
-                <button
-                  onClick={() => { setRestEnabled(false); setShowMenu(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 transition ${!restEnabled ? 'text-blue-500' : 'text-gray-700'}`}
-                >
-                  Off
-                </button>
-                <div className="border-t border-gray-100 mx-3 my-1" />
-                <button
-                  onClick={() => { setExerciseDetailInitialTab('Charts'); setShowMenu(false); setShowExerciseDetail(true); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
-                >
-                  View Exercise Details
-                </button>
                 <button
                   onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
                   className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
