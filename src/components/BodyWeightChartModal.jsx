@@ -32,7 +32,7 @@ const downsample = (data, maxPoints) => {
 };
 
 export default function BodyWeightChartModal({ entries, onClose, onChanged, prediction, muscleLoading, refreshing, fatLossG, onRecalculate }) {
-  const [timeFrame, setTimeFrame] = useState(() => localStorage.getItem('bodyWeightTimeFrame') || '6M');
+  const [timeFrame, setTimeFrame] = useState(() => localStorage.getItem('bodyWeightTimeFrame') || 'M');
   const [showKeypad, setShowKeypad] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editWeight, setEditWeight] = useState('');
