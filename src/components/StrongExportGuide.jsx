@@ -14,7 +14,7 @@ const STEPS = [
     subtitle: 'Tap the gear icon at the top-left of your Profile screen',
     image: SCREENSHOTS.profile,
     // Gear icon is top-left area
-    highlight: { top: '7%', left: '4%', width: '14%', height: '5%' },
+    highlight: { top: '4%', left: '1%', width: '14%', height: '6%' },
   },
   {
     title: 'Find "Export Workouts"',
