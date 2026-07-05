@@ -330,7 +330,7 @@ export default function Splits() {
 
       {/* Top Tabs */}
       <div className="px-4 mb-5">
-        <div className="flex bg-blue-100 dark:bg-blue-950/30 rounded-full p-1 gap-1">
+        <div className="flex rounded-full p-1 gap-1">
           <button
             onClick={() => setActiveTab('mine')}
             className={`flex-1 py-2 rounded-full text-sm font-display uppercase tracking-wide font-semibold transition-all duration-150 ${
