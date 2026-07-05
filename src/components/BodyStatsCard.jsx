@@ -230,12 +230,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                     <span className="text-[9px] font-bold text-white uppercase">Bulking</span>
                   </span>
                 )}
-                {goalMode === 'cutting' && (
-                  <span className="flex items-center gap-1 bg-[#F59E0B] rounded-full px-1.5 py-0.5">
-                    <Flame className="w-2.5 h-2.5 text-white" />
-                    <span className="text-[9px] font-bold text-white uppercase">Cutting</span>
-                  </span>
-                )}
+
               </div>
               <div className="flex items-center gap-1">
                 {latest && (
