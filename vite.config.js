@@ -16,5 +16,22 @@ export default defineConfig({
       visualEditAgent: true
     }),
     react(),
-  ]
+  ],
+  build: {
+    target: 'es2020', // Modern JS — avoids unnecessary transpilation for older browsers
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        // Split large vendor libs into separate chunks for parallel download + caching
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'query': ['@tanstack/react-query'],
+          'framer-motion': ['framer-motion'],
+          'recharts': ['recharts'],
+          'dnd': ['@hello-pangea/dnd'],
+          'hook-form': ['react-hook-form'],
+        },
+      },
+    },
+  },
 });
