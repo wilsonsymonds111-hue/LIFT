@@ -333,13 +333,15 @@ export default function Home() {
           <h1 className="text-4xl font-extrabold text-foreground leading-tight">Workouts</h1>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate('/active-workout/empty-' + Date.now())}
-            className="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500 hover:bg-blue-600 text-white transition"
-            aria-label="Start an Empty Workout"
-          >
-            <Plus className="w-6 h-6" />
-          </button>
+          {currentSplit.length > 0 && (
+            <button
+              onClick={() => navigate('/active-workout/empty-' + Date.now())}
+              className="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500 hover:bg-blue-600 text-white transition"
+              aria-label="Start an Empty Workout"
+            >
+              <Plus className="w-6 h-6" />
+            </button>
+          )}
           <ProfileButton bodyStatsProps={{ templates: currentSplit, targetSessionsPerWeek: Math.round((onDays || 3) * 7 / ((onDays || 3) + (offDays || 1))) }} />
         </div>
       </div>
@@ -393,10 +395,13 @@ export default function Home() {
             })}
             </div>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              <p className="text-lg font-medium mb-1">No current split</p>
-              <p className="text-sm">Go to the Splits tab to choose one.</p>
-            </div>
+            <button
+              onClick={() => navigate('/active-workout/empty-' + Date.now())}
+              className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition active:scale-[0.98] shadow-lg shadow-blue-500/25"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Start New Workout</span>
+            </button>
           )}
         </div>
 
