@@ -262,7 +262,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             <button
               onClick={() => { setGoalMode('cutting'); localStorage.setItem('goalMode', 'cutting'); }}
               className={`flex items-center justify-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase transition ${
-                goalMode === 'cutting' ? 'bg-amber-500 text-white shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
+                goalMode === 'cutting' ? 'bg-amber-400 text-white shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
               }`}
             >
               <Zap className="w-2.5 h-2.5" /> Cutting
