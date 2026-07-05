@@ -230,12 +230,10 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
 
   const latestEntry = sorted.length > 0 ? sorted[sorted.length - 1] : null;
 
-  const displayAverage = useMemo(() => {
-    if (filtered.length === 0) return null;
-    const sum = filtered.reduce((acc, e) => acc + e.weight, 0);
-    const avg = sum / filtered.length;
-    return unit === 'lbs' ? kgToLbs(avg).toFixed(2) : avg.toFixed(2);
-  }, [filtered, unit]);
+  const displayLatest = useMemo(() => {
+    if (!latestEntry) return null;
+    return unit === 'lbs' ? kgToLbs(latestEntry.weight).toFixed(2) : latestEntry.weight.toFixed(2);
+  }, [latestEntry, unit]);
 
   const dateRangeLabel = useMemo(() => {
     if (filtered.length === 0) return '';
@@ -370,8 +368,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-foreground" />
           </button>
           <h1 className="text-2xl font-bold text-black dark:text-foreground">Bodyweight</h1>
-          <button onClick={() => setShowKeypad(true)} className="w-11 h-11 flex items-center justify-center rounded-full bg-white dark:bg-zinc-800 ring-2 ring-white shadow-sm active:scale-95 transition">
-            <Plus className="w-6 h-6 text-gray-900 dark:text-foreground" />
+          <button onClick={() => setShowKeypad(true)} className="w-11 h-11 flex items-center justify-center rounded-full bg-blue-500 ring-2 ring-blue-500 shadow-lg active:scale-95 transition">
+            <Plus className="w-6 h-6 text-white" />
           </button>
         </div>
 
@@ -402,10 +400,10 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       {/* Metric section with unit toggle */}
        <div className="pb-2 pt-1">
          <div className="mb-2">
-           <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">AVERAGE</p>
-         </div>
-         {displayAverage ? (
-           <p className="text-3xl font-bold text-black dark:text-foreground mt-0.5">{displayAverage} <span className="text-lg font-medium text-gray-400 dark:text-muted-foreground">{unit}</span></p>
+           <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">LATEST</p>
+           </div>
+           {displayLatest ? (
+           <p className="text-3xl font-bold text-black dark:text-foreground mt-0.5">{displayLatest} <span className="text-lg font-medium text-gray-400 dark:text-muted-foreground">{unit}</span></p>
          ) : (
            <p className="text-3xl font-bold text-gray-300 dark:text-muted-foreground mt-0.5">—</p>
          )}
@@ -463,8 +461,14 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             )}
             </div>
         ) : (
-          <div className="bg-white dark:bg-card rounded-2xl p-8 text-center">
-            <p className="text-sm text-gray-500 dark:text-muted-foreground">Log at least 2 entries to see your trend chart.</p>
+          <div className="bg-white dark:bg-card py-3">
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={[]} margin={{ top: 10, right: 0, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" opacity={0.7} />
+                <XAxis tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} />
+                <YAxis orientation="right" domain={[60, 90]} ticks={[60, 65, 70, 75, 80, 85, 90]} allowDecimals={false} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={32} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         )}
       </div>

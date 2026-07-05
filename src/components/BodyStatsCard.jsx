@@ -253,7 +253,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                     <span className="text-lg text-gray-500 dark:text-muted-foreground font-medium mb-1">kg</span>
                   </>
                 ) : (
-                  <span className="text-xl text-gray-400 dark:text-muted-foreground font-semibold">Tap to log</span>
+                  <span className="text-xl text-gray-300 dark:text-muted-foreground font-semibold">—</span>
                 )}
               </div>
               {sparklinePoints && (
