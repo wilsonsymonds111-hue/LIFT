@@ -161,7 +161,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   const StaticDot = (props) => {
     const { cx, cy, value } = props;
     if (value == null) return <g />;
-    return <circle cx={cx} cy={cy} r={4} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
+    return <circle cx={cx} cy={cy} r={3} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
   };
 
   const NewDot = (props) => {
@@ -170,19 +170,19 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const isNewest = index === lastRealIdx;
     if (isNewest) {
       if (freshAnim && animDir === 'remove') {
-        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={5} fill="#fff" stroke="#3b82f6" strokeWidth={2} className="retract-dot" />;
+        return <circle key={`dot-${animKey}`} cx={cx} cy={cy} r={4} fill="#fff" stroke="#3b82f6" strokeWidth={2} className="retract-dot" />;
       }
       if (freshAnim && animDir === 'add') {
         return (
           <g key={`dot-${animKey}`}>
-            <circle cx={cx} cy={cy} r={5} fill="#fff" stroke="#3b82f6" strokeWidth={2} className="snap-dot" />
+            <circle cx={cx} cy={cy} r={4} fill="#fff" stroke="#3b82f6" strokeWidth={2} className="snap-dot" />
             <circle cx={cx} cy={cy} r={4} className="ripple-ring" />
           </g>
         );
       }
-      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={5} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
+      return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
     }
-    return <circle cx={cx} cy={cy} r={4} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
+    return <circle cx={cx} cy={cy} r={3} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
   };
 
   const CustomTooltip = ({ active, payload }) => {
