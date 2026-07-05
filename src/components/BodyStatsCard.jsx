@@ -197,8 +197,8 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
   const textMuted = isCutting ? 'text-gray-500' : 'text-white/60';
   const chipBg = isCutting ? 'bg-black/10' : 'bg-white/15';
   const skeletonBg = isCutting ? 'bg-black/10' : 'bg-white/20';
-  const sparkStroke = isCutting ? 'rgba(100,100,100,0.45)' : 'rgba(255,255,255,0.85)';
-  const sparkFill = isCutting ? '#777' : 'white';
+  const sparkStroke = isCutting ? '#d4a017' : 'rgba(255,255,255,0.85)';
+  const sparkFill = isCutting ? '#d4a017' : 'white';
   const emeraldIcon = isCutting ? 'text-emerald-600' : 'text-emerald-300';
   const orangeIcon = isCutting ? 'text-orange-600' : 'text-orange-300';
 
@@ -222,8 +222,8 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             {/* Top row: label + status pill + arrow */}
             <div className="flex items-center justify-between mb-2.5">
               <div className="flex items-center gap-2">
-                <Activity className={`w-3.5 h-3.5 ${textLabel}`} />
-                <span className={`text-xs font-bold ${textLabel} uppercase tracking-wide`}>Body Stats</span>
+                <Activity className={`w-3.5 h-3.5 ${isCutting ? 'text-amber-500' : 'text-white/80'}`} />
+                <span className={`text-xs font-bold ${isCutting ? 'text-amber-500' : 'text-white/80'} uppercase tracking-wide`}>Body Stats</span>
                 {goalMode === 'bulking' ? (
                   <span className="flex items-center gap-1 bg-blue-500 rounded-full px-2 py-0.5 shadow-sm">
                     <BicepsFlexed className="w-3 h-3 text-white" />
