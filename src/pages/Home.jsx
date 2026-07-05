@@ -237,7 +237,10 @@ export default function Home() {
     [splitKey, workoutCount, groupId, cycleVersion]
   );
 
-  const { schedule, startDayIndex, onDays, offDays } = splitDetection;
+  const hasNoSplit = currentSplit.length === 0;
+  const { schedule: rawSchedule, startDayIndex, onDays, offDays } = splitDetection;
+  // When no split is selected, show an empty calendar (all rest days)
+  const schedule = hasNoSplit ? [0, 0, 0, 0, 0, 0, 0] : rawSchedule;
   const sorted = currentSplit;
 
   // schedule is today-first (index 0 = today). Map each on-day to a workout by
@@ -306,6 +309,7 @@ export default function Home() {
   }, []);
 
   const cycleLabel = useMemo(() => {
+    if (hasNoSplit) return null;
     const { onDays, offDays } = splitDetection;
     if (onDays != null && offDays != null) {
       const onPart = `${onDays} day${onDays !== 1 ? 's' : ''} on`;
@@ -313,7 +317,7 @@ export default function Home() {
       return `${onPart}, ${offPart}`;
     }
     return null;
-  }, [splitDetection]);
+  }, [splitDetection, hasNoSplit]);
 
   if (loading) {
     return (
