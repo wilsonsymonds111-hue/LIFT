@@ -130,9 +130,6 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               )}
             </button>
           </div>
-          <p className="text-xs text-muted-foreground">
-            {profilePhoto ? 'Tap camera to change photo' : 'Add a profile photo'}
-          </p>
           <input
             ref={fileInputRef}
             type="file"
