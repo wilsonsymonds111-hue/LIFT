@@ -208,7 +208,7 @@
 
   textarea, input, select {
     font-family: inherit;
-    font-size: 16px;
+    font-size: 16px !important;
     font-weight: inherit;
     letter-spacing: inherit;
   }
