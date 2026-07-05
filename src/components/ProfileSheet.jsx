@@ -108,7 +108,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Photo upload */}
         <div className="flex flex-col items-center gap-3 py-2">
           <div className="relative">
-            <div className={`w-24 h-24 rounded-full overflow-hidden bg-muted border-2 ${isCutting ? 'border-orange-500' : goalMode === 'bulking' ? 'border-blue-500' : 'border-background'} shadow-lg`}>
+            <div className="w-24 h-24 rounded-full overflow-hidden bg-muted shadow-lg">
               {profilePhoto ? (
                 <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
               ) : (
