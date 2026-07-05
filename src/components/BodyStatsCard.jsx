@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { RefreshCw, X, BookOpen } from 'lucide-react';
+import { RefreshCw, X, BookOpen, ChevronRight, TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import {
   calculateMuscleMass,
@@ -168,24 +168,70 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
 
   return (
     <>
-      <div className="px-4 py-2">
+      <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          style={{ backgroundColor: 'rgba(249, 249, 249, 0.85)', backdropFilter: 'blur(40px) saturate(180%)', WebkitBackdropFilter: 'blur(40px) saturate(180%)' }}
-          className="relative rounded-2xl px-4 py-2.5 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] cursor-pointer active:scale-[0.98]"
+          className="relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] shadow-[0_10px_40px_rgba(59,130,246,0.25)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
+          style={{
+            background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 40%, #8b5cf6 100%)',
+          }}
         >
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-gray-500 dark:text-muted-foreground">Bodyweight</span>
-            <div className="flex items-baseline gap-1">
+          {/* Decorative glow */}
+          <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+
+          <div className="relative p-5">
+            {/* Top row: label + arrow */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-white/80" />
+                <span className="text-sm font-bold text-white/80 uppercase tracking-wide">Body Stats</span>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                <ChevronRight className="w-5 h-5 text-white" />
+              </div>
+            </div>
+
+            {/* Current weight — large */}
+            <div className="flex items-end gap-1.5 mb-4">
               {weightLoading ? (
-                <div className="h-6 w-16 bg-gray-100 dark:bg-muted rounded animate-pulse" />
+                <div className="h-12 w-24 bg-white/20 rounded-lg animate-pulse" />
               ) : latest ? (
                 <>
-                  <span className="text-2xl font-bold text-black dark:text-foreground">{latest.weight}</span>
-                  <span className="text-xs text-gray-400 dark:text-muted-foreground font-medium">kg</span>
+                  <span className="text-5xl font-extrabold text-white leading-none">{latest.weight}</span>
+                  <span className="text-lg text-white/70 font-semibold mb-1">kg</span>
                 </>
               ) : (
-                <span className="text-sm text-gray-400 dark:text-muted-foreground">Tap to log</span>
+                <span className="text-lg text-white/80 font-semibold">Tap to log weight</span>
+              )}
+            </div>
+
+            {/* Quick stats row */}
+            <div className="flex items-center gap-3 flex-wrap">
+              {prediction ? (
+                <>
+                  {prediction.muscleGainG > 0 && (
+                    <div className="flex items-center gap-1 bg-white/15 rounded-full px-3 py-1.5 backdrop-blur-sm">
+                      <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
+                      <span className="text-xs font-semibold text-white">+{prediction.muscleGainG}g muscle</span>
+                    </div>
+                  )}
+                  {fatLossG > 0 && (
+                    <div className="flex items-center gap-1 bg-white/15 rounded-full px-3 py-1.5 backdrop-blur-sm">
+                      <TrendingDown className="w-3.5 h-3.5 text-orange-300" />
+                      <span className="text-xs font-semibold text-white">{fatLossG}g fat lost</span>
+                    </div>
+                  )}
+                  {prediction.trainingStatus && (
+                    <div className="flex items-center gap-1 bg-white/15 rounded-full px-3 py-1.5 backdrop-blur-sm">
+                      <span className="text-xs font-semibold text-white capitalize">{prediction.trainingStatus}</span>
+                    </div>
+                  )}
+                </>
+              ) : muscleLoading ? (
+                <div className="h-7 w-32 bg-white/15 rounded-full animate-pulse" />
+              ) : (
+                <p className="text-xs text-white/60 font-medium">Log workouts & weight for insights</p>
               )}
             </div>
           </div>
