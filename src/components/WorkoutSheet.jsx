@@ -280,8 +280,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
             style={{ bottom: '96px' }}
             onClick={() => setMinimized(false)}
           >
-            <p className="font-bold text-foreground text-base truncate">{template.name}</p>
-            <p className="text-base text-gray-700 dark:text-gray-200 font-display">{timer}</p>
+            <p className="text-base text-gray-400 dark:text-gray-500 font-display flex-shrink-0">{timer}</p>
+            <p className="font-bold text-foreground text-base absolute left-1/2 -translate-x-1/2 truncate max-w-[50%] text-center">{template.name}</p>
+            <div className="w-12 flex-shrink-0" />
           </motion.div>
         )}
       </AnimatePresence>
