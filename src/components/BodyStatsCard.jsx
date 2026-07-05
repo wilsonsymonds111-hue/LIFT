@@ -26,7 +26,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
 
   const fetchEntries = useCallback(async () => {
     try {
-      const results = await base44.entities.BodyWeight.list('-date', 30);
+      const results = await base44.entities.BodyWeight.list('-date', 1000);
       setWeightEntries(results || []);
     } catch {
       setWeightEntries([]);
