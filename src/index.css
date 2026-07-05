@@ -111,7 +111,7 @@
   background: #000000;
 }
 .dark .health-gradient::before {
-  background: linear-gradient(180deg, hsl(0 0% 17%) 0%, hsl(0 0% 14%) 25%, hsl(0 0% 11%) 50%, hsl(0 0% 8%) 75%, transparent 100%);
+  display: none;
 }
 
 /* Exercises page gradient: blue fades to grey by ~60%, then stays grey */
@@ -135,7 +135,7 @@
   z-index: 1;
 }
 .dark .exercises-gradient::before {
-  background: linear-gradient(180deg, hsl(0 0% 17%) 0%, hsl(0 0% 14%) 25%, hsl(0 0% 11%) 50%, hsl(0 0% 8%) 75%, transparent 100%);
+  display: none;
 }
 
 /* Semi-transparent sticky header that blends with the gradient */
