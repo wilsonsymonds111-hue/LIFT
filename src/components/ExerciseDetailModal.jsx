@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
 import { X, Trash2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
@@ -23,21 +22,6 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
   const [loadingDetail, setLoadingDetail] = useState(!initialImage);
   const [loadingHistory, setLoadingHistory] = useState(!initialHistory);
   const [shimmer, setShimmer] = useState(false);
-  const [chartView, setChartView] = useState('weight');
-  const [swipeDir, setSwipeDir] = useState(0);
-
-  const switchView = useCallback((view) => {
-    setSwipeDir(view === 'reps' ? 1 : -1);
-    setChartView(view);
-  }, []);
-
-  const handleDragEnd = useCallback((_, info) => {
-    if (info.offset.x < -50 && chartView === 'weight') {
-      switchView('reps');
-    } else if (info.offset.x > 50 && chartView === 'reps') {
-      switchView('weight');
-    }
-  }, [chartView, switchView]);
 
   useEffect(() => { setTimeout(() => setShimmer(true), 200); }, []);
 
@@ -92,33 +76,18 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
     });
   }, [exercise.name, initialImage]);
 
-  const { isBodyweight, repsHistory, repsWeightLevel, stats } = useMemo(() => {
+  const { isBodyweight, stats } = useMemo(() => {
     const allEntries = history.length > 0 ? history : [];
     const isBw = allEntries.length > 0
       ? allEntries.every(h => { const kg = h.kg ?? 0; return kg === 0 || kg == null; })
       : false;
 
-    // Reps chart: show all entries (not filtered by weight) so users see up to 15 data points
-    const rHistory = history.length > 0
-      ? history.map(h => ({ kg: 0, reps: h.reps || 0, date: h.date }))
-      : [];
-
-    const rWeightLevel = null;
-
     const s = history.length > 0
       ? (() => {
-          const isRepsView = chartView === 'reps' && !isBw;
-          if (isRepsView) {
-            const entries = rHistory;
-            const allReps = entries.map(h => h.reps || 0);
-            const firstReps = entries[0]?.reps || 0;
-            const bestReps = Math.max(...allReps);
-            return { start: firstReps + ' reps', best: bestReps + ' reps', increase: `+${bestReps - firstReps} reps` };
-          }
-          const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
-          const reps = history.map(h => h.reps || 0);
-          const bestKg = Math.max(...kgs);
-          const bestEntry = history
+           const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
+           const reps = history.map(h => h.reps || 0);
+           const bestKg = Math.max(...kgs);
+           const bestEntry = history
             .filter(h => (h.kg || 0) === bestKg)
             .sort((a, b) => (b.reps || 0) - (a.reps || 0))[0];
           const bestReps = bestEntry?.reps || 0;
@@ -133,13 +102,12 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
         })()
       : null;
 
-    return { isBodyweight: isBw, repsHistory: rHistory, repsWeightLevel: rWeightLevel, stats: s };
-  }, [history, chartView, exercise.name]);
+    return { isBodyweight: isBw, stats: s };
+    }, [history, exercise.name]);
 
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
 
-  const chartData = chartView === 'reps' ? repsHistory : history;
-  const chartIsBodyweight = chartView === 'reps' ? true : isBodyweight;
+  const chartIsBodyweight = isBodyweight;
 
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60" onClick={onClose}>
@@ -256,53 +224,13 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
                 </div>
               ) : history.length > 0 ? (
                 <>
-                  {/* Segmented chart switcher */}
-                  <div className="flex justify-center">
-                    <div className="inline-flex bg-muted rounded-full p-0.5">
-                      <button
-                        onClick={() => switchView('weight')}
-                        className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                          chartView === 'weight'
-                            ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        Weight
-                      </button>
-                      <button
-                        onClick={() => switchView('reps')}
-                        className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                          chartView === 'reps'
-                            ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        Reps
-                      </button>
-                    </div>
-                  </div>
-                  <div className="overflow-hidden touch-pan-y" style={{ touchAction: 'pan-y' }}>
-                    <motion.div
-                      key={chartView}
-                      initial={{ x: swipeDir * 60, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-                      drag="x"
-                      dragConstraints={{ left: 0, right: 0 }}
-                      dragElastic={0.15}
-                      onDragEnd={handleDragEnd}
-                      style={{ touchAction: 'pan-y' }}
-                    >
-                      <ProgressGraph
-                        history={chartData}
-                        animKey={`${chartView}-${history.length}`}
-                        animDir="add"
-                        isBodyweight={chartIsBodyweight}
-                        exerciseName={exercise.name}
-                        labelOverride={null}
-                      />
-                    </motion.div>
-                  </div>
+                  <ProgressGraph
+                    history={history}
+                    animKey={`weight-${history.length}`}
+                    animDir="add"
+                    isBodyweight={chartIsBodyweight}
+                    exerciseName={exercise.name}
+                  />
                   {stats && (
                     <div className="grid grid-cols-3 gap-1.5">
                       {[

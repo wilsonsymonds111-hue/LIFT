@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback, memo, lazy, Suspense } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'react';
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import ProgressGraph, { getRepCap } from '../ProgressGraph';
@@ -44,13 +43,6 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [customRestInput, setCustomRestInput] = useState('');
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
-  const [chartView, setChartView] = useState('weight');
-  const [swipeDir, setSwipeDir] = useState(0);
-  const switchView = useCallback((view) => {
-    setSwipeDir(view === 'reps' ? 1 : -1);
-    setChartView(view);
-  }, []);
-
   const { toast } = useToast();
   const repCap = getRepCap(exercise.name);
   const goalNoteShownRef = useRef(false);
@@ -80,13 +72,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         const kg = typeof h === 'object' ? (h.kg ?? 0) : (h ?? 0);
         return kg === 0 || kg == null;
       });
-  const repsHistory = (() => {
-    const fullHistory = exercise.history || [];
-    return fullHistory.map(h => (typeof h === 'object' ? { ...h, kg: 0 } : { kg: 0, reps: h, date: null }));
-  })();
-
-  const displayHistory = chartView === 'reps' ? (sessionResults.length > 0 ? [...repsHistory, ...sessionResults.map(s => ({ ...s, kg: 0 }))] : repsHistory) : graphHistory;
-  const displayBodyweight = chartView === 'reps' ? true : isBodyweight;
+  const displayHistory = graphHistory;
+  const displayBodyweight = isBodyweight;
 
   return (
     <>
@@ -188,30 +175,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
         />
       )}
-      <div className="flex items-center justify-center mb-2">
-        <div className="inline-flex bg-muted rounded-full p-0.5">
-          <button
-            onClick={() => switchView('weight')}
-            className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${chartView === 'weight' ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            Weight
-          </button>
-          <button
-            onClick={() => switchView('reps')}
-            className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${chartView === 'reps' ? 'bg-white dark:bg-gray-600 text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            Reps
-          </button>
-        </div>
-      </div>
-      <motion.div
-        key={chartView}
-        initial={{ x: swipeDir * 60, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-      >
-        <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
-      </motion.div>
+      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
       <div className="grid grid-cols-[40px_1fr_80px_80px_44px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
