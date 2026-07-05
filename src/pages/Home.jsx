@@ -395,13 +395,18 @@ export default function Home() {
             })}
             </div>
           ) : (
-            <button
-              onClick={() => navigate('/active-workout/empty-' + Date.now())}
-              className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition active:scale-[0.98] shadow-lg shadow-blue-500/25"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Start New Workout</span>
-            </button>
+            <div className="flex flex-col">
+              <button
+                onClick={() => navigate('/active-workout/empty-' + Date.now())}
+                className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition active:scale-[0.98] shadow-lg shadow-blue-500/25"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Start New Workout</span>
+              </button>
+              <p className="text-center text-sm text-muted-foreground mt-3">
+                Create a new split, or choose a new split in the Splits tab
+              </p>
+            </div>
           )}
         </div>
 

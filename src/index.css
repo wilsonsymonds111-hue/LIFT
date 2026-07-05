@@ -79,9 +79,9 @@
 
 
 
-/* Apple Health / MyFitnessPal-style gradient background */
+/* Neutral background — no blue tint */
 .health-gradient {
-  background: linear-gradient(180deg, #D4E8F7 0%, #E0EEF9 20%, #EEF2F8 50%, #F5F7FA 100%);
+  background: #F2F2F7;
 }
 
 /* Exercises page gradient: blue fades to grey by ~60%, then stays grey */
@@ -105,7 +105,7 @@
   z-index: 1;
 }
 .dark .health-gradient {
-  background: linear-gradient(180deg, #1a2235 0%, #181a2a 25%, #0f0f0f 100%);
+  background: #0f0f0f;
 }
 
 /* Semi-transparent sticky header that blends with the gradient */
