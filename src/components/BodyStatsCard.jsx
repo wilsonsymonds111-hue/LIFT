@@ -209,14 +209,14 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
           onClick={() => setShowWeightModal(true)}
           className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] bg-white dark:bg-zinc-800 shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
         >
-          <div className="relative p-4">
+          <div className="relative p-5">
             {/* Header: icon + label + status | date + chevron */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-red-50 dark:bg-red-950/30">
-                  <Activity className="w-4 h-4 text-red-500" />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-red-50 dark:bg-red-950/30">
+                  <Activity className="w-5 h-5 text-red-500" />
                 </div>
-                <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Body Stats</span>
+                <span className="text-base font-semibold text-gray-900 dark:text-foreground">Body Stats</span>
                 {goalMode === 'bulking' ? (
                   <span className="flex items-center gap-1 bg-blue-500 rounded-full px-1.5 py-0.5">
                     <BicepsFlexed className="w-2.5 h-2.5 text-white" />
@@ -231,11 +231,11 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
               </div>
               <div className="flex items-center gap-1">
                 {latest && (
-                  <span className="text-xs text-gray-400 dark:text-muted-foreground">
+                  <span className="text-sm text-gray-400 dark:text-muted-foreground">
                     {new Date(latest.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                   </span>
                 )}
-                <ChevronRight className="w-4 h-4 text-gray-300 dark:text-muted-foreground" />
+                <ChevronRight className="w-5 h-5 text-gray-300 dark:text-muted-foreground" />
               </div>
             </div>
 
@@ -243,18 +243,18 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             <div className="flex items-end justify-between gap-2">
               <div className="flex items-end gap-1">
                 {weightLoading ? (
-                  <div className="h-9 w-20 bg-gray-100 dark:bg-muted rounded-lg animate-pulse" />
+                  <div className="h-11 w-24 bg-gray-100 dark:bg-muted rounded-lg animate-pulse" />
                 ) : latest ? (
                   <>
-                    <span className="text-3xl font-bold text-gray-900 dark:text-foreground leading-none">{latest.weight}</span>
-                    <span className="text-sm text-gray-500 dark:text-muted-foreground font-medium mb-0.5">kg</span>
+                    <span className="text-4xl font-bold text-gray-900 dark:text-foreground leading-none">{latest.weight}</span>
+                    <span className="text-base text-gray-500 dark:text-muted-foreground font-medium mb-0.5">kg</span>
                   </>
                 ) : (
-                  <span className="text-lg text-gray-400 dark:text-muted-foreground font-semibold">Tap to log</span>
+                  <span className="text-xl text-gray-400 dark:text-muted-foreground font-semibold">Tap to log</span>
                 )}
               </div>
               {sparklinePoints && (
-                <svg width="56" height="28" viewBox="0 0 56 28" className="flex-shrink-0">
+                <svg width="72" height="36" viewBox="0 0 56 28" className="flex-shrink-0">
                   <polyline
                     points={sparklinePoints.map(p => `${p.x},${p.y}`).join(' ')}
                     fill="none"
