@@ -22,8 +22,9 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
   const [detail, setDetail] = useState(initialImage ? { image_url: initialImage } : null);
   const [loadingDetail, setLoadingDetail] = useState(!initialImage);
   const [loadingHistory, setLoadingHistory] = useState(!initialHistory);
-  // Fetch workout history from the Exercise entity — always update with fresh data
+  // Fetch workout history from the Exercise entity — skip if initialHistory provided
   useEffect(() => {
+    if (initialHistory) { setLoadingHistory(false); return; }
     base44.entities.Exercise.filter({ name: exercise.name }).then(results => {
       if (results.length > 0) {
         setHistory(results[0].history || []);
@@ -32,7 +33,7 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
       }
       setLoadingHistory(false);
     });
-  }, [exercise.name]);
+  }, [exercise.name, initialHistory]);
 
   // Fetch or generate exercise detail (instructions + image)
   useEffect(() => {

@@ -43,7 +43,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           setRestSeconds(remaining);
         }
       };
-      restRef.current = setInterval(tick, 250);
+      restRef.current = setInterval(tick, 1000);
       const onVisible = () => { if (!document.hidden) tick(); };
       document.addEventListener('visibilitychange', onVisible);
       return () => {

@@ -117,8 +117,8 @@ export default function Exercises() {
     Object.entries(exerciseHistoryData).forEach(([name, history]) => {
       if (history?.length > 0) {
         historyMap[name] = history
-          .map(h => ({ kg: h.kg || 0, v: h.reps || 0, date: h.date ? new Date(h.date) : null }))
-          .sort((a, b) => (a.date || 0) - (b.date || 0));
+          .map(h => ({ kg: h.kg || 0, v: h.reps || 0, date: h.date || null }))
+          .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
       }
     });
     return historyMap;
@@ -311,7 +311,7 @@ export default function Exercises() {
         <Suspense fallback={null}>
           <ExerciseDetailModal
             exercise={selectedExercise}
-            initialHistory={exerciseHistory[selectedExercise.name]?.map(h => ({ kg: h.kg, reps: h.v, date: h.date?.toISOString() })) || null}
+            initialHistory={exerciseHistory[selectedExercise.name]?.map(h => ({ kg: h.kg, reps: h.v, date: h.date })) || null}
             onClose={() => setSelectedExercise(null)}
             onExerciseDeleted={() => setCustomExercisesVersion(v => v + 1)}
           />

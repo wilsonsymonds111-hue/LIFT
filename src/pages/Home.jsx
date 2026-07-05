@@ -124,6 +124,10 @@ const SPLIT_ACCENTS = {
 };
 
 const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
+const IS_APPLE = (() => {
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+  return /(iPhone|iPad|iPod|Macintosh|Mac OS X)/i.test(ua) && !/Android/i.test(ua);
+})();
 
 export default function Home() {
   const navigate = useNavigate();
@@ -201,42 +205,41 @@ export default function Home() {
     return { currentSplit: [...split].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)), currentSplitName: name };
   }, [templates]);
 
-  // Compute schedule fresh every render — no caching that could go stale
+  // Split detection + schedule — memoized on currentSplit + cycleVersion
+  const splitDetection = useMemo(() => {
+    const groupId = currentSplit.length > 0 ? currentSplit[0].splitGroup : null;
+    const names = currentSplit.map(t => (t.name || '').toLowerCase());
+    const hasUpper = names.some(n => n.includes('upper'));
+    const hasLower = names.some(n => n.includes('lower'));
+    const hasPush  = names.some(n => n.includes('push'));
+    const hasPull  = names.some(n => n.includes('pull'));
+    const hasLegs  = names.some(n => n.includes('legs'));
+    const hasFull  = names.some(n => n.includes('full'));
+
+    let splitKey, workoutCount;
+    if (currentSplit.length === 0) {
+      splitKey = 'full-body';
+      workoutCount = 0;
+    } else if (hasUpper && hasLower && hasPush && hasPull && hasLegs) {
+      splitKey = 'ul-ppl';
+      workoutCount = currentSplit.length;
+    } else if (hasPush && hasPull && hasLegs) {
+      splitKey = 'push-pull-legs';
+      workoutCount = currentSplit.length;
+    } else if (hasUpper && hasLower) {
+      splitKey = 'upper-lower';
+      workoutCount = currentSplit.length;
+    } else if (hasFull && !hasUpper && !hasLower) {
+      splitKey = 'full-body';
+      workoutCount = currentSplit.length;
+    } else {
+      splitKey = 'full-body';
+      workoutCount = currentSplit.length;
+    }
+    return { key: splitKey, ...resolveSchedule(splitKey, workoutCount, groupId) };
+  }, [currentSplit, cycleVersion]);
+
   const groupId = currentSplit.length > 0 ? currentSplit[0].splitGroup : null;
-  const names = currentSplit.map(t => (t.name || '').toLowerCase());
-  const hasUpper = names.some(n => n.includes('upper'));
-  const hasLower = names.some(n => n.includes('lower'));
-  const hasPush  = names.some(n => n.includes('push'));
-  const hasPull  = names.some(n => n.includes('pull'));
-  const hasLegs  = names.some(n => n.includes('legs'));
-  const hasFull  = names.some(n => n.includes('full'));
-
-  let splitKey, workoutCount;
-  if (currentSplit.length === 0) {
-    splitKey = 'full-body';
-    workoutCount = 0;
-  } else if (hasUpper && hasLower && hasPush && hasPull && hasLegs) {
-    splitKey = 'ul-ppl';
-    workoutCount = currentSplit.length;
-  } else if (hasPush && hasPull && hasLegs) {
-    splitKey = 'push-pull-legs';
-    workoutCount = currentSplit.length;
-  } else if (hasUpper && hasLower) {
-    splitKey = 'upper-lower';
-    workoutCount = currentSplit.length;
-  } else if (hasFull && !hasUpper && !hasLower) {
-    splitKey = 'full-body';
-    workoutCount = currentSplit.length;
-  } else {
-    splitKey = 'full-body';
-    workoutCount = currentSplit.length;
-  }
-
-  const splitDetection = useMemo(
-    () => ({ key: splitKey, ...resolveSchedule(splitKey, workoutCount, groupId) }),
-    [splitKey, workoutCount, groupId, cycleVersion]
-  );
-
   const hasNoSplit = currentSplit.length === 0;
   const { schedule: rawSchedule, startDayIndex, onDays, offDays } = splitDetection;
   // When no split is selected, show an empty calendar (all rest days)
@@ -261,9 +264,12 @@ export default function Home() {
 
   // Enhance schedule with completion status (2 = today's workout completed).
   // Today is display index 0.
-  const scheduleWithCompletions = useMemo(() => {
+  const todayStr = useMemo(() => {
     const _now = new Date();
-    const todayStr = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`;
+    return `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`;
+  }, []);
+
+  const scheduleWithCompletions = useMemo(() => {
     return schedule.map((status, k) => {
       if (status < 1 || sorted.length === 0) return status;
       if (k !== 0) return 1; // only today can be "completed"
@@ -273,7 +279,7 @@ export default function Home() {
       const completed = template?.lastPerformed?.slice(0, 10) === todayStr;
       return completed ? 2 : 1;
     });
-  }, [schedule, startDayIndex, sorted, onDays, offDays]);
+  }, [schedule, startDayIndex, sorted, onDays, offDays, todayStr]);
 
   // Which workout (index into sorted) is today's; -1 if today is a rest day.
   const todayWorkoutIndex = useMemo(() => {
@@ -303,10 +309,10 @@ export default function Home() {
 
   const accent = useMemo(() => SPLIT_ACCENTS[splitDetection.key] || SPLIT_ACCENTS['full-body'], [splitDetection.key]);
 
-  const isApple = useMemo(() => {
-    const ua = navigator.userAgent || '';
-    return /(iPhone|iPad|iPod|Macintosh|Mac OS X)/i.test(ua) && !/Android/i.test(ua);
-  }, []);
+  const bodyStatsProps = useMemo(() => ({
+    templates: currentSplit,
+    targetSessionsPerWeek: Math.round((onDays || 3) * 7 / ((onDays || 3) + (offDays || 1))),
+  }), [currentSplit, onDays, offDays]);
 
   const cycleLabel = useMemo(() => {
     if (hasNoSplit) return null;
@@ -346,7 +352,7 @@ export default function Home() {
               <Plus className="w-6 h-6" />
             </button>
           )}
-          <ProfileButton bodyStatsProps={{ templates: currentSplit, targetSessionsPerWeek: Math.round((onDays || 3) * 7 / ((onDays || 3) + (offDays || 1))) }} />
+          <ProfileButton bodyStatsProps={bodyStatsProps} />
         </div>
       </div>
 
@@ -380,8 +386,6 @@ export default function Home() {
           {currentSplit.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {currentSplit.map((template, idx) => {
-              const _now = new Date();
-              const todayStr = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`;
               const isCompleted = template.lastPerformed?.slice(0, 10) === todayStr;
               return (
               <TemplateCard
@@ -442,7 +446,7 @@ export default function Home() {
                   className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
                 >
                   <CalendarPlus className={`w-4 h-4 ${accent.dotClass.replace('bg-', 'text-')}`} />
-                  {isApple ? 'Sync to Apple Calendar' : 'Sync to Android Calendar'}
+                  {IS_APPLE ? 'Sync to Apple Calendar' : 'Sync to Android Calendar'}
                 </button>
               </div>
             );

@@ -39,7 +39,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
 
   const fetchEntries = useCallback(async () => {
     try {
-      const results = await base44.entities.BodyWeight.list('-date', 1000);
+      const results = await base44.entities.BodyWeight.list('-date', 200);
       setWeightEntries(results || []);
     } catch {
       setWeightEntries([]);

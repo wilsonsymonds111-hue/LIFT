@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, memo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
 
 // Exercise classification helpers — exported for use in other components
@@ -61,6 +61,12 @@ export function getNextGoal(exerciseName, history) {
 
   return `${maxKg} kg × ${bestReps + 1}`;
 }
+
+const StaticDot = (props) => {
+  const { cx, cy, value } = props;
+  if (value == null) return <g />;
+  return <circle cx={cx} cy={cy} r={3} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
+};
 
 const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact, exerciseName }) {
   const [freshAnim, setFreshAnim] = useState(false);
@@ -155,18 +161,12 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     return { domain: [niceMin, niceMax], ticks };
   }, [result.data]);
 
-  if (result.empty) return null;
   const { data, lastRealIdx } = result;
 
-  const StaticDot = (props) => {
-    const { cx, cy, value } = props;
-    if (value == null) return <g />;
-    return <circle cx={cx} cy={cy} r={3} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
-  };
-
-  const NewDot = (props) => {
+  const renderNewDot = useCallback((props) => {
     const { cx, cy, index, value } = props;
     if (value == null) return <g />;
+    if (lastRealIdx == null) return <circle cx={cx} cy={cy} r={3} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
     const isNewest = index === lastRealIdx;
     if (isNewest) {
       if (freshAnim && animDir === 'remove') {
@@ -183,9 +183,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       return <circle key={`dot-static-${animKey}`} cx={cx} cy={cy} r={4} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
     }
     return <circle cx={cx} cy={cy} r={3} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
-  };
+  }, [freshAnim, animDir, animKey, lastRealIdx]);
 
-  const CustomTooltip = ({ active, payload }) => {
+  const renderTooltip = useCallback(({ active, payload }) => {
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload;
     const val = d?.valNew ?? d?.valStatic;
@@ -199,7 +199,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         {d.date && <div className="text-[10px] font-normal text-gray-500 mt-0.5">{d.date}</div>}
       </div>
     );
-  };
+  }, [isBodyweight]);
+
+  if (result.empty) return null;
 
   return (
     <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '12px 4px 8px' }}>
@@ -212,9 +214,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
         <LineChart data={data} margin={{ top: 20, right: 12, left: 0, bottom: 4 }}>
           <YAxis domain={yDomain} ticks={yTicks} tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} width={36} allowDataOverflow />
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval="equidistantPreserveStartEnd" minTickGap={20} />
-          <Tooltip content={<CustomTooltip />} />
-          <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={<StaticDot />} activeDot={false} connectNulls={false} isAnimationActive={false} />
-          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={<NewDot />} activeDot={{ r: 6, fill: '#fff', stroke: '#3b82f6', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
+          <Tooltip content={renderTooltip} />
+          <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={StaticDot} activeDot={false} connectNulls={false} isAnimationActive={false} />
+          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={renderNewDot} activeDot={{ r: 6, fill: '#fff', stroke: '#3b82f6', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
         </LineChart>
       </ResponsiveContainer>
     </div>

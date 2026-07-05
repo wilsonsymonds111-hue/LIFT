@@ -9,6 +9,7 @@ export default function usePullToRefresh(onRefresh) {
   const startYRef = useRef(null);
   const pullYRef = useRef(0);
   const containerRef = useRef(null);
+  const rafRef = useRef(null);
   const onRefreshRef = useRef(onRefresh);
   onRefreshRef.current = onRefresh;
 
@@ -36,7 +37,8 @@ export default function usePullToRefresh(onRefresh) {
         setPulling(true);
         const y = Math.min(dy * 0.45, THRESHOLD + 20);
         pullYRef.current = y;
-        setPullY(y);
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        rafRef.current = requestAnimationFrame(() => setPullY(y));
       }
     };
 
@@ -61,6 +63,7 @@ export default function usePullToRefresh(onRefresh) {
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [stableOnRefresh]);
 

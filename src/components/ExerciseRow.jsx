@@ -1,9 +1,8 @@
 import { memo } from 'react';
 import { MUSCLE_COLORS } from '../lib/exercises';
 
-const ExerciseRow = memo(function ExerciseRow({ exercise, exerciseHistory, exerciseImages, onSelect, isLast }) {
+const ExerciseRow = memo(function ExerciseRow({ exercise, historyData, exerciseImages, onSelect, isLast }) {
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
-  const historyData = exerciseHistory[exercise.name];
   const imageUrl = exerciseImages?.[exercise.name];
 
   // Get the latest (most recent) weight + reps as PR

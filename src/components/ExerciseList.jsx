@@ -1,4 +1,4 @@
-import { memo, useRef, useCallback } from 'react';
+import { memo, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import ExerciseRow from './ExerciseRow';
@@ -18,7 +18,7 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
   // Portal it to the body so it stays fixed to the viewport, and only show it
   // on the exercises page (the list stays mounted on other tabs).
   const isExercisesPage = useLocation().pathname === '/exercises';
-  const availableLetters = grouped.map(([l]) => l);
+  const availableLetters = useMemo(() => grouped.map(([l]) => l), [grouped]);
   const showLegend = isExercisesPage && availableLetters.length > 0;
 
   return (
@@ -38,7 +38,7 @@ const ExerciseList = memo(function ExerciseList({ grouped, exerciseHistory, exer
             <ExerciseRow
               key={ex.name}
               exercise={ex}
-              exerciseHistory={exerciseHistory}
+              historyData={exerciseHistory[ex.name]}
               exerciseImages={exerciseImages}
               onSelect={onSelectExercise}
               isLast={idx === exs.length - 1}

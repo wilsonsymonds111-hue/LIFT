@@ -155,10 +155,6 @@ const usePreloadSubPages = () => {
       import('./pages/ActiveWorkout');
       import('./pages/TemplateDetail');
       import('./pages/SplitDetail');
-      import('./pages/SupportChat');
-      import('./pages/Terms');
-      import('./pages/Privacy');
-      import('./components/ExerciseDetailModal');
     };
     const ric = window.requestIdleCallback || ((cb) => setTimeout(cb, 500));
     const id = ric(preload);
