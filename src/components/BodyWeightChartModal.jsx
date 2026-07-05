@@ -37,7 +37,14 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   const [editDate, setEditDate] = useState('');
   const [importing, setImporting] = useState(false);
   const [importMsg, setImportMsg] = useState('');
-  const [unit, setUnit] = useState(() => localStorage.getItem('weightUnit') || 'kg');
+  const [unit, setUnit] = useState(() => {
+    const stored = localStorage.getItem('weightUnit');
+    if (stored) return stored;
+    // Auto-detect based on browser locale — US, UK, Liberia, Myanmar use lbs
+    const region = (navigator.language || 'en-US').toUpperCase();
+    const lbsRegions = ['US', 'GB', 'LR', 'MM'];
+    return lbsRegions.some(r => region.includes(r)) ? 'lbs' : 'kg';
+  });
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || 'cutting');
   const [goalWeight, setGoalWeight] = useState('');
@@ -369,18 +376,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-6">
       {/* Metric section with unit toggle */}
        <div className="pb-2 pt-1">
-         <div className="flex items-center justify-between mb-2">
+         <div className="mb-2">
            <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">AVERAGE</p>
-           <div className="inline-flex bg-gray-200 dark:bg-zinc-800 rounded-full p-0.5">
-             <button
-               onClick={() => { setUnit('kg'); localStorage.setItem('weightUnit', 'kg'); }}
-               className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition ${unit === 'kg' ? 'bg-white dark:bg-card text-gray-900 dark:text-foreground shadow-sm' : 'text-gray-400 dark:text-muted-foreground'}`}
-             >kg</button>
-             <button
-               onClick={() => { setUnit('lbs'); localStorage.setItem('weightUnit', 'lbs'); }}
-               className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition ${unit === 'lbs' ? 'bg-white dark:bg-card text-gray-900 dark:text-foreground shadow-sm' : 'text-gray-400 dark:text-muted-foreground'}`}
-             >lbs</button>
-           </div>
          </div>
          {displayAverage ? (
            <p className="text-3xl font-bold text-black dark:text-foreground mt-0.5">{displayAverage} <span className="text-lg font-medium text-gray-400 dark:text-muted-foreground">{unit}</span></p>
