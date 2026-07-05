@@ -219,11 +219,11 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
           onClick={() => setShowWeightModal(true)}
           className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] bg-white dark:bg-zinc-800 shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
         >
-          <div className="relative p-5">
+          <div className="relative p-6">
             {/* Header: icon + label + status | date + chevron */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2.5">
-                <span className="text-base font-semibold text-gray-900 dark:text-foreground">Body Weight</span>
+                <span className="text-lg font-semibold text-gray-900 dark:text-foreground">Body Weight</span>
                 {goalMode === 'bulking' && (
                   <span className="flex items-center gap-1 bg-blue-500 rounded-full px-1.5 py-0.5">
                     <BicepsFlexed className="w-2.5 h-2.5 text-white" />
@@ -251,18 +251,18 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             <div className="flex items-end justify-between gap-2">
               <div className="flex items-end gap-1">
                 {weightLoading ? (
-                  <div className="h-11 w-24 bg-gray-100 dark:bg-muted rounded-lg animate-pulse" />
+                  <div className="h-14 w-28 bg-gray-100 dark:bg-muted rounded-lg animate-pulse" />
                 ) : latest ? (
                   <>
-                    <span className="text-4xl font-bold text-gray-900 dark:text-foreground leading-none">{latest.weight}</span>
-                    <span className="text-base text-gray-500 dark:text-muted-foreground font-medium mb-0.5">kg</span>
+                    <span className="text-5xl font-bold text-gray-900 dark:text-foreground leading-none">{latest.weight}</span>
+                    <span className="text-lg text-gray-500 dark:text-muted-foreground font-medium mb-1">kg</span>
                   </>
                 ) : (
                   <span className="text-xl text-gray-400 dark:text-muted-foreground font-semibold">Tap to log</span>
                 )}
               </div>
               {sparklinePoints && (
-                <svg width="72" height="36" viewBox="0 0 56 28" className="flex-shrink-0">
+                <svg width="90" height="44" viewBox="0 0 56 28" className="flex-shrink-0">
                   <polyline
                     points={sparklinePoints.map(p => `${p.x},${p.y}`).join(' ')}
                     fill="none"
