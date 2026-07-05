@@ -176,16 +176,9 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         />
       )}
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
-      <div className="grid grid-cols-[36px_1fr_72px_72px_40px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-2 mb-1 gap-1">
-        <span className="text-center">Set</span>
-        <span className="text-center">Previous</span>
-        <span className="text-center">kg</span>
-        <span className="text-center">Reps</span>
-        <span></span>
-      </div>
       {sets.map((s, i) => (
         <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
-        <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg ?? (i === 0 && prev ? prev.kg : null)} initialReps={s.suggestedReps ?? (i === 0 && prev ? prev.reps + 1 : null)} restDuration={restEnabled ? restDuration : 0}
+        <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg ?? (i === 0 && prev ? prev.kg : null)} initialReps={s.suggestedReps ?? (i === 0 && prev ? prev.reps + 1 : null)} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
           onComplete={(result) => {
             const setIndex = sets.findIndex(r => r.id === s.id);
             const wasCompleted = !!completedSets[s.id];

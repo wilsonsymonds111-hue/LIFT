@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, memo } from 'react';
 import { Check } from 'lucide-react';
 import { notifyRestComplete, playTick } from '../../lib/workoutSounds';
 
-const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete, restDuration = 120 }) {
+const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete, restDuration = 120, showHeader = false }) {
   const [kg, setKg] = useState(initialKg ?? previous?.kg ?? '');
   const [reps, setReps] = useState(initialReps ?? previous?.reps ?? '');
   const [done, setDone] = useState(false);
@@ -119,6 +119,15 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
 
   return (
     <div>
+      {showHeader && (
+        <div className="grid grid-cols-[36px_1fr_72px_72px_40px] gap-1 px-2 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+          <span className="text-center">Set</span>
+          <span className="text-center">Previous</span>
+          <span className="text-center">kg</span>
+          <span className="text-center">Reps</span>
+          <span></span>
+        </div>
+      )}
       <div className="relative overflow-hidden rounded-lg">
         <div className="absolute inset-y-0 right-0 flex items-center justify-end px-4 bg-red-500 rounded-lg">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
