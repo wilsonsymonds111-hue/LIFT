@@ -35,7 +35,7 @@ const STEPS = [
     subtitle: 'Choose "Save to Files" to download the CSV to your phone',
     image: SCREENSHOTS.share,
     // "Save to Files" is the 3rd action in the bottom actions row (Copy, New Quick Note, Save to Files)
-    highlight: { top: '83%', left: '58%', width: '20%', height: '11%' },
+    highlight: { top: '83%', left: '52%', width: '20%', height: '11%' },
   },
 ];
 
