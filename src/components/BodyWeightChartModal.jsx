@@ -264,7 +264,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             <button
               onClick={() => { setGoalMode('cutting'); localStorage.setItem('goalMode', 'cutting'); }}
               className={`flex items-center justify-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase transition ${
-                goalMode === 'cutting' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
+                goalMode === 'cutting' ? 'bg-amber-400 text-white shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
               }`}
             >
               <Zap className="w-2.5 h-2.5" /> Cutting
@@ -407,8 +407,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                   contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
                   labelStyle={{ color: '#8E8E93' }}
                 />
-                <Line type="monotone" dataKey="weight" stroke={goalMode === 'cutting' ? '#f97316' : '#3b82f6'} strokeWidth={2.5} dot={(props) => { if (props.payload.weight == null) return false; return <circle cx={props.cx} cy={props.cy} r={props.payload.isLatest ? 5 : 4} fill={props.payload.isLatest ? (goalMode === 'cutting' ? '#ea580c' : '#2563eb') : (goalMode === 'cutting' ? '#f97316' : '#3b82f6')} stroke="#fff" strokeWidth={2} />; }} activeDot={{ r: 6, fill: goalMode === 'cutting' ? '#ea580c' : '#2563eb', stroke: '#fff', strokeWidth: 2 }} animationDuration={200} animationEasing="ease-out" />
-                {goalData && <Line type="linear" dataKey="weightProjection" stroke={goalMode === 'cutting' ? '#fed7aa' : '#bfdbfe'} strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={(props) => { if (props.payload.weight != null) return false; return <circle cx={props.cx} cy={props.cy} r={5} fill="#fff" fillOpacity={0.6} stroke={goalMode === 'cutting' ? '#fed7aa' : '#bfdbfe'} strokeWidth={1.5} strokeDasharray="3 2" />; }} activeDot={{ r: 5, fill: goalMode === 'cutting' ? '#fdba74' : '#93c5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
+                <Line type="monotone" dataKey="weight" stroke={goalMode === 'cutting' ? '#facc15' : '#3b82f6'} strokeWidth={2.5} dot={(props) => { if (props.payload.weight == null) return false; return <circle cx={props.cx} cy={props.cy} r={props.payload.isLatest ? 5 : 4} fill={props.payload.isLatest ? (goalMode === 'cutting' ? '#eab308' : '#2563eb') : (goalMode === 'cutting' ? '#facc15' : '#3b82f6')} stroke="#fff" strokeWidth={2} />; }} activeDot={{ r: 6, fill: goalMode === 'cutting' ? '#eab308' : '#2563eb', stroke: '#fff', strokeWidth: 2 }} animationDuration={200} animationEasing="ease-out" />
+                {goalData && <Line type="linear" dataKey="weightProjection" stroke={goalMode === 'cutting' ? '#fde68a' : '#bfdbfe'} strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={(props) => { if (props.payload.weight != null) return false; return <circle cx={props.cx} cy={props.cy} r={5} fill="#fff" fillOpacity={0.6} stroke={goalMode === 'cutting' ? '#fde68a' : '#bfdbfe'} strokeWidth={1.5} strokeDasharray="3 2" />; }} activeDot={{ r: 5, fill: goalMode === 'cutting' ? '#fcd34d' : '#93c5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
               </LineChart>
             </ResponsiveContainer>
           </div>

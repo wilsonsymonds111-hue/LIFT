@@ -197,8 +197,8 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
   const textMuted = isCutting ? 'text-gray-500' : 'text-gray-500';
   const chipBg = isCutting ? 'bg-black/10' : 'bg-black/10';
   const skeletonBg = isCutting ? 'bg-black/10' : 'bg-black/10';
-  const sparkStroke = isCutting ? '#f97316' : '#3b82f6';
-  const sparkFill = isCutting ? '#f97316' : '#2563eb';
+  const sparkStroke = isCutting ? '#facc15' : '#3b82f6';
+  const sparkFill = isCutting ? '#facc15' : '#2563eb';
   const emeraldIcon = isCutting ? 'text-emerald-600' : 'text-emerald-600';
   const orangeIcon = isCutting ? 'text-orange-600' : 'text-orange-600';
 
@@ -224,7 +224,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                     <span className="text-[10px] font-bold text-white uppercase">Bulking</span>
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 bg-orange-500 rounded-full px-2 py-0.5 shadow-sm">
+                  <span className="flex items-center gap-1 bg-amber-400 rounded-full px-2 py-0.5 shadow-sm">
                     <Flame className="w-3 h-3 text-white" />
                     <span className="text-[10px] font-bold text-white uppercase">Cutting</span>
                   </span>
