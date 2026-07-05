@@ -78,7 +78,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   return (
     <>
     <div className="mb-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
-      <div className="relative flex items-center gap-2 mb-1.5">
+      <div className="relative mb-1.5">
         <div className="relative flex-shrink-0">
           <button onClick={() => setShowMenu(m => !m)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
             <MoreHorizontal className="w-4 h-4 text-gray-400" />
@@ -149,8 +149,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             </>
             )}
             </div>
-            <div className="flex items-center gap-3 min-w-0">
-            <h3 className="text-blue-500 font-semibold text-sm select-none cursor-grab active:cursor-grabbing truncate min-w-0 flex-1" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
+            <div className="flex items-start gap-3">
+            <h3 className="text-blue-500 font-semibold text-sm select-none cursor-grab active:cursor-grabbing flex-1 leading-snug" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
             {exerciseImage ? (
               <img
                 src={exerciseImage}
