@@ -82,7 +82,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
 
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-extrabold text-foreground">Profile</h2>
+          <h2 className="text-2xl font-extrabold text-foreground">Profile</h2>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
             <X className="w-4 h-4 text-foreground" />
           </button>
