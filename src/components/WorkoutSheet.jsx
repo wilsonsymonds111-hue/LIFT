@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Timer, CalendarDays, Clock } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
@@ -37,14 +38,19 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     setDragOffset(delta);
   };
   const onGrabPointerUp = () => {
-    if (dragOffsetRef.current > 80) {
-      setMinimized(true);
-    }
-    setDragOffset(0);
-    dragOffsetRef.current = 0;
+    const shouldMinimize = dragOffsetRef.current > 80;
     draggingRef.current = false;
-    setIsDragging(false);
     dragStartYRef.current = null;
+    setIsDragging(false);
+    dragOffsetRef.current = 0;
+    if (shouldMinimize) {
+      requestAnimationFrame(() => {
+        setMinimized(true);
+        setDragOffset(0);
+      });
+    } else {
+      setDragOffset(0);
+    }
   };
   const [prs, setPrs] = useState([]);
   const [bestSets, setBestSets] = useState({});
@@ -258,30 +264,38 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   return (
     <>
-      {!minimized && <div className="fixed inset-0 z-30 bg-black/50 pointer-events-none" />}
+      <div
+        className="fixed inset-0 z-30 bg-black/50 pointer-events-none transition-opacity duration-300"
+        style={{ opacity: minimized ? 0 : 1 }}
+      />
 
-      {minimized && (
-        <div
-          className="fixed left-4 right-4 z-40 bg-gray-900 flex items-center justify-between px-4 py-3 shadow-2xl cursor-pointer rounded-2xl"
-          style={{ bottom: '96px' }}
-          onClick={() => setMinimized(false)}
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <p className="font-bold text-white text-sm truncate">{template.name}</p>
-          </div>
-          <p className="text-sm text-gray-400 font-mono">{timer}</p>
-        </div>
-      )}
+      <AnimatePresence>
+        {minimized && (
+          <motion.div
+            initial={{ y: 120, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 120, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.33, 1, 0.68, 1] }}
+            className="fixed left-4 right-4 z-40 bg-background border border-border flex items-center justify-between px-5 py-4 shadow-2xl cursor-pointer rounded-2xl"
+            style={{ bottom: '96px' }}
+            onClick={() => setMinimized(false)}
+          >
+            <p className="font-bold text-foreground text-base truncate">{template.name}</p>
+            <p className="text-base text-gray-700 dark:text-gray-200 font-display">{timer}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className={`fixed inset-x-0 bottom-0 z-40 bg-background rounded-t-3xl shadow-2xl transition-all duration-300 ease-in-out flex flex-col ${minimized ? 'h-0 overflow-hidden' : 'h-[95vh]'}`}
+      <div
+        className="fixed inset-x-0 bottom-0 z-40 bg-background rounded-t-3xl shadow-2xl flex flex-col h-[95vh]"
         style={{
-          paddingTop: !minimized ? 'env(safe-area-inset-top)' : undefined,
-          transform: dragOffset > 0 ? `translateY(${dragOffset}px)` : undefined,
-          transition: isDragging ? 'none' : undefined,
+          paddingTop: 'env(safe-area-inset-top)',
+          transform: minimized ? 'translateY(100%)' : dragOffset > 0 ? `translateY(${dragOffset}px)` : 'translateY(0)',
+          transition: isDragging ? 'none' : 'transform 300ms cubic-bezier(0.33, 1, 0.68, 1)',
         }}
       >
         <div
-          className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+          className="flex justify-center pt-1 pb-1 cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
           onPointerDown={onGrabPointerDown}
           onPointerMove={onGrabPointerMove}
           onPointerUp={onGrabPointerUp}
