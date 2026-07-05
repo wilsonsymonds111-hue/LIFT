@@ -243,24 +243,24 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={onClose}>
       <div className="absolute inset-0" onClick={onClose} />
       <div
-        className="relative w-full max-w-2xl mx-auto bg-white dark:bg-card rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-2.5rem)] mt-10"
+        className="relative w-full max-w-2xl mx-auto bg-gray-100 dark:bg-zinc-900 rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-2.5rem)] mt-10"
         style={{}}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
-          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 dark:bg-muted ring-1 ring-black/5 dark:ring-white/10 active:scale-95 transition">
+          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 shadow-sm active:scale-95 transition">
             <ChevronLeft className="w-5 h-5 text-gray-900 dark:text-foreground" />
           </button>
           <h1 className="text-xl font-bold text-black dark:text-foreground">Bodyweight</h1>
-          <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 dark:bg-muted ring-1 ring-black/5 dark:ring-white/10 active:scale-95 transition">
+          <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 shadow-sm active:scale-95 transition">
             <Plus className="w-5 h-5 text-gray-900 dark:text-foreground" />
           </button>
         </div>
 
         {/* Cutting / Bulking toggle */}
         <div className="flex justify-center px-4 pb-2 flex-shrink-0">
-          <div className="inline-flex bg-gray-100 dark:bg-muted rounded-full p-0.5">
+          <div className="inline-flex bg-gray-200 dark:bg-zinc-800 rounded-full p-0.5">
             <button
               onClick={() => { setGoalMode('cutting'); localStorage.setItem('goalMode', 'cutting'); }}
               className={`flex items-center justify-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase transition ${
@@ -286,7 +286,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
        <div className="pb-2 pt-1">
          <div className="flex items-center justify-between mb-2">
            <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground tracking-wide">LATEST</p>
-           <div className="inline-flex bg-gray-100 dark:bg-muted rounded-full p-0.5">
+           <div className="inline-flex bg-gray-200 dark:bg-zinc-800 rounded-full p-0.5">
              <button
                onClick={() => { setUnit('kg'); localStorage.setItem('weightUnit', 'kg'); }}
                className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition ${unit === 'kg' ? 'bg-white dark:bg-card text-gray-900 dark:text-foreground shadow-sm' : 'text-gray-400 dark:text-muted-foreground'}`}
@@ -377,7 +377,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
 
          {/* Time frame pills — full-width Apple Health style */}
          <div className="pb-3">
-           <div className="flex bg-gray-100 dark:bg-muted rounded-full p-0.5 gap-0.5">
+           <div className="flex bg-gray-200 dark:bg-zinc-800 rounded-full p-0.5 gap-0.5">
              {['D', 'W', 'M', '6M', 'Y'].map(tf => (
                <button
                  key={tf}
@@ -424,7 +424,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       {/* Goal section */}
       {goalData && (
         <div className="pb-3">
-          <div className="relative bg-gray-50 dark:bg-muted/50 rounded-2xl p-4 border border-gray-200 dark:border-border">
+          <div className="relative bg-white dark:bg-zinc-800 rounded-2xl p-4 border border-gray-200 dark:border-border shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-900 dark:bg-primary">
                 <CheckeredFlagIcon className="w-5 h-5" />
@@ -539,7 +539,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={importing}
-          className="w-full flex items-center gap-3 bg-gray-100 dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-200 dark:border-border shadow-sm transition active:opacity-70 disabled:opacity-50"
+          className="w-full flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 mb-4 border border-gray-200 dark:border-border shadow-sm transition active:opacity-70 disabled:opacity-50"
         >
           <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/b393a622b_image.png" alt="Apple Health" className="w-10 h-10 rounded-[10px] object-cover flex-shrink-0 shadow-sm" />
           <div className="text-left flex-1">
