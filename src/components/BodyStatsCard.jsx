@@ -212,7 +212,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             background: goalMode === 'cutting'
               ? 'linear-gradient(135deg, #fef9e7 0%, #fdf4d3 45%, #fcf0c0 100%)'
               : 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #3b82f6 100%)',
-
+            border: goalMode === 'cutting' ? '1px solid #f0e0b8' : '1px solid rgba(255,255,255,0.15)',
           }}
         >
           {/* Decorative glow */}
