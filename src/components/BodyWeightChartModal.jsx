@@ -249,12 +249,12 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
-          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-muted active:scale-95 transition">
-            <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-foreground" />
+          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 dark:bg-muted ring-1 ring-black/5 dark:ring-white/10 active:scale-95 transition">
+            <ChevronLeft className="w-5 h-5 text-gray-900 dark:text-foreground" />
           </button>
           <h1 className="text-xl font-bold text-black dark:text-foreground">Bodyweight</h1>
-          <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-900 dark:bg-primary active:scale-95 transition">
-            <Plus className="w-5 h-5 text-white" />
+          <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 dark:bg-muted ring-1 ring-black/5 dark:ring-white/10 active:scale-95 transition">
+            <Plus className="w-5 h-5 text-gray-900 dark:text-foreground" />
           </button>
         </div>
 
