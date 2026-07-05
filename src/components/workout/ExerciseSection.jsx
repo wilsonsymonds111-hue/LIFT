@@ -10,7 +10,7 @@ import GoalModal from './GoalModal';
 import SetRow from './SetRow';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
-const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage }) {
+const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange }) {
   const pr = useMemo(() => {
     const history = exercise.history || [];
     if (history.length === 0) return null;
@@ -28,6 +28,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   }, [exercise.history]);
 
   const [sets, setSets] = useState(() => {
+    if (initialState?.sets) return initialState.sets;
     const setCount = Math.max(1, exercise.sets || 1);
     if (!pr) return Array.from({ length: setCount }, (_, i) => ({ id: i + 1, suggestedKg: null, suggestedReps: null }));
     return Array.from({ length: setCount }, (_, i) => ({
@@ -36,9 +37,9 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       suggestedReps: pr.reps + i + 1,
     }));
   });
-  const [completedSets, setCompletedSets] = useState({});
+  const [completedSets, setCompletedSets] = useState(() => initialState?.completedSets || {});
   const [showMenu, setShowMenu] = useState(false);
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState(() => initialState?.note || '');
   const [showNote, setShowNote] = useState(false);
   const [restDuration, setRestDuration] = useState(() => getDefaultRestDuration(exercise.name));
   const [restEnabled, setRestEnabled] = useState(true);
@@ -74,6 +75,11 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const prevCountRef = useRef(0);
   const animDir = sessionResults.length >= prevCountRef.current ? 'add' : 'remove';
   useEffect(() => { prevCountRef.current = sessionResults.length; }, [sessionResults.length]);
+
+  // Report state changes to parent for session persistence
+  useEffect(() => {
+    onStateChange?.({ sets, completedSets, note });
+  }, [sets, completedSets, note, onStateChange]);
 
   // Preload the detail modal chunk so it opens instantly when the image is clicked
   useEffect(() => { import('../ExerciseDetailModal'); }, []);

@@ -13,8 +13,9 @@ import ExerciseSection from './workout/ExerciseSection';
 import SummaryScreen from './workout/SummaryScreen';
 import { isRestDayToday } from '../lib/restDayCheck';
 import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
+import { saveWorkoutSession, clearWorkoutSession } from '../lib/workoutSession';
 
-export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
+export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedSession }) {
   const [minimized, setMinimized] = useState(false);
   const [prs, setPrs] = useState([]);
   const [bestSets, setBestSets] = useState({});
@@ -22,12 +23,14 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [finishTimer, setFinishTimer] = useState('00:00');
   const [isRestDay, setIsRestDay] = useState(false);
   const { data: allTemplates = [] } = useWorkoutTemplates();
-  const [exercises, setExercises] = useState(() =>
-    (template?.exerciseList || []).map(ex => ({
+  const startTimeRef = useRef(savedSession?.startTime || Date.now());
+  const [exercises, setExercises] = useState(() => {
+    if (savedSession?.exercises?.length) return savedSession.exercises;
+    return (template?.exerciseList || []).map(ex => ({
       ...ex,
       name: ex.name.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()),
     }))
-  );
+  });
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [showRestTimerPicker, setShowRestTimerPicker] = useState(false);
   const [globalRestDuration, setGlobalRestDuration] = useState(120);
@@ -37,8 +40,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
   const [restMinimized, setRestMinimized] = useState(false);
   const restIntervalRef = useRef(null);
   const restEndRef = useRef(null);
-  const { display: timer } = useTimer();
-  const bestSetsRef = useRef({});
+  const { display: timer } = useTimer(startTimeRef.current);
+  const bestSetsRef = useRef(savedSession?.bestSets || {});
+  // Per-exercise state (sets, completedSets, note) for session persistence
+  const exerciseStateRef = useRef(savedSession?.exerciseState || {});
 
   const startRestTimer = (duration) => {
     clearInterval(restIntervalRef.current);
@@ -154,6 +159,23 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     setExercises(prev => prev.filter((_, i) => i !== idx));
   }, []);
 
+  // Persist the live workout session so it survives app kills
+  const handleExerciseStateChange = useCallback((name, state) => {
+    exerciseStateRef.current[name] = state;
+  }, []);
+
+  useEffect(() => {
+    if (showSummary) return;
+    saveWorkoutSession({
+      templateId: template?.id,
+      templateName: template?.name,
+      startTime: startTimeRef.current,
+      exercises,
+      bestSets: bestSetsRef.current,
+      exerciseState: exerciseStateRef.current,
+    });
+  }, [exercises, showSummary, template?.id, template?.name]);
+
   const handleFinish = useCallback(async () => {
     const snapshot = { ...bestSetsRef.current };
     const toKg = (h) => typeof h === 'object' ? h.kg : h;
@@ -185,6 +207,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
     }
     setIsRestDay(isRestDayToday(allTemplates));
     setShowSummary(true);
+    clearWorkoutSession();
   }, [exercises, timer, onSaveHistory, template?.id, allTemplates]);
 
   if (!template) return null;
@@ -319,7 +342,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                         <Draggable key={exercise.name + idx} draggableId={exercise.name + idx} index={idx}>
                           {(p) => (
                             <div ref={p.innerRef} {...p.draggableProps}>
-                              <ExerciseSection key={`${exercise.name}-${(exercise.history || []).length}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name.toLowerCase()]} onDeleteExercise={() => handleDeleteExercise(idx)} />
+                              <ExerciseSection key={`${exercise.name}-${idx}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name.toLowerCase()]} onDeleteExercise={() => handleDeleteExercise(idx)} initialState={exerciseStateRef.current[exercise.name]} onStateChange={(state) => handleExerciseStateChange(exercise.name, state)} />
                             </div>
                           )}
                         </Draggable>
@@ -338,7 +361,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory }) {
                   Add Exercises
                 </button>
                 <button
-                  onClick={onFinish}
+                  onClick={() => { clearWorkoutSession(); onFinish(); }}
                   className="w-full py-3.5 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition"
                 >
                   Cancel Workout

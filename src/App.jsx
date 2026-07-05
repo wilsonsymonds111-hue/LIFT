@@ -37,6 +37,7 @@ const SupportChat = lazy(() => lazyRetry(() => import('./pages/SupportChat')));
 const Terms = lazy(() => lazyRetry(() => import('./pages/Terms')));
 const Privacy = lazy(() => lazyRetry(() => import('./pages/Privacy')));
 import { usePrefetchData } from './hooks/usePrefetchData';
+import { loadWorkoutSession } from './lib/workoutSession';
 
 const TABS = ['/', '/splits', '/exercises'];
 
@@ -167,11 +168,20 @@ const usePreloadSubPages = () => {
 
 const AnimatedRoutes = memo(() => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isTabRoute = TABS.includes(location.pathname);
   usePreloadSubPages();
   usePrefetchData();
   const isModalRoute = location.pathname.startsWith('/template/');
   const tabDisplay = useMemo(() => ({ display: isTabRoute || isModalRoute ? 'flex' : 'none' }), [isTabRoute, isModalRoute]);
+
+  // Restore an in-progress workout if the app was killed and reopened
+  useEffect(() => {
+    const session = loadWorkoutSession();
+    if (session?.templateId && !location.pathname.startsWith('/active-workout')) {
+      navigate(`/active-workout/${session.templateId}`, { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

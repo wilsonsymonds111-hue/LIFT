@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 
-export function useTimer() {
-  const [seconds, setSeconds] = useState(0);
+export function useTimer(startTimestamp = null) {
+  const [seconds, setSeconds] = useState(() => {
+    if (startTimestamp) {
+      return Math.max(0, Math.floor((Date.now() - startTimestamp) / 1000));
+    }
+    return 0;
+  });
   const ref = useRef(seconds);
   ref.current = seconds;
   useEffect(() => {
