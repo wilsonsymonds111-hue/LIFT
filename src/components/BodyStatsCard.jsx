@@ -225,7 +225,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                 <Activity className={`w-3.5 h-3.5 ${textLabel}`} />
                 <span className={`text-xs font-bold ${textLabel} uppercase tracking-wide`}>Body Stats</span>
                 {goalMode === 'bulking' ? (
-                  <span className="flex items-center gap-1 bg-blue-400/40 border border-blue-200/30 rounded-full px-2 py-0.5">
+                  <span className="flex items-center gap-1 bg-blue-500 rounded-full px-2 py-0.5 shadow-sm">
                     <BicepsFlexed className="w-3 h-3 text-white" />
                     <span className="text-[10px] font-bold text-white uppercase">Bulking</span>
                   </span>

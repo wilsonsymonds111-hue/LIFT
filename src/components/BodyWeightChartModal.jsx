@@ -261,16 +261,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
           <div className="inline-flex bg-gray-100 dark:bg-muted rounded-full p-0.5">
             <button
               onClick={() => { setGoalMode('cutting'); localStorage.setItem('goalMode', 'cutting'); }}
-              className={`flex items-center justify-center gap-1 px-3 py-1 rounded-full text-[10px] font-semibold transition ${
-                goalMode === 'cutting' ? 'bg-white dark:bg-card text-amber-500 shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
+              className={`flex items-center justify-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase transition ${
+                goalMode === 'cutting' ? 'bg-amber-500 text-white shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
               }`}
             >
               <Zap className="w-2.5 h-2.5" /> Cutting
             </button>
             <button
               onClick={() => { setGoalMode('bulking'); localStorage.setItem('goalMode', 'bulking'); }}
-              className={`flex items-center justify-center gap-1 px-3 py-1 rounded-full text-[10px] font-semibold transition ${
-                goalMode === 'bulking' ? 'bg-white dark:bg-card text-blue-500 shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
+              className={`flex items-center justify-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase transition ${
+                goalMode === 'bulking' ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
               }`}
             >
               <BicepsFlexed className="w-2.5 h-2.5" /> Bulking
