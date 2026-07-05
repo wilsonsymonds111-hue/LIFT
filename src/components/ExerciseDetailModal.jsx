@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import { getExerciseDetailList } from '../lib/exerciseCache';
 import ProgressGraph from './ProgressGraph';
+import ExerciseHistoryList from './ExerciseHistoryList';
 import { MUSCLE_COLORS } from '../lib/exercises';
 import { isCustomExercise, deleteCustomExercise } from '../lib/customExercises';
 
@@ -21,10 +22,6 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
   const [detail, setDetail] = useState(initialImage ? { image_url: initialImage } : null);
   const [loadingDetail, setLoadingDetail] = useState(!initialImage);
   const [loadingHistory, setLoadingHistory] = useState(!initialHistory);
-  const [shimmer, setShimmer] = useState(false);
-
-  useEffect(() => { setTimeout(() => setShimmer(true), 200); }, []);
-
   // Fetch workout history from the Exercise entity (only if not passed in)
   useEffect(() => {
     base44.entities.Exercise.filter({ name: exercise.name }).then(results => {
@@ -76,34 +73,12 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
     });
   }, [exercise.name, initialImage]);
 
-  const { isBodyweight, stats } = useMemo(() => {
+  const isBodyweight = useMemo(() => {
     const allEntries = history.length > 0 ? history : [];
-    const isBw = allEntries.length > 0
+    return allEntries.length > 0
       ? allEntries.every(h => { const kg = h.kg ?? 0; return kg === 0 || kg == null; })
       : false;
-
-    const s = history.length > 0
-      ? (() => {
-           const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
-           const reps = history.map(h => h.reps || 0);
-           const bestKg = Math.max(...kgs);
-           const bestEntry = history
-            .filter(h => (h.kg || 0) === bestKg)
-            .sort((a, b) => (b.reps || 0) - (a.reps || 0))[0];
-          const bestReps = bestEntry?.reps || 0;
-          const firstKg = history[0]?.kg || 0;
-          const firstReps = history[0]?.reps || 0;
-          const increase = bestKg - firstKg;
-          return {
-            start: isBw ? firstReps + ' reps' : firstKg + ' kg',
-            best: isBw ? Math.max(...reps) + ' reps' : `${bestKg} kg × ${bestReps}`,
-            increase: isBw ? (Math.max(...reps) - firstReps) + ' reps' : `+${increase} kg`,
-          };
-        })()
-      : null;
-
-    return { isBodyweight: isBw, stats: s };
-    }, [history, exercise.name]);
+  }, [history]);
 
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
 
@@ -231,33 +206,11 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
                     isBodyweight={chartIsBodyweight}
                     exerciseName={exercise.name}
                   />
-                  {stats && (
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {[
-                        { label: 'Starting Weight', value: stats.start },
-                        { label: 'Increase', value: stats.increase },
-                        { label: 'Best', value: stats.best },
-                      ].map(s => (
-                        <div
-                          key={s.label}
-                          className={s.label === 'Best'
-                            ? `rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-gradient-to-br from-amber-200/60 to-amber-100/30 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
-                            : 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-blue-400'
-                          }
-                        >
-                          {s.label === 'Best' && s.value.includes(' × ') ? (
-                            <>
-                              <p className="text-xs font-semibold relative z-10 leading-tight text-foreground">{s.value.split(' × ')[0]}</p>
-                              <p className="text-xs font-semibold relative z-10 leading-tight text-foreground">× {s.value.split(' × ')[1]}</p>
-                            </>
-                          ) : (
-                            <p className={`text-xs font-semibold relative z-10 ${s.label === 'Best' ? 'text-foreground' : 'text-white'}`}>{s.value}</p>
-                          )}
-                          <p className={`text-[9px] font-medium uppercase tracking-wider mt-0.5 relative z-10 text-center ${s.label === 'Best' ? 'text-muted-foreground' : 'text-blue-50'}`}>{s.label}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <ExerciseHistoryList
+                    history={history}
+                    exerciseName={exercise.name}
+                    onEntryDeleted={(updated) => setHistory(updated)}
+                  />
                 </>
               ) : (
                 <p className="text-center text-muted-foreground py-12">No workout history yet. Start a workout to see your progress!</p>
