@@ -251,7 +251,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-foreground" />
           </button>
           <h1 className="text-xl font-bold text-black dark:text-foreground">Bodyweight</h1>
-          <button onClick={() => setShowKeypad(true)} className={`w-9 h-9 flex items-center justify-center rounded-full active:scale-95 transition ${goalMode === 'cutting' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-blue-500 hover:bg-blue-600'}`}>
+          <button onClick={() => setShowKeypad(true)} className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-900 dark:bg-primary active:scale-95 transition">
             <Plus className="w-5 h-5 text-white" />
           </button>
         </div>
@@ -309,7 +309,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm relative">
            <div className="flex items-center justify-between mb-1">
              <div className="flex items-center gap-1.5">
-               <Dumbbell className="w-3.5 h-3.5 text-blue-500" />
+               <Dumbbell className="w-3.5 h-3.5 text-gray-400 dark:text-muted-foreground" />
                <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground">Muscle Gain</p>
              </div>
              {prediction && (
@@ -324,7 +324,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
            {muscleLoading ? (
              <div className="h-6 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
            ) : prediction ? (
-             <p className="text-xl font-bold text-blue-500">{prediction.muscleGainG}<span className="text-xs font-medium text-gray-400 dark:text-muted-foreground"> g</span></p>
+             <p className="text-xl font-bold text-gray-900 dark:text-foreground">{prediction.muscleGainG}<span className="text-xs font-medium text-gray-400 dark:text-muted-foreground"> g</span></p>
            ) : (
              <p className="text-sm text-gray-400 dark:text-muted-foreground">No data</p>
            )}
@@ -341,7 +341,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm relative">
            <div className="flex items-center justify-between mb-1">
              <div className="flex items-center gap-1.5">
-               <Flame className="w-3.5 h-3.5 text-orange-500" />
+               <Flame className="w-3.5 h-3.5 text-gray-400 dark:text-muted-foreground" />
                <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground">Fat Loss</p>
              </div>
              {prediction && (
@@ -356,7 +356,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
            {muscleLoading ? (
              <div className="h-6 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
            ) : prediction ? (
-             <p className="text-xl font-bold text-orange-500">{fatLossG}<span className="text-xs font-medium text-gray-400 dark:text-muted-foreground"> g</span></p>
+             <p className="text-xl font-bold text-gray-900 dark:text-foreground">{fatLossG}<span className="text-xs font-medium text-gray-400 dark:text-muted-foreground"> g</span></p>
            ) : (
              <p className="text-sm text-gray-400 dark:text-muted-foreground">No data</p>
            )}
@@ -373,14 +373,14 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          </div>
          </div>
 
-         {/* Time frame pills */}
-         <div className="flex justify-center pb-3">
-           <div className="inline-flex bg-gray-100 dark:bg-muted rounded-full p-0.5 gap-0.5">
+         {/* Time frame pills — full-width Apple Health style */}
+         <div className="pb-3">
+           <div className="flex bg-gray-100 dark:bg-muted rounded-full p-0.5 gap-0.5">
              {['D', 'W', 'M', '6M', 'Y'].map(tf => (
                <button
                  key={tf}
                  onClick={() => { setTimeFrame(tf); localStorage.setItem('bodyWeightTimeFrame', tf); }}
-                 className={`px-3 py-1 rounded-full text-[11px] font-semibold transition ${
+                 className={`flex-1 py-1 rounded-full text-[11px] font-semibold transition ${
                    timeFrame === tf
                      ? 'bg-white dark:bg-card text-gray-900 dark:text-foreground shadow-sm'
                      : 'text-gray-400 dark:text-muted-foreground'
@@ -422,25 +422,25 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       {/* Goal section */}
       {goalData && (
         <div className="pb-3">
-          <div className="relative bg-amber-50 dark:bg-amber-950/30 rounded-2xl p-4 border border-amber-300/60 dark:border-amber-700/40">
+          <div className="relative bg-gray-50 dark:bg-muted/50 rounded-2xl p-4 border border-gray-200 dark:border-border">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-900 dark:bg-primary">
                 <CheckeredFlagIcon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 dark:text-foreground">Goal: {goalData.goal} {unit}</p>
                 <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{weeksAway} weeks away</p>
                 <div className="flex items-center gap-1 mt-1">
-                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
-                  <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-amber-200 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 text-[10px] font-bold flex-shrink-0">?</button>
+                  <p className="text-xs text-gray-600 dark:text-muted-foreground font-medium">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
+                  <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-200 dark:bg-muted text-gray-500 dark:text-muted-foreground text-[10px] font-bold flex-shrink-0">?</button>
                 </div>
               </div>
               <div className="flex items-center gap-0.5 flex-shrink-0">
-                <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40 transition">
-                  <Info className="w-4 h-4 text-amber-500" />
+                <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-muted transition">
+                  <Info className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                 </button>
-                <button onClick={() => setShowGoalModal(true)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40 transition">
-                  <Pencil className="w-4 h-4 text-amber-500" />
+                <button onClick={() => setShowGoalModal(true)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-muted transition">
+                  <Pencil className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                 </button>
                 <button onClick={handleDeleteGoal} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition">
                   <Trash2 className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
@@ -476,9 +476,9 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         {!goalData && entries.length > 0 && (
           <button
             onClick={() => setShowGoalModal(!showGoalModal)}
-            className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-amber-200 dark:border-amber-800/40 shadow-sm transition active:opacity-70"
+            className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-200 dark:border-border shadow-sm transition active:opacity-70"
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-900 dark:bg-primary">
               <CheckeredFlagIcon className="w-5 h-5" />
             </div>
             <div className="text-left flex-1">
@@ -499,14 +499,14 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                 placeholder={`Goal weight (${unit})`}
                 value={goalWeight}
                 onChange={e => setGoalWeight(e.target.value)}
-                className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-gray-400"
+                className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder:text-gray-400"
               />
               <div className="flex items-center gap-1.5">
                 <p className="text-xs font-semibold text-gray-600 dark:text-muted-foreground">Rate per week ({unit})</p>
                 <button type="button" onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-200 dark:bg-muted text-gray-500 dark:text-muted-foreground text-[10px] font-bold flex-shrink-0">?</button>
               </div>
               {showRateHelp && (
-                <p className="text-[11px] text-gray-500 dark:text-muted-foreground bg-blue-50 dark:bg-blue-950/30 rounded-lg p-2.5 -mt-1">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
+                <p className="text-[11px] text-gray-500 dark:text-muted-foreground bg-gray-50 dark:bg-muted/50 rounded-lg p-2.5 -mt-1">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
               )}
               <input
                 type="number"
@@ -515,7 +515,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                 placeholder="0.5"
                 value={goalRate}
                 onChange={e => setGoalRate(e.target.value)}
-                className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-gray-400"
+                className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder:text-gray-400"
               />
               {goalError && (
                 <div className="flex items-start gap-2 bg-red-50 dark:bg-red-950/30 rounded-lg p-2.5 border border-red-200 dark:border-red-700/30">
@@ -525,7 +525,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
               )}
               <button
                 onClick={handleSetGoal}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2.5 rounded-lg transition"
+                className="w-full bg-gray-900 dark:bg-primary hover:bg-gray-800 dark:hover:bg-primary/90 text-white font-semibold py-2.5 rounded-lg transition"
               >
                 Set Goal
               </button>
