@@ -207,14 +207,14 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
       <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-sm"
+          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-zinc-600 shadow-[0_8px_24px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)]"
         >
-          <div className="relative p-5">
+          <div className="relative p-6">
             {/* Top row: label + status pill + arrow */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Activity className={`w-4 h-4 ${isCutting ? 'text-black' : 'text-gray-700'}`} />
-                <span className={`text-sm font-extrabold ${isCutting ? 'text-black' : 'text-gray-700'} uppercase tracking-wide`}>Body Stats</span>
+                <Activity className={`w-5 h-5 ${isCutting ? 'text-black' : 'text-gray-700'}`} />
+                <span className={`text-base font-extrabold ${isCutting ? 'text-black' : 'text-gray-700'} uppercase tracking-wide`}>Body Stats</span>
                 {goalMode === 'bulking' ? (
                   <span className="flex items-center gap-1 bg-blue-500 rounded-full px-2 py-0.5 shadow-sm">
                     <BicepsFlexed className="w-3 h-3 text-white" />
@@ -231,17 +231,17 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             </div>
 
             {/* Weight + sparkline row */}
-            <div className="flex items-end justify-between gap-2 mb-3">
+            <div className="flex items-end justify-between gap-2 mb-1">
               <div className="flex items-end gap-1">
                 {weightLoading ? (
-                  <div className={`h-9 w-20 ${skeletonBg} rounded-lg animate-pulse`} />
+                  <div className={`h-10 w-24 ${skeletonBg} rounded-lg animate-pulse`} />
                 ) : latest ? (
                   <>
-                    <span className={`text-3xl font-extrabold ${textPrimary} leading-none`}>{latest.weight}</span>
-                    <span className={`text-sm ${textSecondary} font-semibold mb-0.5`}>kg</span>
+                    <span className={`text-4xl font-extrabold ${textPrimary} leading-none`}>{latest.weight}</span>
+                    <span className={`text-base ${textSecondary} font-semibold mb-0.5`}>kg</span>
                   </>
                 ) : (
-                  <span className={`text-base ${textLabel} font-semibold`}>Tap to log</span>
+                  <span className={`text-lg ${textLabel} font-semibold`}>Tap to log</span>
                 )}
               </div>
               {sparklinePoints && (
