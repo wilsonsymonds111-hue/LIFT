@@ -242,7 +242,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       <div className="absolute inset-0" onClick={onClose} />
       <div
         className="relative w-full max-w-2xl mx-auto bg-white dark:bg-card rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-2.5rem)] mt-10"
-        style={goalMode === 'cutting' ? { background: 'linear-gradient(180deg, #f5e6c8 0%, #faf3e4 12%, hsl(0 0% 100%) 35%, hsl(0 0% 100%) 100%)' } : {}}
+        style={goalMode === 'cutting' ? { background: 'linear-gradient(180deg, #f5e6c8 0%, #faf3e4 12%, hsl(0 0% 100%) 35%, hsl(0 0% 100%) 100%)' } : goalMode === 'bulking' ? { background: 'linear-gradient(180deg, #dbeafe 0%, #eff6ff 12%, hsl(0 0% 100%) 35%, hsl(0 0% 100%) 100%)' } : {}}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
