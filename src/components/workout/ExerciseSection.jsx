@@ -2,8 +2,8 @@ import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'reac
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import ProgressGraph, { getRepCap } from '../ProgressGraph';
-import { useToast } from '@/components/ui/use-toast';
 import SetRow from './SetRow';
+import RepGoalNotification from './RepGoalNotification';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
 const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange }) {
@@ -43,7 +43,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [customRestInput, setCustomRestInput] = useState('');
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
-  const { toast } = useToast();
+  const [goalNotification, setGoalNotification] = useState(null);
   const repCap = getRepCap(exercise.name);
   const goalNoteShownRef = useRef(false);
   const lastEntry = exercise.history?.[exercise.history.length - 1];
@@ -90,13 +90,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             <img
               src={exerciseImage}
               alt={exercise.name}
-              className="w-16 h-14 rounded-lg object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+              className="w-20 h-16 rounded-xl object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform"
               decoding="async"
               onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
             />
           ) : (
-            <div className="w-16 h-14 rounded-lg bg-gray-100 flex items-center justify-center">
-              <span className="text-sm font-bold text-gray-400">{exercise.name[0]}</span>
+            <div className="w-20 h-16 rounded-xl bg-gray-100 flex items-center justify-center">
+              <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
             </div>
           )}
           {showMenu && (
@@ -194,7 +194,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
               onBestSet?.(exercise.name, result.kg, result.reps);
               if (result.reps >= repCap && !goalNoteShownRef.current) {
                 goalNoteShownRef.current = true;
-                toast({ description: `Studies recommend moving up in weight after hitting ${repCap} reps for maximum muscle growth.` });
+                setGoalNotification(`Great work hitting ${repCap} reps! Time to move up to a heavier weight for maximum muscle growth.`);
               }
               if (!wasCompleted && setIndex < sets.length - 1) {
                 setSets(prev => prev.map((r, i) => {
@@ -252,6 +252,12 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           onClose={() => setShowExerciseDetail(false)}
         />
       </Suspense>
+    )}
+    {goalNotification && (
+      <RepGoalNotification
+        message={goalNotification}
+        onDismiss={() => setGoalNotification(null)}
+      />
     )}
     </>
   );
