@@ -116,6 +116,22 @@
   background: linear-gradient(180deg, #1a1a1e 0%, #161619 25%, #0f0f0f 100%);
 }
 
+/* Subtle darker gradient at the very top of tab pages so iOS status bar
+   text (time, cellular, battery) is easier to read against the light background. */
+.status-bar-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  pointer-events: none;
+  z-index: 50;
+  background: linear-gradient(180deg, hsl(240 6% 72%) 0%, hsl(240 6% 88%) 55%, transparent 100%);
+}
+.dark .status-bar-gradient {
+  background: linear-gradient(180deg, hsl(225 10% 4%) 0%, hsl(225 10% 7%) 55%, transparent 100%);
+}
+
 /* Semi-transparent sticky header that blends with the gradient */
 .glass-header {
   background: rgba(245, 244, 247, 0.75);
