@@ -17,6 +17,34 @@ import { saveWorkoutSession, clearWorkoutSession } from '../lib/workoutSession';
 
 export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedSession }) {
   const [minimized, setMinimized] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartYRef = useRef(null);
+  const draggingRef = useRef(false);
+  const dragOffsetRef = useRef(0);
+
+  const onGrabPointerDown = (e) => {
+    dragStartYRef.current = e.clientY;
+    draggingRef.current = true;
+    setIsDragging(true);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  const onGrabPointerMove = (e) => {
+    if (!draggingRef.current || dragStartYRef.current === null) return;
+    const delta = Math.max(0, e.clientY - dragStartYRef.current);
+    dragOffsetRef.current = delta;
+    setDragOffset(delta);
+  };
+  const onGrabPointerUp = () => {
+    if (dragOffsetRef.current > 80) {
+      setMinimized(true);
+    }
+    setDragOffset(0);
+    dragOffsetRef.current = 0;
+    draggingRef.current = false;
+    setIsDragging(false);
+    dragStartYRef.current = null;
+  };
   const [prs, setPrs] = useState([]);
   const [bestSets, setBestSets] = useState({});
   const [showSummary, setShowSummary] = useState(false);
@@ -233,7 +261,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
       {minimized && (
         <div
-          className="fixed inset-x-0 bottom-0 z-40 bg-gray-900 flex items-center justify-between px-4 py-3 shadow-2xl cursor-pointer"
+          className="fixed left-4 right-4 z-40 bg-gray-900 flex items-center justify-between px-4 py-3 shadow-2xl cursor-pointer rounded-2xl"
+          style={{ bottom: '96px' }}
           onClick={() => setMinimized(false)}
         >
           <div className="flex items-center gap-3 min-w-0">
@@ -257,10 +286,20 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       )}
 
       <div className={`fixed inset-x-0 bottom-0 z-40 bg-background rounded-t-3xl shadow-2xl transition-all duration-300 ease-in-out flex flex-col ${minimized ? 'h-0 overflow-hidden' : 'h-[95vh]'}`}
-        style={!minimized ? { paddingTop: 'env(safe-area-inset-top)' } : undefined}
+        style={{
+          paddingTop: !minimized ? 'env(safe-area-inset-top)' : undefined,
+          transform: dragOffset > 0 ? `translateY(${dragOffset}px)` : undefined,
+          transition: isDragging ? 'none' : undefined,
+        }}
       >
-        <div className="flex justify-center pt-3 pb-1 cursor-pointer flex-shrink-0" onClick={() => setMinimized(true)}>
-          <div className="w-10 h-1 rounded-full bg-gray-300" />
+        <div
+          className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+          onPointerDown={onGrabPointerDown}
+          onPointerMove={onGrabPointerMove}
+          onPointerUp={onGrabPointerUp}
+          onPointerCancel={onGrabPointerUp}
+        >
+          <div className="w-10 h-1.5 rounded-full bg-gray-300" />
         </div>
 
         <>
