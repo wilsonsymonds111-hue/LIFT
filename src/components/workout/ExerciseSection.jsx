@@ -78,31 +78,15 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   return (
     <>
     <div className="mb-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
-      <div className="flex items-center justify-between relative">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing truncate" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
-          <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 transition flex-shrink-0">
-            <MoreHorizontal className="w-3.5 h-3.5 text-gray-400" />
+      <div className="relative mb-1.5">
+        <div className="relative flex-shrink-0">
+          <button onClick={() => setShowMenu(m => !m)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            <MoreHorizontal className="w-4 h-4 text-gray-400" />
           </button>
-        </div>
-        <div className="flex items-center gap-3 relative flex-shrink-0">
-          {exerciseImage ? (
-            <img
-              src={exerciseImage}
-              alt={exercise.name}
-              className="w-20 h-16 rounded-xl object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform"
-              decoding="async"
-              onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
-            />
-          ) : (
-            <div className="w-20 h-16 rounded-xl bg-gray-100 flex items-center justify-center">
-              <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
-            </div>
-          )}
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-7 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[190px]">
+              <div className="absolute left-0 top-9 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 min-w-[190px]">
                 <button
                   onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
                   className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
@@ -163,10 +147,26 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                 </button>
               </div>
             </>
-          )}
-        </div>
-      </div>
-      {showNote && (
+            )}
+            </div>
+            <div className="flex items-center gap-3 min-w-0">
+            <h3 className="text-blue-500 font-semibold text-sm select-none cursor-grab active:cursor-grabbing truncate min-w-0 flex-1" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
+            {exerciseImage ? (
+            <img
+             src={exerciseImage}
+             alt={exercise.name}
+             className="w-16 h-14 rounded-lg object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
+             decoding="async"
+             onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
+            />
+            ) : (
+            <div className="w-16 h-14 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+             <span className="text-sm font-bold text-gray-400">{exercise.name[0]}</span>
+            </div>
+            )}
+            </div>
+            </div>
+            {showNote && (
         <textarea
           value={note}
           onChange={e => setNote(e.target.value)}
