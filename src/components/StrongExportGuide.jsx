@@ -34,8 +34,8 @@ const STEPS = [
     title: 'Save to Files',
     subtitle: 'Choose "Save to Files" to download the CSV to your phone',
     image: SCREENSHOTS.share,
-    // Save to Files is in the actions row near the bottom
-    highlight: { top: '72%', left: '62%', width: '16%', height: '12%' },
+    // "Save to Files" is the 3rd action in the bottom actions row (Copy, New Quick Note, Save to Files)
+    highlight: { top: '80%', left: '64%', width: '20%', height: '11%' },
   },
 ];
 
@@ -61,7 +61,7 @@ export default function StrongExportGuide({ onComplete }) {
       {/* Screenshot in CSS phone frame */}
       <div className="relative mx-auto" style={{ width: 140, height: 290 }}>
         {/* Phone body */}
-        <div className="absolute inset-0 rounded-[2.2rem] bg-[#1A1A1A] shadow-2xl" />
+        <div className="absolute inset-0 rounded-[1.5rem] bg-[#1A1A1A] shadow-2xl" />
         {/* Side buttons - left */}
         <div className="absolute left-[-2px] top-[14%] w-[2px] h-[7%] rounded-l bg-[#8C8C8C]" />
         <div className="absolute left-[-2px] top-[23%] w-[2px] h-[4%] rounded-l bg-[#8C8C8C]" />
@@ -69,7 +69,7 @@ export default function StrongExportGuide({ onComplete }) {
         {/* Side button - right */}
         <div className="absolute right-[-2px] top-[22%] w-[2px] h-[9%] rounded-r bg-[#8C8C8C]" />
         {/* Screen */}
-        <div className="absolute inset-[3px] rounded-[2rem] overflow-hidden z-10 bg-white">
+        <div className="absolute inset-[3px] rounded-[1.3rem] overflow-hidden z-10 bg-white">
           <img
             src={current.image}
             alt={`Step ${step + 1}: ${current.title}`}
