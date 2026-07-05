@@ -46,22 +46,6 @@ export default function RestTimeModal({ currentSeconds, onClose, onSelect }) {
         <div className="px-5 pb-5">
           <p className="text-sm text-muted-foreground text-center mb-4">Choose how long the rest timer lasts between sets</p>
 
-          <div className="flex flex-wrap justify-center gap-2 mb-4">
-            {presets.map(total => (
-              <button
-                key={total}
-                onClick={() => { setMinutes(String(Math.floor(total / 60))); setSeconds(String(total % 60)); }}
-                className={`px-3 h-10 rounded-xl font-semibold text-sm transition ${
-                  total === currentTotal
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-muted text-foreground hover:bg-muted/70'
-                }`}
-              >
-                {formatPreset(total)}
-              </button>
-            ))}
-          </div>
-
           <div className="flex items-center justify-center gap-2 mb-5">
             <input
               type="text"
