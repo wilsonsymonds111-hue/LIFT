@@ -266,22 +266,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
           onClick={() => setMinimized(false)}
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-xs font-bold">{template.name.slice(0, 2)}</span>
-            </div>
-            <div className="min-w-0">
-              <p className="font-bold text-white text-sm truncate">{template.name}</p>
-              <p className="text-xs text-gray-400">{timer}</p>
-            </div>
+            <p className="font-bold text-white text-sm truncate">{template.name}</p>
           </div>
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <button
-              onClick={e => { e.stopPropagation(); handleFinish(); }}
-              className="px-4 py-1.5 bg-green-500 text-white text-sm font-semibold rounded-lg"
-            >
-              Finish
-            </button>
-          </div>
+          <p className="text-sm text-gray-400 font-mono">{timer}</p>
         </div>
       )}
 
