@@ -352,9 +352,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   const { data, lastRealIdx } = result;
 
   const yDomain = animatedY
-    ? isBodyweight
-      ? [animatedY.yMin - animatedY.yStep, animatedY.yMax + animatedY.yStep]
-      : [animatedY.yMin - animatedY.yStep / 2, animatedY.yMax + animatedY.yStep / 2]
+    ? [animatedY.yMin - animatedY.yStep, animatedY.yMax + animatedY.yStep]
     : [0, 100];
 
   // Map Y value → pixel position for sticky overlay
