@@ -66,13 +66,12 @@ Deno.serve(async (req) => {
       if (date > workouts[workoutName].lastDate) workouts[workoutName].lastDate = date;
     }
 
-    // Build templates — use the last session's set counts
+    // Build templates — exerciseList stores only name + sets (history lives in Exercise entities)
     const templatesToCreate = Object.entries(workouts).map(([workoutName, w], idx) => {
       const lastSession = w.sessions[w.lastDate] || {};
       const exerciseList = Object.values(w.exercises).map(e => ({
         name: e.name,
         sets: lastSession[e.name] || 3,
-        history: exerciseHistory[e.name] || []
       }));
       return {
         name: workoutName,
@@ -91,16 +90,32 @@ Deno.serve(async (req) => {
     let templatesCreated = 0;
     let exercisesCreated = 0;
 
-    if (templatesToCreate.length > 0) {
-      await base44.entities.WorkoutTemplate.bulkCreate(templatesToCreate);
-      templatesCreated = templatesToCreate.length;
+    // Create templates one at a time to avoid payload limits
+    for (const tpl of templatesToCreate) {
+      try {
+        await base44.entities.WorkoutTemplate.create(tpl);
+        templatesCreated++;
+      } catch (e) {
+        console.error('Failed to create template:', tpl.name, e.message);
+      }
     }
 
-    if (exercisesToCreate.length > 0) {
-      for (let i = 0; i < exercisesToCreate.length; i += 100) {
-        const batch = exercisesToCreate.slice(i, i + 100);
+    // Create exercises in small batches to stay within payload limits
+    for (let i = 0; i < exercisesToCreate.length; i += 10) {
+      const batch = exercisesToCreate.slice(i, i + 10);
+      try {
         await base44.entities.Exercise.bulkCreate(batch);
         exercisesCreated += batch.length;
+      } catch (e) {
+        console.error('Exercise batch failed, trying individually:', e.message);
+        for (const ex of batch) {
+          try {
+            await base44.entities.Exercise.create(ex);
+            exercisesCreated++;
+          } catch (e2) {
+            console.error('Failed to create exercise:', ex.name, e2.message);
+          }
+        }
       }
     }
 
