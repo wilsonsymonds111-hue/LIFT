@@ -272,27 +272,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
               )}
             </div>
 
-            {/* Quick stats row */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {prediction ? (
-                <>
-                  {prediction.muscleGainG > 0 && (
-                    <div className={`flex items-center gap-1 ${chipBg} rounded-full px-2.5 py-1`}>
-                      <TrendingUp className={`w-3 h-3 ${emeraldIcon}`} />
-                      <span className={`text-[11px] font-semibold ${textPrimary}`}>+{prediction.muscleGainG}g muscle</span>
-                    </div>
-                  )}
-                  <div className={`flex items-center gap-1 ${chipBg} rounded-full px-2.5 py-1`}>
-                    <TrendingDown className={`w-3 h-3 ${orangeIcon}`} />
-                    <span className={`text-[11px] font-semibold ${textPrimary}`}>{fatLossG || 0}g fat lost</span>
-                  </div>
-                </>
-              ) : muscleLoading ? (
-                <div className={`h-6 w-28 ${chipBg} rounded-full animate-pulse`} />
-              ) : (
-                <p className={`text-[11px] ${textMuted} font-medium`}>Log workouts & weight for insights</p>
-              )}
-            </div>
+
           </div>
         </div>
       </div>
