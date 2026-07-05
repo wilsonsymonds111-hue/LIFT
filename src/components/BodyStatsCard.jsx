@@ -236,9 +236,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                   </span>
                 )}
               </div>
-              <div className={`w-7 h-7 rounded-full ${skeletonBg} flex items-center justify-center`}>
-                <ChevronRight className={`w-4 h-4 ${textLabel}`} />
-              </div>
+              <ChevronRight className={`w-4 h-4 ${textLabel}`} />
             </div>
 
             {/* Weight + sparkline row */}
