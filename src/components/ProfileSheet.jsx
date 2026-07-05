@@ -107,30 +107,24 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
 
         {/* Photo upload */}
         <div className="flex flex-col items-center gap-3 py-2">
-          <div className="relative">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-muted shadow-lg">
-              {profilePhoto ? (
-                <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-primary">
-                  <span className="text-3xl font-extrabold text-primary-foreground">?</span>
-                </div>
-              )}
-            </div>
-            {!profilePhoto && (
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="absolute bottom-0 right-0 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md transition active:scale-95"
-              >
-                {uploading ? (
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Camera className="w-3.5 h-3.5" />
-                )}
-              </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="relative w-24 h-24 rounded-full overflow-hidden bg-muted shadow-lg transition active:scale-95"
+          >
+            {profilePhoto ? (
+              <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-primary">
+                <span className="text-3xl font-extrabold text-primary-foreground">?</span>
+              </div>
             )}
-          </div>
+            {uploading && (
+              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+          </button>
           <input
             ref={fileInputRef}
             type="file"
