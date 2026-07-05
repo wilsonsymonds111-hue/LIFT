@@ -197,8 +197,8 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
   const textMuted = isCutting ? 'text-gray-500' : 'text-gray-500';
   const chipBg = isCutting ? 'bg-black/10' : 'bg-black/10';
   const skeletonBg = isCutting ? 'bg-black/10' : 'bg-black/10';
-  const sparkStroke = '#3b82f6';
-  const sparkFill = '#2563eb';
+  const sparkStroke = '#F59E0B';
+  const sparkFill = '#F59E0B';
   const emeraldIcon = isCutting ? 'text-emerald-600' : 'text-emerald-600';
   const orangeIcon = isCutting ? 'text-orange-600' : 'text-orange-600';
 

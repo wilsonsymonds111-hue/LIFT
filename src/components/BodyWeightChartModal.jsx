@@ -371,7 +371,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             <button
               onClick={() => { setGoalMode('cutting'); localStorage.setItem('goalMode', 'cutting'); }}
               className={`flex items-center justify-center gap-1.5 px-5 py-1.5 rounded-full text-xs font-bold uppercase transition ${
-                goalMode === 'cutting' ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
+                goalMode === 'cutting' ? 'bg-[#F59E0B] text-white shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
               }`}
             >
               <Zap className="w-3.5 h-3.5" /> Cutting
@@ -444,7 +444,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                   labelStyle={{ color: '#8E8E93' }}
                   formatter={(value, name) => name === 'weightProjection' ? [`${value} ${unit}`, 'Next Goal'] : [`${value} ${unit}`, 'Weight']}
                 />
-                <Line type="monotone" dataKey="weight" stroke="#3b82f6" strokeWidth={2} dot={(props) => { if (props.payload.weight == null || props.payload.isContext) return false; return <circle cx={props.cx} cy={props.cy} r={props.payload.isLatest ? 5 : 4} fill="#fff" stroke="#3b82f6" strokeWidth={2} />; }} activeDot={(props) => { if (props.payload?.isContext) return false; return <circle cx={props.cx} cy={props.cy} r={6} fill="#fff" stroke="#3b82f6" strokeWidth={2} />; }} animationDuration={200} animationEasing="ease-out" />
+                <Line type="monotone" dataKey="weight" stroke="#F59E0B" strokeWidth={2} dot={(props) => { if (props.payload.weight == null || props.payload.isContext) return false; return <circle cx={props.cx} cy={props.cy} r={props.payload.isLatest ? 5 : 4} fill="#fff" stroke="#F59E0B" strokeWidth={2} />; }} activeDot={(props) => { if (props.payload?.isContext) return false; return <circle cx={props.cx} cy={props.cy} r={6} fill="#fff" stroke="#F59E0B" strokeWidth={2} />; }} animationDuration={200} animationEasing="ease-out" />
                 {goalData && <Line type="linear" dataKey="weightProjection" stroke="#bfdbfe" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={(props) => { if (props.payload.weight != null) return false; return <circle cx={props.cx} cy={props.cy} r={5} fill="#fff" fillOpacity={0.6} stroke="#bfdbfe" strokeWidth={1.5} strokeDasharray="3 2" />; }} activeDot={{ r: 5, fill: '#93c5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
               </LineChart>
             </ResponsiveContainer>
@@ -466,8 +466,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         <div className="pb-3">
           <div className="relative bg-white dark:bg-zinc-800 rounded-2xl p-4 border border-gray-200 dark:border-border shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50 dark:bg-red-950/30">
-                <TargetArrowIcon className="w-6 h-6" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-white overflow-hidden">
+                <TargetArrowIcon className="w-10 h-10" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-lg font-bold text-gray-900 dark:text-foreground">Goal: {goalData.goal} {unit}</p>
@@ -557,8 +557,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             onClick={() => setShowGoalModal(!showGoalModal)}
             className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-200 dark:border-border shadow-sm transition active:opacity-70"
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50 dark:bg-red-950/30">
-              <TargetArrowIcon className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-white overflow-hidden">
+              <TargetArrowIcon className="w-10 h-10" />
             </div>
             <div className="text-left flex-1">
               <p className="font-semibold text-black dark:text-foreground text-sm">Set Weight Goal</p>

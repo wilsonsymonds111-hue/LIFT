@@ -6,7 +6,7 @@ export default function TargetArrowIcon({ className = 'w-6 h-6' }) {
       src={TARGET_ICON_URL}
       alt="Goal target"
       className={className}
-      style={{ objectFit: 'contain' }}
+      style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
       draggable={false}
     />
   );
