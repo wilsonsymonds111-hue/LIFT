@@ -397,12 +397,12 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          {/* Chart */}
          <div className="pb-2">
         {chartData.length > 1 ? (
-          <div className="bg-white dark:bg-card rounded-2xl p-3">
+          <div className="bg-white dark:bg-card rounded-2xl px-1 py-3">
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
+              <LineChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" opacity={0.7} />
-                <XAxis dataKey="dateLabel" tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} interval="preserveStartEnd" minTickGap={20} />
-                <YAxis orientation="right" domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={40} />
+                <XAxis dataKey="dateLabel" tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} interval="equidistantPreserveStartEnd" minTickGap={25} />
+                <YAxis orientation="right" allowDecimals={false} tickCount={5} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip
                   contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
                   labelStyle={{ color: '#8E8E93' }}
