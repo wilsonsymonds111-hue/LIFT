@@ -20,6 +20,11 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
   const { setHideNav } = useNavVisibility();
   const { isAuthenticated, isGuest, logout } = useAuth();
 
+  const goalMode = (() => {
+    try { return localStorage.getItem('goalMode') || 'cutting'; } catch { return 'cutting'; }
+  })();
+  const isCutting = goalMode === 'cutting';
+
   // Hide bottom nav while profile sheet is open
   useEffect(() => {
     setHideNav(true);
@@ -73,7 +78,11 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div
         className="relative bg-card rounded-t-3xl w-full px-5 pt-5 shadow-2xl flex flex-col gap-4 overflow-y-auto"
-        style={{ maxHeight: '80vh', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}
+        style={{
+          maxHeight: '80vh',
+          paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
+          ...(isCutting ? { background: 'linear-gradient(180deg, #f5e6c8 0%, #faf3e4 12%, hsl(var(--card)) 35%, hsl(var(--card)) 100%)' } : {}),
+        }}
       >
         {/* Handle */}
         <div className="flex justify-center mb-1">
