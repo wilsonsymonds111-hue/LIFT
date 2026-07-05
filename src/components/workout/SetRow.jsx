@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, memo } from 'react';
 import { Check } from 'lucide-react';
 import { notifyRestComplete, playTick } from '../../lib/workoutSounds';
-import SetInputKeypad from './SetInputKeypad';
 
 const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete, restDuration = 120 }) {
   const [kg, setKg] = useState(initialKg ?? previous?.kg ?? '');
@@ -11,10 +10,8 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   const [swiping, setSwiping] = useState(false);
   const [restSeconds, setRestSeconds] = useState(null);
   const startXRef = useRef(null);
-  const hasEdited = useRef(false);
   const restRef = useRef(null);
   const restEndRef = useRef(null);
-  const [activeKeypad, setActiveKeypad] = useState(null); // 'kg' | 'reps' | null
 
   useEffect(() => {
     if (done) {
@@ -78,6 +75,31 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
     startXRef.current = null;
   };
 
+  // Scroll the input into view above the native keyboard
+  const handleFocus = (e) => {
+    const el = e.target;
+    // Wait for the keyboard to appear, then scroll the input into view
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  };
+
+  const handleKgChange = (e) => {
+    let v = e.target.value;
+    // Allow only numbers and a single decimal point
+    v = v.replace(/[^0-9.]/g, '');
+    const parts = v.split('.');
+    if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+    setKg(v);
+    if (done) onComplete?.({ kg: parseFloat(v) || 0, reps: parseInt(reps) || 0 });
+  };
+
+  const handleRepsChange = (e) => {
+    let v = e.target.value.replace(/[^0-9]/g, '');
+    setReps(v);
+    if (done) onComplete?.({ kg: parseFloat(kg) || 0, reps: parseInt(v) || 0 });
+  };
+
   return (
     <div>
       <div className="relative overflow-hidden rounded-lg">
@@ -99,21 +121,24 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
             {previous ? `${previous.kg} kg × ${previous.reps}` : '—'}
           </span>
           <input
-            type="text" inputMode="none" value={kg}
-            onChange={() => {}}
-            onFocus={(e) => { e.target.blur(); setActiveKeypad('kg'); }}
-            onPointerDown={(e) => { e.preventDefault(); setActiveKeypad('kg'); }}
+            type="text"
+            inputMode="decimal"
+            value={kg}
+            onChange={handleKgChange}
+            onFocus={handleFocus}
+            onPointerDown={(e) => e.stopPropagation()}
             placeholder="—"
-            readOnly
             className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
           />
           <input
-            type="text" inputMode="none" value={reps}
-            onChange={() => {}}
-            onFocus={(e) => { e.target.blur(); setActiveKeypad('reps'); }}
-            onPointerDown={(e) => { e.preventDefault(); setActiveKeypad('reps'); }}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={reps}
+            onChange={handleRepsChange}
+            onFocus={handleFocus}
+            onPointerDown={(e) => e.stopPropagation()}
             placeholder="—"
-            readOnly
             className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
           />
           <button
@@ -124,24 +149,6 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           </button>
         </div>
       </div>
-      {activeKeypad && (
-        <SetInputKeypad
-          field={activeKeypad}
-          value={activeKeypad === 'kg' ? kg : reps}
-          allowDecimal={activeKeypad === 'kg'}
-          onChange={(v) => {
-            hasEdited.current = true;
-            if (activeKeypad === 'kg') {
-              setKg(v);
-              if (done) onComplete?.({ kg: parseFloat(v) || 0, reps: parseInt(reps) || 0 });
-            } else {
-              setReps(v);
-              if (done) onComplete?.({ kg: parseFloat(kg) || 0, reps: parseInt(v) || 0 });
-            }
-          }}
-          onClose={() => setActiveKeypad(null)}
-        />
-      )}
       {done && restSeconds !== null && restSeconds > 0 && (
         <div
           className="w-full bg-blue-500 text-white font-bold text-center py-1.5 rounded-xl mt-2 text-base tracking-wider cursor-pointer select-none"
