@@ -22,20 +22,14 @@ const BottomNav = memo(function BottomNav() {
       style={{ bottom: '16px' }}
     >
       <nav
-        className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden border border-white/60 dark:border-white/20"
+        className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden border border-black/5 bg-white dark:border-white/10 dark:bg-muted"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.55)',
           backdropFilter: 'blur(30px) saturate(200%)',
           WebkitBackdropFilter: 'blur(30px) saturate(200%)',
           boxShadow:
             '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.6)',
         }}
       >
-        {/* Dark mode tint */}
-        <div className="pointer-events-none absolute inset-0 rounded-full dark:bg-gray-900/50 hidden dark:block" />
-        {/* Top highlight edge */}
-        <div className="pointer-events-none absolute top-0 left-4 right-4 h-px rounded-full bg-white/70 dark:bg-white/10" />
-
         {tabs.map(({ path, Icon, label }) => {
           const active = location.pathname === path;
           return (
@@ -47,20 +41,12 @@ const BottomNav = memo(function BottomNav() {
               {active && (
                 <motion.div
                   layoutId="navBubble"
-                  className="absolute inset-y-1.5 inset-x-1 rounded-full"
-                  style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                    backdropFilter: 'blur(20px) saturate(180%)',
-                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                    boxShadow: '0 2px 12px rgba(0,0,0,0.10), inset 0 0 0 1px rgba(255,255,255,0.8)',
-                    transform: 'translateZ(0)',
-                  }}
+                  className="absolute inset-y-1.5 inset-x-1 rounded-full bg-black/5 dark:bg-white/10"
                   transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.7 }}
                 />
               )}
               <Icon
-                className="relative z-10 w-[23px] h-[23px] transition-colors duration-200"
-                style={{ color: active ? '#007aff' : '#000000' }}
+                className="relative z-10 w-[23px] h-[23px] transition-colors duration-200 text-foreground"
                 strokeWidth={active ? 2.2 : 1.8}
               />
             </Link>
