@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianG
 import { base44 } from '@/api/base44Client';
 import WeightEntryKeypad from './WeightEntryKeypad';
 import CheckeredFlagIcon from './CheckeredFlagIcon';
+import TargetArrowIcon from './TargetArrowIcon';
 
 const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -470,7 +471,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
           <div className="relative bg-white dark:bg-zinc-800 rounded-2xl p-4 border border-gray-200 dark:border-border shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#FFD60A' }}>
-                <Target className="w-6 h-6 text-white" />
+                <TargetArrowIcon className="w-6 h-6" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-lg font-bold text-gray-900 dark:text-foreground">Goal: {goalData.goal} {unit}</p>
