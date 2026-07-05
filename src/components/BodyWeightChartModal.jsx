@@ -240,7 +240,11 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   return createPortal(
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={onClose}>
       <div className="absolute inset-0" onClick={onClose} />
-      <div className="relative w-full max-w-2xl mx-auto bg-white dark:bg-card rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-2.5rem)] mt-10" onClick={e => e.stopPropagation()}>
+      <div
+        className="relative w-full max-w-2xl mx-auto bg-white dark:bg-card rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-2.5rem)] mt-10"
+        style={goalMode === 'cutting' ? { background: 'linear-gradient(180deg, #f5e6c8 0%, #faf3e4 12%, hsl(0 0% 100%) 35%, hsl(0 0% 100%) 100%)' } : {}}
+        onClick={e => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
           <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-muted active:scale-95 transition">
@@ -275,7 +279,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         </div>
 
       {/* Scrollable body: chart + lists scroll under the sticky header & toggle */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-6 bg-gray-50 dark:bg-background">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-6">
       {/* Metric section with unit toggle */}
        <div className="pb-2 pt-1">
          <div className="flex items-center justify-between mb-2">

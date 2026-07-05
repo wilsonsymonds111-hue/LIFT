@@ -81,7 +81,6 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         style={{
           maxHeight: '80vh',
           paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
-          ...(isCutting ? { background: 'linear-gradient(180deg, #f5e6c8 0%, #faf3e4 12%, hsl(var(--card)) 35%, hsl(var(--card)) 100%)' } : {}),
         }}
       >
         {/* Handle */}
