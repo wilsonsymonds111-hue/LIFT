@@ -31,6 +31,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   const [showRateHelp, setShowRateHelp] = useState(false);
   const [showWeighInTip, setShowWeighInTip] = useState(false);
   const [showMuscleInfo, setShowMuscleInfo] = useState(false);
+  const [showFatInfo, setShowFatInfo] = useState(false);
   const [goalData, setGoalData] = useState(() => {
     try {
       const raw = localStorage.getItem('bodyWeightGoal');
@@ -338,10 +339,20 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
              </>
            )}
          </div>
-         <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm">
-           <div className="flex items-center gap-1.5 mb-1">
-             <Flame className="w-3.5 h-3.5 text-orange-500" />
-             <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground">Fat Loss</p>
+         <div className="flex-1 bg-white dark:bg-card rounded-2xl p-3 border border-gray-100 dark:border-border shadow-sm relative">
+           <div className="flex items-center justify-between mb-1">
+             <div className="flex items-center gap-1.5">
+               <Flame className="w-3.5 h-3.5 text-orange-500" />
+               <p className="text-[11px] font-semibold text-gray-500 dark:text-muted-foreground">Fat Loss</p>
+             </div>
+             {prediction && (
+               <button
+                 onClick={(e) => { e.stopPropagation(); setShowFatInfo(v => !v); }}
+                 className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-muted transition flex-shrink-0"
+               >
+                 <Info className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
+               </button>
+             )}
            </div>
            {muscleLoading ? (
              <div className="h-6 w-14 bg-gray-100 dark:bg-muted rounded animate-pulse" />
@@ -350,7 +361,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
            ) : (
              <p className="text-sm text-gray-400 dark:text-muted-foreground">No data</p>
            )}
-         </div>
+           {showFatInfo && prediction && (
+             <>
+               <div className="fixed inset-0 z-20" onClick={() => setShowFatInfo(false)} />
+               <div className="absolute right-2 top-full mt-2 w-[240px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
+                 <div className="absolute -top-1.5 right-3 w-3 h-3 bg-white dark:bg-card border-l border-t border-gray-100 dark:border-border rotate-45" />
+                 <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">Estimated fat loss based on your bodyweight trend and training data. This is an approximation — actual fat loss depends on diet, consistency, and other lifestyle factors.</p>
+               </div>
+             </>
+           )}
+           </div>
          </div>
          </div>
 
