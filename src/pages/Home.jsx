@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
-import { MoreHorizontal, CalendarPlus, Plus, Moon } from 'lucide-react';
+import { MoreHorizontal, CalendarPlus, Plus, Moon, Layers } from 'lucide-react';
 import CalendarSyncModal from '../components/CalendarSyncModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -403,8 +403,11 @@ export default function Home() {
                 <Plus className="w-5 h-5" />
                 <span>Start New Workout</span>
               </button>
-              <div className="text-center text-sm text-muted-foreground mt-3">
-                Or choose a split in the Splits tab to get started
+              <div className="flex flex-col items-center justify-center text-center" style={{ minHeight: '45vh' }}>
+                <p className="text-lg text-muted-foreground font-medium flex items-center gap-2 flex-wrap justify-center">
+                  Choose or create a Workout Split in the Splits Tab
+                  <Layers className="w-5 h-5 text-muted-foreground" />
+                </p>
               </div>
             </>
           )}
