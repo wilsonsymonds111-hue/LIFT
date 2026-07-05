@@ -484,9 +484,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                 <button onClick={() => setShowGoalModal(v => !v)} className={`w-7 h-7 flex items-center justify-center rounded-lg transition ${showGoalModal ? 'bg-gray-100 dark:bg-muted' : 'hover:bg-gray-100 dark:hover:bg-muted'}`}>
                   <Pencil className={`w-4 h-4 ${showGoalModal ? 'text-gray-900 dark:text-foreground' : 'text-gray-400 dark:text-muted-foreground'}`} />
                 </button>
-                <button onClick={handleDeleteGoal} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition">
-                  <Trash2 className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
-                </button>
+
               </div>
             </div>
 
@@ -714,9 +712,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                     <button onClick={() => startEdit(entry)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-muted transition">
                       <Edit3 className="w-3.5 h-3.5 text-gray-500 dark:text-muted-foreground" />
                     </button>
-                    <button onClick={() => handleDelete(entry)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition">
-                      <Trash2 className="w-3.5 h-3.5 text-red-400" />
-                    </button>
+
                   </>
                 )}
               </div>
