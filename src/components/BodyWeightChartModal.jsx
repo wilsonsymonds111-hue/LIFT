@@ -444,6 +444,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                 <Tooltip
                   contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
                   labelStyle={{ color: '#8E8E93' }}
+                  formatter={(value, name) => name === 'weightProjection' ? [`${value} ${unit}`, 'Next Goal'] : [`${value} ${unit}`, 'Weight']}
                 />
                 <Line type="monotone" dataKey="weight" stroke="#3b82f6" strokeWidth={2} dot={(props) => { if (props.payload.weight == null || props.payload.isContext) return false; return <circle cx={props.cx} cy={props.cy} r={props.payload.isLatest ? 5 : 4} fill="#fff" stroke="#3b82f6" strokeWidth={2} />; }} activeDot={{ r: 6, fill: '#fff', stroke: '#3b82f6', strokeWidth: 2 }} animationDuration={200} animationEasing="ease-out" />
                 {goalData && <Line type="linear" dataKey="weightProjection" stroke="#bfdbfe" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={(props) => { if (props.payload.weight != null) return false; return <circle cx={props.cx} cy={props.cy} r={5} fill="#fff" fillOpacity={0.6} stroke="#bfdbfe" strokeWidth={1.5} strokeDasharray="3 2" />; }} activeDot={{ r: 5, fill: '#93c5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
