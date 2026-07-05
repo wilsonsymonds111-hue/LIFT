@@ -12,6 +12,21 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   const startXRef = useRef(null);
   const restRef = useRef(null);
   const restEndRef = useRef(null);
+  const userEditedKg = useRef(false);
+  const userEditedReps = useRef(false);
+
+  // Update suggestions when parent changes them (e.g., after completing set 1, set 2 updates)
+  useEffect(() => {
+    if (!done && !userEditedKg.current && initialKg != null && initialKg !== '') {
+      setKg(initialKg);
+    }
+  }, [initialKg, done]);
+
+  useEffect(() => {
+    if (!done && !userEditedReps.current && initialReps != null && initialReps !== '') {
+      setReps(initialReps);
+    }
+  }, [initialReps, done]);
 
   useEffect(() => {
     if (done) {
@@ -85,6 +100,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   };
 
   const handleKgChange = (e) => {
+    userEditedKg.current = true;
     let v = e.target.value;
     // Allow only numbers and a single decimal point
     v = v.replace(/[^0-9.]/g, '');
@@ -95,6 +111,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   };
 
   const handleRepsChange = (e) => {
+    userEditedReps.current = true;
     let v = e.target.value.replace(/[^0-9]/g, '');
     setReps(v);
     if (done) onComplete?.({ kg: parseFloat(kg) || 0, reps: parseInt(v) || 0 });
@@ -138,6 +155,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
             onChange={handleRepsChange}
             onFocus={handleFocus}
             onPointerDown={(e) => e.stopPropagation()}
+            onBlur={(e) => { if (reps !== '' && !done && !e.relatedTarget) { handleToggle(); } }}
             placeholder="—"
             className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
           />

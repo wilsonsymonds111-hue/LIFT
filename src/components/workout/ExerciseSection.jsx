@@ -25,7 +25,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
 
   const [sets, setSets] = useState(() => {
     if (initialState?.sets) return initialState.sets;
-    const setCount = Math.max(1, exercise.sets || 1);
+    const setCount = Math.max(2, exercise.sets || 2);
     if (!pr) return Array.from({ length: setCount }, (_, i) => ({ id: i + 1, suggestedKg: null, suggestedReps: null }));
     return Array.from({ length: setCount }, (_, i) => ({
       id: i + 1,
@@ -196,16 +196,18 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                 goalNoteShownRef.current = true;
                 toast({ description: `Studies recommend moving up in weight after hitting ${repCap} reps for maximum muscle growth.` });
               }
-              if (!wasCompleted) {
-                const currentSet = sets[setIndex];
-                const targetReps = currentSet.suggestedReps;
-                const achieved = targetReps != null && result.reps >= targetReps;
-                if (!achieved && setIndex < sets.length - 1 && targetReps != null) {
-                  setSets(prev => prev.map((r, i) => {
-                    if (i <= setIndex) return r;
-                    return { ...r, suggestedReps: targetReps };
-                  }));
-                }
+              if (!wasCompleted && setIndex < sets.length - 1) {
+                setSets(prev => prev.map((r, i) => {
+                  if (i <= setIndex) return r;
+                  if (i === setIndex + 1) {
+                    return {
+                      ...r,
+                      suggestedKg: result.kg || r.suggestedKg,
+                      suggestedReps: result.reps + 1
+                    };
+                  }
+                  return r;
+                }));
               }
             }
           }}
