@@ -195,9 +195,11 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
       <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] shadow-[0_16px_48px_rgba(37,99,235,0.45),0_4px_12px_rgba(37,99,235,0.2)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.5),0_4px_12px_rgba(0,0,0,0.3)]"
+          className={`relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] ${goalMode === 'cutting' ? 'shadow-[0_16px_48px_rgba(217,119,6,0.45),0_4px_12px_rgba(217,119,6,0.2)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.5),0_4px_12px_rgba(0,0,0,0.3)]' : 'shadow-[0_16px_48px_rgba(37,99,235,0.45),0_4px_12px_rgba(37,99,235,0.2)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.5),0_4px_12px_rgba(0,0,0,0.3)]'}`}
           style={{
-            background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #3b82f6 100%)',
+            background: goalMode === 'cutting'
+              ? 'linear-gradient(135deg, #b45309 0%, #d97706 45%, #f59e0b 100%)'
+              : 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #3b82f6 100%)',
           }}
         >
           {/* Decorative glow */}

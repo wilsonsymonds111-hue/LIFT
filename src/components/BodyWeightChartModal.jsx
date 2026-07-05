@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianG
 import { Slider } from '@/components/ui/slider';
 import { base44 } from '@/api/base44Client';
 import WeightEntryKeypad from './WeightEntryKeypad';
+import CheckeredFlagIcon from './CheckeredFlagIcon';
 
 const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -394,25 +395,25 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       {/* Goal section */}
       {goalData && (
         <div className="pb-3">
-          <div className="relative bg-blue-50 dark:bg-blue-950/30 rounded-2xl p-4 border border-blue-200/60 dark:border-blue-800/40">
+          <div className="relative bg-amber-50 dark:bg-amber-950/30 rounded-2xl p-4 border border-amber-300/60 dark:border-amber-700/40">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0">
-                <Flag className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' }}>
+                <CheckeredFlagIcon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 dark:text-foreground">Goal: {goalData.goal} {unit}</p>
                 <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{weeksAway} weeks away</p>
                 <div className="flex items-center gap-1 mt-1">
-                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
-                  <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-200 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[10px] font-bold flex-shrink-0">?</button>
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
+                  <button onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-amber-200 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 text-[10px] font-bold flex-shrink-0">?</button>
                 </div>
               </div>
               <div className="flex items-center gap-0.5 flex-shrink-0">
-                <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition">
-                  <Info className="w-4 h-4 text-blue-500" />
+                <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40 transition">
+                  <Info className="w-4 h-4 text-amber-500" />
                 </button>
-                <button onClick={() => setShowGoalModal(true)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition">
-                  <Pencil className="w-4 h-4 text-blue-500" />
+                <button onClick={() => setShowGoalModal(true)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40 transition">
+                  <Pencil className="w-4 h-4 text-amber-500" />
                 </button>
                 <button onClick={handleDeleteGoal} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition">
                   <Trash2 className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
@@ -448,10 +449,10 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         {!goalData && entries.length > 0 && (
           <button
             onClick={() => setShowGoalModal(!showGoalModal)}
-            className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-gray-100 dark:border-border shadow-sm transition active:opacity-70"
+            className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 mb-4 border border-amber-200 dark:border-amber-800/40 shadow-sm transition active:opacity-70"
           >
-            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Flag className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' }}>
+              <CheckeredFlagIcon className="w-5 h-5" />
             </div>
             <div className="text-left flex-1">
               <p className="font-semibold text-black dark:text-foreground text-sm">Set Weight Goal</p>
