@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, Flag, AlertCircle, Zap, BicepsFlexed, Info, Pencil, Dumbbell, Flame, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, Flag, AlertCircle, Zap, BicepsFlexed, Info, Pencil, Dumbbell, Flame, RefreshCw, TrendingDown } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
 import { base44 } from '@/api/base44Client';
 import WeightEntryKeypad from './WeightEntryKeypad';
@@ -477,7 +477,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                 <p className="text-lg font-bold text-gray-900 dark:text-foreground">Goal: {goalData.goal} {unit}</p>
               </div>
               <div className="flex items-center gap-0.5 flex-shrink-0">
-                <button onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-muted transition">
+                <button id="goal-info-btn" onClick={() => setShowWeighInTip(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-muted transition">
                   <Info className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                 </button>
                 <button onClick={() => setShowGoalModal(v => !v)} className={`w-7 h-7 flex items-center justify-center rounded-lg transition ${showGoalModal ? 'bg-gray-100 dark:bg-muted' : 'hover:bg-gray-100 dark:hover:bg-muted'}`}>
@@ -489,30 +489,70 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
               </div>
             </div>
 
-            {/* Tap-outside backdrop to dismiss popovers */}
-            {(showRateHelp || showWeighInTip || showGoalRateHelp) && (
-              <div className="fixed inset-0 z-20" onClick={() => { setShowRateHelp(false); setShowWeighInTip(false); setShowGoalRateHelp(false); }} />
-            )}
+            {/* Info popover — positioned via portal, auto-scrolls into view */}
+            {showWeighInTip && (() => {
+              const tipEl = document.getElementById('goal-info-btn');
+              const rect = tipEl?.getBoundingClientRect();
+              if (!rect) return null;
+              const POPUP_W = 240;
+              const POPUP_H = 150;
+              const margin = 8;
+              const spaceBelow = window.innerHeight - rect.bottom;
+              const showBelow = spaceBelow > POPUP_H + margin;
+              const top = showBelow ? rect.bottom + margin : rect.top - POPUP_H - margin;
+              let left = rect.left + rect.width / 2 - POPUP_W / 2;
+              left = Math.max(margin, Math.min(left, window.innerWidth - POPUP_W - margin));
 
-            {/* Floating rate-help popover */}
-            {showRateHelp && (
-              <div className="absolute left-4 top-full mt-2 w-[260px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
-                <div className="absolute -top-1.5 left-6 w-3 h-3 bg-white dark:bg-card border-l border-t border-gray-100 dark:border-border rotate-45" />
-                <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
-              </div>
-            )}
+              // Auto-scroll so the popover is fully visible
+              setTimeout(() => {
+                const elBottom = top + POPUP_H;
+                if (elBottom > window.innerHeight) {
+                  window.scrollBy({ top: elBottom - window.innerHeight + margin, behavior: 'smooth' });
+                } else if (top < 0) {
+                  window.scrollBy({ top: top - margin, behavior: 'smooth' });
+                }
+              }, 10);
 
-            {/* Floating info popover */}
-            {showWeighInTip && (
-              <div className="absolute right-4 top-full mt-2 w-[240px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
-                <div className="absolute -top-1.5 right-6 w-3 h-3 bg-white dark:bg-card border-r border-t border-gray-100 dark:border-border rotate-45" />
-                <div className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative space-y-1">
-                  <p className="font-semibold text-gray-900 dark:text-foreground">{weeksAway} weeks away</p>
-                  <p>{goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week</p>
-                  <p className="pt-1 border-t border-gray-100 dark:border-border mt-1 pt-2">Weigh in once a week — daily readings swing with water weight &amp; hydration.</p>
-                </div>
-              </div>
-            )}
+              return createPortal(
+                <>
+                  <div
+                    className="fixed inset-0 z-[60]"
+                    onClick={() => setShowWeighInTip(false)}
+                  />
+                  <div
+                    className="fixed z-[61] bg-white dark:bg-card rounded-2xl shadow-xl border border-gray-100 dark:border-border p-4"
+                    style={{ width: POPUP_W, top, left, animation: 'graphFadeIn 0.18s ease-out' }}
+                  >
+                    {/* Pointer beak */}
+                    <div
+                      className="absolute w-3 h-3 bg-white dark:bg-card border-t border-l border-gray-100 dark:border-border rotate-45"
+                      style={{
+                        ...(showBelow
+                          ? { top: -6, left: rect.left + rect.width / 2 - left - 6 }
+                          : { bottom: -6, left: rect.left + rect.width / 2 - left - 6, borderBottom: 'none', borderRight: 'none', borderTop: '1px', borderLeft: '1px' }
+                        ),
+                      }}
+                    />
+                    <div className="space-y-1.5 relative">
+                      <div className="flex items-center gap-1.5">
+                        <Target className="w-3.5 h-3.5 text-red-500" />
+                        <p className="text-sm font-bold text-gray-900 dark:text-foreground">{weeksAway} weeks away</p>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <TrendingDown className="w-3.5 h-3.5 text-gray-400 dark:text-muted-foreground" />
+                        <p className="text-sm font-semibold text-gray-700 dark:text-muted-foreground">
+                          {goalData.weeklyChange > 0 ? '+' : ''}{goalData.weeklyChange} {unit}/week
+                        </p>
+                      </div>
+                      <p className="text-[11px] leading-relaxed text-gray-500 dark:text-muted-foreground pt-2 border-t border-gray-100 dark:border-border">
+                        Weigh in once a week — daily readings swing with water weight &amp; hydration.
+                      </p>
+                    </div>
+                  </div>
+                </>,
+                document.body
+              );
+            })()}
           </div>
         </div>
       )}
