@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Timer } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
@@ -298,7 +299,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                   onClick={() => setRestMinimized(false)}
                 />
               ) : (
-                <button onClick={() => setShowRestTimerPicker(true)} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-xl transition">
+                <button onClick={() => setShowRestTimerPicker(true)} className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-xl transition">
+                  <Timer className="w-4 h-4" />
                   Rest Timer
                 </button>
               )}
@@ -350,9 +352,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{template.name}</h1>
               </div>
-              <p className="text-sm text-gray-500 mb-0.5">📅 {today}</p>
-              <p className="text-sm text-gray-500 mb-4">🕐 {timer}</p>
-              <textarea placeholder="Note" rows={1} className="w-full text-sm text-gray-800 placeholder-gray-400 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 pb-1 bg-transparent resize-none [font-family:inherit] [font-weight:inherit] [letter-spacing:inherit]" />
+              <p className="text-sm text-gray-500 mb-0.5 font-mono">📅 {today}</p>
+              <p className="text-sm text-gray-500 mb-4 font-mono">🕐 {timer}</p>
+              <textarea placeholder="Note" rows={1} className="w-full text-sm text-gray-800 placeholder-gray-400 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 pb-1 bg-transparent resize-none font-mono [font-weight:inherit] [letter-spacing:inherit]" />
 
               <DragDropContext onDragEnd={({ source, destination }) => {
                 if (!destination) return;
