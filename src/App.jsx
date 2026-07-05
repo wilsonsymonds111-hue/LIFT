@@ -126,7 +126,6 @@ const SwipeableTabs = memo(() => {
 
   return (
     <div ref={containerRef} className="relative flex-1" style={TAB_STYLES}>
-      <div className="status-bar-gradient" />
       <motion.div
         drag="x"
         dragDirectionLock
