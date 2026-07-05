@@ -332,9 +332,9 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
            {showMuscleInfo && prediction && (
              <>
                <div className="fixed inset-0 z-20" onClick={() => setShowMuscleInfo(false)} />
-               <div className="absolute right-2 top-full mt-2 w-[240px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
-                 <div className="absolute -top-1.5 right-3 w-3 h-3 bg-white dark:bg-card border-l border-t border-gray-100 dark:border-border rotate-45" />
-                 <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">{prediction.summary}</p>
+               <div className="absolute left-2 top-full mt-2 w-[200px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
+                 <div className="absolute -top-1.5 left-3 w-3 h-3 bg-white dark:bg-card border-l border-t border-gray-100 dark:border-border rotate-45" />
+                 <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">An estimate of how much muscle you've gained, based on your bodyweight trend, strength progress on compound lifts, and training consistency. This is an approximation, not a precise measurement.</p>
                </div>
              </>
            )}
@@ -364,9 +364,9 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
            {showFatInfo && prediction && (
              <>
                <div className="fixed inset-0 z-20" onClick={() => setShowFatInfo(false)} />
-               <div className="absolute right-2 top-full mt-2 w-[240px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
-                 <div className="absolute -top-1.5 right-3 w-3 h-3 bg-white dark:bg-card border-l border-t border-gray-100 dark:border-border rotate-45" />
-                 <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">Estimated fat loss based on your bodyweight trend and training data. This is an approximation — actual fat loss depends on diet, consistency, and other lifestyle factors.</p>
+               <div className="absolute right-2 top-full mt-2 w-[200px] z-30 bg-white dark:bg-card rounded-xl shadow-lg border border-gray-100 dark:border-border p-3">
+                 <div className="absolute -top-1.5 right-3 w-3 h-3 bg-white dark:bg-card border-r border-t border-gray-100 dark:border-border rotate-45" />
+                 <p className="text-[11px] leading-relaxed text-gray-600 dark:text-muted-foreground relative">An estimate of how much fat you've lost, based on your bodyweight trend and training data. This is an approximation — actual fat loss depends on diet, consistency, and other lifestyle factors.</p>
                </div>
              </>
            )}
