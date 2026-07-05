@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianG
 import { base44 } from '@/api/base44Client';
 import WeightEntryKeypad from './WeightEntryKeypad';
 import TargetArrowIcon from './TargetArrowIcon';
+import EditEntryModal from './EditEntryModal';
 
 const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -33,9 +34,8 @@ const downsample = (data, maxPoints) => {
 export default function BodyWeightChartModal({ entries, onClose, onChanged, prediction, muscleLoading, refreshing, fatLossG, onRecalculate }) {
   const [timeFrame, setTimeFrame] = useState(() => localStorage.getItem('bodyWeightTimeFrame') || 'M');
   const [showKeypad, setShowKeypad] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [editWeight, setEditWeight] = useState('');
-  const [editDate, setEditDate] = useState('');
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [pressedId, setPressedId] = useState(null);
   const [importing, setImporting] = useState(false);
   const [importMsg, setImportMsg] = useState('');
   const [unit, setUnit] = useState(() => {
@@ -274,25 +274,18 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   };
   const handleChartDragEnd = () => { dragStartX.current = null; };
 
-  const startEdit = (entry) => {
-    setEditingId(entry.id);
-    setEditWeight(String(entry.weight));
-    setEditDate(entry.date);
-  };
-
-  const saveEdit = async (entry) => {
-    const w = parseFloat(editWeight);
-    if (!w || w <= 0) return;
+  const saveEdit = async (w, date) => {
     try {
-      await base44.entities.BodyWeight.update(entry.id, { weight: w, date: editDate });
-      setEditingId(null);
+      await base44.entities.BodyWeight.update(editingEntry.id, { weight: w, date });
+      setEditingEntry(null);
       onChanged();
     } catch (e) { console.error('Failed to update entry:', e); }
   };
 
-  const handleDelete = async (entry) => {
+  const handleDelete = async () => {
     try {
-      await base44.entities.BodyWeight.delete(entry.id);
+      await base44.entities.BodyWeight.delete(editingEntry.id);
+      setEditingEntry(null);
       onChanged();
     } catch (e) { console.error('Failed to delete entry:', e); }
   };
@@ -626,23 +619,21 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             <p className="text-sm text-gray-500 dark:text-muted-foreground text-center py-6">No entries yet</p>
           ) : (
             entries.map((entry, idx) => (
-              <div key={entry.id} className={`flex items-center gap-3 px-4 py-3 ${idx < entries.length - 1 ? 'border-b border-gray-100 dark:border-border' : ''}`} {...TouchHold(() => startEdit(entry))}>
-                {editingId === entry.id ? (
-                  <>
-                    <input type="number" step="0.1" value={editWeight} onChange={e => setEditWeight(e.target.value)} className="w-20 border border-gray-200 dark:border-border rounded-lg px-2 py-1 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-purple-400" />
-                    <input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="flex-1 border border-gray-200 dark:border-border rounded-lg px-2 py-1 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-purple-400" />
-                    <button onClick={() => saveEdit(entry)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-purple-500 text-white">
-                      <Check className="w-4 h-4" />
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex-1">
-                      <span className="font-semibold text-black dark:text-foreground text-sm">{unit === 'lbs' ? kgToLbs(entry.weight).toFixed(2) : entry.weight} {unit}</span>
-                    </div>
-                    <span className="text-xs text-gray-500 dark:text-muted-foreground">{fmtDate(entry.date)}</span>
-                  </>
-                )}
+              <div
+                key={entry.id}
+                className={`flex items-center gap-3 px-4 py-3 transition-transform duration-150 ${pressedId === entry.id ? 'scale-105 bg-gray-50 dark:bg-muted/50' : 'scale-100'} ${idx < entries.length - 1 ? 'border-b border-gray-100 dark:border-border' : ''}`}
+                {...TouchHold(() => setEditingEntry(entry))}
+                onTouchStart={() => setPressedId(entry.id)}
+                onTouchEnd={() => setPressedId(null)}
+                onTouchMove={() => setPressedId(null)}
+                onMouseDown={() => setPressedId(entry.id)}
+                onMouseUp={() => setPressedId(null)}
+                onMouseLeave={() => setPressedId(null)}
+              >
+                <div className="flex-1">
+                  <span className="font-semibold text-black dark:text-foreground text-sm">{unit === 'lbs' ? kgToLbs(entry.weight).toFixed(2) : entry.weight} {unit}</span>
+                </div>
+                <span className="text-xs text-gray-500 dark:text-muted-foreground">{fmtDate(entry.date)}</span>
               </div>
             ))
           )}
@@ -653,6 +644,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
           <WeightEntryKeypad
             onClose={() => setShowKeypad(false)}
             onSave={handleKeypadSave}
+          />
+        )}
+
+        {editingEntry && (
+          <EditEntryModal
+            entry={editingEntry}
+            unit={unit}
+            onSave={saveEdit}
+            onDelete={handleDelete}
+            onClose={() => setEditingEntry(null)}
           />
         )}
       </div>
