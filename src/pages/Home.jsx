@@ -117,9 +117,9 @@ const SPLIT_ACCENTS = {
   'ul-ppl': {
     hex: '#F57C00',
     tint: 'rgba(220, 100, 0, 0.18)',
-    cardClasses: 'border-2 border-border hover:border-amber-500',
+    cardClasses: 'border-2 border-border hover:border-amber-400',
     tagClasses: 'bg-muted text-muted-foreground',
-    dotClass: 'bg-amber-500',
+    dotClass: 'bg-amber-400',
   },
 };
 

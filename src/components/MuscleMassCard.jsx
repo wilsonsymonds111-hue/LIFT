@@ -234,7 +234,7 @@ export default function MuscleMassCard({ templates, compact, targetSessionsPerWe
 
             <div className="flex justify-between text-sm py-2 border-t border-border">
               <span className="text-muted-foreground">Body fat change</span>
-              <span className={`font-semibold ${prediction.fatGainG < 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+              <span className={`font-semibold ${prediction.fatGainG < 0 ? 'text-emerald-500' : 'text-amber-400'}`}>
                 {prediction.fatGainG > 0 ? '+' : ''}{prediction.fatGainG} g
               </span>
             </div>

@@ -207,14 +207,14 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
       <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] bg-white dark:bg-zinc-800 border border-gray-300/70 dark:border-zinc-700 shadow-[0_10px_30px_rgba(0,0,0,0.12),0_3px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.4),0_3px_8px_rgba(0,0,0,0.25)]"
+          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] bg-white dark:bg-zinc-800 border border-gray-300/70 dark:border-zinc-700 shadow-[0_10px_30px_rgba(0,0,0,0.12),0_3px_8px_rgba(0,0,0,0.06),0_0_20px_rgba(252,211,77,0.5)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.4),0_3px_8px_rgba(0,0,0,0.25),0_0_20px_rgba(252,211,77,0.3)]"
         >
           {/* Decorative glow */}
           <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" />
 
-          <div className="relative p-4">
+          <div className="relative p-5">
             {/* Top row: label + status pill + arrow */}
-            <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Activity className={`w-4 h-4 ${isCutting ? 'text-black' : 'text-gray-700'}`} />
                 <span className={`text-sm font-extrabold ${isCutting ? 'text-black' : 'text-gray-700'} uppercase tracking-wide`}>Body Stats</span>
@@ -234,7 +234,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             </div>
 
             {/* Weight + sparkline row */}
-            <div className="flex items-end justify-between gap-2 mb-2.5">
+            <div className="flex items-end justify-between gap-2 mb-3">
               <div className="flex items-end gap-1">
                 {weightLoading ? (
                   <div className={`h-9 w-20 ${skeletonBg} rounded-lg animate-pulse`} />
@@ -315,7 +315,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
 
             <div className="flex justify-between text-sm py-2 border-t border-border">
               <span className="text-muted-foreground">Body fat change</span>
-              <span className={`font-semibold ${prediction.fatGainG < 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+              <span className={`font-semibold ${prediction.fatGainG < 0 ? 'text-emerald-500' : 'text-amber-400'}`}>
                 {prediction.fatGainG > 0 ? '+' : ''}{prediction.fatGainG} g
               </span>
             </div>
