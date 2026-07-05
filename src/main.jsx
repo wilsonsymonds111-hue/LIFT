@@ -5,6 +5,6 @@ import '@/index.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
-// Remove the inline splash once React has mounted
-const splash = document.getElementById('splash');
-if (splash) splash.remove();
+// Splash is removed automatically by React when it renders into #root.
+// Do NOT remove it manually — root.render() is async in React 18, so
+// removing synchronously creates a gap where the body background shows through.
