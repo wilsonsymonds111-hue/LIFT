@@ -45,7 +45,7 @@ export default function StrongExportGuide({ onComplete }) {
   const isLast = step === STEPS.length - 1;
 
   return (
-    <div className="flex flex-col items-center gap-3 py-1">
+    <div className="flex flex-col items-center gap-2 py-0">
       {/* Step indicator */}
       <div className="flex items-center gap-1.5">
         {STEPS.map((_, i) => (
@@ -59,7 +59,7 @@ export default function StrongExportGuide({ onComplete }) {
       </div>
 
       {/* Screenshot in phone frame */}
-      <div className="relative mx-auto" style={{ width: 150, height: 315 }}>
+      <div className="relative mx-auto" style={{ width: 130, height: 273 }}>
         {/* Phone frame PNG (transparent screen) */}
         <img
           src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/69b193eac_image.png"
@@ -96,7 +96,7 @@ export default function StrongExportGuide({ onComplete }) {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center gap-3 w-full">
+      <div className="flex items-center gap-3 w-full pt-1">
         {step > 0 && (
           <button
             onClick={() => setStep(s => s - 1)}
