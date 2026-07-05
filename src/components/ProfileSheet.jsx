@@ -182,8 +182,8 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/dbc22ac3c_image.png" alt="Strong" className="w-full h-full object-cover" />
           </div>
           <div className="text-left flex-1">
-            <p className="font-semibold text-foreground text-sm">Import from Strong</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Bring your workout history from the Strong app</p>
+            <p className="font-semibold text-foreground text-sm">Import from STRONG</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Bring your workout history from the STRONG app</p>
           </div>
         </button>
 
