@@ -89,6 +89,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
 
   const filtered = useMemo(() => {
     if (sorted.length === 0) return sorted;
+    // "ALL" shows every entry from the very first log
+    if (timeFrame === 'ALL') return sorted;
     const ranges = { 'M': 30, '6M': 180, 'Y': 365 };
     const days = ranges[timeFrame] || 180;
     const cutoff = new Date();
@@ -148,10 +150,12 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       ? { day: 'numeric', month: 'short' }
       : timeFrame === 'Y'
         ? { month: 'narrow' }
-        : { month: 'short' };
-    // Downsample to ~13 points so the chart isn't overloaded with data.
+        : timeFrame === 'ALL'
+          ? { month: 'short', year: '2-digit' }
+          : { month: 'short' };
+    // Downsample so the chart isn't overloaded with data.
     // Each point is the average weight of its bucket (Apple Health style).
-    const maxPoints = timeFrame === 'M' ? 31 : timeFrame === '6M' ? 15 : 13;
+    const maxPoints = timeFrame === 'M' ? 31 : timeFrame === '6M' ? 15 : timeFrame === 'ALL' ? 20 : 13;
     const downsampled = downsample(filtered, maxPoints);
     // Use actual latest entry for the last point so the projection connects seamlessly
     if (downsampled.length > 0 && filtered.length > 0) {
@@ -411,7 +415,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          {/* Time frame pills — full-width Apple Health style */}
          <div className="pb-3">
            <div className="flex bg-gray-200 dark:bg-zinc-800 rounded-full p-0.5 gap-0.5">
-             {['M', '6M', 'Y'].map(tf => (
+             {['M', '6M', 'Y', 'ALL'].map(tf => (
                <button
                  key={tf}
                  onClick={() => { setTimeFrame(tf); localStorage.setItem('bodyWeightTimeFrame', tf); }}
@@ -421,7 +425,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                      : 'text-gray-400 dark:text-muted-foreground'
                  }`}
                >
-                 {tf}
+                 {tf === 'ALL' ? 'All' : tf}
                </button>
              ))}
            </div>
