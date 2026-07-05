@@ -217,7 +217,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
       <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] bg-white dark:bg-zinc-800 shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
+          className="body-stats-card-bg relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
         >
           <div className="relative p-6">
             {/* Header: icon + label + status | date + chevron */}
