@@ -207,12 +207,8 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
       <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] border border-gray-300/70 dark:border-zinc-700 shadow-[0_10px_30px_rgba(0,0,0,0.12),0_3px_8px_rgba(0,0,0,0.06),0_0_24px_rgba(59,130,246,0.18)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.4),0_3px_8px_rgba(0,0,0,0.25),0_0_24px_rgba(59,130,246,0.12)]"
-          style={{ background: 'linear-gradient(145deg, #f8fbff 0%, #eff6ff 40%, #e0f2fe 100%)' }}
+          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-sm"
         >
-          {/* Decorative glow */}
-          <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-blue-300/20 blur-2xl pointer-events-none" />
-
           <div className="relative p-5">
             {/* Top row: label + status pill + arrow */}
             <div className="flex items-center justify-between mb-3">
