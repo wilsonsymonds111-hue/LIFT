@@ -151,7 +151,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           <>
             <button
               onClick={() => setShowCreateAccount(true)}
-              className="relative flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+              className="relative z-10 flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
               <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <UserPlus className="w-4 h-4 text-white" />
@@ -165,7 +165,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             {/* Log In — guest only */}
             <button
               onClick={() => setShowCreateAccount(true)}
-              className="relative flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
+              className="relative z-10 flex items-center gap-3 bg-blue-50 dark:bg-blue-950/30 rounded-2xl px-4 py-3.5 transition active:opacity-70"
             >
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <LogIn className="w-4 h-4 text-white" />
@@ -181,7 +181,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Import from Strong */}
         <button
           onClick={() => setShowImportStrong(true)}
-          className="relative flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+          className="relative z-10 flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
         >
           <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
             <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/dbc22ac3c_image.png" alt="Strong" className="w-full h-full object-cover" />
@@ -193,7 +193,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         </button>
 
         {/* Dark mode toggle */}
-        <div className="relative flex items-center justify-between bg-gray-900 dark:bg-black rounded-2xl px-4 py-3.5">
+        <div className="relative z-10 flex items-center justify-between bg-gray-900 dark:bg-black rounded-2xl px-4 py-3.5">
           <div className="flex items-center gap-3">
             {darkMode ? <Moon className="w-5 h-5 text-blue-400" /> : <Sun className="w-5 h-5 text-amber-400" />}
             <span className="font-semibold text-white text-sm">Dark Mode</span>
@@ -211,7 +211,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Feedback & Support */}
         <button
           onClick={() => setShowFeedback(true)}
-          className="relative flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+          className="relative z-10 flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
         >
           <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
             <MessageSquare className="w-4 h-4 text-blue-500" />
@@ -226,7 +226,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         <Link
           to="/terms"
           onClick={onClose}
-          className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70 mt-2"
+          className="relative z-10 flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70 mt-2"
         >
           <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
             <FileText className="w-4 h-4 text-foreground" />
@@ -246,7 +246,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               setLoggingOut(false);
               onClose();
             }}
-            className="relative flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+            className="relative z-10 flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
           >
             <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
               <LogOut className="w-4 h-4 text-foreground" />
