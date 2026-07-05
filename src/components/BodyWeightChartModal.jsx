@@ -110,7 +110,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
 
   const chartData = useMemo(() => {
     const data = filtered.map((e, i) => ({
-      date: new Date(e.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+      date: e.date,
+      dateLabel: new Date(e.date + 'T00:00:00').toLocaleDateString('en-GB', { month: 'short' }),
       weight: unit === 'lbs' ? kgToLbs(e.weight) : e.weight,
       id: e.id,
       isLatest: i === filtered.length - 1,
@@ -130,7 +131,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
           const projDate = new Date(startDate.getTime() + w * 7 * 24 * 60 * 60 * 1000);
           const projWeight = recent.weight + (goalData.weeklyChange * w);
           data.push({
-            date: projDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+            date: projDate.toISOString().split('T')[0],
+            dateLabel: projDate.toLocaleDateString('en-GB', { month: 'short' }),
             weightProjection: unit === 'lbs' ? kgToLbs(projWeight) : projWeight,
           });
         }
@@ -397,10 +399,10 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         {chartData.length > 1 ? (
           <div className="bg-white dark:bg-card rounded-2xl p-3">
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
+              <LineChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" opacity={0.7} />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} />
-                <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} />
+                <XAxis dataKey="dateLabel" tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} interval="preserveStartEnd" minTickGap={20} />
+                <YAxis orientation="right" domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={40} />
                 <Tooltip
                   contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
                   labelStyle={{ color: '#8E8E93' }}
