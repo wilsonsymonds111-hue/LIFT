@@ -80,21 +80,9 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         const kg = typeof h === 'object' ? (h.kg ?? 0) : (h ?? 0);
         return kg === 0 || kg == null;
       });
-  const repsMaxKg = (() => {
-    const kgs = allEntries.map(h => (typeof h === 'object' ? h.kg || 0 : h || 0)).filter(k => k > 0);
-    return kgs.length > 0 ? Math.max(...kgs) : 0;
-  })();
-  const repsWeightLabel = chartView === 'reps' && repsMaxKg > 0 ? `Reps Progress (${repsMaxKg} kg)` : undefined;
-
   const repsHistory = (() => {
     const fullHistory = exercise.history || [];
-    if (fullHistory.length === 0) return fullHistory;
-    const kgs = fullHistory.map(h => (typeof h === 'object' ? h.kg || 0 : h || 0)).filter(k => k > 0);
-    const maxKg = kgs.length > 0 ? Math.max(...kgs) : 0;
-    const filtered = maxKg > 0
-      ? fullHistory.filter(h => ((typeof h === 'object' ? h.kg || 0 : h || 0)) === maxKg)
-      : fullHistory;
-    return filtered.map(h => (typeof h === 'object' ? { ...h, kg: 0 } : { kg: 0, reps: h, date: null }));
+    return fullHistory.map(h => (typeof h === 'object' ? { ...h, kg: 0 } : { kg: 0, reps: h, date: null }));
   })();
 
   const displayHistory = chartView === 'reps' ? (sessionResults.length > 0 ? [...repsHistory, ...sessionResults.map(s => ({ ...s, kg: 0 }))] : repsHistory) : graphHistory;
@@ -222,7 +210,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
       >
-        <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} labelOverride={repsWeightLabel} />
+        <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
       </motion.div>
       <div className="grid grid-cols-[40px_1fr_80px_80px_44px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>

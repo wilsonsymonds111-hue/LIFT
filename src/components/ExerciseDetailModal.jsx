@@ -98,20 +98,12 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
       ? allEntries.every(h => { const kg = h.kg ?? 0; return kg === 0 || kg == null; })
       : false;
 
-    // Reps chart: filter to current max weight level
+    // Reps chart: show all entries (not filtered by weight) so users see up to 15 data points
     const rHistory = history.length > 0
-      ? (() => {
-          const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
-          const maxKg = kgs.length > 0 ? Math.max(...kgs) : 0;
-          const filtered = maxKg > 0
-            ? history.filter(h => (h.kg || 0) === maxKg)
-            : history;
-          return filtered.map(h => ({ kg: 0, reps: h.reps || 0, date: h.date }));
-        })()
+      ? history.map(h => ({ kg: 0, reps: h.reps || 0, date: h.date }))
       : [];
 
-    const kgVals = history.map(h => h.kg || 0).filter(k => k > 0);
-    const rWeightLevel = kgVals.length > 0 ? Math.max(...kgVals) : null;
+    const rWeightLevel = null;
 
     const s = history.length > 0
       ? (() => {
@@ -307,7 +299,7 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
                         animDir="add"
                         isBodyweight={chartIsBodyweight}
                         exerciseName={exercise.name}
-                        labelOverride={chartView === 'reps' && repsWeightLevel ? `Reps Progress of ${repsWeightLevel} kg` : null}
+                        labelOverride={null}
                       />
                     </motion.div>
                   </div>
