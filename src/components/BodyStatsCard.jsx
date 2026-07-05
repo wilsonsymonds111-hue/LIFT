@@ -197,8 +197,8 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
   const textMuted = isCutting ? 'text-gray-500' : 'text-gray-500';
   const chipBg = isCutting ? 'bg-black/10' : 'bg-black/10';
   const skeletonBg = isCutting ? 'bg-black/10' : 'bg-black/10';
-  const sparkStroke = isCutting ? '#fbbf24' : '#3b82f6';
-  const sparkFill = isCutting ? '#f59e0b' : '#2563eb';
+  const sparkStroke = isCutting ? '#f97316' : '#3b82f6';
+  const sparkFill = isCutting ? '#f97316' : '#2563eb';
   const emeraldIcon = isCutting ? 'text-emerald-600' : 'text-emerald-600';
   const orangeIcon = isCutting ? 'text-orange-600' : 'text-orange-600';
 
@@ -207,12 +207,12 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
       <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          className={`relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] ${goalMode === 'cutting' ? 'shadow-[0_12px_36px_rgba(212,160,23,0.25),0_2px_8px_rgba(212,160,23,0.12)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.5),0_4px_12px_rgba(0,0,0,0.3)]' : 'shadow-[0_12px_36px_rgba(37,99,235,0.18),0_2px_8px_rgba(37,99,235,0.08)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.5),0_4px_12px_rgba(0,0,0,0.3)]'}`}
+          className={`relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] ${goalMode === 'cutting' ? 'shadow-[0_12px_36px_rgba(249,115,22,0.25),0_2px_8px_rgba(249,115,22,0.12)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.5),0_4px_12px_rgba(0,0,0,0.3)]' : 'shadow-[0_12px_36px_rgba(37,99,235,0.18),0_2px_8px_rgba(37,99,235,0.08)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.5),0_4px_12px_rgba(0,0,0,0.3)]'}`}
           style={{
             background: goalMode === 'cutting'
-              ? 'linear-gradient(135deg, #fef9e7 0%, #fdf4d3 45%, #fcf0c0 100%)'
+              ? 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 45%, #fed7aa 100%)'
               : 'linear-gradient(135deg, #eff6ff 0%, #e0ecff 45%, #dbeafe 100%)',
-            border: goalMode === 'cutting' ? '1px solid #f0e0b8' : '1px solid #c7d8f5',
+            border: goalMode === 'cutting' ? '1px solid #fed7aa' : '1px solid #c7d8f5',
           }}
         >
           {/* Decorative glow */}
@@ -230,7 +230,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                     <span className="text-[10px] font-bold text-white uppercase">Bulking</span>
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 bg-amber-400 rounded-full px-2 py-0.5 shadow-sm">
+                  <span className="flex items-center gap-1 bg-orange-500 rounded-full px-2 py-0.5 shadow-sm">
                     <Flame className="w-3 h-3 text-white" />
                     <span className="text-[10px] font-bold text-white uppercase">Cutting</span>
                   </span>
