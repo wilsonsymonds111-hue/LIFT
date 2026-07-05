@@ -166,7 +166,23 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       id: e.id,
       isLatest: i === downsampled.length - 1,
     }));
-    
+
+    // Context point: the last entry before the visible range.  It carries a
+    // weight (so the line draws) but no dot, making the graph feel like it
+    // continues off the left edge — matching Apple Health's behaviour.
+    const firstFiltered = filtered[0];
+    const contextEntry = firstFiltered
+      ? [...sorted].reverse().find(e => new Date(e.date + 'T00:00:00') < new Date(firstFiltered.date + 'T00:00:00'))
+      : null;
+    if (contextEntry) {
+      data.unshift({
+        date: contextEntry.date,
+        dateLabel: '',
+        weight: unit === 'lbs' ? kgToLbs(contextEntry.weight) : contextEntry.weight,
+        isContext: true,
+      });
+    }
+
     // Goal projection: show only `projectionReveal` points ahead by default.
     // User can drag right on the chart to reveal more, up to the final goal.
     if (goalData) {
@@ -410,7 +426,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          <div className="pb-2">
         {chartData.length > 1 ? (
           <div
-            className="bg-white dark:bg-card rounded-2xl px-1 py-3 relative"
+            className="bg-white dark:bg-card rounded-2xl px-1 py-3 relative overflow-hidden"
             onTouchStart={(e) => { dragStartX.current = e.touches[0].clientX; }}
             onTouchMove={(e) => handleChartDragMove(e.touches[0].clientX)}
             onTouchEnd={handleChartDragEnd}
@@ -420,15 +436,15 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             onMouseLeave={handleChartDragEnd}
           >
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 5 }}>
+              <LineChart data={chartData} margin={{ top: 10, right: 12, left: 12, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" opacity={0.7} />
-                <XAxis dataKey="dateLabel" tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} interval="equidistantPreserveStartEnd" minTickGap={25} />
+                <XAxis dataKey="dateLabel" tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} interval="equidistantPreserveStartEnd" minTickGap={25} padding={{ left: 0, right: 10 }} />
                 <YAxis orientation="right" domain={yDomain?.domain || [0, 100]} ticks={yDomain?.ticks} allowDecimals={false} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip
                   contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
                   labelStyle={{ color: '#8E8E93' }}
                 />
-                <Line type="monotone" dataKey="weight" stroke="#3b82f6" strokeWidth={2} dot={(props) => { if (props.payload.weight == null) return false; return <circle cx={props.cx} cy={props.cy} r={props.payload.isLatest ? 5 : 4} fill="#fff" stroke="#3b82f6" strokeWidth={2} />; }} activeDot={{ r: 6, fill: '#fff', stroke: '#3b82f6', strokeWidth: 2 }} animationDuration={200} animationEasing="ease-out" />
+                <Line type="monotone" dataKey="weight" stroke="#3b82f6" strokeWidth={2} dot={(props) => { if (props.payload.weight == null || props.payload.isContext) return false; return <circle cx={props.cx} cy={props.cy} r={props.payload.isLatest ? 5 : 4} fill="#fff" stroke="#3b82f6" strokeWidth={2} />; }} activeDot={{ r: 6, fill: '#fff', stroke: '#3b82f6', strokeWidth: 2 }} animationDuration={200} animationEasing="ease-out" />
                 {goalData && <Line type="linear" dataKey="weightProjection" stroke="#bfdbfe" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={(props) => { if (props.payload.weight != null) return false; return <circle cx={props.cx} cy={props.cy} r={5} fill="#fff" fillOpacity={0.6} stroke="#bfdbfe" strokeWidth={1.5} strokeDasharray="3 2" />; }} activeDot={{ r: 5, fill: '#93c5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
               </LineChart>
             </ResponsiveContainer>
