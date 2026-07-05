@@ -45,7 +45,7 @@ export default function StrongExportGuide({ onComplete }) {
   const isLast = step === STEPS.length - 1;
 
   return (
-    <div className="flex flex-col items-center gap-5 py-2">
+    <div className="flex flex-col items-center gap-3 py-1">
       {/* Step indicator */}
       <div className="flex items-center gap-1.5">
         {STEPS.map((_, i) => (
@@ -59,7 +59,7 @@ export default function StrongExportGuide({ onComplete }) {
       </div>
 
       {/* Screenshot in phone frame */}
-      <div className="relative mx-auto" style={{ width: 220, height: 440 }}>
+      <div className="relative mx-auto" style={{ width: 160, height: 300 }}>
         {/* Phone body */}
         <div className="absolute inset-0 rounded-[2.5rem] bg-zinc-900 shadow-2xl border-[3px] border-zinc-700" />
         {/* Notch */}
@@ -90,7 +90,7 @@ export default function StrongExportGuide({ onComplete }) {
       {/* Step text */}
       <div className="text-center px-4">
         <p className="text-sm font-bold text-foreground">{current.title}</p>
-        <p className="text-xs text-muted-foreground mt-1">{current.subtitle}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{current.subtitle}</p>
       </div>
 
       {/* Navigation */}
