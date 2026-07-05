@@ -2,7 +2,6 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, Flag, AlertCircle, Zap, BicepsFlexed, Info, Pencil, Dumbbell, Flame, RefreshCw } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
-import { Slider } from '@/components/ui/slider';
 import { base44 } from '@/api/base44Client';
 import WeightEntryKeypad from './WeightEntryKeypad';
 import CheckeredFlagIcon from './CheckeredFlagIcon';
@@ -13,10 +12,7 @@ const kgToLbs = (kg) => parseFloat((kg * 2.20462).toFixed(2));
 const lbsToKg = (lbs) => parseFloat((lbs / 2.20462).toFixed(2));
 
 export default function BodyWeightChartModal({ entries, onClose, onChanged, prediction, muscleLoading, refreshing, fatLossG, onRecalculate }) {
-  const [zoom, setZoom] = useState(() => {
-    const stored = localStorage.getItem('bodyWeightZoom');
-    return stored ? Number(stored) : 0;
-  });
+  const [timeFrame, setTimeFrame] = useState(() => localStorage.getItem('bodyWeightTimeFrame') || '6M');
   const [showKeypad, setShowKeypad] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editWeight, setEditWeight] = useState('');
@@ -57,16 +53,19 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   [entries]);
 
   const filtered = useMemo(() => {
-    if (sorted.length <= 3) return sorted;
-    const showCount = Math.max(3, Math.round(sorted.length * (1 - zoom / 100)));
-    return sorted.slice(-showCount);
-  }, [sorted, zoom]);
-
-  const handleZoomChange = (value) => {
-    const v = value[0];
-    setZoom(v);
-    localStorage.setItem('bodyWeightZoom', String(v));
-  };
+    if (sorted.length === 0) return sorted;
+    const ranges = { 'D': 1, 'W': 7, 'M': 30, '6M': 180, 'Y': 365 };
+    const days = ranges[timeFrame] || 180;
+    const cutoff = new Date();
+    cutoff.setHours(0, 0, 0, 0);
+    cutoff.setDate(cutoff.getDate() - days);
+    const result = sorted.filter(e => new Date(e.date + 'T00:00:00') >= cutoff);
+    // If too few entries in the selected range, fall back to most recent entries
+    if (result.length < 2 && sorted.length >= 2) {
+      return sorted.slice(-Math.min(sorted.length, 3));
+    }
+    return result;
+  }, [sorted, timeFrame]);
 
   const handleSetGoal = () => {
     if (!goalWeight) {
@@ -374,8 +373,27 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          </div>
          </div>
 
+         {/* Time frame pills */}
+         <div className="flex justify-center pb-3">
+           <div className="inline-flex bg-gray-100 dark:bg-muted rounded-full p-0.5 gap-0.5">
+             {['D', 'W', 'M', '6M', 'Y'].map(tf => (
+               <button
+                 key={tf}
+                 onClick={() => { setTimeFrame(tf); localStorage.setItem('bodyWeightTimeFrame', tf); }}
+                 className={`px-3 py-1 rounded-full text-[11px] font-semibold transition ${
+                   timeFrame === tf
+                     ? 'bg-white dark:bg-card text-gray-900 dark:text-foreground shadow-sm'
+                     : 'text-gray-400 dark:text-muted-foreground'
+                 }`}
+               >
+                 {tf}
+               </button>
+             ))}
+           </div>
+         </div>
+
          {/* Chart */}
-      <div className="pb-2">
+         <div className="pb-2">
         {chartData.length > 1 ? (
           <div className="bg-white dark:bg-card rounded-2xl p-3">
             <ResponsiveContainer width="100%" height={200}>
@@ -399,22 +417,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         )}
       </div>
 
-      {/* Zoom slider */}
-      {sorted.length > 1 && (
-        <div className="pb-4">
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-semibold text-gray-400 dark:text-muted-foreground flex-shrink-0">All</span>
-            <Slider
-              value={[zoom]}
-              onValueChange={handleZoomChange}
-              max={100}
-              step={1}
-              className="flex-1"
-            />
-            <span className="text-[10px] font-semibold text-gray-400 dark:text-muted-foreground flex-shrink-0">Recent</span>
-          </div>
-        </div>
-      )}
+
 
       {/* Goal section */}
       {goalData && (
