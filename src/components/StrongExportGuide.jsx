@@ -58,10 +58,18 @@ export default function StrongExportGuide({ onComplete }) {
         ))}
       </div>
 
-      {/* Screenshot in phone frame */}
-      <div className="relative mx-auto" style={{ width: 130, height: 282 }}>
-        {/* Screen content — sits BEHIND the frame PNG */}
-        <div className="absolute overflow-hidden z-10 bg-black" style={{ top: '2.5%', left: '6%', right: '6%', bottom: '2.5%', borderRadius: '1.6rem' }}>
+      {/* Screenshot in CSS phone frame */}
+      <div className="relative mx-auto" style={{ width: 140, height: 290 }}>
+        {/* Phone body */}
+        <div className="absolute inset-0 rounded-[2.2rem] bg-[#1A1A1A] shadow-2xl" />
+        {/* Side buttons - left */}
+        <div className="absolute left-[-2px] top-[14%] w-[2px] h-[7%] rounded-l bg-[#8C8C8C]" />
+        <div className="absolute left-[-2px] top-[23%] w-[2px] h-[4%] rounded-l bg-[#8C8C8C]" />
+        <div className="absolute left-[-2px] top-[29%] w-[2px] h-[4%] rounded-l bg-[#8C8C8C]" />
+        {/* Side button - right */}
+        <div className="absolute right-[-2px] top-[22%] w-[2px] h-[9%] rounded-r bg-[#8C8C8C]" />
+        {/* Screen */}
+        <div className="absolute inset-[3px] rounded-[2rem] overflow-hidden z-10 bg-white">
           <img
             src={current.image}
             alt={`Step ${step + 1}: ${current.title}`}
@@ -80,13 +88,9 @@ export default function StrongExportGuide({ onComplete }) {
             <div className="absolute inset-0 rounded-lg bg-blue-500/20 animate-ping" />
             <div className="absolute inset-0 rounded-lg border-[3px] border-blue-500 bg-blue-500/10" />
           </div>
+          {/* Home indicator */}
+          <div className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[40px] h-[3px] bg-black/30 rounded-full z-20" />
         </div>
-        {/* Phone frame PNG (transparent screen) — sits ON TOP */}
-        <img
-          src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/69b193eac_image.png"
-          alt="iPhone frame"
-          className="absolute inset-0 w-full h-full object-fill z-30 pointer-events-none"
-        />
       </div>
 
       {/* Step text */}
