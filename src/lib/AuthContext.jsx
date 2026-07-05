@@ -3,6 +3,7 @@ import { base44, setCloudMode, migrateToCloud } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 import { hasLocalData } from '@/lib/dataLayer';
+import { queryClientInstance } from '@/lib/query-client';
 
 const AuthContext = createContext();
 
@@ -126,6 +127,10 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     setIsGuest(true);
     setCloudMode(false);
+
+    // Clear all cached query data so the previous user's workouts/splits
+    // don't bleed into the new guest session.
+    queryClientInstance.clear();
 
     // Hit server logout endpoint to clear HTTP-only auth cookies.
     // Use fetch with redirect:'manual' so we don't get redirected/reloaded —
