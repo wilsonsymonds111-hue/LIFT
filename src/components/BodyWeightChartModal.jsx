@@ -692,6 +692,33 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
           </div>
           </div>
 
+        {/* Apple Health import */}
+        <div className="pb-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xml,text/xml,application/xml"
+            className="hidden"
+            onChange={handleAppleHealthImport}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className="w-full flex items-center gap-3 bg-white dark:bg-card rounded-2xl px-4 py-3.5 border border-gray-200 dark:border-border shadow-sm transition active:opacity-70 disabled:opacity-50"
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+              <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/09465d902_image.png" alt="Apple Health" className="w-full h-full object-cover" />
+            </div>
+            <div className="text-left flex-1">
+              <p className="font-semibold text-foreground text-sm">Import from Apple Health</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{importing ? 'Importing…' : 'Upload your export.xml file'}</p>
+            </div>
+          </button>
+          {importMsg && (
+            <p className="text-xs text-gray-500 dark:text-muted-foreground mt-2 px-1">{importMsg}</p>
+          )}
+        </div>
+
         {/* History list */}
         <p className="font-semibold text-black dark:text-foreground text-sm mb-2 px-1">History</p>
         <div className="bg-white dark:bg-card rounded-2xl shadow-sm overflow-hidden">
