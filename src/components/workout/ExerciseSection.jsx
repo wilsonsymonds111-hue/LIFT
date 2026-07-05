@@ -152,17 +152,17 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             <div className="flex items-center gap-3 min-w-0">
             <h3 className="text-blue-500 font-semibold text-sm select-none cursor-grab active:cursor-grabbing truncate min-w-0 flex-1" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
             {exerciseImage ? (
-            <img
-             src={exerciseImage}
-             alt={exercise.name}
-             className="w-16 h-14 rounded-lg object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
-             decoding="async"
-             onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
-            />
+              <img
+                src={exerciseImage}
+                alt={exercise.name}
+                className="w-28 h-20 rounded-xl object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
+                decoding="async"
+                onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
+              />
             ) : (
-            <div className="w-16 h-14 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-             <span className="text-sm font-bold text-gray-400">{exercise.name[0]}</span>
-            </div>
+              <div className="w-28 h-20 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
+              </div>
             )}
             </div>
             </div>
