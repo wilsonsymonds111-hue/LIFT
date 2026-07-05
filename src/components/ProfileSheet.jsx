@@ -77,7 +77,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div
-        className="relative bg-card rounded-t-3xl w-full px-5 pt-5 shadow-2xl flex flex-col gap-4 overflow-y-auto"
+        className="relative bg-gray-100 dark:bg-zinc-900 rounded-t-3xl w-full px-5 pt-5 shadow-2xl flex flex-col gap-4 overflow-y-auto"
         style={{
           maxHeight: '80vh',
           paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
@@ -181,7 +181,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Import from Strong */}
         <button
           onClick={() => setShowImportStrong(true)}
-          className="relative z-10 flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+          className="relative z-10 flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 transition active:opacity-70 shadow-sm"
         >
           <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
             <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/dbc22ac3c_image.png" alt="Strong" className="w-full h-full object-cover" />
@@ -211,7 +211,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Feedback & Support */}
         <button
           onClick={() => setShowFeedback(true)}
-          className="relative z-10 flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+          className="relative z-10 flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 transition active:opacity-70 shadow-sm"
         >
           <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
             <MessageSquare className="w-4 h-4 text-blue-500" />
@@ -226,7 +226,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         <Link
           to="/terms"
           onClick={onClose}
-          className="relative z-10 flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70 mt-2"
+          className="relative z-10 flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 transition active:opacity-70 mt-2 shadow-sm"
         >
           <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
             <FileText className="w-4 h-4 text-foreground" />
@@ -246,7 +246,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               setLoggingOut(false);
               onClose();
             }}
-            className="relative z-10 flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5 transition active:opacity-70"
+            className="relative z-10 flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 transition active:opacity-70 shadow-sm"
           >
             <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
               <LogOut className="w-4 h-4 text-foreground" />
