@@ -425,11 +425,11 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
            </div>
          </div>
 
-         {/* Chart */}
-         <div className="pb-2">
+         {/* Chart — edge-to-edge, no card bubble (Apple Health style) */}
+         <div className="pb-2 -mx-4">
         {chartData.length > 1 ? (
           <div
-            className="bg-white dark:bg-card rounded-2xl px-1 py-3 relative overflow-hidden"
+            className="bg-white dark:bg-card py-3 relative overflow-hidden"
             onTouchStart={(e) => { dragStartX.current = e.touches[0].clientX; }}
             onTouchMove={(e) => handleChartDragMove(e.touches[0].clientX)}
             onTouchEnd={handleChartDragEnd}
@@ -439,7 +439,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             onMouseLeave={handleChartDragEnd}
           >
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={chartData} margin={{ top: 10, right: 12, left: 12, bottom: 5 }}>
+              <LineChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" opacity={0.7} />
                 <XAxis dataKey="dateLabel" tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} interval="equidistantPreserveStartEnd" minTickGap={25} padding={{ left: 0, right: 10 }} />
                 <YAxis orientation="right" domain={yDomain?.domain || [0, 100]} ticks={yDomain?.ticks} allowDecimals={false} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={32} />
