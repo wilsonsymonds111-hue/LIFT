@@ -59,15 +59,9 @@ export default function StrongExportGuide({ onComplete }) {
       </div>
 
       {/* Screenshot in phone frame */}
-      <div className="relative mx-auto" style={{ width: 130, height: 273 }}>
-        {/* Phone frame PNG (transparent screen) */}
-        <img
-          src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/69b193eac_image.png"
-          alt="iPhone frame"
-          className="absolute inset-0 w-full h-full object-contain z-30 pointer-events-none"
-        />
-        {/* Screen content */}
-        <div className="absolute rounded-[2rem] overflow-hidden z-10 bg-white" style={{ top: '1.5%', left: '4%', right: '4%', bottom: '1.5%' }}>
+      <div className="relative mx-auto" style={{ width: 130, height: 282 }}>
+        {/* Screen content — sits BEHIND the frame PNG */}
+        <div className="absolute overflow-hidden z-10 bg-black" style={{ top: '2.5%', left: '6%', right: '6%', bottom: '2.5%', borderRadius: '1.6rem' }}>
           <img
             src={current.image}
             alt={`Step ${step + 1}: ${current.title}`}
@@ -87,6 +81,12 @@ export default function StrongExportGuide({ onComplete }) {
             <div className="absolute inset-0 rounded-lg border-[3px] border-blue-500 bg-blue-500/10" />
           </div>
         </div>
+        {/* Phone frame PNG (transparent screen) — sits ON TOP */}
+        <img
+          src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/69b193eac_image.png"
+          alt="iPhone frame"
+          className="absolute inset-0 w-full h-full object-fill z-30 pointer-events-none"
+        />
       </div>
 
       {/* Step text */}
