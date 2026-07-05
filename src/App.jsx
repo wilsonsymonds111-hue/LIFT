@@ -84,7 +84,10 @@ const TAB_CONTENT = [Home, Splits, Exercises];
 const SwipeableTabs = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
-  const activeIndex = TABS.indexOf(location.pathname);
+  // Modal routes (e.g. /template/:id) should keep the tab content pinned
+  // to the Home tab instead of shifting it off-screen (indexOf returns -1).
+  const rawIndex = TABS.indexOf(location.pathname);
+  const activeIndex = rawIndex === -1 ? 0 : rawIndex;
   const containerRef = useRef(null);
   const [width, setWidth] = useState(0);
   // Track which tabs have ever been "visited" so we only mount/fetch what's needed
