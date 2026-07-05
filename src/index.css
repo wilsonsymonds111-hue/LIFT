@@ -29,7 +29,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, 'SF Pro Rounded', 'Helvetica Neue', sans-serif;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -73,7 +73,7 @@
     --sidebar-accent-foreground: 225 10% 90%;
     --sidebar-border: 225 6% 22%;
     --sidebar-ring: 217 91% 60%;
-    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, 'SF Pro Rounded', 'Helvetica Neue', sans-serif;
   }
 }
 

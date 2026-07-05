@@ -5,7 +5,7 @@ module.exports = {
   theme: {
   	extend: {
   		fontFamily: {
-  			display: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'system-ui', 'sans-serif'],
+  			display: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Rounded', 'SF Pro Display', 'SF Pro Text', 'system-ui', 'sans-serif'],
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

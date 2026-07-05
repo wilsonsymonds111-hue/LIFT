@@ -354,13 +354,13 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
               </div>
               <div className="flex items-center gap-1.5 mb-0.5">
                 <CalendarDays className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" strokeWidth={1.5} />
-                <p className="text-sm text-gray-700 dark:text-gray-200">{today}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-200 font-display">{today}</p>
               </div>
               <div className="flex items-center gap-1.5 mb-4">
                 <Clock className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" strokeWidth={1.5} />
-                <p className="text-sm text-gray-700 dark:text-gray-200">{timer}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-200 font-display">{timer}</p>
               </div>
-              <textarea placeholder="Note" rows={1} className="w-full text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 mb-6 focus:outline-none border-b border-transparent focus:border-gray-200 dark:focus:border-gray-600 pb-1 bg-transparent resize-none" />
+              <textarea placeholder="Note" rows={1} className="w-full text-sm text-blue-500 placeholder-gray-400 dark:placeholder-gray-500 mb-6 focus:outline-none border-b border-transparent focus:border-blue-300 dark:focus:border-blue-500 pb-1 bg-transparent resize-none font-display" />
 
               <DragDropContext onDragEnd={({ source, destination }) => {
                 if (!destination) return;
