@@ -212,7 +212,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             background: goalMode === 'cutting'
               ? 'linear-gradient(135deg, #fef9e7 0%, #fdf4d3 45%, #fcf0c0 100%)'
               : 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #3b82f6 100%)',
-            ...(goalMode === 'cutting' ? { border: '1.5px solid #ffffff' } : {}),
+
           }}
         >
           {/* Decorative glow */}
@@ -248,11 +248,8 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                   <div className={`h-9 w-20 ${skeletonBg} rounded-lg animate-pulse`} />
                 ) : latest ? (
                   <>
-                    <span className={`text-[10px] ${textLabel} font-semibold uppercase tracking-wide block`}>Body Weight</span>
-                    <div className="flex items-end gap-1">
-                      <span className={`text-3xl font-extrabold ${textPrimary} leading-none`}>{latest.weight}</span>
-                      <span className={`text-sm ${textSecondary} font-semibold mb-0.5`}>kg</span>
-                    </div>
+                    <span className={`text-3xl font-extrabold ${textPrimary} leading-none`}>{latest.weight}</span>
+                    <span className={`text-sm ${textSecondary} font-semibold mb-0.5`}>kg</span>
                   </>
                 ) : (
                   <span className={`text-base ${textLabel} font-semibold`}>Tap to log</span>
