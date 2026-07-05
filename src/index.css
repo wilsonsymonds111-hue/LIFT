@@ -173,10 +173,15 @@
   html {
     font-size: 16.8px; /* 5% increase from 16px — scales all rem-based sizing proportionally */
   }
-  html, body, #root {
+  html, body {
     height: 100%;
     overflow: hidden;
     background-color: #000;
+  }
+  #root {
+    height: 100%;
+    overflow: hidden;
+    background-color: hsl(var(--background));
   }
   #root {
     display: flex;
