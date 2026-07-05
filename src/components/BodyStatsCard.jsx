@@ -190,6 +190,18 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
     else if (!muscleLoading) compute(true);
   };
 
+  const isCutting = goalMode === 'cutting';
+  const textPrimary = isCutting ? 'text-gray-900' : 'text-white';
+  const textSecondary = isCutting ? 'text-gray-600' : 'text-white/70';
+  const textLabel = isCutting ? 'text-gray-500' : 'text-white/80';
+  const textMuted = isCutting ? 'text-gray-500' : 'text-white/60';
+  const chipBg = isCutting ? 'bg-black/10' : 'bg-white/15';
+  const skeletonBg = isCutting ? 'bg-black/10' : 'bg-white/20';
+  const sparkStroke = isCutting ? 'rgba(100,100,100,0.45)' : 'rgba(255,255,255,0.85)';
+  const sparkFill = isCutting ? '#777' : 'white';
+  const emeraldIcon = isCutting ? 'text-emerald-600' : 'text-emerald-300';
+  const orangeIcon = isCutting ? 'text-orange-600' : 'text-orange-300';
+
   return (
     <>
       <div className="px-1">
@@ -200,7 +212,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             background: goalMode === 'cutting'
               ? 'linear-gradient(135deg, #fef9e7 0%, #fdf4d3 45%, #fcf0c0 100%)'
               : 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #3b82f6 100%)',
-            ...(goalMode === 'cutting' ? { border: '2px solid #f0c040' } : {}),
+            ...(goalMode === 'cutting' ? { border: '1.5px solid #c9a227' } : {}),
           }}
         >
           {/* Decorative glow */}
@@ -210,22 +222,22 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             {/* Top row: label + status pill + arrow */}
             <div className="flex items-center justify-between mb-2.5">
               <div className="flex items-center gap-2">
-                <Activity className="w-3.5 h-3.5 text-white/80" />
-                <span className="text-xs font-bold text-white/80 uppercase tracking-wide">Body Stats</span>
+                <Activity className={`w-3.5 h-3.5 ${textLabel}`} />
+                <span className={`text-xs font-bold ${textLabel} uppercase tracking-wide`}>Body Stats</span>
                 {goalMode === 'bulking' ? (
                   <span className="flex items-center gap-1 bg-blue-400/40 border border-blue-200/30 rounded-full px-2 py-0.5">
                     <BicepsFlexed className="w-3 h-3 text-white" />
                     <span className="text-[10px] font-bold text-white uppercase">Bulking</span>
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 bg-amber-400/40 border border-amber-200/40 rounded-full px-2 py-0.5">
-                    <Flame className="w-3 h-3 text-amber-100" />
-                    <span className="text-[10px] font-bold text-amber-50 uppercase">Cutting</span>
+                  <span className="flex items-center gap-1 bg-amber-500 rounded-full px-2 py-0.5 shadow-sm">
+                    <Flame className="w-3 h-3 text-white" />
+                    <span className="text-[10px] font-bold text-white uppercase">Cutting</span>
                   </span>
                 )}
               </div>
-              <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                <ChevronRight className="w-4 h-4 text-white" />
+              <div className={`w-7 h-7 rounded-full ${skeletonBg} flex items-center justify-center`}>
+                <ChevronRight className={`w-4 h-4 ${textLabel}`} />
               </div>
             </div>
 
@@ -233,14 +245,14 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
             <div className="flex items-end justify-between gap-2 mb-2.5">
               <div className="flex items-end gap-1">
                 {weightLoading ? (
-                  <div className="h-9 w-20 bg-white/20 rounded-lg animate-pulse" />
+                  <div className={`h-9 w-20 ${skeletonBg} rounded-lg animate-pulse`} />
                 ) : latest ? (
                   <>
-                    <span className="text-3xl font-extrabold text-white leading-none">{latest.weight}</span>
-                    <span className="text-sm text-white/70 font-semibold mb-0.5">kg</span>
+                    <span className={`text-3xl font-extrabold ${textPrimary} leading-none`}>{latest.weight}</span>
+                    <span className={`text-sm ${textSecondary} font-semibold mb-0.5`}>kg</span>
                   </>
                 ) : (
-                  <span className="text-base text-white/80 font-semibold">Tap to log</span>
+                  <span className={`text-base ${textLabel} font-semibold`}>Tap to log</span>
                 )}
               </div>
               {sparklinePoints && (
@@ -248,13 +260,13 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
                   <polyline
                     points={sparklinePoints.map(p => `${p.x},${p.y}`).join(' ')}
                     fill="none"
-                    stroke="rgba(255,255,255,0.85)"
+                    stroke={sparkStroke}
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                   {sparklinePoints.map((p, i) => (
-                    <circle key={i} cx={p.x} cy={p.y} r="1.5" fill="white" />
+                    <circle key={i} cx={p.x} cy={p.y} r="1.5" fill={sparkFill} />
                   ))}
                 </svg>
               )}
@@ -265,22 +277,22 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
               {prediction ? (
                 <>
                   {prediction.muscleGainG > 0 && (
-                    <div className="flex items-center gap-1 bg-white/15 rounded-full px-2.5 py-1">
-                      <TrendingUp className="w-3 h-3 text-emerald-300" />
-                      <span className="text-[11px] font-semibold text-white">+{prediction.muscleGainG}g muscle</span>
+                    <div className={`flex items-center gap-1 ${chipBg} rounded-full px-2.5 py-1`}>
+                      <TrendingUp className={`w-3 h-3 ${emeraldIcon}`} />
+                      <span className={`text-[11px] font-semibold ${textPrimary}`}>+{prediction.muscleGainG}g muscle</span>
                     </div>
                   )}
                   {fatLossG > 0 && (
-                    <div className="flex items-center gap-1 bg-white/15 rounded-full px-2.5 py-1">
-                      <TrendingDown className="w-3 h-3 text-orange-300" />
-                      <span className="text-[11px] font-semibold text-white">{fatLossG}g fat lost</span>
+                    <div className={`flex items-center gap-1 ${chipBg} rounded-full px-2.5 py-1`}>
+                      <TrendingDown className={`w-3 h-3 ${orangeIcon}`} />
+                      <span className={`text-[11px] font-semibold ${textPrimary}`}>{fatLossG}g fat lost</span>
                     </div>
                   )}
                 </>
               ) : muscleLoading ? (
-                <div className="h-6 w-28 bg-white/15 rounded-full animate-pulse" />
+                <div className={`h-6 w-28 ${chipBg} rounded-full animate-pulse`} />
               ) : (
-                <p className="text-[11px] text-white/60 font-medium">Log workouts & weight for insights</p>
+                <p className={`text-[11px] ${textMuted} font-medium`}>Log workouts & weight for insights</p>
               )}
             </div>
           </div>
