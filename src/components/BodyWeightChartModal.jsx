@@ -50,6 +50,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   const [goalWeight, setGoalWeight] = useState('');
   const [goalRate, setGoalRate] = useState('0.5');
   const [showRateHelp, setShowRateHelp] = useState(false);
+  const [showGoalRateHelp, setShowGoalRateHelp] = useState(false);
   const [showWeighInTip, setShowWeighInTip] = useState(false);
   const [showMuscleInfo, setShowMuscleInfo] = useState(false);
   const [showFatInfo, setShowFatInfo] = useState(false);
@@ -493,8 +494,8 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             </div>
 
             {/* Tap-outside backdrop to dismiss popovers */}
-            {(showRateHelp || showWeighInTip) && (
-              <div className="fixed inset-0 z-20" onClick={() => { setShowRateHelp(false); setShowWeighInTip(false); }} />
+            {(showRateHelp || showWeighInTip || showGoalRateHelp) && (
+              <div className="fixed inset-0 z-20" onClick={() => { setShowRateHelp(false); setShowWeighInTip(false); setShowGoalRateHelp(false); }} />
             )}
 
             {/* Floating rate-help popover */}
@@ -547,9 +548,9 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
               />
               <div className="flex items-center gap-1.5">
                 <p className="text-xs font-semibold text-gray-600 dark:text-muted-foreground">Rate per week ({unit})</p>
-                <button type="button" onClick={() => setShowRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-200 dark:bg-muted text-gray-500 dark:text-muted-foreground text-[10px] font-bold flex-shrink-0">?</button>
+                <button type="button" onClick={() => setShowGoalRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-200 dark:bg-muted text-gray-500 dark:text-muted-foreground text-[10px] font-bold flex-shrink-0">?</button>
               </div>
-              {showRateHelp && (
+              {showGoalRateHelp && (
                 <p className="text-[11px] text-gray-500 dark:text-muted-foreground bg-gray-50 dark:bg-muted/50 rounded-lg p-2.5 -mt-1">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
               )}
               <input
