@@ -4,6 +4,7 @@ import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import ProgressGraph, { getRepCap } from '../ProgressGraph';
 import SetRow from './SetRow';
 import RepGoalNotification from './RepGoalNotification';
+import RestTimeModal from './RestTimeModal';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
 const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange }) {
@@ -39,8 +40,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [showNote, setShowNote] = useState(false);
   const [restDuration, setRestDuration] = useState(() => getDefaultRestDuration(exercise.name));
   const [restEnabled, setRestEnabled] = useState(true);
-  const [showCustomRest, setShowCustomRest] = useState(false);
-  const [customRestInput, setCustomRestInput] = useState('');
+  const [showRestTimeModal, setShowRestTimeModal] = useState(false);
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
   const [goalNotification, setGoalNotification] = useState(null);
@@ -107,30 +107,11 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                 {showNote ? 'Hide Note' : 'Add a Note'}
               </button>
               <button
-                onClick={() => setShowCustomRest(c => !c)}
+                onClick={() => { setShowMenu(false); setShowRestTimeModal(true); }}
                 className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
               >
                 Change Default Rest Time
               </button>
-              {showCustomRest && (
-                <div className="px-4 pb-2 flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={customRestInput}
-                    onChange={e => setCustomRestInput(e.target.value)}
-                    placeholder="sec"
-                    className="w-16 text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
-                  <button
-                    onClick={() => {
-                      const s = parseInt(customRestInput);
-                      if (s > 0) { setRestDuration(s); setRestEnabled(true); }
-                      setShowCustomRest(false); setShowMenu(false);
-                    }}
-                    className="text-xs bg-blue-500 text-white px-2 py-1 rounded-lg font-semibold"
-                  >Set</button>
-                </div>
-              )}
               <button
                 onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
                 className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
@@ -226,6 +207,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       <RepGoalNotification
         message={goalNotification}
         onDismiss={() => setGoalNotification(null)}
+      />
+    )}
+    {showRestTimeModal && (
+      <RestTimeModal
+        currentSeconds={restDuration}
+        onClose={() => setShowRestTimeModal(false)}
+        onSelect={(secs) => { setRestDuration(secs); setRestEnabled(true); }}
       />
     )}
     </>
