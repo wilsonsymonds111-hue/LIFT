@@ -191,7 +191,6 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         {/* Dark mode toggle */}
         <div className="relative z-10 flex items-center justify-between bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 shadow-sm">
           <div className="flex items-center gap-3">
-            {darkMode ? <Moon className="w-5 h-5 text-blue-400" /> : <Sun className="w-5 h-5 text-amber-400" />}
             <span className="font-semibold text-foreground text-sm">Dark Mode</span>
           </div>
           <button
