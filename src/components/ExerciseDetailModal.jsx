@@ -5,10 +5,9 @@ import { X, Trash2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import { getExerciseDetailList } from '../lib/exerciseCache';
-import ProgressGraph, { getNextGoal } from './ProgressGraph';
+import ProgressGraph from './ProgressGraph';
 import { MUSCLE_COLORS } from '../lib/exercises';
 import { isCustomExercise, deleteCustomExercise } from '../lib/customExercises';
-import ExerciseGoalSetter from './ExerciseGoalSetter';
 
 const TABS = ['Charts', 'About'];
 
@@ -23,7 +22,6 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
   const [detail, setDetail] = useState(initialImage ? { image_url: initialImage } : null);
   const [loadingDetail, setLoadingDetail] = useState(!initialImage);
   const [loadingHistory, setLoadingHistory] = useState(!initialHistory);
-  const [goal, setGoal] = useState(null);
   const [shimmer, setShimmer] = useState(false);
   const [chartView, setChartView] = useState('weight');
   const [swipeDir, setSwipeDir] = useState(0);
@@ -47,10 +45,8 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
   useEffect(() => {
     base44.entities.Exercise.filter({ name: exercise.name }).then(results => {
       if (results.length > 0) {
-        setGoal(results[0].goal || null);
         if (!initialHistory) setHistory(results[0].history || []);
       } else {
-        setGoal(null);
         if (!initialHistory) setHistory([]);
       }
       if (!initialHistory) setLoadingHistory(false);
@@ -125,8 +121,7 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
             const allReps = entries.map(h => h.reps || 0);
             const firstReps = entries[0]?.reps || 0;
             const bestReps = Math.max(...allReps);
-            const suggestion = getNextGoal(exercise.name, history) || `${bestReps + 1} reps`;
-            return { start: firstReps + ' reps', best: bestReps + ' reps', increase: `+${bestReps - firstReps} reps`, suggestion };
+            return { start: firstReps + ' reps', best: bestReps + ' reps', increase: `+${bestReps - firstReps} reps` };
           }
           const kgs = history.map(h => h.kg || 0).filter(k => k > 0);
           const reps = history.map(h => h.reps || 0);
@@ -138,22 +133,16 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
           const firstKg = history[0]?.kg || 0;
           const firstReps = history[0]?.reps || 0;
           const increase = bestKg - firstKg;
-          const suggestion = getNextGoal(exercise.name, history) || (isBw
-            ? (Math.max(...reps) + 1) + ' reps'
-            : `${bestKg} kg × ${bestReps + 1}`);
           return {
             start: isBw ? firstReps + ' reps' : firstKg + ' kg',
             best: isBw ? Math.max(...reps) + ' reps' : `${bestKg} kg × ${bestReps}`,
             increase: isBw ? (Math.max(...reps) - firstReps) + ' reps' : `+${increase} kg`,
-            suggestion,
           };
         })()
       : null;
 
-    if (goal && s) s.suggestion = `${goal.kg} kg × ${goal.reps}`;
-
     return { isBodyweight: isBw, repsHistory: rHistory, repsWeightLevel: rWeightLevel, stats: s };
-  }, [history, chartView, exercise.name, goal]);
+  }, [history, chartView, exercise.name]);
 
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
 
@@ -318,26 +307,20 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
                         animDir="add"
                         isBodyweight={chartIsBodyweight}
                         exerciseName={exercise.name}
-                        goal={goal}
-                        chartView={chartView}
-                        repsChartWeight={repsWeightLevel}
                         labelOverride={chartView === 'reps' && repsWeightLevel ? `Reps Progress of ${repsWeightLevel} kg` : null}
                       />
                     </motion.div>
                   </div>
                   {stats && (
-                    <div className="grid grid-cols-4 gap-1.5">
+                    <div className="grid grid-cols-3 gap-1.5">
                       {[
                         { label: 'Starting Weight', value: stats.start },
                         { label: 'Increase', value: stats.increase },
                         { label: 'Best', value: stats.best },
-                        { label: 'Next Goal', value: stats.suggestion, isAI: true },
                       ].map(s => (
                         <div
                           key={s.label}
-                          className={s.isAI
-                            ? 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-white overflow-hidden relative border-2 border-dashed border-purple-300'
-                            : s.label === 'Best'
+                          className={s.label === 'Best'
                             ? `rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-gradient-to-br from-amber-200/60 to-amber-100/30 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`
                             : 'rounded-xl px-1.5 py-2.5 flex flex-col items-center justify-center bg-blue-400'
                           }
@@ -348,9 +331,9 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
                               <p className="text-xs font-semibold relative z-10 leading-tight text-foreground">× {s.value.split(' × ')[1]}</p>
                             </>
                           ) : (
-                            <p className={`text-xs font-semibold relative z-10 ${s.isAI ? 'text-foreground' : s.label === 'Best' ? 'text-foreground' : 'text-white'}`}>{s.value}</p>
+                            <p className={`text-xs font-semibold relative z-10 ${s.label === 'Best' ? 'text-foreground' : 'text-white'}`}>{s.value}</p>
                           )}
-                          <p className={`text-[9px] font-medium uppercase tracking-wider mt-0.5 relative z-10 text-center ${s.isAI ? 'text-muted-foreground' : s.label === 'Best' ? 'text-muted-foreground' : 'text-blue-50'}`}>{s.label}</p>
+                          <p className={`text-[9px] font-medium uppercase tracking-wider mt-0.5 relative z-10 text-center ${s.label === 'Best' ? 'text-muted-foreground' : 'text-blue-50'}`}>{s.label}</p>
                         </div>
                       ))}
                     </div>

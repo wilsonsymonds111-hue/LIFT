@@ -1,12 +1,9 @@
 import { useState, useEffect, useRef, useMemo, useCallback, memo, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { MoreHorizontal, Plus } from 'lucide-react';
-import CheckeredFlagIcon from '../CheckeredFlagIcon';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
-import { useExerciseGoals } from '../../hooks/useExerciseGoals';
 import ProgressGraph, { getRepCap } from '../ProgressGraph';
 import { useToast } from '@/components/ui/use-toast';
-import GoalModal from './GoalModal';
 import SetRow from './SetRow';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
@@ -49,22 +46,14 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
   const [chartView, setChartView] = useState('weight');
   const [swipeDir, setSwipeDir] = useState(0);
-  const [showGoalModal, setShowGoalModal] = useState(false);
   const switchView = useCallback((view) => {
     setSwipeDir(view === 'reps' ? 1 : -1);
     setChartView(view);
   }, []);
 
-  const { data: goalsData = {} } = useExerciseGoals();
   const { toast } = useToast();
   const repCap = getRepCap(exercise.name);
   const goalNoteShownRef = useRef(false);
-  const [goal, setGoal] = useState(null);
-  useEffect(() => {
-    const key = exercise.name.toLowerCase();
-    const found = Object.entries(goalsData).find(([k]) => k.toLowerCase() === key)?.[1] || null;
-    setGoal(found);
-  }, [goalsData, exercise.name]);
   const lastEntry = exercise.history?.[exercise.history.length - 1];
   const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
   const sessionResults = Object.values(completedSets).filter(Boolean);
@@ -211,13 +200,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
         />
       )}
-      <div className="relative flex items-center justify-center mb-2">
-        <button
-          onClick={() => setShowGoalModal(true)}
-          className={`absolute left-0 flex items-center gap-1 h-7 rounded-full transition ${goal ? 'bg-green-500 text-white px-2' : 'bg-green-100 dark:bg-green-900/30 text-green-500 hover:bg-green-200 dark:hover:bg-green-900/50 px-3'}`}
-        >
-          {goal ? <CheckeredFlagIcon className="w-5 h-5" /> : <><Plus className="w-3.5 h-3.5" /><span className="text-xs font-semibold">Set a goal</span></>}
-        </button>
+      <div className="flex items-center justify-center mb-2">
         <div className="inline-flex bg-muted rounded-full p-0.5">
           <button
             onClick={() => switchView('weight')}
@@ -239,16 +222,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
       >
-        <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} goal={goal} chartView={chartView} labelOverride={repsWeightLabel} repsChartWeight={repsMaxKg} />
+        <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} labelOverride={repsWeightLabel} />
       </motion.div>
-      {showGoalModal && (
-        <GoalModal
-          exerciseName={exercise.name}
-          goal={goal}
-          onClose={() => setShowGoalModal(false)}
-          onSaved={(g) => { setGoal(g); }}
-        />
-      )}
       <div className="grid grid-cols-[40px_1fr_80px_80px_44px] text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1 gap-1">
         <span className="text-center">Set</span>
         <span className="text-center">Previous</span>
