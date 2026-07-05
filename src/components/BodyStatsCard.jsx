@@ -23,6 +23,19 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
   const [refreshing, setRefreshing] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
   const [showMuscleModal, setShowMuscleModal] = useState(false);
+  const [goalMode, setGoalMode] = useState(() => {
+    try { return localStorage.getItem('goalMode') || null; } catch { return null; }
+  });
+
+  // Load goalMode from the cloud user entity so it syncs across devices
+  useEffect(() => {
+    base44.auth.me().then(user => {
+      if (user?.goalMode) {
+        setGoalMode(user.goalMode);
+        localStorage.setItem('goalMode', user.goalMode);
+      }
+    }).catch(() => {});
+  }, []);
 
   const fetchEntries = useCallback(async () => {
     try {
@@ -161,10 +174,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
   // Fat loss: prediction.fatGainG is negative when fat is lost
   const fatLossG = prediction ? Math.abs(Math.min(0, prediction.fatGainG)) : null;
 
-  // Goal mode: 'cutting' (gold) or 'bulking' (blue)
-  const goalMode = (() => {
-    try { return localStorage.getItem('goalMode') || null; } catch { return null; }
-  })();
+
 
   // Last 5 weight entries in chronological order for the mini sparkline
   const sparkData = useMemo(() => {

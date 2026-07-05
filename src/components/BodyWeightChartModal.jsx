@@ -48,6 +48,27 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   });
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || null);
+
+  // Sync goalMode + goalData from the cloud user entity so goals set on
+  // another device carry over after login.
+  useEffect(() => {
+    base44.auth.me().then(user => {
+      if (user?.goalMode) {
+        setGoalMode(user.goalMode);
+        localStorage.setItem('goalMode', user.goalMode);
+      }
+      if (user?.bodyWeightGoal) {
+        setGoalData(user.bodyWeightGoal);
+        localStorage.setItem('bodyWeightGoal', JSON.stringify(user.bodyWeightGoal));
+      }
+    }).catch(() => {});
+  }, []);
+
+  const changeGoalMode = (mode) => {
+    setGoalMode(mode);
+    localStorage.setItem('goalMode', mode);
+    base44.auth.updateMe({ goalMode: mode }).catch(() => {});
+  };
   const [goalWeight, setGoalWeight] = useState('');
   const [goalRate, setGoalRate] = useState('0.5');
   const [showRateHelp, setShowRateHelp] = useState(false);
@@ -63,17 +84,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   const fileInputRef = useRef(null);
   const [projectionReveal, setProjectionReveal] = useState(2);
   const dragStartX = useRef(null);
-
-  // Persist the goal to the user entity so it survives across sessions and
-  // devices. localStorage is only a fallback for guest mode.
-  useEffect(() => {
-    base44.auth.me().then(user => {
-      if (user?.bodyWeightGoal) {
-        setGoalData(user.bodyWeightGoal);
-        localStorage.setItem('bodyWeightGoal', JSON.stringify(user.bodyWeightGoal));
-      }
-    }).catch(() => {});
-  }, []);
 
   // Reset projection reveal when time frame or goal changes
   useEffect(() => {
@@ -369,7 +379,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         <div className="flex justify-center px-4 pb-2 flex-shrink-0">
           <div className="inline-flex bg-gray-200 dark:bg-zinc-800 rounded-full p-0.5">
             <button
-              onClick={() => { setGoalMode('cutting'); localStorage.setItem('goalMode', 'cutting'); }}
+              onClick={() => changeGoalMode('cutting')}
               className={`flex items-center justify-center gap-1.5 px-5 py-1.5 rounded-full text-xs font-bold uppercase transition ${
                 goalMode === 'cutting' ? 'bg-[#F59E0B] text-white shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
               }`}
@@ -377,7 +387,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
               <Zap className="w-3.5 h-3.5" /> Cutting
             </button>
             <button
-              onClick={() => { setGoalMode('bulking'); localStorage.setItem('goalMode', 'bulking'); }}
+              onClick={() => changeGoalMode('bulking')}
               className={`flex items-center justify-center gap-1.5 px-5 py-1.5 rounded-full text-xs font-bold uppercase transition ${
                 goalMode === 'bulking' ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-400 dark:text-muted-foreground'
               }`}

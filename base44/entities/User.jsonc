@@ -35,6 +35,14 @@
           "format": "date"
         }
       }
+    },
+    "goalMode": {
+      "type": "string",
+      "enum": [
+        "cutting",
+        "bulking"
+      ],
+      "description": "Whether the user is cutting or bulking"
     }
   },
   "required": [
