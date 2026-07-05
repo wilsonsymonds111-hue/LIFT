@@ -87,7 +87,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           </svg>
         </div>
         <div
-          className={`grid grid-cols-[40px_1fr_80px_80px_44px] items-center gap-1 py-1.5 px-1 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
+          className={`grid grid-cols-[36px_1fr_72px_72px_40px] items-center gap-1 py-1.5 px-2 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
           style={{ transform: `translateX(${swipeX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease' }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -118,7 +118,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           />
           <button
             onClick={handleToggle}
-            className={`w-11 h-11 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-400 text-white' : 'bg-gray-200 text-gray-400'}`}
+            className={`w-10 h-10 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-400 text-white' : 'bg-gray-200 text-gray-400'}`}
           >
             <Check className="w-5 h-5" />
           </button>
