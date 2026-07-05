@@ -168,8 +168,8 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
 
   // Last 5 weight entries in chronological order for the mini sparkline
   const sparkData = useMemo(() => {
-    const last5 = weightEntries.slice(0, 5).reverse();
-    return last5.map(e => e.weight).filter(w => w != null);
+    const last6 = weightEntries.slice(0, 6).reverse();
+    return last6.map(e => e.weight).filter(w => w != null);
   }, [weightEntries]);
 
   const sparklinePoints = useMemo(() => {
