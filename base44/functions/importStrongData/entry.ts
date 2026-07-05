@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
     }
 
     // Build templates — use the last session's set counts
-    const templatesToCreate = Object.values(workouts).map((w, idx) => {
+    const templatesToCreate = Object.entries(workouts).map(([workoutName, w], idx) => {
       const lastSession = w.sessions[w.lastDate] || {};
       const exerciseList = Object.values(w.exercises).map(e => ({
         name: e.name,
@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
         history: exerciseHistory[e.name] || []
       }));
       return {
-        name: w.name,
+        name: workoutName,
         exerciseList,
         lastPerformed: w.lastDate,
         sort_order: idx,
