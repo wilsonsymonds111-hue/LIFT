@@ -308,6 +308,9 @@ export default function Home() {
     URL.revokeObjectURL(url);
   }, [currentSplitName, currentSplit, splitDetection]);
 
+  // Long-press on calendar row opens rest frequency editor
+  const calendarHoldProps = TouchHold(() => groupId && setShowSplitEditor(true));
+
   const accent = useMemo(() => SPLIT_ACCENTS[splitDetection.key] || SPLIT_ACCENTS['full-body'], [splitDetection.key]);
 
   const bodyStatsProps = useMemo(() => ({
@@ -358,7 +361,7 @@ export default function Home() {
       </div>
 
       {/* Weekly Tracker — long-press to edit rest frequency */}
-      <div className="py-5 select-none" {...TouchHold(() => groupId && setShowSplitEditor(true))}>
+      <div className="py-5 select-none" {...calendarHoldProps}>
         <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
       </div>
 
