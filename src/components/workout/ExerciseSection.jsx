@@ -79,36 +79,38 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     <>
     <div className="mb-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
       <div className="flex items-start gap-2">
-        <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing flex-1 leading-snug" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
-        <div className="relative flex-shrink-0">
-          <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-            <MoreHorizontal className="w-4 h-4 text-gray-700 dark:text-gray-200" />
-          </button>
-          {showMenu && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-8 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 min-w-[190px]">
-                <button
-                  onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
-                >
-                  {showNote ? 'Hide Note' : 'Add a Note'}
-                </button>
-                <button
-                  onClick={() => { setShowMenu(false); setShowRestTimeModal(true); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
-                >
-                  Change Default Rest Time
-                </button>
-                <button
-                  onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
-                >
-                  Remove Exercise
-                </button>
-              </div>
-            </>
-          )}
+        <div className="flex-1 min-w-0 flex flex-col">
+          <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing leading-snug" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
+          <div className="relative -ml-1 mt-0.5">
+            <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+              <MoreHorizontal className="w-4 h-4 text-gray-700 dark:text-gray-200" />
+            </button>
+            {showMenu && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+                <div className="absolute left-0 top-8 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 min-w-[190px]">
+                  <button
+                    onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
+                  >
+                    {showNote ? 'Hide Note' : 'Add a Note'}
+                  </button>
+                  <button
+                    onClick={() => { setShowMenu(false); setShowRestTimeModal(true); }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
+                  >
+                    Change Default Rest Time
+                  </button>
+                  <button
+                    onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
+                  >
+                    Remove Exercise
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
         {exerciseImage ? (
           <img
