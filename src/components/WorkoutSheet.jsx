@@ -235,8 +235,19 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     setBestSets(snapshot);
     setPrs(computedPrs);
     setFinishTimer(timer);
+    // Collect ALL completed sets (not just the best) for persistence
+    const allSets = {};
+    for (const ex of exercises) {
+      const state = exerciseStateRef.current[ex.name];
+      if (state?.completedSets) {
+        const completed = Object.values(state.completedSets).filter(Boolean);
+        if (completed.length > 0) {
+          allSets[ex.name] = completed;
+        }
+      }
+    }
     try {
-      await onSaveHistory?.(template.id, snapshot, exercises);
+      await onSaveHistory?.(template.id, allSets, exercises);
     } catch (e) {
       console.error('Save failed:', e);
     }

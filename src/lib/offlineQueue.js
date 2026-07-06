@@ -37,19 +37,19 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
   const exerciseSaves = exerciseList
     .filter(ex => snapshot[ex.name])
     .map(async (ex) => {
-      const best = snapshot[ex.name];
-      const entry = { kg: best.kg, reps: best.reps, date: today };
+      const sets = snapshot[ex.name];
+      const newEntries = sets.map(s => ({ kg: s.kg, reps: s.reps, date: today }));
       const existing = exerciseMap[ex.name];
       if (existing) {
         await base44.entities.Exercise.update(existing.id, {
-          history: [...(existing.history || []), entry],
+          history: [...(existing.history || []), ...newEntries],
           muscle: ex.muscle || existing.muscle,
         });
       } else {
         await base44.entities.Exercise.create({
           name: ex.name,
           muscle: ex.muscle || '',
-          history: [entry],
+          history: newEntries,
         });
       }
     });
