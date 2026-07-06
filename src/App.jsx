@@ -58,8 +58,8 @@ const MemoTab = memo(({ Component }) => (
   </Suspense>
 ));
 const LOADING_SPINNER = (
-  <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#000' }}>
-    <span style={{ color: '#fff' }} className="text-2xl font-extrabold font-display tracking-widest">LIFT</span>
+  <div className="fixed inset-0 flex items-center justify-center bg-background">
+    <span className="text-2xl font-extrabold font-display tracking-widest text-foreground">LIFT</span>
   </div>
 );
 

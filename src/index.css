@@ -201,7 +201,7 @@
   html, body {
     height: 100%;
     overflow: hidden;
-    background-color: #000;
+    background-color: hsl(var(--background));
   }
   #root {
     height: 100%;

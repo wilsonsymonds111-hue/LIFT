@@ -340,8 +340,8 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#000' }}>
-        <div className="w-8 h-8 border-4 border-gray-700 border-t-white rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-muted border-t-foreground rounded-full animate-spin" />
       </div>
     );
   }
