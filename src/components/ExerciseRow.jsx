@@ -1,12 +1,15 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { MUSCLE_COLORS } from '../lib/exercises';
 
 const ExerciseRow = memo(function ExerciseRow({ exercise, historyData, exerciseImages, onSelect, isLast }) {
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
   const imageUrl = exerciseImages?.[exercise.name];
+  const [imgFailed, setImgFailed] = useState(false);
 
   // Get the latest (most recent) weight + reps as PR
   const pr = historyData && historyData.length > 0 ? historyData[historyData.length - 1] : null;
+
+  const showImage = imageUrl && !imgFailed;
 
   return (
     <div
@@ -15,8 +18,14 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, historyData, exerciseI
     >
       {/* Exercise image or letter fallback */}
       <div className="w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden bg-gray-50 dark:bg-muted/60">
-        {imageUrl ? (
-          <img src={imageUrl} alt={exercise.name} loading="lazy" decoding="async" className="w-full h-full object-contain" />
+        {showImage ? (
+          <img
+            src={imageUrl}
+            alt={exercise.name}
+            decoding="async"
+            className="w-full h-full object-contain"
+            onError={() => setImgFailed(true)}
+          />
         ) : (
           <div className={`w-full h-full ${colors.bg} flex items-center justify-center`}>
             <span className={`text-base font-bold ${colors.text}`}>{exercise.name[0]}</span>
