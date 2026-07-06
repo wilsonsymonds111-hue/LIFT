@@ -168,7 +168,7 @@ export const EXAMPLE_SPLITS_DATA = {
     ],
   },
   'ass-aesthetics': {
-    name: 'Ass & Aesthetics',
+    name: 'Aesthetics',
     description: 'Glute-focused lower body with upper body aesthetics — 3-day rotation',
     label: 'Glutes • Upper • Glutes & Core',
     schedule: [1, 0, 1, 0, 1, 0, 1], // Day 1, Rest, Day 2, Rest, Day 3, Rest, repeat
