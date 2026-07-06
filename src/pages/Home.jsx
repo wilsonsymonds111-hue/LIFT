@@ -195,7 +195,7 @@ export default function Home() {
     const hasActive = templates.some(t => t.isActiveSplit === true);
     const split = hasActive
       ? templates.filter(t => t.isActiveSplit === true)
-      : templates.filter(t => !t.splitGroup || t.splitGroup === '');
+      : [];
 
     // Prefer the first template's splitName, then check all templates for a shared splitName,
     // then fall back to joining individual workout names
