@@ -37,8 +37,6 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
         isCompleted
           ? 'bg-emerald-50 dark:bg-emerald-950/40'
           : 'bg-[rgb(249,249,249)] dark:bg-card'
-      } ${
-        isTodayCard ? 'ring-2 ring-emerald-400/60' : ''
       }`}
     >
       {/* Green checkmark — completed today */}
