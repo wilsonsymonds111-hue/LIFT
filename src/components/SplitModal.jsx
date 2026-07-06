@@ -99,20 +99,23 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
   const defaultSchedule = exampleSplit?.schedule || [1, 0, 1, 0, 1, 0, 1];
 
   const defaultCycle = useMemo(() => loadCycle(splitKey, defaultSchedule), [splitKey]);
-  const [onDays, setOnDays] = useState(defaultCycle.onDays);
-  const [offDays, setOffDays] = useState(defaultCycle.offDays);
+  const [onDays, setOnDays] = useState(String(defaultCycle.onDays));
+  const [offDays, setOffDays] = useState(String(defaultCycle.offDays));
   const [startDayIndex, setStartDayIndex] = useState(defaultCycle.startDayIndex);
 
+  const onDaysNum = Math.max(1, Math.min(6, parseInt(onDays) || 1));
+  const offDaysNum = Math.max(1, Math.min(6, parseInt(offDays) || 1));
+
   const previewSchedule = useMemo(
-    () => cycleToSchedule(onDays, offDays, startDayIndex),
-    [onDays, offDays, startDayIndex]
+    () => cycleToSchedule(onDaysNum, offDaysNum, startDayIndex),
+    [onDaysNum, offDaysNum, startDayIndex]
   );
 
   // When the modal opens for a different split, reload cycle
   useEffect(() => {
     const c = loadCycle(splitKey, defaultSchedule);
-    setOnDays(c.onDays);
-    setOffDays(c.offDays);
+    setOnDays(String(c.onDays));
+    setOffDays(String(c.offDays));
     setStartDayIndex(c.startDayIndex);
     setEditing(!!isActiveSplit);
     setRestConfirmed(false);
@@ -167,7 +170,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
   const handleMakeCurrent = async () => {
     setApplying(true);
     // Save the cycle so the Home page can read it
-    saveCycle(splitKey, { onDays, offDays, startDayIndex });
+    saveCycle(splitKey, { onDays: onDaysNum, offDays: offDaysNum, startDayIndex });
     const workouts = orderedWorkouts.length > 0 ? orderedWorkouts : split.workouts;
     setApplying(false);
     onClose();
@@ -231,10 +234,10 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
 
   const frequencyLabel = useMemo(() => {
-    const onPart = `${onDays} day${onDays !== 1 ? 's' : ''} on`;
-    const offPart = `${offDays} day${offDays !== 1 ? 's' : ''} off`;
+    const onPart = `${onDaysNum} day${onDaysNum !== 1 ? 's' : ''} on`;
+    const offPart = `${offDaysNum} day${offDaysNum !== 1 ? 's' : ''} off`;
     return `${onPart}, ${offPart}, repeat`;
-  }, [onDays, offDays]);
+  }, [onDaysNum, offDaysNum]);
 
   const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -360,7 +363,8 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
                           max={6}
                           value={onDays}
                           onFocus={(e) => e.target.select()}
-                          onChange={(e) => setOnDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
+                          onChange={(e) => setOnDays(e.target.value)}
+                          onBlur={() => setOnDays(String(Math.max(1, Math.min(6, parseInt(onDays) || 1))))}
                           className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
@@ -372,7 +376,8 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
                           max={6}
                           value={offDays}
                           onFocus={(e) => e.target.select()}
-                          onChange={(e) => setOffDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
+                          onChange={(e) => setOffDays(e.target.value)}
+                          onBlur={() => setOffDays(String(Math.max(1, Math.min(6, parseInt(offDays) || 1))))}
                           className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
@@ -424,7 +429,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
                     {/* Done button */}
                     <button
                       onClick={() => {
-                        saveCycle(splitKey, { onDays, offDays, startDayIndex });
+                        saveCycle(splitKey, { onDays: onDaysNum, offDays: offDaysNum, startDayIndex });
                         if (isActiveSplit) {
                           onClose();
                           if (onCycleSaved) onCycleSaved();
