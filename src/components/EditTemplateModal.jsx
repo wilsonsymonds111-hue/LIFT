@@ -72,7 +72,7 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-[60] flex flex-col bg-card">
+      <div className="fixed inset-0 z-[60] flex flex-col bg-card pointer-events-auto">
         {/* Top bar */}
         <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100">
           <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-200 hover:bg-gray-300 transition">
