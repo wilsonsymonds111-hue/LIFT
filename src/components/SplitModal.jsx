@@ -305,7 +305,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
               <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-border">
                 <button
                   onClick={onClose}
-                  className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-blue-500 transition group -ml-2"
+                  className="w-11 h-11 aspect-square flex items-center justify-center rounded-full bg-muted hover:bg-blue-500 transition group -ml-2"
                 >
                   <ArrowLeft className="w-5 h-5 text-foreground group-hover:text-white transition" />
                 </button>
@@ -485,7 +485,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
               </div>
               {/* Make Current button — hidden when editing the already-active split */}
               {!isActiveSplit && (
-              <div className="px-5 pb-4 pt-2">
+              <div className="px-5 pb-8 pt-4">
                 <button
                   onClick={() => {
                     if (!restConfirmed) {
