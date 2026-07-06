@@ -20,7 +20,7 @@ const SPLIT_IMAGES = {
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a9ff09fcf_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5e854ea52_image.png',
   'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/831e29602_image.png',
-  'ass-aesthetics': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/aff79b862_image.png',
+  'ass-aesthetics': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/f0d234263_image.png',
 };
 
 const SPLIT_LABELS = {
