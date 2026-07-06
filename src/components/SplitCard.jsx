@@ -117,7 +117,7 @@ const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClic
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
               draggable={false}
-              style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', imageRendering: '-webkit-optimize-contrast' }}
+              style={{ transform: `translateZ(0)${splitKey === 'ass-aesthetics' ? ' scale(1.05)' : ''}`, backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', imageRendering: '-webkit-optimize-contrast' }}
             />
             <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.15) 0%, transparent 25%)' }} />
           </>
