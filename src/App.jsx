@@ -38,6 +38,7 @@ const Terms = lazy(() => lazyRetry(() => import('./pages/Terms')));
 const Privacy = lazy(() => lazyRetry(() => import('./pages/Privacy')));
 import { usePrefetchData } from './hooks/usePrefetchData';
 import { loadWorkoutSession } from './lib/workoutSession';
+import { isSessionStale, handleStaleSession } from './lib/staleWorkoutCheck';
 
 const TABS = ['/', '/splits', '/exercises'];
 
@@ -174,7 +175,17 @@ const AnimatedRoutes = memo(() => {
   // Restore an in-progress workout if the app was killed and reopened
   useEffect(() => {
     const session = loadWorkoutSession();
-    if (session?.templateId && !location.pathname.startsWith('/active-workout')) {
+    if (!session?.templateId) return;
+
+    if (isSessionStale(session)) {
+      handleStaleSession(session);
+      if (location.pathname.startsWith('/active-workout')) {
+        navigate('/', { replace: true });
+      }
+      return;
+    }
+
+    if (!location.pathname.startsWith('/active-workout')) {
       navigate(`/active-workout/${session.templateId}`, { replace: true });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps

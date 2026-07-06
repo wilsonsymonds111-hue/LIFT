@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { MoreHorizontal, CalendarPlus, Plus, Moon, Layers } from 'lucide-react';
+import { motion, useAnimationControls } from 'framer-motion';
 import CalendarSyncModal from '../components/CalendarSyncModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -140,6 +141,7 @@ export default function Home() {
   const [showCalendarSync, setShowCalendarSync] = useState(false);
   const [showSplitEditor, setShowSplitEditor] = useState(false);
   const [cycleVersion, setCycleVersion] = useState(0);
+  const punchControls = useAnimationControls();
   const menuRef = useRef({});
   const splitMenuBtnRef = useRef(null);
 
@@ -309,7 +311,14 @@ export default function Home() {
   }, [currentSplitName, currentSplit, splitDetection]);
 
   // Long-press on calendar row opens rest frequency editor
-  const calendarHoldProps = TouchHold(() => groupId && setShowSplitEditor(true));
+  const calendarHoldProps = TouchHold(() => {
+    if (!groupId) return;
+    punchControls.start({
+      scale: [1, 0.88, 1],
+      transition: { duration: 0.4, times: [0, 0.4, 1], ease: [0.4, 0, 0.2, 1] }
+    });
+    setTimeout(() => setShowSplitEditor(true), 250);
+  });
 
   const accent = useMemo(() => SPLIT_ACCENTS[splitDetection.key] || SPLIT_ACCENTS['full-body'], [splitDetection.key]);
 
@@ -361,9 +370,9 @@ export default function Home() {
       </div>
 
       {/* Weekly Tracker — long-press to edit rest frequency */}
-      <div className="py-5 select-none" {...calendarHoldProps}>
+      <motion.div animate={punchControls} className="py-5 select-none" {...calendarHoldProps}>
         <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
-      </div>
+      </motion.div>
 
       {/* ==================== CURRENT SPLIT ==================== */}
       <div className="px-4 py-2">
