@@ -12,6 +12,7 @@ import WeekTracker from '../components/WeekTracker';
 import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
+import { TouchHold } from '../lib/useTouchHold';
 
 const SplitModal = lazy(() => import('../components/SplitModal'));
 
@@ -356,8 +357,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Weekly Tracker */}
-      <div className="py-5">
+      {/* Weekly Tracker — long-press to edit rest frequency */}
+      <div className="py-5 select-none" {...TouchHold(() => groupId && setShowSplitEditor(true))}>
         <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
       </div>
 
