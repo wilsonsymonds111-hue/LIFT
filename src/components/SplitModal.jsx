@@ -359,6 +359,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
                           min={1}
                           max={6}
                           value={onDays}
+                          onFocus={(e) => e.target.select()}
                           onChange={(e) => setOnDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
                           className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
@@ -370,6 +371,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
                           min={1}
                           max={6}
                           value={offDays}
+                          onFocus={(e) => e.target.select()}
                           onChange={(e) => setOffDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
                           className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
