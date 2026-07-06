@@ -6,6 +6,7 @@ const SPLIT_COLORS = {
   'push-pull-legs': {},
   'full-body': {},
   'ul-ppl': {},
+  'ass-aesthetics': {},
 };
 
 const DEFAULT_COLORS = [
@@ -19,6 +20,7 @@ const SPLIT_IMAGES = {
   'push-pull-legs': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a9ff09fcf_image.png',
   'full-body': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5e854ea52_image.png',
   'ul-ppl': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/831e29602_image.png',
+  'ass-aesthetics': 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/1d17c0db8_image.png',
 };
 
 const SPLIT_LABELS = {
@@ -26,6 +28,7 @@ const SPLIT_LABELS = {
   'push-pull-legs': 'CBUM Split',
   'full-body': '',
   'ul-ppl': 'Jeff Nippard Split',
+  'ass-aesthetics': '',
 };
 
 const EXERCISE_IMAGES = [
