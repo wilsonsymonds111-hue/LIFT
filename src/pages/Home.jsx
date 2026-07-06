@@ -418,7 +418,7 @@ export default function Home() {
                 <span className="text-sm">Start New Workout</span>
               </button>
               <div className="flex flex-col items-center justify-center text-center" style={{ minHeight: '45vh' }}>
-                <p className="text-lg text-muted-foreground font-medium flex items-center gap-2 flex-wrap justify-center">
+                <p className="text-sm text-muted-foreground font-medium flex items-center gap-2 flex-wrap justify-center">
                   Choose or create a Workout Split in the Splits Tab
                   <Layers className="w-5 h-5 text-muted-foreground" />
                 </p>
