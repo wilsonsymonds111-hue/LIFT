@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, memo } from 'react';
 import { Check, Trash2 } from 'lucide-react';
-import { notifyRestComplete, playTick } from '../../lib/workoutSounds';
+import { playTick } from '../../lib/workoutSounds';
+import RestCountdown from './RestCountdown';
 
 const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete, restDuration = 120, showHeader = false }) {
   const [kg, setKg] = useState(initialKg ?? previous?.kg ?? '');
@@ -9,11 +10,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   const [swipeX, setSwipeX] = useState(0);
   const [swiping, setSwiping] = useState(false);
   const [pastThreshold, setPastThreshold] = useState(false);
-  const [restSeconds, setRestSeconds] = useState(null);
   const startXRef = useRef(null);
-  const restRef = useRef(null);
-  const restEndRef = useRef(null);
-  const notifiedRef = useRef(false);
   const userEditedKg = useRef(false);
   const userEditedReps = useRef(false);
 
@@ -29,42 +26,6 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
       setReps(initialReps);
     }
   }, [initialReps, done]);
-
-  useEffect(() => {
-    if (done) {
-      notifiedRef.current = false;
-      const end = Date.now() + restDuration * 1000;
-      restEndRef.current = end;
-      setRestSeconds(restDuration);
-      const tick = (silent = false) => {
-        const remaining = Math.round((end - Date.now()) / 1000);
-        if (remaining <= 0) {
-          clearInterval(restRef.current);
-          setRestSeconds(0);
-          if (!notifiedRef.current) {
-            notifiedRef.current = true;
-            notifyRestComplete(silent);
-          }
-        } else {
-          setRestSeconds(remaining);
-        }
-      };
-      restRef.current = setInterval(() => tick(false), 1000);
-      // On visibility change (app returning from background), notify silently
-      // to avoid interrupting Spotify/music playback on iOS
-      const onVisible = () => { if (!document.hidden) tick(true); };
-      document.addEventListener('visibilitychange', onVisible);
-      return () => {
-        clearInterval(restRef.current);
-        document.removeEventListener('visibilitychange', onVisible);
-      };
-    } else {
-      clearInterval(restRef.current);
-      setRestSeconds(null);
-      restEndRef.current = null;
-    }
-    return () => clearInterval(restRef.current);
-  }, [done]);
 
   const DELETE_THRESHOLD = 80;
 
@@ -176,6 +137,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           style={{
             transform: `translateX(${swipeX}px)`,
             transition: swiping ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            willChange: 'transform',
           }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -216,13 +178,8 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           </button>
         </div>
       </div>
-      {done && restSeconds !== null && restSeconds > 0 && (
-        <div
-          className="w-full bg-blue-500 text-white font-bold text-center py-1.5 rounded-xl mt-2 text-base tracking-wider cursor-pointer select-none"
-          onClick={() => { clearInterval(restRef.current); setRestSeconds(0); }}
-        >
-          {String(Math.floor(restSeconds/60)).padStart(2,'0')}:{String(restSeconds%60).padStart(2,'0')}
-        </div>
+      {done && restDuration > 0 && (
+        <RestCountdown duration={restDuration} />
       )}
     </div>
   );

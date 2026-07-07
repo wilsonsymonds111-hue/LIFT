@@ -63,12 +63,12 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [goalNotification, setGoalNotification] = useState(null);
   const repCap = getRepCap(exercise.name);
   const goalNoteShownRef = useRef(false);
-  const lastEntry = exercise.history?.[exercise.history.length - 1];
-  const prev = lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null;
-  const sessionResults = Object.values(completedSets).filter(Boolean);
-  const graphHistory = sessionResults.length > 0
+  const lastEntry = useMemo(() => exercise.history?.[exercise.history.length - 1], [exercise.history]);
+  const prev = useMemo(() => lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null, [lastEntry]);
+  const sessionResults = useMemo(() => Object.values(completedSets).filter(Boolean), [completedSets]);
+  const graphHistory = useMemo(() => sessionResults.length > 0
     ? [...(exercise.history || []), ...sessionResults]
-    : exercise.history;
+    : exercise.history, [sessionResults, exercise.history]);
   const graphAnimKey = sessionResults.length;
   const prevCountRef = useRef(0);
   const animDir = sessionResults.length >= prevCountRef.current ? 'add' : 'remove';
@@ -82,13 +82,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   // Preload the detail modal chunk so it opens instantly when the image is clicked
   useEffect(() => { import('../ExerciseDetailModal'); }, []);
 
-  const allEntries = [...(exercise.history || []), ...sessionResults];
-  const isBodyweight = allEntries.length === 0
+  const allEntries = useMemo(() => [...(exercise.history || []), ...sessionResults], [exercise.history, sessionResults]);
+  const isBodyweight = useMemo(() => allEntries.length === 0
     ? false
     : allEntries.every(h => {
         const kg = typeof h === 'object' ? (h.kg ?? 0) : (h ?? 0);
         return kg === 0 || kg == null;
-      });
+      }), [allEntries]);
   const displayHistory = graphHistory;
   const displayBodyweight = isBodyweight;
 
@@ -135,6 +135,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             alt={exercise.name}
             className="w-28 h-20 rounded-xl object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
             decoding="async"
+            loading="lazy"
             onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
           />
         ) : (

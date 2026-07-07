@@ -133,15 +133,7 @@ export default function Splits() {
 
     setSwapping(true);
     setSwappingSplitName(splitData.name);
-    setSwappingSplitData(splitData);
-
-    let allTemplates;
-    try {
-      allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
-    } catch (_) {
-      setSwapping(false);
-      return;
-    }
+    const allTemplates = queryClient.getQueryData(['workoutTemplates']) || [];
 
     const currentActive = allTemplates.filter(
       t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
@@ -220,14 +212,7 @@ export default function Splits() {
     setSwappingSplitName(splitData.name);
     setSwappingSplitData(splitData);
 
-    // Fetch once, store in ref (immune to React batching) for the animation
-    let allTemplates;
-    try {
-      allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
-    } catch (_) {
-      setSwapping(false);
-      return;
-    }
+    const allTemplates = queryClient.getQueryData(['workoutTemplates']) || [];
 
     const currentActive = allTemplates.filter(
       t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
@@ -541,15 +526,7 @@ export default function Splits() {
             // Trigger swap animation from inside the modal
             setSwapping(true);
             setSwappingSplitName(splitData.name);
-            setSwappingSplitData({ name: splitData.name, workouts, label: `${workouts.length} workout${workouts.length !== 1 ? 's' : ''}` });
-
-            let allTemplates;
-            try {
-              allTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
-            } catch (_) {
-              setSwapping(false);
-              return;
-            }
+            const allTemplates = queryClient.getQueryData(['workoutTemplates']) || [];
 
             const currentActive = allTemplates.filter(
               t => t.isActiveSplit === true || (!t.splitGroup || t.splitGroup === '')
@@ -604,7 +581,7 @@ export default function Splits() {
                 ));
                 // Backfill lastPerformed from exercise history
                 try {
-                  const fullTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
+                  const fullTemplates = queryClient.getQueryData(['workoutTemplates']) || [];
                   const activated = fullTemplates.filter(t => templateIds.has(t.id));
                   await backfillLastPerformed(activated);
                 } catch {}

@@ -7,15 +7,17 @@ import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
-import { getExerciseDetailList, invalidateExerciseCache } from '../lib/exerciseCache';
+import { getExerciseDetailList } from '../lib/exerciseCache';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
-import { useTimer } from '../hooks/useTimer';
+import TimerDisplay from './workout/TimerDisplay';
 import { notifyRestComplete } from '../lib/workoutSounds';
 import ExerciseSection from './workout/ExerciseSection';
 import SummaryScreen from './workout/SummaryScreen';
 import { isRestDayToday } from '../lib/restDayCheck';
 import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { saveWorkoutSession, clearWorkoutSession } from '../lib/workoutSession';
+
+const TODAY_STR = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
 export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedSession }) {
   const [minimized, setMinimized] = useState(false);
@@ -74,8 +76,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const restIntervalRef = useRef(null);
   const restEndRef = useRef(null);
   const restNotifiedRef = useRef(false);
-  const { display: timer } = useTimer(startTimeRef.current);
   const bestSetsRef = useRef(savedSession?.bestSets || {});
+  const saveTimeoutRef = useRef(null);
   // Per-exercise state (sets, completedSets, note) for session persistence
   const exerciseStateRef = useRef(savedSession?.exerciseState || {});
 
@@ -141,8 +143,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [restActive]);
 
-  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
@@ -153,7 +153,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
-    invalidateExerciseCache();
     getExerciseDetailList().then(async (results) => {
       const detailByName = {};
       (results || []).forEach(d => {
@@ -187,10 +186,17 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   useEffect(() => {
     if (Object.keys(exerciseHistoryData).length === 0) return;
-    setExercises(prev => prev.map(ex => ({
-      ...ex,
-      history: exerciseHistoryData[ex.name] || ex.history || [],
-    })));
+    setExercises(prev => {
+      const hasChange = prev.some(ex => {
+        const newHist = exerciseHistoryData[ex.name] || ex.history || [];
+        return newHist !== ex.history;
+      });
+      if (!hasChange) return prev;
+      return prev.map(ex => ({
+        ...ex,
+        history: exerciseHistoryData[ex.name] || ex.history || [],
+      }));
+    });
   }, [exerciseHistoryData]);
 
   const handleBestSet = useCallback((name, kg, reps) => {
@@ -209,14 +215,18 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   useEffect(() => {
     if (showSummary) return;
-    saveWorkoutSession({
-      templateId: template?.id,
-      templateName: template?.name,
-      startTime: startTimeRef.current,
-      exercises,
-      bestSets: bestSetsRef.current,
-      exerciseState: exerciseStateRef.current,
-    });
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      saveWorkoutSession({
+        templateId: template?.id,
+        templateName: template?.name,
+        startTime: startTimeRef.current,
+        exercises,
+        bestSets: bestSetsRef.current,
+        exerciseState: exerciseStateRef.current,
+      });
+    }, 500);
+    return () => { if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current); };
   }, [exercises, showSummary, template?.id, template?.name]);
 
   const handleFinish = useCallback(async () => {
@@ -242,7 +252,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     }).map(ex => ({ name: ex.name, kg: snapshot[ex.name].kg }));
     setBestSets(snapshot);
     setPrs(computedPrs);
-    setFinishTimer(timer);
+    const _elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+    setFinishTimer(`${String(Math.floor(_elapsed / 60)).padStart(2, '0')}:${String(_elapsed % 60).padStart(2, '0')}`);
     // Collect ALL completed sets (not just the best) for persistence
     const allSets = {};
     for (const ex of exercises) {
@@ -262,7 +273,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     setIsRestDay(isRestDayToday(allTemplates));
     setShowSummary(true);
     clearWorkoutSession();
-  }, [exercises, timer, onSaveHistory, template?.id, allTemplates]);
+  }, [exercises, onSaveHistory, template?.id, allTemplates]);
 
   if (!template) return null;
 
@@ -286,7 +297,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       className="fixed inset-x-0 bottom-0 z-40 bg-background rounded-t-3xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
       animate={{ height: minimized ? '76px' : '95vh' }}
       transition={{ duration: 0.35, ease: [0.33, 1, 0.68, 1] }}
-      style={{ y: yMotion }}
+      style={{ y: yMotion, contain: 'layout style' }}
     >
       {/* Grab bar */}
       <div
@@ -310,7 +321,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
             className="flex items-center justify-between px-5 py-2 flex-shrink-0 cursor-pointer"
             onClick={() => setMinimized(false)}
           >
-            <p className="text-base text-gray-400 dark:text-gray-500 font-display flex-shrink-0">{timer}</p>
+            <TimerDisplay startTimestamp={startTimeRef.current} className="text-base text-gray-400 dark:text-gray-500 font-display flex-shrink-0" />
             <p className="font-bold text-foreground text-base absolute left-1/2 -translate-x-1/2 truncate max-w-[50%] text-center">{template.name}</p>
             <div className="w-12 flex-shrink-0" />
           </motion.div>
@@ -387,11 +398,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
               </div>
               <div className="flex items-center gap-1.5 mb-0.5">
                 <CalendarDays className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" strokeWidth={1.5} />
-                <p className="text-sm text-gray-700 dark:text-gray-200 font-display">{today}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-200 font-display">{TODAY_STR}</p>
               </div>
               <div className="flex items-center gap-1.5 mb-4">
                 <Clock className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" strokeWidth={1.5} />
-                <p className="text-sm text-gray-700 dark:text-gray-200 font-display">{timer}</p>
+                <TimerDisplay startTimestamp={startTimeRef.current} className="text-sm text-gray-700 dark:text-gray-200 font-display" />
               </div>
               <textarea placeholder="Note" rows={1} className="w-full text-sm text-blue-500 placeholder-gray-400 dark:placeholder-gray-500 mb-6 focus:outline-none border-b border-transparent focus:border-blue-300 dark:focus:border-blue-500 pb-1 bg-transparent resize-none font-display" />
 

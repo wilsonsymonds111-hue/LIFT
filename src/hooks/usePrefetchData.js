@@ -14,7 +14,7 @@ export function usePrefetchData() {
       queryClient.prefetchQuery({
         queryKey: EXERCISE_HISTORY_KEY,
         queryFn: async () => {
-          const results = await base44.entities.Exercise.list('name', 200);
+          const results = await base44.entities.Exercise.list('name', 500);
           const map = {};
           (results || []).forEach(ex => { map[ex.name] = ex.history || []; });
           return map;

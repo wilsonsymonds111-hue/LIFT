@@ -201,7 +201,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           <XAxis dataKey="dateShort" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} interval="equidistantPreserveStartEnd" minTickGap={20} />
           <Tooltip content={renderTooltip} />
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={StaticDot} activeDot={false} connectNulls={false} isAnimationActive={false} />
-          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={renderNewDot} activeDot={{ r: 6, fill: '#fff', stroke: '#3b82f6', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={600} animationEasing="ease-out" />
+          <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={renderNewDot} activeDot={{ r: 6, fill: '#fff', stroke: '#3b82f6', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={300} animationEasing="ease-out" />
         </LineChart>
       </ResponsiveContainer>
     </div>
