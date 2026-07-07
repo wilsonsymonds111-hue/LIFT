@@ -8,24 +8,29 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
 
-  // Generate day labels for all days based on today's position
   const dayLabels = schedule.map((_, i) => {
     const offset = i - todayDisplayIndex;
     return DAY_LETTERS[((todayMonSun + offset) % 7 + 7) % 7];
   });
 
-  // Auto-scroll to center today on mount
+  // Auto-scroll so today is at the leftmost visible position
   useEffect(() => {
-    if (scrollRef.current && scrollRef.current.children[todayDisplayIndex]) {
-      const container = scrollRef.current;
-      const todayEl = container.children[todayDisplayIndex];
-      container.scrollLeft = todayEl.offsetLeft - container.offsetWidth / 2 + todayEl.offsetWidth / 2;
-    }
+    const container = scrollRef.current;
+    if (!container) return;
+    const todayEl = container.children[todayDisplayIndex];
+    if (todayEl) container.scrollLeft = todayEl.offsetLeft;
   }, [todayDisplayIndex]);
 
   return (
     <div className="px-4 pb-2">
-      <div ref={scrollRef} className="flex gap-1.5 overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div
+        ref={scrollRef}
+        className="flex overflow-x-auto"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          scrollSnapType: 'x mandatory',
+        }}
+      >
         {schedule.map((status, i) => {
           const isToday = i === todayDisplayIndex;
           const isGymDay = status >= 1;
@@ -37,7 +42,11 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
           else bgClass = 'border border-blue-300 dark:border-blue-700 bg-transparent';
 
           return (
-            <div key={i} className="flex flex-col items-center flex-shrink-0" style={{ width: '40px' }}>
+            <div
+              key={i}
+              className="flex flex-col items-center flex-shrink-0 px-1"
+              style={{ width: 'calc(100% / 7)', scrollSnapAlign: 'start' }}
+            >
               <span className={`text-xs font-semibold mb-1.5 text-center ${isToday ? 'text-foreground' : 'text-muted-foreground'}`}>
                 {dayLabels[i]}
               </span>
@@ -49,7 +58,6 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
                 {isCompleted && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
                 {isGymDay && !isCompleted && <Dumbbell className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />}
               </div>
-              <div className="w-1 h-1.5 mt-1.5" />
             </div>
           );
         })}
