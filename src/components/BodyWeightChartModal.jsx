@@ -358,7 +358,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
+        <div className="flex items-center justify-between px-4 pb-2 flex-shrink-0" style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top))' }}>
           <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full bg-white dark:bg-muted ring-2 ring-white shadow-sm active:scale-95 transition">
             <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-foreground" />
           </button>
