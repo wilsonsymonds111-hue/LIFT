@@ -61,21 +61,15 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
           )}
         </div>
 
-        {/* Meta row — last performed + exercise count */}
-        <div className="flex items-center gap-2 mt-1">
-          <p className="text-xs text-muted-foreground">
-            {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
-          </p>
-          {exercises.length > 0 && (
-            <>
-              <span className="text-muted-foreground/40 text-xs">·</span>
-              <span className="text-xs text-muted-foreground flex items-center gap-0.5">
-                <Dumbbell className="w-3 h-3" strokeWidth={2.5} />
-                {exercises.length} {exercises.length === 1 ? 'exercise' : 'exercises'}
-              </span>
-            </>
-          )}
-        </div>
+        {/* Meta row — exercise count */}
+        {exercises.length > 0 && (
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+              <Dumbbell className="w-3 h-3" strokeWidth={2.5} />
+              {exercises.length} {exercises.length === 1 ? 'exercise' : 'exercises'}
+            </span>
+          </div>
+        )}
 
         {/* Exercise pills */}
         {exercises.length > 0 && (
