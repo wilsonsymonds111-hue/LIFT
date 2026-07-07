@@ -577,48 +577,72 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
           </button>
         )}
 
-        {showGoalModal && (
-          <div className="bg-white dark:bg-card rounded-2xl px-4 py-4 mb-4 border border-gray-200 dark:border-border">
-            <div className="space-y-3">
-              <p className="text-xs font-semibold text-gray-600 dark:text-muted-foreground">Target weight</p>
-              <input
-                type="number"
-                step="0.1"
-                placeholder={`Goal weight (${unit})`}
-                value={goalWeight}
-                onChange={e => setGoalWeight(e.target.value)}
-                className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder:text-gray-400"
-              />
-              <div className="flex items-center gap-1.5">
-                <p className="text-xs font-semibold text-gray-600 dark:text-muted-foreground">Rate per week ({unit})</p>
-                <button type="button" onClick={() => setShowGoalRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-200 dark:bg-muted text-gray-500 dark:text-muted-foreground text-[10px] font-bold flex-shrink-0">?</button>
-              </div>
-              {showGoalRateHelp && (
-                <p className="text-[11px] text-gray-500 dark:text-muted-foreground bg-gray-50 dark:bg-muted/50 rounded-lg p-2.5 -mt-1">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
-              )}
-              <input
-                type="number"
-                step="0.1"
-                min="0.1"
-                placeholder="0.5"
-                value={goalRate}
-                onChange={e => setGoalRate(e.target.value)}
-                className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder:text-gray-400"
-              />
-              {goalError && (
-                <div className="flex items-start gap-2 bg-red-50 dark:bg-red-950/30 rounded-lg p-2.5 border border-red-200 dark:border-red-700/30">
-                  <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-red-700 dark:text-red-300">{goalError}</p>
+        {showGoalModal && createPortal(
+          <div className="fixed inset-0 z-[70] flex items-center justify-center px-6" onClick={() => setShowGoalModal(false)}>
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+            <div
+              className="relative bg-white dark:bg-card rounded-2xl px-5 py-5 border border-gray-200 dark:border-border shadow-2xl w-full max-w-sm"
+              onClick={e => e.stopPropagation()}
+              style={{ animation: 'graphFadeIn 0.18s ease-out' }}
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-base font-bold text-black dark:text-foreground">{goalData ? 'Edit Goal' : 'Set Goal'}</p>
+                  <button onClick={() => setShowGoalModal(false)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-muted transition">
+                    <Plus className="w-4 h-4 text-gray-400 rotate-45" />
+                  </button>
                 </div>
-              )}
-              <button
-                onClick={handleSetGoal}
-                className="w-full bg-gray-900 dark:bg-primary hover:bg-gray-800 dark:hover:bg-primary/90 text-white font-semibold py-2.5 rounded-lg transition"
-              >
-                {goalData ? 'Update Goal' : 'Set Goal'}
-              </button>
+                <p className="text-xs font-semibold text-gray-600 dark:text-muted-foreground">Target weight</p>
+                <input
+                  type="number"
+                  step="0.1"
+                  placeholder={`Goal weight (${unit})`}
+                  value={goalWeight}
+                  onChange={e => setGoalWeight(e.target.value)}
+                  className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder:text-gray-400"
+                />
+                <div className="flex items-center gap-1.5">
+                  <p className="text-xs font-semibold text-gray-600 dark:text-muted-foreground">Rate per week ({unit})</p>
+                  <button type="button" onClick={() => setShowGoalRateHelp(v => !v)} className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-200 dark:bg-muted text-gray-500 dark:text-muted-foreground text-[10px] font-bold flex-shrink-0">?</button>
+                </div>
+                {showGoalRateHelp && (
+                  <p className="text-[11px] text-gray-500 dark:text-muted-foreground bg-gray-50 dark:bg-muted/50 rounded-lg p-2.5 -mt-1">0.5kg per week is the optimal rate for both weight loss and gain. Faster changes risk muscle loss, fatigue and rebound weight gain, while slower progress is hard to sustain — this pace is safe, effective and easier to maintain long-term.</p>
+                )}
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0.1"
+                  placeholder="0.5"
+                  value={goalRate}
+                  onChange={e => setGoalRate(e.target.value)}
+                  className="w-full border border-gray-200 dark:border-border rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-background text-black dark:text-foreground focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder:text-gray-400"
+                />
+                {goalError && (
+                  <div className="flex items-start gap-2 bg-red-50 dark:bg-red-950/30 rounded-lg p-2.5 border border-red-200 dark:border-red-700/30">
+                    <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-red-700 dark:text-red-300">{goalError}</p>
+                  </div>
+                )}
+                <div className="flex gap-2 pt-1">
+                  {goalData && (
+                    <button
+                      onClick={handleDeleteGoal}
+                      className="px-4 py-2.5 bg-red-50 dark:bg-red-950/30 text-red-500 font-semibold rounded-lg text-sm transition active:scale-95"
+                    >
+                      Delete
+                    </button>
+                  )}
+                  <button
+                    onClick={handleSetGoal}
+                    className="flex-1 bg-gray-900 dark:bg-primary hover:bg-gray-800 dark:hover:bg-primary/90 text-white font-semibold py-2.5 rounded-lg transition active:scale-95"
+                  >
+                    {goalData ? 'Update Goal' : 'Set Goal'}
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* History list */}
