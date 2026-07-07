@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -35,31 +35,34 @@ export default function TemplateDetail() {
   const listRef = useRef(null);
   const [fontScale, setFontScale] = useState(1);
 
+  const exerciseCount = template?.exerciseList?.length ?? 0;
+
   // Auto-shrink the exercise list so all content fits without scrolling.
   // The list uses em-based sizing so a single fontSize on the container scales everything.
   const measure = useCallback(() => {
     const el = listRef.current;
     if (!el) return;
-    // Reset to natural size first so we can measure the true content height
+    // Reset to natural size to measure true content height
     el.style.fontSize = '';
     const available = el.clientHeight;
     const content = el.scrollHeight;
     if (content > available && available > 0) {
-      const scale = Math.max(0.55, available / content);
+      const scale = Math.max(0.5, available / content);
       setFontScale(scale);
     } else {
       setFontScale(1);
     }
   }, []);
 
-  useLayoutEffect(() => {
-    measure();
+  useEffect(() => {
+    // rAF ensures the modal layout has settled before measuring
+    const raf = requestAnimationFrame(measure);
     const el = listRef.current;
     if (!el) return;
     const ro = new ResizeObserver(measure);
     ro.observe(el);
-    return () => ro.disconnect();
-  }, [measure, template?.exerciseList?.length]);
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
+  }, [measure, exerciseCount]);
 
   if (!template) {
     return createPortal(
@@ -90,7 +93,7 @@ export default function TemplateDetail() {
 
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
-      <div className="relative bg-card rounded-3xl w-[90%] max-w-sm max-h-[85vh] flex flex-col shadow-2xl">
+      <div className="relative bg-card rounded-3xl w-[90%] max-w-sm h-[85vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 rounded-full bg-muted" />
@@ -117,7 +120,7 @@ export default function TemplateDetail() {
 
         <div
           ref={listRef}
-          className="px-5 py-3 flex-1 overflow-hidden"
+          className="px-5 py-3 flex-1 min-h-0 overflow-hidden"
           style={{ fontSize: `${fontScale}rem` }}
         >
           <div className="space-y-[0.75em]">
