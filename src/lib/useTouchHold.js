@@ -9,6 +9,7 @@ export function TouchHold(onHold, duration = 300) {
 
   const start = useCallback(() => {
     timerRef.current = setTimeout(() => {
+      if (navigator.vibrate) navigator.vibrate(8);
       onHold();
       timerRef.current = null;
     }, duration);

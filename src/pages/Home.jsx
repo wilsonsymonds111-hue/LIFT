@@ -364,10 +364,15 @@ export default function Home() {
   const calendarHoldProps = TouchHold(() => {
     if (!groupId) return;
     punchControls.start({
-      scale: [1, 0.92, 1],
-      transition: { duration: 0.32, times: [0, 0.45, 1], ease: [0.34, 1.56, 0.64, 1] }
+      scale: [1, 0.93, 1.02, 1],
+      opacity: [1, 0.5, 0.85, 1],
+      transition: {
+        duration: 0.5,
+        times: [0, 0.2, 0.55, 1],
+        ease: [0.22, 1, 0.36, 1],
+      }
     });
-    setTimeout(() => setShowSplitEditor(true), 180);
+    setTimeout(() => setShowSplitEditor(true), 230);
   });
 
   const accent = useMemo(() => SPLIT_ACCENTS[splitDetection.key] || SPLIT_ACCENTS['full-body'], [splitDetection.key]);
