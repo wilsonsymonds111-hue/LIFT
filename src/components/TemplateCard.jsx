@@ -48,12 +48,6 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
 
       <div onClick={() => navigate(`/template/${template.id}`)} className={`cursor-pointer ${isCompleted ? 'pl-6' : ''}`}>
         <h4 className="text-base font-bold text-foreground pr-8">{template.name}</h4>
-        <p className="text-sm text-muted-foreground mt-1.5 line-clamp-1">
-          {(template.exerciseList?.length > 0
-            ? template.exerciseList.map(e => e.name).join(', ')
-            : (template.exercises || '').split(',').map(s => s.trim()).filter(Boolean).join(', ')
-          )}
-        </p>
         <p className="text-xs text-muted-foreground/70 mt-1.5">
           {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
         </p>
