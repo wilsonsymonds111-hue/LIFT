@@ -223,7 +223,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         <Link
           to="/terms"
           onClick={onClose}
-          className="relative z-10 flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 transition active:opacity-70 mt-2 shadow-sm"
+          className="relative z-10 flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 transition active:opacity-70 shadow-sm"
         >
           <div className="w-8 h-8 bg-muted-foreground/20 rounded-full flex items-center justify-center flex-shrink-0">
             <FileText className="w-4 h-4 text-foreground" />
@@ -311,7 +311,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               onClose();
               window.location.reload();
             }}
-            className="flex items-center gap-3 bg-red-50 dark:bg-red-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70 mt-2"
+            className="flex items-center gap-3 bg-red-50 dark:bg-red-950/40 rounded-2xl px-4 py-3.5 transition active:opacity-70"
           >
             <div className="w-8 h-8 bg-red-100 dark:bg-red-900/60 rounded-full flex items-center justify-center flex-shrink-0">
               <Trash2 className="w-4 h-4 text-red-500" />
