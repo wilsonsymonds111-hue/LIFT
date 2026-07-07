@@ -143,29 +143,34 @@
 
 /* Permanent safe-area buffer — matches the page gradient so scrolling
    content is hidden behind Apple's native status bar area seamlessly.
-   The bottom edge fades to transparent with a backdrop blur so content
-   scrolls behind it with a smooth blur instead of a hard cutoff. */
+   Layer 1: opaque gradient matching the page's grey hue.
+   Layer 2: thin strip at the bottom edge with backdrop blur that fades
+   to transparent, so content scrolls behind with a smooth blur. */
 .safe-area-buffer-gradient {
   background: linear-gradient(180deg,
     #D4D5D8 0%,
-    #DCDDDF 25%,
-    #E4E5E7 45%,
-    #ECEDEF 65%,
-    rgba(241,242,244,0.85) 80%,
-    rgba(241,242,244,0) 100%
+    #DCDDDF 30%,
+    #E4E5E7 55%,
+    #ECEDEF 80%,
+    #F1F2F4 100%
   );
-  backdrop-filter: blur(14px) saturate(150%);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
 .dark .safe-area-buffer-gradient {
   background: linear-gradient(180deg,
     hsl(0 0% 9%) 0%,
-    hsl(0 0% 9%) 60%,
-    rgba(23,23,23,0.85) 80%,
-    rgba(23,23,23,0) 100%
+    hsl(0 0% 10%) 50%,
+    hsl(0 0% 11%) 100%
   );
-  backdrop-filter: blur(14px) saturate(150%);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
+}
+.safe-area-buffer-blur {
+  background: linear-gradient(180deg, #F1F2F4 0%, rgba(241,242,244,0) 100%);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+.dark .safe-area-buffer-blur {
+  background: linear-gradient(180deg, hsl(0 0% 11%) 0%, rgba(23,23,23,0) 100%);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
 }
 .safe-area-buffer-solid {
   background: hsl(var(--background));
