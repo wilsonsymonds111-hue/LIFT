@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Timer, CalendarDays, Clock } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, animate as framerAnimate } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
@@ -19,8 +19,8 @@ import { saveWorkoutSession, clearWorkoutSession } from '../lib/workoutSession';
 
 export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedSession }) {
   const [minimized, setMinimized] = useState(false);
-  const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const yMotion = useMotionValue(0);
   const dragStartYRef = useRef(null);
   const draggingRef = useRef(false);
   const dragOffsetRef = useRef(0);
@@ -35,22 +35,20 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     if (!draggingRef.current || dragStartYRef.current === null) return;
     const delta = Math.max(0, e.clientY - dragStartYRef.current);
     dragOffsetRef.current = delta;
-    setDragOffset(delta);
+    yMotion.set(delta);
   };
   const onGrabPointerUp = () => {
     const shouldMinimize = dragOffsetRef.current > 80;
     draggingRef.current = false;
     dragStartYRef.current = null;
     setIsDragging(false);
-    dragOffsetRef.current = 0;
     if (shouldMinimize) {
-      requestAnimationFrame(() => {
-        setMinimized(true);
-        setDragOffset(0);
-      });
+      framerAnimate(yMotion, 0, { duration: 0.35, ease: [0.33, 1, 0.68, 1] });
+      setMinimized(true);
     } else {
-      setDragOffset(0);
+      framerAnimate(yMotion, 0, { duration: 0.3, ease: [0.33, 1, 0.68, 1] });
     }
+    dragOffsetRef.current = 0;
   };
   const [prs, setPrs] = useState([]);
   const [bestSets, setBestSets] = useState({});
@@ -284,21 +282,32 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   }
 
   return (
-    <>
+    <motion.div
+      className="fixed inset-x-0 bottom-0 z-40 bg-background rounded-t-3xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
+      animate={{ height: minimized ? '76px' : '95vh' }}
+      transition={{ duration: 0.35, ease: [0.33, 1, 0.68, 1] }}
+      style={{ y: yMotion }}
+    >
+      {/* Grab bar */}
       <div
-        className="fixed inset-0 z-30 bg-black/50 pointer-events-none transition-opacity duration-300"
-        style={{ opacity: minimized ? 0 : 1 }}
-      />
+        className="flex justify-center pt-2 pb-1.5 cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+        onPointerDown={onGrabPointerDown}
+        onPointerMove={onGrabPointerMove}
+        onPointerUp={onGrabPointerUp}
+        onPointerCancel={onGrabPointerUp}
+      >
+        <div className="w-10 h-1.5 rounded-full bg-gray-300" />
+      </div>
 
+      {/* Minimized bar content */}
       <AnimatePresence>
         {minimized && (
           <motion.div
-            initial={{ y: 120, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 120, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.33, 1, 0.68, 1] }}
-            className="fixed left-4 right-4 z-40 bg-background border border-border flex items-center justify-between px-5 py-4 shadow-2xl cursor-pointer rounded-2xl"
-            style={{ bottom: '96px' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center justify-between px-5 py-2 flex-shrink-0 cursor-pointer"
             onClick={() => setMinimized(false)}
           >
             <p className="text-base text-gray-400 dark:text-gray-500 font-display flex-shrink-0">{timer}</p>
@@ -308,26 +317,14 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         )}
       </AnimatePresence>
 
-      <div
-        className="fixed inset-x-0 bottom-0 z-40 bg-background rounded-t-3xl shadow-2xl flex flex-col h-[95vh]"
-        style={{
-          paddingTop: 'env(safe-area-inset-top)',
-          transform: minimized ? 'translateY(100%)' : dragOffset > 0 ? `translateY(${dragOffset}px)` : 'translateY(0)',
-          transition: isDragging ? 'none' : 'transform 300ms cubic-bezier(0.33, 1, 0.68, 1)',
-        }}
+      {/* Full content */}
+      <motion.div
+        animate={{ opacity: minimized ? 0 : 1 }}
+        transition={{ duration: 0.2 }}
+        className="flex-1 flex flex-col overflow-hidden"
+        style={{ pointerEvents: minimized ? 'none' : 'auto' }}
       >
-        <div
-          className="flex justify-center pt-1 pb-1 cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
-          onPointerDown={onGrabPointerDown}
-          onPointerMove={onGrabPointerMove}
-          onPointerUp={onGrabPointerUp}
-          onPointerCancel={onGrabPointerUp}
-        >
-          <div className="w-10 h-1.5 rounded-full bg-gray-300" />
-        </div>
-
-        <>
-            <div className="relative flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
+        <div className="relative flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
               {restActive && restMinimized ? (
                 <RestTimerPill
                   seconds={restSeconds}
@@ -438,8 +435,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 </button>
               </div>
             </div>
-          </>
-      </div>
-    </>
+      </motion.div>
+    </motion.div>
   );
 }

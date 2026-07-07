@@ -209,7 +209,7 @@ const AnimatedRoutes = memo(() => {
   const isTabRoute = TABS.includes(location.pathname);
   usePreloadSubPages();
   usePrefetchData();
-  const isModalRoute = location.pathname.startsWith('/template/');
+  const isModalRoute = location.pathname.startsWith('/template/') || location.pathname.startsWith('/active-workout/');
   const tabDisplay = useMemo(() => ({ display: isTabRoute || isModalRoute ? 'flex' : 'none' }), [isTabRoute, isModalRoute]);
 
   // Restore an in-progress workout if the app was killed and reopened
@@ -246,7 +246,7 @@ const AnimatedRoutes = memo(() => {
                 <Route path="/template/new" element={<SlideIn><NewTemplate /></SlideIn>} />
                 <Route path="/template/:id" element={<SlideIn transparent><TemplateDetail /></SlideIn>} />
                 <Route path="/split/:key" element={<SlideIn><SplitDetail /></SlideIn>} />
-                <Route path="/active-workout/:id" element={<SlideIn><ActiveWorkout /></SlideIn>} />
+                <Route path="/active-workout/:id" element={<SlideIn transparent><ActiveWorkout /></SlideIn>} />
                 <Route path="/support-chat/:id" element={<SlideIn><SupportChat /></SlideIn>} />
                 <Route path="/terms" element={<SlideIn><Terms /></SlideIn>} />
                 <Route path="/privacy" element={<SlideIn><Privacy /></SlideIn>} />
