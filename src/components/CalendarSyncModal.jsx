@@ -185,20 +185,20 @@ export default function CalendarSyncModal({ onClose, onSync }) {
             <div className="w-10 h-1 rounded-full bg-border" />
           </div>
 
-          <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-border">
+          <div className="flex items-center gap-2 px-5 pt-2 pb-3 border-b border-border">
             <button
               onClick={onClose}
-              className="w-11 h-11 flex items-center justify-center rounded-full bg-muted hover:bg-blue-500 transition group -ml-2"
+              className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-muted hover:bg-blue-500 transition group"
             >
               <ArrowLeft className="w-5 h-5 text-foreground group-hover:text-white transition" />
             </button>
-            <div className="text-center">
-              <h2 className="text-lg font-extrabold text-foreground">Workout Time</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                What time would you like your workouts scheduled each day?
+            <div className="text-center flex-1 min-w-0">
+              <h2 className="text-base font-extrabold text-foreground">Workout Time</h2>
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">
+                What time would you like your workouts scheduled?
               </p>
             </div>
-            <div className="w-11" />
+            <div className="w-10 flex-shrink-0" />
           </div>
 
           <div className="px-5 py-4">
