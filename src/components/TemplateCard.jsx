@@ -34,11 +34,6 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
 
   return (
     <div className="relative">
-      {dotColor && (
-        <div className="absolute left-[-14px] top-1/2 -translate-y-1/2 z-10">
-          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: dotColor }} />
-        </div>
-      )}
       <div
         className={`relative w-full rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] ${
           isCompleted
@@ -74,13 +69,13 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
             {exercises.slice(0, 5).map((ex, i) => (
               <span
                 key={i}
-                className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted/80 text-muted-foreground"
+                className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400"
               >
                 {ex.name}
               </span>
             ))}
             {exercises.length > 5 && (
-              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted/80 text-muted-foreground">
+              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
                 +{exercises.length - 5}
               </span>
             )}
