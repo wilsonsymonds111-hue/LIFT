@@ -384,12 +384,15 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
                       <div className="flex-1">
                         <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days On</label>
                         <input
-                          type="number"
-                          min={1}
-                          max={6}
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           value={onDays}
                           onFocus={(e) => e.target.select()}
-                          onChange={(e) => setOnDays(e.target.value)}
+                          onChange={(e) => {
+                            const v = e.target.value.replace(/[^0-9]/g, '');
+                            setOnDays(v);
+                          }}
                           onBlur={() => setOnDays(String(Math.max(1, Math.min(6, parseInt(onDays) || 1))))}
                           className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
@@ -397,12 +400,15 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
                       <div className="flex-1">
                         <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days Off</label>
                         <input
-                          type="number"
-                          min={1}
-                          max={6}
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           value={offDays}
                           onFocus={(e) => e.target.select()}
-                          onChange={(e) => setOffDays(e.target.value)}
+                          onChange={(e) => {
+                            const v = e.target.value.replace(/[^0-9]/g, '');
+                            setOffDays(v);
+                          }}
                           onBlur={() => setOffDays(String(Math.max(1, Math.min(6, parseInt(offDays) || 1))))}
                           className="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />

@@ -371,22 +371,22 @@ export default function SplitBuilder({ onClose, onSaved }) {
                 <div className="flex-1">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days On</label>
                   <input
-                    type="number"
-                    min={1}
-                    max={6}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={restOnDays}
-                    onChange={(e) => setRestOnDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
+                    onChange={(e) => setRestOnDays(Math.max(1, Math.min(6, parseInt(e.target.value.replace(/[^0-9]/g, '')) || 1)))}
                     className="w-full bg-card border-2 border-blue-200 dark:border-blue-800 rounded-xl px-3 py-3 text-lg font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div className="flex-1">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Days Off</label>
                   <input
-                    type="number"
-                    min={1}
-                    max={6}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={restOffDays}
-                    onChange={(e) => setRestOffDays(Math.max(1, Math.min(6, parseInt(e.target.value) || 1)))}
+                    onChange={(e) => setRestOffDays(Math.max(1, Math.min(6, parseInt(e.target.value.replace(/[^0-9]/g, '')) || 1)))}
                     className="w-full bg-card border-2 border-blue-200 dark:border-blue-800 rounded-xl px-3 py-3 text-lg font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
