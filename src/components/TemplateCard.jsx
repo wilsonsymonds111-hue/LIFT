@@ -41,11 +41,6 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
             : 'border-border/60 shadow-[0_6px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.03),inset_0_0_0_1px_rgba(255,255,255,0.6)] dark:shadow-[0_6px_24px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.06)]'
         }`}
       >
-      {/* Accent stripe for today's workout */}
-      {isTodayCard && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />
-      )}
-
       {/* Three-dot menu button — top right */}
       <button
         ref={setBtnRef}
