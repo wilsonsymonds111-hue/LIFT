@@ -1,6 +1,6 @@
 import { memo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { MoreHorizontal, Check, Pencil, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Check, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -99,13 +99,6 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
           >
             <Pencil className="w-4 h-4 text-blue-500" />
             Edit workout
-          </button>
-          <button
-            onClick={() => onRemove(template)}
-            className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-muted transition rounded-xl flex items-center gap-2"
-          >
-            <Trash2 className="w-4 h-4" />
-            Remove from current split
           </button>
         </div>,
         document.body
