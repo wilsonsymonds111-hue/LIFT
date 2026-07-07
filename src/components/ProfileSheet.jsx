@@ -7,7 +7,6 @@ import FeedbackModal from './FeedbackModal';
 import CreateAccountModal from './CreateAccountModal';
 import ImportStrongModal from './ImportStrongModal';
 import ImageCropper from './ImageCropper';
-import BodyStatsCard from './BodyStatsCard';
 import { useNavVisibility } from '@/lib/NavContext';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -133,14 +132,6 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             onChange={handlePhotoSelect}
           />
         </div>
-
-        {/* Bodyweight */}
-        {bodyStatsProps && (
-          <BodyStatsCard
-            templates={bodyStatsProps.templates}
-            targetSessionsPerWeek={bodyStatsProps.targetSessionsPerWeek}
-          />
-        )}
 
         {/* Create Account — guest only */}
         {isGuest && (

@@ -352,11 +352,9 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={onClose}>
-      <div className="absolute inset-0" onClick={onClose} />
+    <div className="fixed inset-0 z-50 bg-gray-100 dark:bg-background" onClick={e => e.stopPropagation()}>
       <div
-        className="relative w-full max-w-2xl mx-auto bg-gray-100 dark:bg-background rounded-t-3xl shadow-2xl flex flex-col h-[calc(100dvh-4rem)] mt-16"
-        style={{}}
+        className="relative w-full max-w-2xl mx-auto bg-gray-100 dark:bg-background flex flex-col h-full"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
