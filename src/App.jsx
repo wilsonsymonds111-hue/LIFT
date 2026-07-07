@@ -28,7 +28,7 @@ const lazyRetry = (importFn, retries = 5) =>
 
 import Home from './pages/Home';
 import Splits from './pages/Splits';
-import Exercises from './pages/Exercises';
+import BodyStats from './pages/BodyStats';
 const NewTemplate = lazy(() => lazyRetry(() => import('./pages/NewTemplate')));
 const ActiveWorkout = lazy(() => lazyRetry(() => import('./pages/ActiveWorkout')));
 const TemplateDetail = lazy(() => lazyRetry(() => import('./pages/TemplateDetail')));
@@ -81,7 +81,7 @@ const SlideIn = memo(({ children, transparent }) => (
 
 const TAB_STYLES = { touchAction: 'pan-y' };
 
-const TAB_CONTENT = [Home, Splits, Exercises];
+const TAB_CONTENT = [Home, Splits, BodyStats];
 
 const SwipeableTabs = memo(() => {
   const location = useLocation();
