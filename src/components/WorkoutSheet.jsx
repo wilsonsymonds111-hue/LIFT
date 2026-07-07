@@ -294,20 +294,23 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   return (
     <motion.div
-      className="fixed inset-x-0 bottom-0 z-40 bg-background rounded-t-3xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
-      animate={{ height: minimized ? '76px' : '95vh' }}
+      className="fixed inset-x-0 z-40 bg-background rounded-t-3xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
+      animate={{ 
+        height: minimized ? '64px' : 'calc(100vh - 3rem)',
+        bottom: minimized ? '90px' : '0px'
+      }}
       transition={{ duration: 0.35, ease: [0.33, 1, 0.68, 1] }}
       style={{ y: yMotion, contain: 'layout style' }}
     >
       {/* Grab bar */}
       <div
-        className="flex justify-center pt-2 pb-1.5 cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+        className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
         onPointerDown={onGrabPointerDown}
         onPointerMove={onGrabPointerMove}
         onPointerUp={onGrabPointerUp}
         onPointerCancel={onGrabPointerUp}
       >
-        <div className="w-10 h-1.5 rounded-full bg-gray-300" />
+        <div className="w-10 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
       </div>
 
       {/* Minimized bar content */}
