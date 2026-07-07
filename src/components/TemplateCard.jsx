@@ -46,14 +46,6 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
         </div>
       )}
 
-      <button
-        ref={setBtnRef}
-        onClick={e => { e.stopPropagation(); onToggleMenu(template.id); }}
-        className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition z-10"
-      >
-        <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
-      </button>
-
       <div onClick={() => navigate(`/template/${template.id}`)} className={`cursor-pointer ${isCompleted ? 'pl-6' : ''}`}>
         <h4 className="text-base font-bold text-foreground pr-8">{template.name}</h4>
         <p className="text-sm text-muted-foreground mt-1.5 line-clamp-1">
