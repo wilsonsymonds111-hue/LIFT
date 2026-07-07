@@ -192,17 +192,34 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
         await Promise.all(currentActive.map(t =>
           base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false, splitGroup: oldGroupId })
         ));
-        const newTemplates = workouts.map((w, i) => ({
-          name: w.name,
-          exercises: (w.exercises || []).map(e => e.name).join(', '),
-          exerciseList: (w.exercises || []).map(e => ({ ...e, history: [] })),
-          lastPerformed: null,
-          sort_order: i,
-          isActiveSplit: true,
-          splitGroup: newGroupId,
-          splitName: split.name,
-        }));
-        await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+
+        // Update existing templates if they have IDs; otherwise create new ones
+        const existingWorkouts = workouts.filter(w => w.templateId);
+        const newWorkouts = workouts.filter(w => !w.templateId);
+
+        if (existingWorkouts.length > 0) {
+          await Promise.all(existingWorkouts.map((w, i) =>
+            base44.entities.WorkoutTemplate.update(w.templateId, {
+              isActiveSplit: true,
+              splitGroup: newGroupId,
+              sort_order: i,
+              splitName: split.name,
+            })
+          ));
+        }
+        if (newWorkouts.length > 0) {
+          const newTemplates = newWorkouts.map((w, i) => ({
+            name: w.name,
+            exercises: (w.exercises || []).map(e => e.name).join(', '),
+            exerciseList: (w.exercises || []).map(e => ({ ...e, history: [] })),
+            lastPerformed: null,
+            sort_order: existingWorkouts.length + i,
+            isActiveSplit: true,
+            splitGroup: newGroupId,
+            splitName: split.name,
+          }));
+          await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+        }
       } catch (_) {}
       navigate('/');
     }
