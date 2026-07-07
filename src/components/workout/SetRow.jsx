@@ -132,7 +132,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           />
         </div>
         <div
-          className={`grid grid-cols-[36px_1fr_72px_72px_40px] items-center gap-1 py-1.5 px-2 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
+          className={`grid grid-cols-[36px_1fr_72px_72px_40px] items-center gap-1 py-1.5 px-3 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
           style={{
             transform: `translateX(${swipeX}px)`,
             transition: swiping ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
