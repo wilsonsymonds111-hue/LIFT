@@ -1,6 +1,6 @@
 import { memo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { MoreHorizontal, Check } from 'lucide-react';
+import { MoreHorizontal, Check, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -10,7 +10,6 @@ const relativeTime = (dateStr) => {
   const date = new Date(dateStr);
   const now = new Date();
 
-  // Calendar-day comparison
   const dateMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const diffDays = Math.round((nowMidnight - dateMidnight) / 86400000);
@@ -30,6 +29,8 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
     btnRef.current = el;
     if (menuRef && el) menuRef.current[template.id] = el;
   };
+
+  const exercises = template.exerciseList || [];
 
   return (
     <div className="relative">
@@ -52,11 +53,39 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
         </div>
       )}
 
-      <div onClick={() => navigate(`/template/${template.id}`)} className={`cursor-pointer ${isCompleted ? 'pl-6' : ''}`}>
-        <h4 className="text-base font-bold text-foreground pr-8">{template.name}</h4>
-        <p className="text-xs text-muted-foreground/70 mt-1.5">
+      {/* Three-dot menu button — top right */}
+      <button
+        ref={setBtnRef}
+        onClick={(e) => { e.stopPropagation(); onToggleMenu(template.id); }}
+        className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted/60 transition z-10"
+      >
+        <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+      </button>
+
+      <div onClick={() => navigate(`/active-workout/${template.id}`)} className={`cursor-pointer ${isCompleted ? 'pl-6' : ''}`}>
+        <h4 className="text-base font-bold text-foreground pr-10">{template.name}</h4>
+        <p className="text-xs text-muted-foreground/70 mt-1">
           {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
         </p>
+
+        {/* Exercise pills */}
+        {exercises.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2.5">
+            {exercises.slice(0, 5).map((ex, i) => (
+              <span
+                key={i}
+                className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted/80 text-muted-foreground"
+              >
+                {ex.name}
+              </span>
+            ))}
+            {exercises.length > 5 && (
+              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted/80 text-muted-foreground">
+                +{exercises.length - 5}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {isMenuOpen && createPortal(
@@ -70,9 +99,17 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
           }}
         >
           <button
-            onClick={() => onRemove(template)}
-            className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-muted transition rounded-xl"
+            onClick={() => { onToggleMenu(null); navigate(`/template/${template.id}`); }}
+            className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
           >
+            <Pencil className="w-4 h-4 text-blue-500" />
+            Edit workout
+          </button>
+          <button
+            onClick={() => onRemove(template)}
+            className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-muted transition rounded-xl flex items-center gap-2"
+          >
+            <Trash2 className="w-4 h-4" />
             Remove from current split
           </button>
         </div>,
