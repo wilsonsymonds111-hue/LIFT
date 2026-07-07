@@ -39,13 +39,13 @@ export default function PersistentWorkoutBar() {
           exit={{ y: 120, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 320, damping: 30 }}
           className="fixed left-3 right-3 z-30"
-          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 84px)' }}
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
           onClick={() => navigate(`/active-workout/${session.templateId}`)}
         >
           <div
             className="flex items-center justify-between px-5 h-[72px] rounded-2xl cursor-pointer active:scale-[0.98] transition"
             style={{
-              background: 'rgba(255,255,255,0.55)',
+              background: 'rgba(255,255,255,0.78)',
               backdropFilter: 'blur(60px) saturate(160%)',
               WebkitBackdropFilter: 'blur(60px) saturate(160%)',
               boxShadow: '0 8px 24px rgba(0,0,0,0.12), 0 0 0 2px rgba(59,130,246,1), inset 0 1px 1px rgba(255,255,255,0.6)',
