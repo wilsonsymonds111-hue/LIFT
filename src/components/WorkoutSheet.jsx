@@ -7,7 +7,7 @@ import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
-import { getExerciseDetailList } from '../lib/exerciseCache';
+import { getExerciseDetailList, invalidateExerciseCache } from '../lib/exerciseCache';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
 import { useTimer } from '../hooks/useTimer';
 import { notifyRestComplete } from '../lib/workoutSounds';
@@ -75,6 +75,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const [restMinimized, setRestMinimized] = useState(false);
   const restIntervalRef = useRef(null);
   const restEndRef = useRef(null);
+  const restNotifiedRef = useRef(false);
   const { display: timer } = useTimer(startTimeRef.current);
   const bestSetsRef = useRef(savedSession?.bestSets || {});
   // Per-exercise state (sets, completedSets, note) for session persistence
@@ -82,24 +83,28 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   const startRestTimer = (duration) => {
     clearInterval(restIntervalRef.current);
+    restNotifiedRef.current = false;
     const end = Date.now() + duration * 1000;
     restEndRef.current = end;
     setRestTotal(duration);
     setRestSeconds(duration);
     setRestActive(true);
     setRestMinimized(false);
-    const tick = () => {
+    const tick = (silent = false) => {
       const remaining = Math.round((restEndRef.current - Date.now()) / 1000);
       if (remaining <= 0) {
         clearInterval(restIntervalRef.current);
         setRestSeconds(0);
         setRestActive(false);
-        notifyRestComplete();
+        if (!restNotifiedRef.current) {
+          restNotifiedRef.current = true;
+          notifyRestComplete(silent);
+        }
       } else {
         setRestSeconds(remaining);
       }
     };
-    restIntervalRef.current = setInterval(tick, 250);
+    restIntervalRef.current = setInterval(() => tick(false), 250);
   };
 
   const stopRestTimer = () => {
@@ -124,7 +129,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
           clearInterval(restIntervalRef.current);
           setRestSeconds(0);
           setRestActive(false);
-          notifyRestComplete();
+          if (!restNotifiedRef.current) {
+            restNotifiedRef.current = true;
+            // Silent on visibility change — don't interrupt Spotify/music
+            notifyRestComplete(true);
+          }
         } else {
           setRestSeconds(remaining);
         }
@@ -146,6 +155,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
+    invalidateExerciseCache();
     getExerciseDetailList().then(async (results) => {
       const detailByName = {};
       (results || []).forEach(d => {

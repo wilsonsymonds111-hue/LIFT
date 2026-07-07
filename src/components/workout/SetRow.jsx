@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, memo } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Trash2 } from 'lucide-react';
 import { notifyRestComplete, playTick } from '../../lib/workoutSounds';
 
 const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete, restDuration = 120, showHeader = false }) {
@@ -8,10 +8,12 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   const [done, setDone] = useState(false);
   const [swipeX, setSwipeX] = useState(0);
   const [swiping, setSwiping] = useState(false);
+  const [pastThreshold, setPastThreshold] = useState(false);
   const [restSeconds, setRestSeconds] = useState(null);
   const startXRef = useRef(null);
   const restRef = useRef(null);
   const restEndRef = useRef(null);
+  const notifiedRef = useRef(false);
   const userEditedKg = useRef(false);
   const userEditedReps = useRef(false);
 
@@ -30,21 +32,27 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
 
   useEffect(() => {
     if (done) {
+      notifiedRef.current = false;
       const end = Date.now() + restDuration * 1000;
       restEndRef.current = end;
       setRestSeconds(restDuration);
-      const tick = () => {
+      const tick = (silent = false) => {
         const remaining = Math.round((end - Date.now()) / 1000);
         if (remaining <= 0) {
           clearInterval(restRef.current);
           setRestSeconds(0);
-          notifyRestComplete();
+          if (!notifiedRef.current) {
+            notifiedRef.current = true;
+            notifyRestComplete(silent);
+          }
         } else {
           setRestSeconds(remaining);
         }
       };
-      restRef.current = setInterval(tick, 1000);
-      const onVisible = () => { if (!document.hidden) tick(); };
+      restRef.current = setInterval(() => tick(false), 1000);
+      // On visibility change (app returning from background), notify silently
+      // to avoid interrupting Spotify/music playback on iOS
+      const onVisible = () => { if (!document.hidden) tick(true); };
       document.addEventListener('visibilitychange', onVisible);
       return () => {
         clearInterval(restRef.current);
@@ -57,6 +65,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
     }
     return () => clearInterval(restRef.current);
   }, [done]);
+
   const DELETE_THRESHOLD = 80;
 
   const handleToggle = () => {
@@ -72,28 +81,44 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   };
 
   const onPointerDown = (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
     startXRef.current = e.clientX;
     setSwiping(true);
+    setPastThreshold(false);
   };
   const onPointerMove = (e) => {
     if (!swiping || startXRef.current === null) return;
     const dx = Math.min(0, e.clientX - startXRef.current);
-    setSwipeX(Math.max(dx, -DELETE_THRESHOLD - 20));
+    // Rubber-band resistance beyond threshold
+    const clamped = dx < -DELETE_THRESHOLD
+      ? -DELETE_THRESHOLD - (Math.min(-dx - DELETE_THRESHOLD, 30)) * 0.4
+      : dx;
+    setSwipeX(clamped);
+    const isPast = clamped < -DELETE_THRESHOLD;
+    if (isPast !== pastThreshold) {
+      setPastThreshold(isPast);
+      if (isPast && navigator.vibrate) navigator.vibrate(10);
+    }
   };
   const onPointerUp = () => {
+    if (!swiping) return;
     if (swipeX < -DELETE_THRESHOLD) {
-      onDelete?.();
+      // Animate slide-out then delete
+      setSwiping(false);
+      setSwipeX(-300);
+      if (navigator.vibrate) navigator.vibrate(20);
+      setTimeout(() => onDelete?.(), 250);
     } else {
       setSwipeX(0);
+      setSwiping(false);
     }
-    setSwiping(false);
+    setPastThreshold(false);
     startXRef.current = null;
   };
 
   // Scroll the input into view above the native keyboard
   const handleFocus = (e) => {
     const el = e.target;
-    // Wait for the keyboard to appear, then scroll the input into view
     setTimeout(() => {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 300);
@@ -102,7 +127,6 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   const handleKgChange = (e) => {
     userEditedKg.current = true;
     let v = e.target.value;
-    // Allow only numbers and a single decimal point
     v = v.replace(/[^0-9.]/g, '');
     const parts = v.split('.');
     if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
@@ -117,6 +141,8 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
     if (done) onComplete?.({ kg: parseFloat(kg) || 0, reps: parseInt(v) || 0 });
   };
 
+  const deleteProgress = Math.min(1, Math.abs(swipeX) / DELETE_THRESHOLD);
+
   return (
     <div>
       {showHeader && (
@@ -129,14 +155,28 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
         </div>
       )}
       <div className="relative overflow-hidden rounded-lg">
-        <div className="absolute inset-y-0 right-0 flex items-center justify-end px-4 bg-red-500 rounded-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-          </svg>
+        <div
+          className="absolute inset-y-0 right-0 flex items-center justify-end px-4 rounded-lg"
+          style={{
+            backgroundColor: '#ef4444',
+            opacity: deleteProgress * 0.95,
+          }}
+        >
+          <Trash2
+            className="w-5 h-5 text-white"
+            style={{
+              transform: `scale(${0.7 + deleteProgress * 0.5})`,
+              transition: swiping ? 'none' : 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              opacity: 0.4 + deleteProgress * 0.6,
+            }}
+          />
         </div>
         <div
           className={`grid grid-cols-[36px_1fr_72px_72px_40px] items-center gap-1 py-1.5 px-2 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
-          style={{ transform: `translateX(${swipeX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease' }}
+          style={{
+            transform: `translateX(${swipeX}px)`,
+            transition: swiping ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}

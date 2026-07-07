@@ -22,8 +22,8 @@ export function playCompleteChime() {
   } catch (_) {}
 }
 
-export function notifyRestComplete() {
-  playTick();
+export function notifyRestComplete(silent = false) {
+  if (!silent) playTick();
   if (navigator.vibrate) {
     try { navigator.vibrate([200, 100, 200]); } catch (_) {}
   }

@@ -89,22 +89,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const toPoint = (h) => typeof h === 'object' ? h : { kg: h, reps: 8 };
     let allPoints = history.map(toPoint);
 
-    // Limit to 15 data points — aggregate into evenly distributed buckets
-    const MAX_POINTS = 15;
-    if (allPoints.length > MAX_POINTS) {
-      const bucketSize = allPoints.length / MAX_POINTS;
-      const aggregated = [];
-      for (let i = 0; i < MAX_POINTS; i++) {
-        const start = Math.floor(i * bucketSize);
-        const end = Math.floor((i + 1) * bucketSize);
-        const bucket = allPoints.slice(start, Math.max(end, start + 1));
-        if (bucket.length === 0) continue;
-        const avgKg = bucket.reduce((s, p) => s + (p.kg || 0), 0) / bucket.length;
-        const avgReps = bucket.reduce((s, p) => s + (p.reps || 0), 0) / bucket.length;
-        aggregated.push({ kg: Math.round(avgKg * 10) / 10, reps: Math.round(avgReps), date: bucket[bucket.length - 1].date });
-      }
-      allPoints = aggregated;
-    }
+    // Show every data point — no averaging or aggregation
 
     const getValue = (p) => isBodyweight ? p.reps : p.kg;
     const idx = allPoints.length - 1;

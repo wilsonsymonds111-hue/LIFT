@@ -24,6 +24,23 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     return { kg: maxKg, reps: maxReps, bodyweight: false };
   }, [exercise.history]);
 
+  // Extract the most recent workout session's sets for "Previous" column display
+  const lastSessionSets = useMemo(() => {
+    const history = exercise.history || [];
+    if (history.length === 0) return [];
+    const byDate = {};
+    history.forEach(h => {
+      const entry = typeof h === 'object' ? h : { kg: h, reps: 8 };
+      const d = entry.date || '';
+      if (!d) return;
+      if (!byDate[d]) byDate[d] = [];
+      byDate[d].push(entry);
+    });
+    const dates = Object.keys(byDate).sort().reverse();
+    if (dates.length === 0) return [];
+    return byDate[dates[0]];
+  }, [exercise.history]);
+
   const [sets, setSets] = useState(() => {
     if (initialState?.sets) return initialState.sets;
     const setCount = Math.max(2, exercise.sets || 2);
@@ -136,9 +153,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         />
       )}
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
-      {sets.map((s, i) => (
+      {sets.map((s, i) => {
+        const prevSet = i < lastSessionSets.length ? lastSessionSets[i] : null;
+        const suggestedKg = s.suggestedKg ?? prevSet?.kg ?? (i === 0 && prev ? prev.kg : null);
+        const suggestedReps = s.suggestedReps ?? (prevSet ? prevSet.reps + 1 : (i === 0 && prev ? prev.reps + 1 : null));
+        return (
         <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
-        <SetRow setNum={i + 1} previous={i === 0 ? prev : null} initialKg={s.suggestedKg ?? (i === 0 && prev ? prev.kg : null)} initialReps={s.suggestedReps ?? (i === 0 && prev ? prev.reps + 1 : null)} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
+        <SetRow setNum={i + 1} previous={prevSet ?? (i === 0 ? prev : null)} initialKg={suggestedKg} initialReps={suggestedReps} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
           onComplete={(result) => {
             const setIndex = sets.findIndex(r => r.id === s.id);
             const wasCompleted = !!completedSets[s.id];
@@ -169,7 +190,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             setCompletedSets(prev => { const next = {...prev}; delete next[s.id]; return next; });
           }} />
         </div>
-      ))}
+      );
+      })}
       <button
         onClick={() => {
           const sessionCompleted = Object.values(completedSets).filter(Boolean);
