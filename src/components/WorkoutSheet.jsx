@@ -353,7 +353,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         WebkitBackdropFilter: sheetBackdrop,
       }}
     >
-      {/* Grab bar — fades out as it minimizes */}
+      {/* Grab bar — only in expanded view; tap the minimized bar to expand */}
+      {!minimized && (
       <div
         className="flex justify-center cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
         style={{
@@ -361,7 +362,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
           paddingBottom: '4px',
           minHeight: '20px',
           opacity: grabOpacity,
-          pointerEvents: minimized ? 'none' : 'auto',
         }}
         onPointerDown={onGrabPointerDown}
         onPointerMove={onGrabPointerMove}
@@ -370,6 +370,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       >
         <div className="w-10 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
       </div>
+      )}
 
       {/* Minimized bar — fades in as it minimizes, anchored to the bottom of the sheet */}
       <div
