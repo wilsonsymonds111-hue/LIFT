@@ -22,7 +22,7 @@ const relativeTime = (dateStr) => {
   return `${Math.floor(diffDays / 7)}w ago`;
 };
 
-const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompleted, accent, isMenuOpen, onToggleMenu, menuRef, onRemove }) {
+const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompleted, accent, dotColor, isMenuOpen, onToggleMenu, menuRef, onRemove }) {
   const navigate = useNavigate();
   const btnRef = useRef(null);
 
@@ -39,6 +39,11 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
           : 'bg-[rgb(249,249,249)] dark:bg-card'
       }`}
     >
+      {/* Colored dot — workout identifier */}
+      {dotColor && (
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full z-10" style={{ backgroundColor: dotColor }} />
+      )}
+
       {/* Green checkmark — completed today */}
       {isCompleted && (
         <div className="absolute top-2 left-2 w-6 h-6 flex items-center justify-center rounded-full bg-emerald-500 text-white z-10 shadow-sm">
@@ -46,7 +51,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
         </div>
       )}
 
-      <div onClick={() => navigate(`/template/${template.id}`)} className={`cursor-pointer ${isCompleted ? 'pl-6' : ''}`}>
+      <div onClick={() => navigate(`/template/${template.id}`)} className={`cursor-pointer ${isCompleted || dotColor ? 'pl-6' : ''}`}>
         <h4 className="text-base font-bold text-foreground pr-8">{template.name}</h4>
         <p className="text-xs text-muted-foreground/70 mt-1.5">
           {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}

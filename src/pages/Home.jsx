@@ -125,6 +125,16 @@ const SPLIT_ACCENTS = {
   },
 };
 
+const WORKOUT_COLORS = [
+  '#EF4444', // red
+  '#8B5CF6', // purple
+  '#F59E0B', // amber
+  '#EC4899', // pink
+  '#14B8A6', // teal
+  '#F97316', // orange
+  '#6366F1', // indigo
+];
+
 const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
 const IS_APPLE = (() => {
   const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
@@ -265,6 +275,21 @@ export default function Home() {
     return names;
   }, [schedule, startDayIndex, sorted, onDays, offDays]);
 
+  // Color per calendar day — matches each day to its workout's color for visual identification
+  const dayColors = useMemo(() => {
+    const colors = [];
+    for (let k = 0; k < 7; k++) {
+      if (schedule[k] && sorted.length > 0) {
+        const onDayIdx = onDayIndexForDisplay(k, startDayIndex, onDays, offDays);
+        const workoutIdx = ((onDayIdx % sorted.length) + sorted.length) % sorted.length;
+        colors.push(WORKOUT_COLORS[workoutIdx % WORKOUT_COLORS.length]);
+      } else {
+        colors.push(null);
+      }
+    }
+    return colors;
+  }, [schedule, startDayIndex, sorted, onDays, offDays]);
+
   // Enhance schedule with completion status (2 = today's workout completed).
   // Today is display index 0.
   const todayStr = useMemo(() => {
@@ -371,7 +396,7 @@ export default function Home() {
 
       {/* Weekly Tracker — long-press to edit rest frequency */}
       <motion.div animate={punchControls} className="py-5 select-none" {...calendarHoldProps}>
-        <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} />
+        <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} dayColors={dayColors} />
       </motion.div>
 
       {/* ==================== CURRENT SPLIT ==================== */}
@@ -409,6 +434,7 @@ export default function Home() {
                 isTodayCard={idx === todayWorkoutIndex}
                 isCompleted={isCompleted}
                 accent={accent}
+                dotColor={WORKOUT_COLORS[idx % WORKOUT_COLORS.length]}
                 isMenuOpen={menuOpen === template.id}
                 onToggleMenu={handleToggleMenu}
                 menuRef={menuRef}

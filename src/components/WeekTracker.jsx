@@ -3,7 +3,7 @@ import { Check, Dumbbell } from 'lucide-react';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [] }) {
+function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [], dayColors = [] }) {
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
 
@@ -53,6 +53,11 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
                 {isCompleted && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
                 {isGymDay && !isCompleted && <Dumbbell className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />}
               </div>
+              {dayColors[i] ? (
+                <div className="w-2 h-2 rounded-full mt-1.5" style={{ backgroundColor: dayColors[i] }} />
+              ) : (
+                <div className="w-2 h-2 mt-1.5" />
+              )}
             </div>
           );
         })}
