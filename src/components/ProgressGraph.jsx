@@ -121,7 +121,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     return { data: d, lastRealIdx: idx };
   }, [history, isBodyweight]);
 
-  // Y-axis domain — "nice" rounded ticks (1, 2, 5, 10, 20, 50 …) like the body weight chart
+  // Y-axis domain — ticks always in increments of 5 or 10 kg for clean, even spacing
   const { domain: yDomain, ticks: yTicks } = useMemo(() => {
     if (!result.data || result.data.length === 0) return { domain: [0, 100], ticks: [] };
     const vals = result.data.map(x => x.valStatic ?? x.valNew).filter(v => v != null);
@@ -131,14 +131,9 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const padding = Math.max((max - min) * 0.1, 2.5);
     const rangeMin = min - padding;
     const rangeMax = max + padding;
-    const rawStep = (rangeMax - rangeMin) / 4;
-    const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
-    const normalized = rawStep / magnitude;
-    let step;
-    if (normalized < 1.5) step = magnitude;
-    else if (normalized < 3) step = 2 * magnitude;
-    else if (normalized < 7) step = 5 * magnitude;
-    else step = 10 * magnitude;
+    const span = rangeMax - rangeMin;
+    // Pick 5 or 10 as the step — whichever gives ~3-6 ticks
+    const step = span <= 50 ? 5 : 10;
     const niceMin = Math.floor(rangeMin / step) * step;
     const niceMax = Math.ceil(rangeMax / step) * step;
     const ticks = [];
