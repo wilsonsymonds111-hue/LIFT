@@ -106,7 +106,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
 
   return (
     <>
-      <div className="fixed inset-0 z-[60] flex items-center justify-center">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-auto">
         <div className="absolute inset-0 bg-black/60" />
 
         <div className="relative bg-gray-50 rounded-3xl w-[92%] max-w-sm flex flex-col shadow-2xl overflow-hidden"
