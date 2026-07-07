@@ -16,7 +16,7 @@ import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWor
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 import { backfillLastPerformed } from '../lib/backfillLastPerformed';
 
-const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
+const SAFE_AREA_PT = { paddingTop: 'calc(0.5rem + env(safe-area-inset-top))' };
 const DIALOG_BG = { background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(18px)' };
 const SWAP_CARD_W = { width: 340 };
 

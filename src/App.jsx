@@ -229,7 +229,7 @@ const AnimatedRoutes = memo(() => {
           Apple's native status bar (time, battery, Wi-Fi) with a blur */}
       <div
         className={`fixed top-0 left-0 right-0 z-20 pointer-events-none ${isTabRoute || isModalRoute ? 'safe-area-buffer-gradient' : 'safe-area-buffer-solid'}`}
-        style={{ height: 'calc(env(safe-area-inset-top, 20px) + 24px)' }}
+        style={{ height: 'calc(env(safe-area-inset-top, 20px) + 10px)' }}
       />
 
       {/* Only render active tab for performance */}

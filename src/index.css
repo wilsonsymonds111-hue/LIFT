@@ -147,14 +147,13 @@
    Layer 2: thin strip at the bottom edge with backdrop blur that fades
    to transparent, so content scrolls behind with a smooth blur. */
 .safe-area-buffer-gradient {
-  background: #D4D5D8;
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  background: linear-gradient(180deg, #D4D5D8 0%, #DCDDDF 20%, #E4E5E7 40%, #ECEDEF 65%, #F1F2F4 82%, transparent 100%);
+  background-size: 100% 50vh;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 .dark .safe-area-buffer-gradient {
   background: hsl(0 0% 9%);
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
 }
 .safe-area-buffer-solid {
   background: hsl(var(--background));

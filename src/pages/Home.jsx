@@ -139,7 +139,7 @@ const WORKOUT_COLORS = [
   '#6366F1', // indigo
 ];
 
-const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
+const SAFE_AREA_PT = { paddingTop: 'calc(0.5rem + env(safe-area-inset-top))' };
 const IS_APPLE = (() => {
   const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
   return /(iPhone|iPad|iPod|Macintosh|Mac OS X)/i.test(ua) && !/Android/i.test(ua);

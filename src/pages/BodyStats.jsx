@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import BodyStatsCard from '../components/BodyStatsCard';
 
-const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
+const SAFE_AREA_PT = { paddingTop: 'calc(0.5rem + env(safe-area-inset-top))' };
 
 const SPLIT_CYCLES = {
   'push-pull-legs': { onDays: 3, offDays: 1 },
