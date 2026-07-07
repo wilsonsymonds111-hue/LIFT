@@ -55,7 +55,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
         <div className="flex items-center gap-2 pr-10">
           <h4 className="text-base font-extrabold text-foreground tracking-tight">{template.name}</h4>
           {isTodayCard && (
-            <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-blue-500 text-white">
+            <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">
               Today
             </span>
           )}
