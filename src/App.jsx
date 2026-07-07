@@ -8,6 +8,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import BottomNav from './components/BottomNav';
+import PersistentWorkoutBar from './components/PersistentWorkoutBar';
 import { NavProvider } from '@/lib/NavContext';
 import ImportErrorBoundary from './components/ImportErrorBoundary';
 
@@ -251,6 +252,7 @@ const AnimatedRoutes = memo(() => {
       )}
 
       <BottomNav />
+      <PersistentWorkoutBar />
     </>
   );
 });

@@ -362,11 +362,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       {/* Grab bar — only in expanded view; tap the minimized bar to expand */}
       {!minimized && (
       <div
-        className="flex justify-center cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+        className="flex justify-center items-center cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
         style={{
           paddingTop: 'calc(env(safe-area-inset-top, 20px) + 8px)',
-          paddingBottom: '4px',
-          minHeight: '20px',
+          paddingBottom: '14px',
+          minHeight: '40px',
           opacity: grabOpacity,
         }}
         onPointerDown={onGrabPointerDown}
@@ -446,6 +446,13 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                   }}
                 />
               )}
+              <div
+                className="flex-1 self-stretch cursor-grab active:cursor-grabbing touch-none min-h-[40px]"
+                onPointerDown={onGrabPointerDown}
+                onPointerMove={onGrabPointerMove}
+                onPointerUp={onGrabPointerUp}
+                onPointerCancel={onGrabPointerUp}
+              />
               <button onClick={handleFinish} className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition">
                 Finish
               </button>
