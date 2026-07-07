@@ -33,7 +33,6 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
     const next = !done;
     setDone(next);
     if (next) {
-      if (navigator.vibrate) navigator.vibrate(15);
       playTick();
       onComplete?.({ kg: kg !== '' ? parseFloat(kg) : 0, reps: reps !== '' ? parseInt(reps) : 0 });
     } else {

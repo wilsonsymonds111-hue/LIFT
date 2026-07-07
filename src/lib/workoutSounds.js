@@ -1,29 +1,21 @@
-const SET_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/87d1fec3a_ScreenRecording_06-16-202607-45-53_12.mp3';
-const LEVEL_COMPLETE_SOUND = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/b340fae3c_universfield-game-level-complete-143022.mp3';
+// Haptic-only feedback for workout events.
+// We intentionally do NOT play audio (HTML5 Audio or Web Audio API) because on iOS
+// any audio playback claims exclusive audio focus and pauses background music (Spotify).
+// Vibration + notifications provide feedback without interrupting the user's music.
 
-// Create audio on demand and clean up after playback.
-// Module-level Audio elements with preload cause iOS to register a
-// persistent media session (lock screen widget) and replay on resume.
 export function playTick() {
-  try {
-    const audio = new Audio(SET_COMPLETE_SOUND);
-    audio.preload = 'none';
-    audio.onended = () => { audio.src = ''; audio.removeAttribute('src'); };
-    audio.play().catch(() => {});
-  } catch (_) {}
+  if (navigator.vibrate) {
+    try { navigator.vibrate(15); } catch (_) {}
+  }
 }
 
 export function playCompleteChime() {
-  try {
-    const audio = new Audio(LEVEL_COMPLETE_SOUND);
-    audio.preload = 'none';
-    audio.onended = () => { audio.src = ''; audio.removeAttribute('src'); };
-    audio.play().catch(() => {});
-  } catch (_) {}
+  if (navigator.vibrate) {
+    try { navigator.vibrate([100, 50, 100, 50, 200]); } catch (_) {}
+  }
 }
 
 export function notifyRestComplete(silent = false) {
-  if (!silent) playTick();
   if (navigator.vibrate) {
     try { navigator.vibrate([200, 100, 200]); } catch (_) {}
   }
