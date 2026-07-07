@@ -32,14 +32,14 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
   };
 
   return (
-    <div className="flex items-stretch gap-2">
+    <div className="relative">
       {dotColor && (
-        <div className="flex items-center pl-0.5">
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: dotColor }} />
+        <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 z-10">
+          <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: dotColor }} />
         </div>
       )}
       <div
-        className={`relative flex-1 rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] ${
+        className={`relative w-full rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] ${
           isCompleted
             ? 'bg-emerald-50 dark:bg-emerald-950/40'
             : 'bg-[rgb(249,249,249)] dark:bg-card'
