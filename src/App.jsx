@@ -171,12 +171,12 @@ const SwipeableTabs = memo(() => {
 const TabPanel = memo(function TabPanel({ width, index, x, visited, Component }) {
   // Derive each tab's distance from center for subtle parallax depth
   const tabOffset = useTransform(x, (currentX) => {
-    const tabCenter = index * width;
+    const tabCenter = index * width + width / 2;
     const screenCenter = -currentX + width / 2;
     return (tabCenter - screenCenter) / width;
   });
   const scale = useTransform(tabOffset, [-1, 0, 1], [0.93, 1, 0.93]);
-  const opacity = useTransform(tabOffset, [-1.5, -0.5, 0, 0.5, 1.5], [0.4, 0.82, 1, 0.82, 0.4]);
+  const opacity = useTransform(tabOffset, [-1, -0.5, 0, 0.5, 1], [0.4, 0.82, 1, 0.82, 0.4]);
 
   return (
     <motion.div
