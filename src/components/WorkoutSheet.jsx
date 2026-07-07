@@ -308,20 +308,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       )}
     </AnimatePresence>
 
-    {/* Status bar blur areas — covers Apple's time/battery region */}
-    {!minimized && (
-      <>
-        <div className="fixed top-0 left-0 w-36 h-14 rounded-b-2xl pointer-events-none"
-             style={{ zIndex: 36, background: 'hsl(var(--background) / 0.55)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }} />
-        <div className="fixed top-0 right-0 w-36 h-14 rounded-b-2xl pointer-events-none"
-             style={{ zIndex: 36, background: 'hsl(var(--background) / 0.55)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }} />
-      </>
-    )}
-
     <motion.div
       className="fixed z-40 bg-background flex flex-col overflow-hidden pointer-events-auto"
       animate={{ 
-        height: minimized ? '60px' : 'calc(100vh - 3rem)',
+        height: minimized ? '72px' : 'calc(100vh - 3rem)',
         bottom: minimized ? '90px' : '0px',
         left: minimized ? '12px' : '0px',
         right: minimized ? '12px' : '0px',
@@ -337,23 +327,25 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
           : '0 -4px 30px rgba(0,0,0,0.12)',
       }}
     >
-      {/* Grab bar — larger tappable area */}
-      <div
-        className="flex justify-center cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
-        style={{
-          paddingTop: minimized ? '0px' : 'calc(env(safe-area-inset-top) + 10px)',
-          paddingBottom: minimized ? '0px' : '4px',
-          minHeight: minimized ? '0' : '48px',
-        }}
-        onPointerDown={onGrabPointerDown}
-        onPointerMove={onGrabPointerMove}
-        onPointerUp={onGrabPointerUp}
-        onPointerCancel={onGrabPointerUp}
-      >
-        <div className="w-10 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
-      </div>
+      {/* Grab bar — only visible in expanded view */}
+      {!minimized && (
+        <div
+          className="flex justify-center cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+          style={{
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: '4px',
+            minHeight: '32px',
+          }}
+          onPointerDown={onGrabPointerDown}
+          onPointerMove={onGrabPointerMove}
+          onPointerUp={onGrabPointerUp}
+          onPointerCancel={onGrabPointerUp}
+        >
+          <div className="w-10 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
+        </div>
+      )}
 
-      {/* Minimized bar — pill with 3-column layout: title left, grab center, timer right */}
+      {/* Minimized bar — title left, timer right, evenly spaced */}
       <AnimatePresence>
         {minimized && (
           <motion.div
@@ -361,18 +353,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="flex items-center h-full cursor-pointer"
+            className="flex items-center justify-between h-full px-5 cursor-pointer"
             onClick={() => setMinimized(false)}
           >
-            <div className="flex-1 flex justify-center px-3">
-              <p className="font-bold text-foreground text-sm truncate max-w-full">{template.name}</p>
-            </div>
-            <div className="flex-1 flex justify-center">
-              <div className="w-8 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
-            </div>
-            <div className="flex-1 flex justify-center px-3">
-              <TimerDisplay startTimestamp={startTimeRef.current} className="text-sm text-muted-foreground font-display" />
-            </div>
+            <p className="font-bold text-foreground text-base truncate">{template.name}</p>
+            <TimerDisplay startTimestamp={startTimeRef.current} className="text-base text-muted-foreground font-display" />
           </motion.div>
         )}
       </AnimatePresence>
