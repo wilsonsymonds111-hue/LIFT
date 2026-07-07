@@ -71,7 +71,7 @@ function resolveSchedule(key, workoutCount, groupId) {
   // Try both the split key (stored by RestFrequencyConfirmModal) and the group ID.
   let savedStartDayIndex = null;
   try {
-    const keysToTry = [key, groupId].filter(Boolean);
+    const keysToTry = [groupId, key].filter(Boolean);
     for (const k of keysToTry) {
       const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
       if (cycleRaw) {

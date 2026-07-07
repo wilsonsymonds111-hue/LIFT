@@ -41,11 +41,13 @@ function loadCycle(splitKey, fallbackSchedule) {
     const raw = localStorage.getItem(`splitCycle_${splitKey}`);
     if (raw) {
       const parsed = JSON.parse(raw);
+      const savedStart = Number(parsed.startDayIndex);
+      const startDayIndex = (!isNaN(savedStart)) ? savedStart : todayMonSun;
       // If a known split with no user customization, use the authoritative defaults
       if (defaults && parsed.onDays === defaults.onDays && parsed.offDays === defaults.offDays) {
-        return { ...defaults, startDayIndex: todayMonSun };
+        return { ...defaults, startDayIndex };
       }
-      return { ...parsed, startDayIndex: todayMonSun };
+      return { ...parsed, startDayIndex };
     }
   } catch {}
 
