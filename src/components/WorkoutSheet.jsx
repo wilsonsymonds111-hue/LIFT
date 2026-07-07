@@ -67,20 +67,24 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const expandedHeightMV = useMotionValue(typeof window !== 'undefined' ? window.innerHeight - TOP_OFFSET : 752);
   useEffect(() => {
     const update = () => {
-      expandedHeightMV.set(window.innerHeight - TOP_OFFSET);
-      setMorphDistance(Math.max(window.innerHeight - 210, 200));
+      const vh = window.innerHeight;
+      expandedHeightMV.set(vh - TOP_OFFSET);
+      vhMV.set(vh);
+      setMorphDistance(Math.max(vh - 210, 200));
     };
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
   const height = useTransform([expandedHeightMV, progress], ([eh, p]) => eh + (72 - eh) * p);
-  const bottom = useTransform(progress, p => 90 * p);
+  const vhMV = useMotionValue(typeof window !== 'undefined' ? window.innerHeight : 800);
+  useEffect(() => { vhMV.set(window.innerHeight); }, []);
+  const top = useTransform([vhMV, progress], ([vh, p]) => TOP_OFFSET + (vh - 72 - 90 - TOP_OFFSET) * p);
   const sideMargin = useTransform(progress, p => 12 * p);
   const borderRadius = useTransform(progress, p => 24 + 6 * p);
   const contentOpacity = useTransform(progress, [0, 0.5], [1, 0], { clamp: true });
   const barOpacity = useTransform(progress, [0.5, 0.85], [0, 1], { clamp: true });
   const grabOpacity = useTransform(progress, [0, 0.3], [1, 0], { clamp: true });
-  const bgDimOpacity = useTransform(progress, [0, 0.7], [0.4, 0], { clamp: true });
+  const bgDimOpacity = useTransform(progress, [0, 0.7], [0.72, 0], { clamp: true });
   const shadowY = useTransform(progress, p => -4 + 14 * p);
   const shadowBlur = useTransform(progress, p => 30 + 10 * p);
   const shadowOpacity = useTransform(progress, p => 0.12 + 0.08 * p);
@@ -334,17 +338,17 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   return (
     <>
-    {/* Dimmed background — fades out as it minimizes */}
+    {/* Dimmed background — starts below safe area so Apple's status bar stays visible */}
     <motion.div
-      className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 35, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(3px)', opacity: bgDimOpacity }}
+      className="fixed pointer-events-none"
+      style={{ zIndex: 35, top: 'env(safe-area-inset-top, 0px)', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', opacity: bgDimOpacity }}
     />
 
     <motion.div
       className="fixed z-40 flex flex-col overflow-hidden pointer-events-auto"
       style={{ 
         height,
-        bottom,
+        top,
         left: sideMargin,
         right: sideMargin,
         contain: 'layout style',
