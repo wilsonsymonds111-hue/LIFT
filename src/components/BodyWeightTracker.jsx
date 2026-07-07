@@ -35,7 +35,7 @@ export default function BodyWeightTracker() {
   };
 
   return (
-    <div className="bg-muted rounded-2xl px-4 py-3.5">
+    <div className="bg-white dark:bg-card rounded-2xl px-4 py-3.5 border border-white shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
       <div className="flex items-center gap-3 mb-3">
         <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center flex-shrink-0">
           <Scale className="w-4 h-4 text-emerald-500" />
