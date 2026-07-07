@@ -59,7 +59,7 @@ function detectSplitType(workoutNames) {
   if (hasUpper && hasLower && hasPush && hasPull && hasLegs) return 'ul-ppl';
   if (hasUpper && hasLower) return 'upper-lower';
   if (hasPush || hasPull || hasLegs) return 'push-pull-legs';
-  return 'upper-lower';
+  return null;
 }
 
 const SplitCard = memo(function SplitCard({ splitKey, name, workouts, onCardClick, onMenuToggle, menuRef, cardRef, isActive, imageIndex, backgroundImage }) {

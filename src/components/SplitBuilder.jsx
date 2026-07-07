@@ -97,7 +97,7 @@ export default function SplitBuilder({ onClose, onSaved }) {
     setSaving(true);
     const groupId = 'custom_' + Date.now().toString();
     try {
-      const splitDisplayName = splitName.trim() || workouts.map(w => w.name.trim()).join(' / ');
+      const splitDisplayName = splitName.trim() || 'Custom Split';
       const templates = workouts.map((w, i) => ({
         name: w.name.trim(),
         exercises: w.exercises.map(e => e.name).join(', '),
