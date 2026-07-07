@@ -63,10 +63,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   // --- Real-time morph: all visual properties derive from a single progress value (0=expanded, 1=minimized) ---
   const progress = useTransform(yMotion, [0, morphDistance], [0, 1], { clamp: true });
-  const expandedHeightMV = useMotionValue(typeof window !== 'undefined' ? window.innerHeight - 48 : 752);
+  const TOP_OFFSET = 90;
+  const expandedHeightMV = useMotionValue(typeof window !== 'undefined' ? window.innerHeight - TOP_OFFSET : 752);
   useEffect(() => {
     const update = () => {
-      expandedHeightMV.set(window.innerHeight - 48);
+      expandedHeightMV.set(window.innerHeight - TOP_OFFSET);
       setMorphDistance(Math.max(window.innerHeight - 210, 200));
     };
     window.addEventListener('resize', update);
@@ -85,7 +86,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const shadowOpacity = useTransform(progress, p => 0.12 + 0.08 * p);
   const insetOpacity = useTransform(progress, p => 0.6 * p);
   const glassBorderOpacity = useTransform(progress, [0, 0.6, 1], [0, 0, 0.5], { clamp: true });
-  const boxShadow = useMotionTemplate`0 ${shadowY}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity}), 0 0 0 1px rgba(255,255,255,${glassBorderOpacity}), inset 0 1px 1px rgba(255,255,255,${insetOpacity})`;
+  const blueBorderOpacity = useTransform(progress, [0.4, 1], [0, 1], { clamp: true });
+  const boxShadow = useMotionTemplate`0 ${shadowY}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity}), 0 0 0 1px rgba(255,255,255,${glassBorderOpacity}), 0 0 0 2px rgba(59,130,246,${blueBorderOpacity}), inset 0 1px 1px rgba(255,255,255,${insetOpacity})`;
   const bgAlpha = useTransform(progress, [0, 0.5, 1], [1, 1, 0.55], { clamp: true });
   const sheetBg = useMotionTemplate`hsl(var(--background) / ${bgAlpha})`;
   const blurPx = useTransform(progress, [0, 0.4, 1], [0, 20, 60], { clamp: true });
