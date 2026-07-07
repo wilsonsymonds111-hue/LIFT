@@ -10,14 +10,15 @@ export default function PersonIcon({ className, strokeWidth = 2.2 }) {
       className={className}
     >
       {/* Head */}
-      <circle cx="12" cy="4.5" r="2.2" fill="currentColor" stroke="none" />
-      {/* Slimmer torso */}
-      <rect x="10" y="8" width="4" height="6" rx="1.2" fill="currentColor" stroke="none" />
-      {/* Arms — horizontal */}
-      <line x1="4.5" y1="10.5" x2="19.5" y2="10.5" />
-      {/* Legs — V shape */}
-      <line x1="12" y1="14" x2="7.5" y2="21" />
-      <line x1="12" y1="14" x2="16.5" y2="21" />
+      <circle cx="12" cy="5" r="1.8" fill="currentColor" stroke="none" />
+      {/* Thin torso */}
+      <line x1="12" y1="7" x2="12" y2="14" />
+      {/* Arms — diagonal up-and-out */}
+      <line x1="12" y1="8.5" x2="5.5" y2="5.5" />
+      <line x1="12" y1="8.5" x2="18.5" y2="5.5" />
+      {/* Legs — diagonal down-and-out */}
+      <line x1="12" y1="14" x2="7" y2="20.5" />
+      <line x1="12" y1="14" x2="17" y2="20.5" />
     </svg>
   );
 }
