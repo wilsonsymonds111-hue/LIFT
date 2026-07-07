@@ -349,7 +349,11 @@ export default function Home() {
   const bodyStatsProps = useMemo(() => ({
     templates: currentSplit,
     targetSessionsPerWeek: Math.round((onDays || 3) * 7 / ((onDays || 3) + (offDays || 1))),
-  }), [currentSplit, onDays, offDays]);
+    splitName: currentSplitName,
+    onDays: onDays || 3,
+    offDays: offDays || 1,
+    startDayIndex: startDayIndex ?? 0,
+  }), [currentSplit, onDays, offDays, currentSplitName, startDayIndex]);
 
   const cycleLabel = useMemo(() => {
     if (hasNoSplit) return null;

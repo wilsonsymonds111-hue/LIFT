@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, LogOut, FileText } from 'lucide-react';
+import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, LogOut, FileText, CalendarPlus } from 'lucide-react';
+import CalendarSyncModal from './CalendarSyncModal';
+import { generateWorkoutICS } from '../lib/icsGenerator';
 import { base44 } from '@/api/base44Client';
 import FeedbackModal from './FeedbackModal';
 import CreateAccountModal from './CreateAccountModal';
@@ -14,8 +16,36 @@ import { memo } from 'react';
 const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange, bodyStatsProps }) {
   const [showFeedback, setShowFeedback] = useState(false);
   const [showCreateAccount, setShowCreateAccount] = useState(false);
+  const [showCalendarSync, setShowCalendarSync] = useState(false);
   const { setHideNav } = useNavVisibility();
   const { isAuthenticated, isGuest, logout } = useAuth();
+
+  const IS_APPLE = (() => {
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+    return /(iPhone|iPad|iPod|Macintosh|Mac OS X)/i.test(ua) && !/Android/i.test(ua);
+  })();
+
+  const hasActiveSplit = bodyStatsProps?.templates?.length > 0;
+
+  const handleCalendarSyncConfirm = (hour) => {
+    setShowCalendarSync(false);
+    if (!hasActiveSplit) return;
+    const ics = generateWorkoutICS({
+      splitName: bodyStatsProps.splitName || 'Workout',
+      workouts: bodyStatsProps.templates.map(t => ({ name: t.name })),
+      onDays: bodyStatsProps.onDays || 3,
+      offDays: bodyStatsProps.offDays || 1,
+      startDayIndex: bodyStatsProps.startDayIndex ?? 0,
+      workoutHour: hour,
+    });
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'lift-workouts.ics';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const goalMode = (() => {
     try { return localStorage.getItem('goalMode') || 'cutting'; } catch { return 'cutting'; }
@@ -130,6 +160,24 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             onChange={handlePhotoSelect}
           />
         </div>
+
+        {/* Sync to Calendar */}
+        {hasActiveSplit && (
+          <button
+            onClick={() => setShowCalendarSync(true)}
+            className="relative z-10 flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 transition active:opacity-70 shadow-sm"
+          >
+            <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+              <CalendarPlus className="w-4 h-4 text-indigo-500" />
+            </div>
+            <div className="text-left flex-1">
+              <p className="font-semibold text-foreground text-sm">Sync to Calendar</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {IS_APPLE ? 'Apple Calendar' : 'Google Calendar'} — get reminders for each workout day
+              </p>
+            </div>
+          </button>
+        )}
 
         {/* Create Account — guest only */}
         {isGuest && (
@@ -294,6 +342,13 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
               <p className="text-xs text-muted-foreground mt-0.5">Remove all data stored on this device</p>
             </div>
           </button>
+        )}
+
+        {showCalendarSync && (
+          <CalendarSyncModal
+            onClose={() => setShowCalendarSync(false)}
+            onSync={handleCalendarSyncConfirm}
+          />
         )}
 
         {showFeedback && (
