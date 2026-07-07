@@ -12,6 +12,7 @@ export const PRESET_IMAGES = [
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/80cf906e8_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/c2e8728fc_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/fb6555f67_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/208bb5fb9_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e8cb3e56c_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a45a6aa20_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a9ff09fcf_image.png',
