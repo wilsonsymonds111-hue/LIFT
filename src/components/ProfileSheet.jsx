@@ -16,6 +16,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
   const [showFeedback, setShowFeedback] = useState(false);
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [showImportStrong, setShowImportStrong] = useState(false);
+  const [strongDismissed, setStrongDismissed] = useState(() => localStorage.getItem('strongCardDismissed') === 'true');
   const { setHideNav } = useNavVisibility();
   const { isAuthenticated, isGuest, logout } = useAuth();
 
@@ -166,18 +167,28 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
         )}
 
         {/* Import from Strong */}
-        <button
-          onClick={() => setShowImportStrong(true)}
-          className="relative z-10 flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 transition active:opacity-70 shadow-sm"
-        >
-          <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-            <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/dbc22ac3c_image.png" alt="Strong" className="w-full h-full object-cover" />
-          </div>
-          <div className="text-left flex-1">
-            <p className="font-semibold text-foreground text-sm">Import from STRONG</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Bring your workout history from the STRONG app</p>
-          </div>
-        </button>
+        {!strongDismissed && (
+        <div className="relative">
+          <button
+            onClick={() => setShowImportStrong(true)}
+            className="relative z-10 flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 transition active:opacity-70 shadow-sm w-full"
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+              <img src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/dbc22ac3c_image.png" alt="Strong" className="w-full h-full object-cover" />
+            </div>
+            <div className="text-left flex-1">
+              <p className="font-semibold text-foreground text-sm">Import from STRONG</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Bring your workout history from the STRONG app</p>
+            </div>
+          </button>
+          <button
+            onClick={() => { setStrongDismissed(true); localStorage.setItem('strongCardDismissed', 'true'); }}
+            className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-gray-200 dark:bg-zinc-600 flex items-center justify-center shadow-sm z-20 active:scale-90 transition"
+          >
+            <X className="w-3.5 h-3.5 text-gray-500 dark:text-gray-300" />
+          </button>
+        </div>
+        )}
 
         {/* Dark mode toggle */}
         <div className="relative z-10 flex items-center justify-between bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 shadow-sm">
