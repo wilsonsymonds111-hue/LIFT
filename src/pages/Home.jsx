@@ -402,7 +402,7 @@ export default function Home() {
       {/* ==================== CURRENT SPLIT ==================== */}
       <div className="px-4 py-2">
         <div>
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-end justify-between mb-4">
             <div>
               <div className="mb-1">
                 <h3 className="font-semibold text-muted-foreground text-sm">Current Split</h3>
