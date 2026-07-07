@@ -4,7 +4,7 @@ import { useRef, useCallback } from 'react';
  * Returns spreadable props for an element that fires `onHold` after
  * the user presses and holds for ~500ms. Works with touch and mouse.
  */
-export function TouchHold(onHold, duration = 500) {
+export function TouchHold(onHold, duration = 300) {
   const timerRef = useRef(null);
 
   const start = useCallback(() => {

@@ -359,10 +359,10 @@ export default function Home() {
   const calendarHoldProps = TouchHold(() => {
     if (!groupId) return;
     punchControls.start({
-      scale: [1, 0.88, 1],
-      transition: { duration: 0.4, times: [0, 0.4, 1], ease: [0.4, 0, 0.2, 1] }
+      scale: [1, 0.92, 1],
+      transition: { duration: 0.32, times: [0, 0.45, 1], ease: [0.34, 1.56, 0.64, 1] }
     });
-    setTimeout(() => setShowSplitEditor(true), 250);
+    setTimeout(() => setShowSplitEditor(true), 180);
   });
 
   const accent = useMemo(() => SPLIT_ACCENTS[splitDetection.key] || SPLIT_ACCENTS['full-body'], [splitDetection.key]);

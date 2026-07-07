@@ -44,7 +44,7 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
               className="flex flex-col items-center w-7"
             >
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-150 cursor-pointer ${
+                className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 ease-out cursor-pointer active:scale-90 ${
                   isToday
                     ? 'ring-2 ring-emerald-500 ring-offset-1 ring-offset-background'
                     : ''
