@@ -34,8 +34,8 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
   return (
     <div className="relative">
       {dotColor && (
-        <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 z-10">
-          <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: dotColor }} />
+        <div className="absolute left-[-14px] top-1/2 -translate-y-1/2 z-10">
+          <div className="w-[3px] h-[3px] rounded-full" style={{ backgroundColor: dotColor }} />
         </div>
       )}
       <div
