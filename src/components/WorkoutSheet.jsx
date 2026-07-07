@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Timer, CalendarDays, Clock } from 'lucide-react';
-import { AnimatePresence, motion, useMotionValue, animate as framerAnimate } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, useTransform, useMotionTemplate, animate as framerAnimate } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
@@ -18,6 +18,7 @@ import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { saveWorkoutSession, clearWorkoutSession } from '../lib/workoutSession';
 
 const TODAY_STR = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+const MORPH_DISTANCE = 140;
 
 export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedSession }) {
   const [minimized, setMinimized] = useState(false);
@@ -40,18 +41,46 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     yMotion.set(delta);
   };
   const onGrabPointerUp = () => {
-    const shouldMinimize = dragOffsetRef.current > 80;
+    const shouldMinimize = dragOffsetRef.current > MORPH_DISTANCE / 2;
     draggingRef.current = false;
     dragStartYRef.current = null;
     setIsDragging(false);
     if (shouldMinimize) {
-      framerAnimate(yMotion, 0, { type: 'spring', stiffness: 420, damping: 40, mass: 0.7 });
+      framerAnimate(yMotion, MORPH_DISTANCE, { type: 'spring', stiffness: 420, damping: 40, mass: 0.7 });
       setMinimized(true);
     } else {
       framerAnimate(yMotion, 0, { type: 'spring', stiffness: 450, damping: 38, mass: 0.6 });
     }
     dragOffsetRef.current = 0;
   };
+
+  const handleBarClick = () => {
+    setMinimized(false);
+    framerAnimate(yMotion, 0, { type: 'spring', stiffness: 400, damping: 36, mass: 0.8 });
+  };
+
+  // --- Real-time morph: all visual properties derive from a single progress value (0=expanded, 1=minimized) ---
+  const progress = useTransform(yMotion, [0, MORPH_DISTANCE], [0, 1], { clamp: true });
+  const expandedHeightMV = useMotionValue(typeof window !== 'undefined' ? window.innerHeight - 48 : 752);
+  useEffect(() => {
+    const update = () => expandedHeightMV.set(window.innerHeight - 48);
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+  const height = useTransform([expandedHeightMV, progress], ([eh, p]) => eh + (72 - eh) * p);
+  const bottom = useTransform(progress, p => 90 * p);
+  const sideMargin = useTransform(progress, p => 12 * p);
+  const borderRadius = useTransform(progress, p => 24 + 6 * p);
+  const contentOpacity = useTransform(progress, [0, 0.5], [1, 0], { clamp: true });
+  const barOpacity = useTransform(progress, [0.5, 0.85], [0, 1], { clamp: true });
+  const grabOpacity = useTransform(progress, [0, 0.3], [1, 0], { clamp: true });
+  const bgDimOpacity = useTransform(progress, [0, 0.7], [0.4, 0], { clamp: true });
+  const shadowY = useTransform(progress, p => -4 + 14 * p);
+  const shadowBlur = useTransform(progress, p => 30 + 10 * p);
+  const shadowOpacity = useTransform(progress, p => 0.12 + 0.08 * p);
+  const ringOpacity = useTransform(progress, p => 0.5 * p);
+  const insetOpacity = useTransform(progress, p => 0.6 * p);
+  const boxShadow = useMotionTemplate`0 ${shadowY}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity}), 0 0 0 2px rgba(59, 130, 246, ${ringOpacity}), inset 0 1px 1px rgba(255,255,255,${insetOpacity})`;
   const [prs, setPrs] = useState([]);
   const [bestSets, setBestSets] = useState({});
   const [showSummary, setShowSummary] = useState(false);
@@ -294,80 +323,56 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   return (
     <>
-    {/* Dimmed background behind the workout sheet */}
-    <AnimatePresence>
-      {!minimized && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 pointer-events-none"
-          style={{ zIndex: 35, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(3px)' }}
-        />
-      )}
-    </AnimatePresence>
+    {/* Dimmed background — fades out as it minimizes */}
+    <motion.div
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 35, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(3px)', opacity: bgDimOpacity }}
+    />
 
     <motion.div
       className="fixed z-40 bg-background flex flex-col overflow-hidden pointer-events-auto"
-      animate={{ 
-        height: minimized ? '72px' : 'calc(100vh - 3rem)',
-        bottom: minimized ? '90px' : '0px',
-        left: minimized ? '12px' : '0px',
-        right: minimized ? '12px' : '0px',
-      }}
-      transition={{ type: 'spring', stiffness: 380, damping: 36, mass: 0.8 }}
       style={{ 
-        y: yMotion, 
+        height,
+        bottom,
+        left: sideMargin,
+        right: sideMargin,
         contain: 'layout style',
-        borderRadius: minimized ? '30px' : '24px 24px 0 0',
-        border: minimized ? '2px solid rgba(59, 130, 246, 0.5)' : 'none',
-        boxShadow: minimized 
-          ? '0 10px 40px rgba(0,0,0,0.2), 0 2px 12px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.6)' 
-          : '0 -4px 30px rgba(0,0,0,0.12)',
+        borderRadius,
+        boxShadow,
       }}
     >
-      {/* Grab bar — only visible in expanded view */}
-      {!minimized && (
-        <div
-          className="flex justify-center cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
-          style={{
-            paddingTop: 'env(safe-area-inset-top)',
-            paddingBottom: '4px',
-            minHeight: '32px',
-          }}
-          onPointerDown={onGrabPointerDown}
-          onPointerMove={onGrabPointerMove}
-          onPointerUp={onGrabPointerUp}
-          onPointerCancel={onGrabPointerUp}
-        >
-          <div className="w-10 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
-        </div>
-      )}
+      {/* Grab bar — fades out as it minimizes */}
+      <div
+        className="flex justify-center cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+        style={{
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingBottom: '4px',
+          minHeight: '32px',
+          opacity: grabOpacity,
+          pointerEvents: minimized ? 'none' : 'auto',
+        }}
+        onPointerDown={onGrabPointerDown}
+        onPointerMove={onGrabPointerMove}
+        onPointerUp={onGrabPointerUp}
+        onPointerCancel={onGrabPointerUp}
+      >
+        <div className="w-10 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
+      </div>
 
-      {/* Minimized bar — title left, timer right, evenly spaced */}
-      <AnimatePresence>
-        {minimized && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center justify-between h-full px-5 cursor-pointer"
-            onClick={() => setMinimized(false)}
-          >
-            <p className="font-bold text-foreground text-base truncate">{template.name}</p>
-            <TimerDisplay startTimestamp={startTimeRef.current} className="text-base text-muted-foreground font-display" />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Minimized bar — fades in as it minimizes, anchored to the bottom of the sheet */}
+      <div
+        className="flex items-center justify-between px-5 cursor-pointer absolute inset-x-0 bottom-0"
+        style={{ height: 72, opacity: barOpacity, pointerEvents: minimized ? 'auto' : 'none' }}
+        onClick={handleBarClick}
+      >
+        <p className="font-bold text-foreground text-base truncate">{template.name}</p>
+        <TimerDisplay startTimestamp={startTimeRef.current} className="text-base text-muted-foreground font-display" />
+      </div>
 
-      {/* Full content */}
+      {/* Full content — fades out as it minimizes */}
       <motion.div
-        animate={{ opacity: minimized ? 0 : 1 }}
-        transition={{ duration: 0.2 }}
         className="flex-1 flex flex-col overflow-hidden"
-        style={{ pointerEvents: minimized ? 'none' : 'auto' }}
+        style={{ opacity: contentOpacity, pointerEvents: minimized ? 'none' : 'auto' }}
       >
         <div className="relative flex items-center justify-between px-4 pt-1 pb-2 flex-shrink-0">
               {restActive && restMinimized ? (
