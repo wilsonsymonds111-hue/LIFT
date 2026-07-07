@@ -197,7 +197,8 @@ export default function SplitBuilder({ onClose, onSaved }) {
                 value={splitName}
                 onChange={e => setSplitName(e.target.value)}
                 placeholder="Name your split"
-                className="flex-1 min-w-0 bg-transparent font-extrabold text-foreground text-xl text-center focus:outline-none placeholder:text-muted-foreground/50"
+                className="flex-1 min-w-0 bg-transparent font-extrabold text-foreground text-2xl text-center focus:outline-none placeholder:text-muted-foreground/50"
+                style={{ fontSize: '1.5rem' }}
               />
               <button
                 onClick={handleContinueToRest}
