@@ -63,8 +63,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   // --- Real-time morph: all visual properties derive from a single progress value (0=expanded, 1=minimized) ---
   const progress = useTransform(yMotion, [0, morphDistance], [0, 1], { clamp: true });
-  const TOP_OFFSET = 90;
-  const expandedHeightMV = useMotionValue(typeof window !== 'undefined' ? window.innerHeight - TOP_OFFSET : 752);
+  const TOP_OFFSET = 0;
+  const expandedHeightMV = useMotionValue(typeof window !== 'undefined' ? window.innerHeight - TOP_OFFSET : 800);
   useEffect(() => {
     const update = () => {
       const vh = window.innerHeight;
@@ -338,10 +338,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   return (
     <>
-    {/* Dimmed background — starts below safe area so Apple's status bar stays visible */}
+    {/* Dimmed background — covers full screen so no gap shows above during transitions */}
     <motion.div
       className="fixed pointer-events-none"
-      style={{ zIndex: 35, top: 'env(safe-area-inset-top, 0px)', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', opacity: bgDimOpacity }}
+      style={{ zIndex: 35, top: 0, bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', opacity: bgDimOpacity }}
     />
 
     <motion.div
@@ -364,7 +364,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       <div
         className="flex justify-center cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
         style={{
-          paddingTop: '8px',
+          paddingTop: 'calc(env(safe-area-inset-top, 20px) + 8px)',
           paddingBottom: '4px',
           minHeight: '20px',
           opacity: grabOpacity,
