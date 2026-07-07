@@ -4,22 +4,20 @@ import { Upload, Check } from 'lucide-react';
 export const PRESET_IMAGES = [
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/954973baa_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e2a83fded_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/d5760e7c6_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6138ff867_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/7499fd7e7_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/71974cf18_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/151ed9c82_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/80cf906e8_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/c2e8728fc_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/fb6555f67_image.png',
-  // Example split background images
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/e8cb3e56c_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a45a6aa20_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a9ff09fcf_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5e854ea52_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/831e29602_image.png',
-  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a45a6aa20_image.png',
-  // User-uploaded images
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/039ef34f8_image.png',
-  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/d5760e7c6_image.png',
-  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/71974cf18_image.png',
-  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/c2e8728fc_image.png',
 ];
 
 export default function BackgroundImagePicker({ selectedImage, onSelect, onUpload, uploading }) {
