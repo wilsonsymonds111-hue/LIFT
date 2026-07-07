@@ -228,8 +228,8 @@ const AnimatedRoutes = memo(() => {
       {/* Permanent safe-area buffer — covers scrolling content so nothing
           overlaps Apple's native status bar (time, battery, Wi-Fi) */}
       <div
-        className="fixed top-0 left-0 right-0 z-20 pointer-events-none"
-        style={{ height: 'calc(env(safe-area-inset-top, 20px) + 10px)', background: 'hsl(var(--background))' }}
+        className={`fixed top-0 left-0 right-0 z-20 pointer-events-none ${isTabRoute || isModalRoute ? 'safe-area-buffer-gradient' : 'safe-area-buffer-solid'}`}
+        style={{ height: 'calc(env(safe-area-inset-top, 20px) + 10px)' }}
       />
 
       {/* Only render active tab for performance */}

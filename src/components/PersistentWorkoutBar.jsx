@@ -39,7 +39,7 @@ export default function PersistentWorkoutBar() {
           exit={{ y: 120, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 320, damping: 30 }}
           className="fixed left-3 right-3 z-30"
-          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
+          style={{ bottom: '80px' }}
           onClick={() => navigate(`/active-workout/${session.templateId}`)}
         >
           <div

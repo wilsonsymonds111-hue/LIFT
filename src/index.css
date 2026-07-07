@@ -141,6 +141,21 @@
   display: none;
 }
 
+/* Permanent safe-area buffer — matches the page gradient so scrolling
+   content is hidden behind Apple's native status bar area seamlessly. */
+.safe-area-buffer-gradient {
+  background: linear-gradient(180deg, #D4D5D8 0%, #DCDDDF 20%, #E4E5E7 40%, #ECEDEF 65%, #F1F2F4 82%, transparent 100%);
+  background-size: 100% 50vh;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+}
+.dark .safe-area-buffer-gradient {
+  background: hsl(var(--background));
+}
+.safe-area-buffer-solid {
+  background: hsl(var(--background));
+}
+
 /* Semi-transparent sticky header that blends with the gradient */
 .glass-header {
   background: rgba(245, 244, 247, 0.75);
