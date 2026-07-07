@@ -311,6 +311,7 @@ export default function Exercises() {
         <Suspense fallback={null}>
           <ExerciseDetailModal
             exercise={selectedExercise}
+            initialImage={exerciseImages[selectedExercise.name]}
             initialHistory={exerciseHistory[selectedExercise.name]?.map(h => ({ kg: h.kg, reps: h.v, date: h.date })) || null}
             onClose={() => setSelectedExercise(null)}
             onExerciseDeleted={() => setCustomExercisesVersion(v => v + 1)}

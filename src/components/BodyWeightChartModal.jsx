@@ -365,7 +365,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-foreground" />
           </button>
           <h1 className="text-2xl font-bold text-black dark:text-foreground">Bodyweight</h1>
-          <button onClick={() => setShowKeypad(true)} className="w-11 h-11 flex items-center justify-center rounded-full bg-blue-500 ring-2 ring-blue-500 shadow-lg active:scale-95 transition">
+          <button onClick={() => setShowKeypad(true)} className={`w-11 h-11 flex items-center justify-center rounded-full ring-2 shadow-lg active:scale-95 transition ${goalMode === 'cutting' ? 'bg-[#F59E0B] ring-[#F59E0B]' : 'bg-blue-500 ring-blue-500'}`}>
             <Plus className="w-6 h-6 text-white" />
           </button>
         </div>
