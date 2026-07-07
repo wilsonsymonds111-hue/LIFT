@@ -3,7 +3,7 @@ import { useEffect, useRef, useMemo, useCallback, useState, lazy, Suspense, memo
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion, useMotionValue, useTransform, animate as framerAnimate } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, animate as framerAnimate } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -133,9 +133,9 @@ const SwipeableTabs = memo(() => {
     if (isDraggingRef.current || !width) return;
     const controls = framerAnimate(x, targetX, {
       type: 'spring',
-      stiffness: 300,
-      damping: 36,
-      mass: 0.3,
+      stiffness: 550,
+      damping: 44,
+      mass: 0.22,
       restSpeed: 0.01,
       restDelta: 0.5,
     });
@@ -160,31 +160,23 @@ const SwipeableTabs = memo(() => {
         className="flex absolute top-0 bottom-0 overflow-hidden"
       >
         {TAB_CONTENT.map((Component, i) => (
-          <TabPanel key={TABS[i]} width={width} index={i} x={x} visited={visitedRef.current.has(i)} Component={Component} />
+          <TabPanel key={TABS[i]} width={width} visited={visitedRef.current.has(i)} Component={Component} />
         ))}
       </motion.div>
     </div>
   );
 });
 
-// Separate memoized panel so motion value hooks are called at top level of a component
-const TabPanel = memo(function TabPanel({ width, index, x, visited, Component }) {
-  // Derive each tab's distance from center for subtle parallax depth
-  const tabOffset = useTransform(x, (currentX) => {
-    const tabCenter = index * width + width / 2;
-    const screenCenter = -currentX + width / 2;
-    return (tabCenter - screenCenter) / width;
-  });
-  const scale = useTransform(tabOffset, [-1, 0, 1], [0.93, 1, 0.93]);
-  const opacity = useTransform(tabOffset, [-1, -0.5, 0, 0.5, 1], [0.4, 0.82, 1, 0.82, 0.4]);
-
+// Plain div — no per-frame useTransform recalculations. The slide alone is smooth
+// and keeps all three panels from forcing simultaneous GPU compositing layers.
+const TabPanel = memo(function TabPanel({ width, visited, Component }) {
   return (
-    <motion.div
+    <div
       className="flex-shrink-0 overflow-y-auto"
-      style={{ width, scale, opacity, contain: 'layout style', transformOrigin: 'center center' }}
+      style={{ width, contain: 'layout style paint' }}
     >
       {visited ? <MemoTab Component={Component} /> : <div className="w-full h-full bg-background" />}
-    </motion.div>
+    </div>
   );
 });
 
