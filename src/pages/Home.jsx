@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { MoreHorizontal, CalendarPlus, Plus, Moon, Layers } from 'lucide-react';
 import { motion, useAnimationControls } from 'framer-motion';
 import CalendarSyncModal from '../components/CalendarSyncModal';
+import SplitModal from '../components/SplitModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,8 +15,6 @@ import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
 import { TouchHold } from '../lib/useTouchHold';
-
-const SplitModal = lazy(() => import('../components/SplitModal'));
 
 // Default cycle patterns: { onDays, offDays } for known split types
 const SPLIT_CYCLES = {
@@ -501,18 +500,16 @@ export default function Home() {
       )}
 
       {showSplitEditor && groupId && (
-        <Suspense fallback={null}>
-          <SplitModal
-            splitKey={groupId}
-            isActiveSplit
-            onClose={() => setShowSplitEditor(false)}
-            onCycleSaved={() => { setCycleVersion(v => v + 1); invalidateWorkoutTemplates(queryClient); }}
-            onMakeCurrent={async () => {
-              setShowSplitEditor(false);
-              invalidateWorkoutTemplates(queryClient);
-            }}
-          />
-        </Suspense>
+        <SplitModal
+          splitKey={groupId}
+          isActiveSplit
+          onClose={() => setShowSplitEditor(false)}
+          onCycleSaved={() => { setCycleVersion(v => v + 1); invalidateWorkoutTemplates(queryClient); }}
+          onMakeCurrent={async () => {
+            setShowSplitEditor(false);
+            invalidateWorkoutTemplates(queryClient);
+          }}
+        />
       )}
 
     </div>
