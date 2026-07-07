@@ -127,11 +127,11 @@ const SPLIT_ACCENTS = {
 
 const WORKOUT_COLORS = [
   '#EF4444', // red
-  '#8B5CF6', // purple
-  '#F59E0B', // amber
+  '#22C55E', // green
+  '#3B82F6', // blue
   '#EC4899', // pink
   '#14B8A6', // teal
-  '#22C55E', // green
+  '#8B5CF6', // purple
   '#6366F1', // indigo
 ];
 
@@ -404,8 +404,7 @@ export default function Home() {
         <div>
           <div className="flex items-start justify-between mb-4">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-breathe shadow-[0_0_6px_rgba(59,130,246,0.6)]" />
+              <div className="mb-1">
                 <h3 className="font-semibold text-muted-foreground text-sm">Current Split</h3>
               </div>
               {currentSplitName && (
