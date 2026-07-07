@@ -33,7 +33,7 @@ export default function PersistentWorkoutBar() {
     <div
       className="fixed left-3 right-3 z-30 transition-all duration-300 ease-out"
       style={{
-        bottom: '80px',
+        bottom: '90px',
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(120px)',
         pointerEvents: visible ? 'auto' : 'none',
