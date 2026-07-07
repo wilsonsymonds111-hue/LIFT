@@ -35,7 +35,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
   return (
     <div className="relative">
       <div
-        className={`relative w-full rounded-2xl p-4 transition-all duration-150 active:scale-[0.99] border bg-white dark:bg-card overflow-hidden ${
+        className={`relative w-full rounded-2xl p-5 transition-all duration-150 active:scale-[0.99] border bg-white dark:bg-card overflow-hidden ${
           isTodayCard
             ? 'border-blue-400/60 dark:border-blue-500/50 shadow-[0_10px_36px_rgba(0,0,0,0.10),0_2px_8px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(255,255,255,0.7)] dark:shadow-[0_10px_36px_rgba(0,0,0,0.25),inset_0_0_0_1px_rgba(255,255,255,0.08)]'
             : 'border-border/60 shadow-[0_6px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.03),inset_0_0_0_1px_rgba(255,255,255,0.6)] dark:shadow-[0_6px_24px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.06)]'
@@ -53,7 +53,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
       <div onClick={() => navigate(`/active-workout/${template.id}`)} className={`cursor-pointer ${isTodayCard ? 'pl-1.5' : ''}`}>
         {/* Title row */}
         <div className="flex items-center gap-2 pr-10">
-          <h4 className="text-base font-extrabold text-foreground tracking-tight">{template.name}</h4>
+          <h4 className="text-lg font-extrabold text-foreground tracking-tight">{template.name}</h4>
           {isTodayCard && (
             <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">
               Today
@@ -79,11 +79,11 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
 
         {/* Exercise pills */}
         {exercises.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-3">
+          <div className="flex flex-wrap gap-2 mt-4">
             {exercises.map((ex, i) => (
               <span
                 key={i}
-                className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-muted dark:bg-muted/60 text-foreground/80 dark:text-foreground/70"
+                className="text-xs font-medium px-3 py-1.5 rounded-lg bg-muted dark:bg-muted/60 text-foreground/80 dark:text-foreground/70"
               >
                 {ex.name}
               </span>
