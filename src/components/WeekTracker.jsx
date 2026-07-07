@@ -54,9 +54,9 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
                 {isGymDay && !isCompleted && <Dumbbell className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />}
               </div>
               {dayColors[i] ? (
-                <div className="w-2 h-2 rounded-full mt-1.5" style={{ backgroundColor: dayColors[i] }} />
+                <div className="w-1.5 h-1.5 rounded-full mt-1.5" style={{ backgroundColor: dayColors[i] }} />
               ) : (
-                <div className="w-2 h-2 mt-1.5" />
+                <div className="w-1.5 h-1.5 mt-1.5" />
               )}
             </div>
           );

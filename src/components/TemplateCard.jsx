@@ -32,18 +32,19 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
   };
 
   return (
-    <div
-      className={`relative rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] ${
-        isCompleted
-          ? 'bg-emerald-50 dark:bg-emerald-950/40'
-          : 'bg-[rgb(249,249,249)] dark:bg-card'
-      }`}
-    >
-      {/* Colored dot — workout identifier */}
+    <div className="flex items-stretch gap-2">
       {dotColor && (
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full z-10" style={{ backgroundColor: dotColor }} />
+        <div className="flex items-center pl-0.5">
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: dotColor }} />
+        </div>
       )}
-
+      <div
+        className={`relative flex-1 rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] ${
+          isCompleted
+            ? 'bg-emerald-50 dark:bg-emerald-950/40'
+            : 'bg-[rgb(249,249,249)] dark:bg-card'
+        }`}
+      >
       {/* Green checkmark — completed today */}
       {isCompleted && (
         <div className="absolute top-2 left-2 w-6 h-6 flex items-center justify-center rounded-full bg-emerald-500 text-white z-10 shadow-sm">
@@ -51,7 +52,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
         </div>
       )}
 
-      <div onClick={() => navigate(`/template/${template.id}`)} className={`cursor-pointer ${isCompleted || dotColor ? 'pl-6' : ''}`}>
+      <div onClick={() => navigate(`/template/${template.id}`)} className={`cursor-pointer ${isCompleted ? 'pl-6' : ''}`}>
         <h4 className="text-base font-bold text-foreground pr-8">{template.name}</h4>
         <p className="text-xs text-muted-foreground/70 mt-1.5">
           {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
@@ -77,6 +78,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
         </div>,
         document.body
       )}
+    </div>
     </div>
   );
 });

@@ -45,10 +45,10 @@ const TABS = ['/', '/splits', '/exercises'];
 const pageVariants = {
   initial: { x: '100%', opacity: 0 },
   animate: { x: 0, opacity: 1 },
-  exit: { x: '-30%', opacity: 0 },
+  exit: { x: '-25%', opacity: 0 },
 };
 
-const PAGE_TRANSITION = { duration: 0.15, ease: [0.33, 1, 0.68, 1] };
+const PAGE_TRANSITION = { duration: 0.28, ease: [0.22, 1, 0.36, 1] };
 const SUSPENSE_FALLBACK = <div className="w-full h-screen bg-background" />;
 
 // Memo wrapper prevents inactive tab pages from re-rendering on every navigation
@@ -113,11 +113,15 @@ const SwipeableTabs = memo(() => {
   if (activeIndex < TABS.length - 1) visitedRef.current.add(activeIndex + 1);
 
   const handleDragEnd = useCallback((_, info) => {
-    const threshold = 80;
-    if (info.offset.x < -threshold && activeIndex < TABS.length - 1) {
-      navigate(TABS[activeIndex + 1]);
-    } else if (info.offset.x > threshold && activeIndex > 0) {
-      navigate(TABS[activeIndex - 1]);
+    const threshold = 60;
+    const velocityThreshold = 500;
+    const shouldNav = Math.abs(info.offset.x) > threshold || Math.abs(info.velocity.x) > velocityThreshold;
+    if (shouldNav) {
+      if (info.offset.x < 0 && activeIndex < TABS.length - 1) {
+        navigate(TABS[activeIndex + 1]);
+      } else if (info.offset.x > 0 && activeIndex > 0) {
+        navigate(TABS[activeIndex - 1]);
+      }
     }
   }, [activeIndex, navigate]);
 
@@ -131,10 +135,10 @@ const SwipeableTabs = memo(() => {
         drag="x"
         dragDirectionLock
         dragConstraints={{ left: -(TABS.length - 1) * width, right: 0 }}
-        dragElastic={0.08}
+        dragElastic={0.15}
         onDragEnd={handleDragEnd}
         animate={{ x: -activeIndex * width }}
-        transition={{ type: 'spring', stiffness: 400, damping: 26, mass: 0.18 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 34, mass: 0.22 }}
         className="flex absolute top-0 bottom-0 overflow-hidden"
         style={{ width: TABS.length * width, willChange: 'transform', transform: 'translateZ(0)' }}
       >

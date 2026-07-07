@@ -131,7 +131,7 @@ const WORKOUT_COLORS = [
   '#F59E0B', // amber
   '#EC4899', // pink
   '#14B8A6', // teal
-  '#F97316', // orange
+  '#22C55E', // green
   '#6366F1', // indigo
 ];
 
