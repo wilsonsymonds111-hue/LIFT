@@ -3,7 +3,7 @@ import { useEffect, useRef, useMemo, useCallback, useState, lazy, Suspense, memo
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -86,14 +86,13 @@ const TAB_CONTENT = [Home, Splits, Exercises];
 const SwipeableTabs = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
-  // Modal routes (e.g. /template/:id) should keep the tab content pinned
-  // to the Home tab instead of shifting it off-screen (indexOf returns -1).
   const rawIndex = TABS.indexOf(location.pathname);
   const activeIndex = rawIndex === -1 ? 0 : rawIndex;
   const containerRef = useRef(null);
   const [width, setWidth] = useState(0);
-  // Track which tabs have ever been "visited" so we only mount/fetch what's needed
   const visitedRef = useRef(new Set([0]));
+  const x = useMotionValue(0);
+  const isDraggingRef = useRef(false);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -107,15 +106,17 @@ const SwipeableTabs = memo(() => {
     return () => { ro.disconnect(); cancelAnimationFrame(raf); };
   }, []);
 
-  // Mark current + adjacent tabs as visited
   visitedRef.current.add(activeIndex);
   if (activeIndex > 0) visitedRef.current.add(activeIndex - 1);
   if (activeIndex < TABS.length - 1) visitedRef.current.add(activeIndex + 1);
 
   const handleDragEnd = useCallback((_, info) => {
-    const threshold = 60;
-    const velocityThreshold = 500;
-    const shouldNav = Math.abs(info.offset.x) > threshold || Math.abs(info.velocity.x) > velocityThreshold;
+    isDraggingRef.current = false;
+    // Adaptive threshold: lower for fast flicks, standard for slow drags
+    const velocity = Math.abs(info.velocity.x);
+    const offset = Math.abs(info.offset.x);
+    const flickThreshold = velocity > 800 ? 20 : 60;
+    const shouldNav = offset > flickThreshold || velocity > 1200;
     if (shouldNav) {
       if (info.offset.x < 0 && activeIndex < TABS.length - 1) {
         navigate(TABS[activeIndex + 1]);
@@ -129,26 +130,49 @@ const SwipeableTabs = memo(() => {
     return <div ref={containerRef} className="w-full flex-1"><Suspense fallback={SUSPENSE_FALLBACK}><Home /></Suspense></div>;
   }
 
+  const targetX = -activeIndex * width;
+
   return (
     <div ref={containerRef} className="relative flex-1" style={TAB_STYLES}>
       <motion.div
         drag="x"
         dragDirectionLock
         dragConstraints={{ left: -(TABS.length - 1) * width, right: 0 }}
-        dragElastic={0.15}
+        dragElastic={0.08}
+        dragMomentum={false}
+        onDragStart={() => { isDraggingRef.current = true; }}
         onDragEnd={handleDragEnd}
-        animate={{ x: -activeIndex * width }}
-        transition={{ type: 'spring', stiffness: 320, damping: 34, mass: 0.22 }}
-        className="flex absolute top-0 bottom-0 overflow-hidden"
+        animate={{ x: targetX }}
+        transition={{ type: 'spring', stiffness: 300, damping: 36, mass: 0.3, restSpeed: 0.01, restDelta: 0.5 }}
         style={{ width: TABS.length * width, willChange: 'transform', transform: 'translateZ(0)' }}
+        className="flex absolute top-0 bottom-0 overflow-hidden"
       >
         {TAB_CONTENT.map((Component, i) => (
-          <div key={TABS[i]} className="flex-shrink-0 overflow-y-auto" style={{ width, contain: 'layout style' }}>
-            {visitedRef.current.has(i) ? <MemoTab Component={Component} /> : <div className="w-full h-full bg-background" />}
-          </div>
+          <TabPanel key={TABS[i]} width={width} index={i} x={x} visited={visitedRef.current.has(i)} Component={Component} />
         ))}
       </motion.div>
     </div>
+  );
+});
+
+// Separate memoized panel so motion value hooks are called at top level of a component
+const TabPanel = memo(function TabPanel({ width, index, x, visited, Component }) {
+  // Derive each tab's distance from center for subtle parallax depth
+  const tabOffset = useTransform(x, (currentX) => {
+    const tabCenter = index * width;
+    const screenCenter = -currentX + width / 2;
+    return (tabCenter - screenCenter) / width;
+  });
+  const scale = useTransform(tabOffset, [-1, 0, 1], [0.93, 1, 0.93]);
+  const opacity = useTransform(tabOffset, [-1.5, -0.5, 0, 0.5, 1.5], [0.4, 0.82, 1, 0.82, 0.4]);
+
+  return (
+    <motion.div
+      className="flex-shrink-0 overflow-y-auto"
+      style={{ width, scale, opacity, contain: 'layout style', transformOrigin: 'center center' }}
+    >
+      {visited ? <MemoTab Component={Component} /> : <div className="w-full h-full bg-background" />}
+    </motion.div>
   );
 });
 
