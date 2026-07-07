@@ -25,10 +25,11 @@ function WeekTracker({ schedule, cycleLabel, startDayIndex = 0, workoutNames = [
     <div className="px-4 pb-2">
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto"
+        className="flex overflow-x-auto overflow-y-visible"
         style={{
           WebkitOverflowScrolling: 'touch',
           scrollSnapType: 'x mandatory',
+          paddingBottom: '6px',
         }}
       >
         {schedule.map((status, i) => {
