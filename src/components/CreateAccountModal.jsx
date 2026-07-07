@@ -22,7 +22,7 @@ export default function CreateAccountModal({ onClose }) {
         {/* X close button — top left */}
         <button
           onClick={onClose}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-muted self-start"
+          className="w-8 h-8 flex-shrink-0 aspect-square flex items-center justify-center rounded-full bg-muted self-start"
         >
           <X className="w-4 h-4 text-foreground" />
         </button>
