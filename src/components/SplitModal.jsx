@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { base44 } from '@/api/base44Client';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
+import { backfillLastPerformed } from '../lib/backfillLastPerformed';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -206,6 +207,12 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
               splitName: split.name,
             })
           ));
+          // Backfill lastPerformed from exercise history
+          try {
+            const refreshed = await base44.entities.WorkoutTemplate.list('sort_order', 500);
+            const activated = refreshed.filter(t => existingWorkouts.some(w => w.templateId === t.id));
+            await backfillLastPerformed(activated);
+          } catch {}
         }
         if (newWorkouts.length > 0) {
           const newTemplates = newWorkouts.map((w, i) => ({

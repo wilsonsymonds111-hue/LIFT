@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
+import { backfillLastPerformed } from '../lib/backfillLastPerformed';
 
 const SAFE_AREA_PT = { paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' };
 const DIALOG_BG = { background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(18px)' };
@@ -182,6 +183,8 @@ export default function Splits() {
       await Promise.all(group.templates.map((t, i) =>
         base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: true, splitGroup: newGroupId, sort_order: i, splitName: splitName })
       ));
+      // Backfill lastPerformed from exercise history for templates that have none
+      try { await backfillLastPerformed(group.templates); } catch {}
       invalidateWorkoutTemplates(queryClient);
     } catch (_) {
       invalidateWorkoutTemplates(queryClient);
@@ -288,6 +291,8 @@ export default function Splits() {
         splitName: splitData.name,
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+      // Backfill lastPerformed from exercise history for the newly created templates
+      try { await backfillLastPerformed(newTemplates); } catch {}
       invalidateWorkoutTemplates(queryClient);
       // Persist default cycle only if the user hasn't already saved one via the
       // RestFrequencyConfirmModal — otherwise we'd overwrite their chosen start day.
@@ -597,6 +602,12 @@ export default function Splits() {
                     splitName: splitData.name,
                   })
                 ));
+                // Backfill lastPerformed from exercise history
+                try {
+                  const fullTemplates = await base44.entities.WorkoutTemplate.list('sort_order', 500);
+                  const activated = fullTemplates.filter(t => templateIds.has(t.id));
+                  await backfillLastPerformed(activated);
+                } catch {}
                 invalidateWorkoutTemplates(queryClient);
               } catch (_) {
                 invalidateWorkoutTemplates(queryClient);
@@ -643,6 +654,8 @@ export default function Splits() {
                   splitName: splitData.name,
                 }));
                 await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
+                // Backfill lastPerformed from exercise history
+                try { await backfillLastPerformed(newTemplates); } catch {}
                 invalidateWorkoutTemplates(queryClient);
               } catch (_) {
                 invalidateWorkoutTemplates(queryClient);
