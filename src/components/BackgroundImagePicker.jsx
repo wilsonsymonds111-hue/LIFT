@@ -15,8 +15,11 @@ export const PRESET_IMAGES = [
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/5e854ea52_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/831e29602_image.png',
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/a45a6aa20_image.png',
-  // User-uploaded image
+  // User-uploaded images
   'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/039ef34f8_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/d5760e7c6_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/71974cf18_image.png',
+  'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/c2e8728fc_image.png',
 ];
 
 export default function BackgroundImagePicker({ selectedImage, onSelect, onUpload, uploading }) {
