@@ -221,13 +221,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
       <div className="px-1">
         <div
           onClick={() => setShowWeightModal(true)}
-          className={`relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] border border-gray-200 dark:border-border shadow-[0_4px_20px_rgba(0,0,0,0.12)] ${
-            goalMode === 'bulking'
-              ? 'bg-blue-50 dark:bg-blue-950/20'
-              : goalMode === 'cutting'
-                ? 'bg-amber-50 dark:bg-amber-950/20'
-                : 'bg-white dark:bg-card'
-          }`}
+          className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] border border-white dark:border-border shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] bg-white dark:bg-card"
         >
           <div className="relative p-6">
             {/* Header: icon + label + status | date + chevron */}
