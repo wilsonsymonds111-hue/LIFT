@@ -3,7 +3,7 @@ import { useEffect, useRef, useMemo, useCallback, useState, lazy, Suspense, memo
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, useTransform, animate as framerAnimate } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -112,7 +112,6 @@ const SwipeableTabs = memo(() => {
 
   const handleDragEnd = useCallback((_, info) => {
     isDraggingRef.current = false;
-    // Adaptive threshold: lower for fast flicks, standard for slow drags
     const velocity = Math.abs(info.velocity.x);
     const offset = Math.abs(info.offset.x);
     const flickThreshold = velocity > 800 ? 20 : 60;
@@ -126,11 +125,26 @@ const SwipeableTabs = memo(() => {
     }
   }, [activeIndex, navigate]);
 
+  // Animate x to target when activeIndex changes (from nav tap or drag-end navigation).
+  // Using animate() directly avoids the conflict between the `animate` prop and `drag`
+  // that causes iOS to get stuck halfway between tabs.
+  const targetX = -activeIndex * width;
+  useEffect(() => {
+    if (isDraggingRef.current || !width) return;
+    const controls = framerAnimate(x, targetX, {
+      type: 'spring',
+      stiffness: 300,
+      damping: 36,
+      mass: 0.3,
+      restSpeed: 0.01,
+      restDelta: 0.5,
+    });
+    return () => controls.stop();
+  }, [targetX, width]);
+
   if (!width) {
     return <div ref={containerRef} className="w-full flex-1"><Suspense fallback={SUSPENSE_FALLBACK}><Home /></Suspense></div>;
   }
-
-  const targetX = -activeIndex * width;
 
   return (
     <div ref={containerRef} className="relative flex-1" style={TAB_STYLES}>
@@ -142,9 +156,7 @@ const SwipeableTabs = memo(() => {
         dragMomentum={false}
         onDragStart={() => { isDraggingRef.current = true; }}
         onDragEnd={handleDragEnd}
-        animate={{ x: targetX }}
-        transition={{ type: 'spring', stiffness: 300, damping: 36, mass: 0.3, restSpeed: 0.01, restDelta: 0.5 }}
-        style={{ width: TABS.length * width, willChange: 'transform', transform: 'translateZ(0)' }}
+        style={{ x, width: TABS.length * width, willChange: 'transform', transform: 'translateZ(0)' }}
         className="flex absolute top-0 bottom-0 overflow-hidden"
       >
         {TAB_CONTENT.map((Component, i) => (
