@@ -1,5 +1,6 @@
 import { memo } from 'react';
-import { Dumbbell, Layers, PersonStanding } from 'lucide-react';
+import { Dumbbell, Layers } from 'lucide-react';
+import PersonIcon from './PersonIcon';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useNavVisibility } from '@/lib/NavContext';
@@ -7,7 +8,7 @@ import { useNavVisibility } from '@/lib/NavContext';
 const tabs = [
   { path: '/', Icon: Dumbbell, label: 'Workouts' },
   { path: '/splits', Icon: Layers, label: 'Splits' },
-  { path: '/exercises', Icon: PersonStanding, label: 'Body Stats' },
+  { path: '/exercises', Icon: PersonIcon, label: 'Body Stats' },
 ];
 
 const BottomNav = memo(function BottomNav() {
