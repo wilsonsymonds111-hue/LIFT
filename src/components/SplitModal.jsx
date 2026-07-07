@@ -78,7 +78,7 @@ function saveCycle(splitKey, cycle) {
 function cycleToSchedule(onDays, offDays, startDayIndex) {
   const cycleLength = onDays + offDays;
   const schedule = [];
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 14; i++) {
     if (i < startDayIndex) {
       schedule.push(0); // Before cycle start — rest day
     } else {
@@ -268,10 +268,13 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
   const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   // Shift the week to start from today so the user sees the next 7 days
-  const shiftedDayLabels = useMemo(
-    () => [...DAY_LABELS.slice(todayMonSun), ...DAY_LABELS.slice(0, todayMonSun)],
-    [todayMonSun]
-  );
+  const shiftedDayLabels = useMemo(() => {
+    const labels = [];
+    for (let i = 0; i < 14; i++) {
+      labels.push(DAY_LABELS[(todayMonSun + i) % 7]);
+    }
+    return labels;
+  }, [todayMonSun]);
   const shiftedSchedule = useMemo(
     () => [...previewSchedule.slice(todayMonSun), ...previewSchedule.slice(0, todayMonSun)],
     [previewSchedule, todayMonSun]
@@ -281,10 +284,10 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
   // Compute which workout is scheduled for each day — workouts cycle in order across on-days
   const dayWorkoutLabels = useMemo(() => {
     const workouts = orderedWorkouts.length > 0 ? orderedWorkouts : (split?.workouts || []);
-    if (workouts.length === 0) return Array(7).fill('Rest');
+    if (workouts.length === 0) return Array(14).fill('Rest');
     const labels = [];
     let workoutIdx = 0;
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 14; i++) {
       if (previewSchedule[i] === 1) {
         labels.push(workouts[workoutIdx % workouts.length].name);
         workoutIdx++;
@@ -409,13 +412,13 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
                     <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mb-2">
                       Tap a day to set cycle start
                     </p>
-                    <div className="flex justify-between gap-1 mb-3">
+                    <div className="flex gap-1 mb-3 overflow-x-auto pb-1" style={{ WebkitOverflowScrolling: 'touch' }}>
                       {shiftedSchedule.map((status, i) => {
                         const isGymDay = status === 1;
                         const isToday = i === 0;
-                        const isStart = shiftedStartDayIndex === i;
+                        const isStart = i % 7 === shiftedStartDayIndex;
                         return (
-                          <div key={i} className="flex flex-col items-center flex-1">
+                          <div key={i} className="flex flex-col items-center flex-shrink-0" style={{ width: '44px' }}>
                             <button
                               onClick={() => setStartDayIndex((i + todayMonSun) % 7)}
                               className={`flex flex-col items-center w-full py-2 rounded-lg text-xs font-bold transition-all duration-150 ${

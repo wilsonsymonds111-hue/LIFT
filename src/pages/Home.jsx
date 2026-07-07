@@ -16,6 +16,9 @@ import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWor
 import { generateWorkoutICS } from '../lib/icsGenerator';
 import { TouchHold } from '../lib/useTouchHold';
 
+const PAST_DAYS = 3;
+const DISPLAY_DAYS = 14;
+
 // Default cycle patterns: { onDays, offDays } for known split types
 const SPLIT_CYCLES = {
   'push-pull-legs': { onDays: 3, offDays: 1 },
@@ -36,8 +39,9 @@ function cycleToSchedule(onDays, offDays, startDayIdx) {
   const todayAbs = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
   const startAbs = todayAbs - todayMonSun + startDayIdx;
   const schedule = [];
-  for (let k = 0; k < 7; k++) {
-    const offset = (todayAbs + k) - startAbs;
+  for (let k = 0; k < DISPLAY_DAYS; k++) {
+    const dayOffset = k - PAST_DAYS;
+    const offset = (todayAbs + dayOffset) - startAbs;
     const pos = ((offset % cycleLength) + cycleLength) % cycleLength;
     schedule.push(pos < onDays ? 1 : 0);
   }
@@ -52,7 +56,8 @@ function onDayIndexForDisplay(k, startDayIdx, onDays, offDays) {
   const todayMonSun = now.getDay() === 0 ? 6 : now.getDay() - 1;
   const todayAbs = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
   const startAbs = todayAbs - todayMonSun + startDayIdx;
-  const offset = (todayAbs + k) - startAbs;
+  const dayOffset = k - PAST_DAYS;
+  const offset = (todayAbs + dayOffset) - startAbs;
   const pos = ((offset % cycleLength) + cycleLength) % cycleLength;
   const cycleNum = Math.floor(offset / cycleLength);
   return cycleNum * onDays + pos;
@@ -276,14 +281,14 @@ export default function Home() {
   const hasNoSplit = currentSplit.length === 0;
   const { schedule: rawSchedule, startDayIndex, onDays, offDays } = splitDetection;
   // When no split is selected, show an empty calendar (all rest days)
-  const schedule = hasNoSplit ? [0, 0, 0, 0, 0, 0, 0] : rawSchedule;
+  const schedule = hasNoSplit ? Array(DISPLAY_DAYS).fill(0) : rawSchedule;
   const sorted = currentSplit;
 
   // schedule is today-first (index 0 = today). Map each on-day to a workout by
   // counting on-days from the cycle start across the continuous cycle.
   const dayWorkoutNames = useMemo(() => {
     const names = [];
-    for (let k = 0; k < 7; k++) {
+    for (let k = 0; k < DISPLAY_DAYS; k++) {
       if (schedule[k] && sorted.length > 0) {
         const onDayIdx = onDayIndexForDisplay(k, startDayIndex, onDays, offDays);
         const workoutIdx = ((onDayIdx % sorted.length) + sorted.length) % sorted.length;
@@ -298,7 +303,7 @@ export default function Home() {
   // Color per calendar day — matches each day to its workout's color for visual identification
   const dayColors = useMemo(() => {
     const colors = [];
-    for (let k = 0; k < 7; k++) {
+    for (let k = 0; k < DISPLAY_DAYS; k++) {
       if (schedule[k] && sorted.length > 0) {
         const onDayIdx = onDayIndexForDisplay(k, startDayIndex, onDays, offDays);
         const workoutIdx = ((onDayIdx % sorted.length) + sorted.length) % sorted.length;
@@ -320,7 +325,7 @@ export default function Home() {
   const scheduleWithCompletions = useMemo(() => {
     return schedule.map((status, k) => {
       if (status < 1 || sorted.length === 0) return status;
-      if (k !== 0) return 1; // only today can be "completed"
+      if (k !== PAST_DAYS) return 1; // only today can be "completed"
       const onDayIdx = onDayIndexForDisplay(k, startDayIndex, onDays, offDays);
       const workoutIdx = ((onDayIdx % sorted.length) + sorted.length) % sorted.length;
       const template = sorted[workoutIdx];
@@ -331,8 +336,8 @@ export default function Home() {
 
   // Which workout (index into sorted) is today's; -1 if today is a rest day.
   const todayWorkoutIndex = useMemo(() => {
-    if (schedule[0] < 1 || sorted.length === 0) return -1;
-    const onDayIdx = onDayIndexForDisplay(0, startDayIndex, onDays, offDays);
+    if (schedule[PAST_DAYS] < 1 || sorted.length === 0) return -1;
+    const onDayIdx = onDayIndexForDisplay(PAST_DAYS, startDayIndex, onDays, offDays);
     return ((onDayIdx % sorted.length) + sorted.length) % sorted.length;
   }, [schedule, startDayIndex, sorted, onDays, offDays]);
 
@@ -420,7 +425,7 @@ export default function Home() {
 
       {/* Weekly Tracker — long-press to edit rest frequency */}
       <motion.div animate={punchControls} className="py-5 select-none" {...calendarHoldProps}>
-        <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} dayColors={dayColors} />
+        <WeekTracker schedule={scheduleWithCompletions} cycleLabel={cycleLabel} startDayIndex={splitDetection.startDayIndex} workoutNames={dayWorkoutNames} dayColors={dayColors} todayDisplayIndex={PAST_DAYS} />
       </motion.div>
 
       {/* ==================== CURRENT SPLIT ==================== */}
