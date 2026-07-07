@@ -37,8 +37,8 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
       <div
         className={`relative w-full rounded-2xl p-5 transition-all duration-150 active:scale-[0.99] border bg-white dark:bg-card overflow-hidden ${
           isTodayCard
-            ? 'border-blue-400/60 dark:border-blue-500/50 shadow-[0_10px_36px_rgba(0,0,0,0.10),0_2px_8px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(255,255,255,0.7)] dark:shadow-[0_10px_36px_rgba(0,0,0,0.25),inset_0_0_0_1px_rgba(255,255,255,0.08)]'
-            : 'border-blue-400/60 dark:border-blue-500/50 shadow-[0_6px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.03),inset_0_0_0_1px_rgba(255,255,255,0.6)] dark:shadow-[0_6px_24px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.06)]'
+            ? 'border-border shadow-[0_10px_36px_rgba(0,0,0,0.10),0_2px_8px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(255,255,255,0.7)] dark:shadow-[0_10px_36px_rgba(0,0,0,0.25),inset_0_0_0_1px_rgba(255,255,255,0.08)]'
+            : 'border-border shadow-[0_6px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.03),inset_0_0_0_1px_rgba(255,255,255,0.6)] dark:shadow-[0_6px_24px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.06)]'
         }`}
       >
       {/* Three-dot menu button — top right */}

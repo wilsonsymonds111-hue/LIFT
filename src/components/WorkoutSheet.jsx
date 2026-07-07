@@ -18,7 +18,6 @@ import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { saveWorkoutSession, clearWorkoutSession } from '../lib/workoutSession';
 
 const TODAY_STR = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-const MORPH_DISTANCE = 140;
 
 export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedSession }) {
   const [minimized, setMinimized] = useState(false);
@@ -27,6 +26,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const dragStartYRef = useRef(null);
   const draggingRef = useRef(false);
   const dragOffsetRef = useRef(0);
+  const [morphDistance, setMorphDistance] = useState(() =>
+    typeof window !== 'undefined' ? Math.max(window.innerHeight - 210, 200) : 500
+  );
 
   const onGrabPointerDown = (e) => {
     dragStartYRef.current = e.clientY;
@@ -36,34 +38,37 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   };
   const onGrabPointerMove = (e) => {
     if (!draggingRef.current || dragStartYRef.current === null) return;
-    const delta = Math.max(0, e.clientY - dragStartYRef.current);
+    const delta = Math.max(0, Math.min(e.clientY - dragStartYRef.current, morphDistance));
     dragOffsetRef.current = delta;
     yMotion.set(delta);
   };
   const onGrabPointerUp = () => {
-    const shouldMinimize = dragOffsetRef.current > MORPH_DISTANCE / 2;
+    const shouldMinimize = dragOffsetRef.current > morphDistance / 2;
     draggingRef.current = false;
     dragStartYRef.current = null;
     setIsDragging(false);
     if (shouldMinimize) {
-      framerAnimate(yMotion, MORPH_DISTANCE, { type: 'spring', stiffness: 420, damping: 40, mass: 0.7 });
+      framerAnimate(yMotion, morphDistance, { type: 'spring', stiffness: 180, damping: 28, mass: 1.1 });
       setMinimized(true);
     } else {
-      framerAnimate(yMotion, 0, { type: 'spring', stiffness: 450, damping: 38, mass: 0.6 });
+      framerAnimate(yMotion, 0, { type: 'spring', stiffness: 220, damping: 30, mass: 1.0 });
     }
     dragOffsetRef.current = 0;
   };
 
   const handleBarClick = () => {
     setMinimized(false);
-    framerAnimate(yMotion, 0, { type: 'spring', stiffness: 400, damping: 36, mass: 0.8 });
+    framerAnimate(yMotion, 0, { type: 'spring', stiffness: 200, damping: 28, mass: 1.1 });
   };
 
   // --- Real-time morph: all visual properties derive from a single progress value (0=expanded, 1=minimized) ---
-  const progress = useTransform(yMotion, [0, MORPH_DISTANCE], [0, 1], { clamp: true });
+  const progress = useTransform(yMotion, [0, morphDistance], [0, 1], { clamp: true });
   const expandedHeightMV = useMotionValue(typeof window !== 'undefined' ? window.innerHeight - 48 : 752);
   useEffect(() => {
-    const update = () => expandedHeightMV.set(window.innerHeight - 48);
+    const update = () => {
+      expandedHeightMV.set(window.innerHeight - 48);
+      setMorphDistance(Math.max(window.innerHeight - 210, 200));
+    };
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
@@ -78,9 +83,13 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const shadowY = useTransform(progress, p => -4 + 14 * p);
   const shadowBlur = useTransform(progress, p => 30 + 10 * p);
   const shadowOpacity = useTransform(progress, p => 0.12 + 0.08 * p);
-  const ringOpacity = useTransform(progress, p => 0.5 * p);
   const insetOpacity = useTransform(progress, p => 0.6 * p);
-  const boxShadow = useMotionTemplate`0 ${shadowY}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity}), 0 0 0 2px rgba(59, 130, 246, ${ringOpacity}), inset 0 1px 1px rgba(255,255,255,${insetOpacity})`;
+  const glassBorderOpacity = useTransform(progress, [0, 0.6, 1], [0, 0, 0.5], { clamp: true });
+  const boxShadow = useMotionTemplate`0 ${shadowY}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity}), 0 0 0 1px rgba(255,255,255,${glassBorderOpacity}), inset 0 1px 1px rgba(255,255,255,${insetOpacity})`;
+  const bgAlpha = useTransform(progress, [0, 0.5, 1], [1, 1, 0.55], { clamp: true });
+  const sheetBg = useMotionTemplate`hsl(var(--background) / ${bgAlpha})`;
+  const blurPx = useTransform(progress, [0, 0.4, 1], [0, 20, 60], { clamp: true });
+  const sheetBackdrop = useMotionTemplate`blur(${blurPx}px) saturate(160%)`;
   const [prs, setPrs] = useState([]);
   const [bestSets, setBestSets] = useState({});
   const [showSummary, setShowSummary] = useState(false);
@@ -330,7 +339,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     />
 
     <motion.div
-      className="fixed z-40 bg-background flex flex-col overflow-hidden pointer-events-auto"
+      className="fixed z-40 flex flex-col overflow-hidden pointer-events-auto"
       style={{ 
         height,
         bottom,
@@ -339,15 +348,18 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         contain: 'layout style',
         borderRadius,
         boxShadow,
+        background: sheetBg,
+        backdropFilter: sheetBackdrop,
+        WebkitBackdropFilter: sheetBackdrop,
       }}
     >
       {/* Grab bar — fades out as it minimizes */}
       <div
         className="flex justify-center cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
         style={{
-          paddingTop: 'env(safe-area-inset-top)',
+          paddingTop: '8px',
           paddingBottom: '4px',
-          minHeight: '32px',
+          minHeight: '20px',
           opacity: grabOpacity,
           pointerEvents: minimized ? 'none' : 'auto',
         }}
