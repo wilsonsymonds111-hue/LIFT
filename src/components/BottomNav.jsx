@@ -23,12 +23,12 @@ const BottomNav = memo(function BottomNav() {
       style={{ bottom: '16px' }}
     >
       <nav
-        className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden border border-white/60 dark:border-white/15 bg-white/30 dark:bg-white/5"
+        className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden border border-white/50 dark:border-white/10 bg-gray-400/20 dark:bg-gray-500/10"
         style={{
-          backdropFilter: 'blur(50px) saturate(180%) brightness(1.05)',
-          WebkitBackdropFilter: 'blur(50px) saturate(180%) brightness(1.05)',
+          backdropFilter: 'blur(60px) saturate(160%)',
+          WebkitBackdropFilter: 'blur(60px) saturate(160%)',
           boxShadow:
-            '0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.7), inset 0 0 0 1px rgba(255,255,255,0.3)',
+            '0 20px 60px rgba(0,0,0,0.22), 0 8px 24px rgba(0,0,0,0.10), inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.06)',
         }}
       >
         {tabs.map(({ path, Icon, label }) => {
@@ -42,12 +42,12 @@ const BottomNav = memo(function BottomNav() {
               {active && (
                 <motion.div
                   layoutId="navBubble"
-                  className="absolute inset-y-1.5 inset-x-1 rounded-full bg-white/50 dark:bg-white/12 border border-white/90 dark:border-white/25"
+                  className="absolute inset-y-1.5 inset-x-1 rounded-full bg-gray-300/30 dark:bg-gray-400/15 border border-white/70 dark:border-white/20"
                   transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.7 }}
                   style={{
-                    backdropFilter: 'blur(20px) saturate(200%) brightness(1.08)',
-                    WebkitBackdropFilter: 'blur(20px) saturate(200%) brightness(1.08)',
-                    boxShadow: '0 6px 20px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4)',
+                    backdropFilter: 'blur(30px) saturate(180%) brightness(1.12)',
+                    WebkitBackdropFilter: 'blur(30px) saturate(180%) brightness(1.12)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.14), inset 0 1px 1px rgba(255,255,255,0.8), inset 0 0 0 1px rgba(255,255,255,0.3)',
                   }}
                 />
               )}
