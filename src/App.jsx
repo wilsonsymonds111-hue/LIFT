@@ -236,7 +236,7 @@ const AnimatedRoutes = memo(() => {
       {isTabRoute && (
         <div
           className="fixed left-0 right-0 z-20 pointer-events-none safe-area-buffer-blur"
-          style={{ top: 'calc(env(safe-area-inset-top, 20px) + 24px)', height: '20px' }}
+          style={{ top: 'calc(env(safe-area-inset-top, 20px) + 24px)', height: '40px' }}
         />
       )}
 
