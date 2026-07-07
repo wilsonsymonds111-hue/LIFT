@@ -231,13 +231,19 @@ const AnimatedRoutes = memo(() => {
         className={`fixed top-0 left-0 right-0 z-20 pointer-events-none ${isTabRoute || isModalRoute ? 'safe-area-buffer-gradient' : 'safe-area-buffer-solid'}`}
         style={{ height: 'calc(env(safe-area-inset-top, 20px) + 24px)' }}
       />
-      {/* Blur fade strip at the buffer's bottom edge — content scrolls
-          behind with a smooth blur instead of a hard cutoff line */}
+      {/* Blur fade strips at the buffer's bottom edge — stacked layers
+          create a gradual blur so content scrolls behind smoothly */}
       {isTabRoute && (
-        <div
-          className="fixed left-0 right-0 z-20 pointer-events-none safe-area-buffer-blur"
-          style={{ top: 'calc(env(safe-area-inset-top, 20px) + 24px)', height: '40px' }}
-        />
+        <>
+          <div
+            className="fixed left-0 right-0 z-20 pointer-events-none safe-area-buffer-blur"
+            style={{ top: 'calc(env(safe-area-inset-top, 20px) + 24px)', height: '60px' }}
+          />
+          <div
+            className="fixed left-0 right-0 z-20 pointer-events-none safe-area-buffer-blur-2"
+            style={{ top: 'calc(env(safe-area-inset-top, 20px) + 24px)', height: '80px' }}
+          />
+        </>
       )}
 
       {/* Only render active tab for performance */}
