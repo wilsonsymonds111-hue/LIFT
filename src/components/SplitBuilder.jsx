@@ -179,10 +179,10 @@ export default function SplitBuilder({ onClose, onSaved }) {
         )}
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-border flex-shrink-0">
+        <div className="flex items-center justify-between px-4 pt-5 pb-3 border-b border-border flex-shrink-0 gap-2">
           {step === 1 ? (
             <>
-              <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
+              <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted flex-shrink-0">
                 <X className="w-4 h-4 text-foreground" />
               </button>
               <span className="font-extrabold text-foreground text-base">New Split</span>
@@ -190,46 +190,46 @@ export default function SplitBuilder({ onClose, onSaved }) {
             </>
           ) : step === 2 ? (
             <>
-              <button onClick={() => setStep(1)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
+              <button onClick={() => setStep(1)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted flex-shrink-0">
                 <ChevronLeft className="w-4 h-4 text-foreground" />
               </button>
               <input
                 value={splitName}
                 onChange={e => setSplitName(e.target.value)}
                 placeholder="Name your split"
-                className="flex-1 mx-3 bg-transparent font-extrabold text-foreground text-base text-center focus:outline-none placeholder:text-muted-foreground/50"
+                className="flex-1 min-w-0 bg-transparent font-extrabold text-foreground text-base text-center focus:outline-none placeholder:text-muted-foreground/50"
               />
               <button
                 onClick={handleContinueToRest}
                 disabled={!allWorkoutsNamed || !allWorkoutsHaveExercises}
-                className="flex items-center gap-1 px-4 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition"
+                className="flex items-center gap-0.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition flex-shrink-0"
               >
                 Next <ChevronRight className="w-4 h-4" />
               </button>
             </>
           ) : step === 3 ? (
             <>
-              <button onClick={() => setStep(2)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
+              <button onClick={() => setStep(2)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted flex-shrink-0">
                 <ChevronLeft className="w-4 h-4 text-foreground" />
               </button>
               <span className="flex-1 text-center font-extrabold text-foreground text-base">Rest Frequency</span>
               <button
                 onClick={() => setStep(4)}
-                className="flex items-center gap-1 px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl text-sm transition"
+                className="flex items-center gap-0.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl text-sm transition flex-shrink-0"
               >
                 Next <ChevronRight className="w-4 h-4" />
               </button>
             </>
           ) : (
             <>
-              <button onClick={() => setStep(3)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
+              <button onClick={() => setStep(3)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted flex-shrink-0">
                 <ChevronLeft className="w-4 h-4 text-foreground" />
               </button>
               <span className="flex-1 text-center font-extrabold text-foreground text-base">Background</span>
               <button
                 onClick={handleSave}
                 disabled={saving || saved}
-                className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition"
+                className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition flex-shrink-0"
               >
                 {saving ? 'Saving…' : 'Save'}
               </button>
