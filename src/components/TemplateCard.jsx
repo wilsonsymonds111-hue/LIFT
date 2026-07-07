@@ -1,6 +1,6 @@
 import { memo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { MoreHorizontal, Pencil } from 'lucide-react';
+import { MoreHorizontal, Pencil, Dumbbell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -35,8 +35,17 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
   return (
     <div className="relative">
       <div
-        className={`relative w-full rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] bg-[rgb(249,249,249)] dark:bg-card`}
+        className={`relative w-full rounded-2xl p-4 transition-all duration-150 active:scale-[0.99] border bg-white dark:bg-card overflow-hidden ${
+          isTodayCard
+            ? 'border-blue-400/60 dark:border-blue-500/50 shadow-[0_10px_36px_rgba(0,0,0,0.10),0_2px_8px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(255,255,255,0.7)] dark:shadow-[0_10px_36px_rgba(0,0,0,0.25),inset_0_0_0_1px_rgba(255,255,255,0.08)]'
+            : 'border-border/60 shadow-[0_6px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.03),inset_0_0_0_1px_rgba(255,255,255,0.6)] dark:shadow-[0_6px_24px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.06)]'
+        }`}
       >
+      {/* Accent stripe for today's workout */}
+      {isTodayCard && (
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />
+      )}
+
       {/* Three-dot menu button — top right */}
       <button
         ref={setBtnRef}
@@ -46,19 +55,40 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
         <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
       </button>
 
-      <div onClick={() => navigate(`/active-workout/${template.id}`)} className="cursor-pointer">
-        <h4 className="text-base font-bold text-foreground pr-10">{template.name}</h4>
-        <p className="text-xs text-muted-foreground/70 mt-1">
-          {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
-        </p>
+      <div onClick={() => navigate(`/active-workout/${template.id}`)} className={`cursor-pointer ${isTodayCard ? 'pl-1.5' : ''}`}>
+        {/* Title row */}
+        <div className="flex items-center gap-2 pr-10">
+          <h4 className="text-base font-extrabold text-foreground tracking-tight">{template.name}</h4>
+          {isTodayCard && (
+            <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-blue-500 text-white">
+              Today
+            </span>
+          )}
+        </div>
+
+        {/* Meta row — last performed + exercise count */}
+        <div className="flex items-center gap-2 mt-1">
+          <p className="text-xs text-muted-foreground">
+            {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}
+          </p>
+          {exercises.length > 0 && (
+            <>
+              <span className="text-muted-foreground/40 text-xs">·</span>
+              <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+                <Dumbbell className="w-3 h-3" strokeWidth={2.5} />
+                {exercises.length} {exercises.length === 1 ? 'exercise' : 'exercises'}
+              </span>
+            </>
+          )}
+        </div>
 
         {/* Exercise pills */}
         {exercises.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-2.5">
+          <div className="flex flex-wrap gap-1.5 mt-3">
             {exercises.map((ex, i) => (
               <span
                 key={i}
-                className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400"
+                className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-muted/70 dark:bg-muted/40 text-foreground/70 dark:text-foreground/60"
               >
                 {ex.name}
               </span>
