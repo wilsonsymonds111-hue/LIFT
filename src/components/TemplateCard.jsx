@@ -1,6 +1,6 @@
 import { memo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { MoreHorizontal, Check, Pencil } from 'lucide-react';
+import { MoreHorizontal, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -21,7 +21,7 @@ const relativeTime = (dateStr) => {
   return `${Math.floor(diffDays / 7)}w ago`;
 };
 
-const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompleted, accent, dotColor, isMenuOpen, onToggleMenu, menuRef, onRemove }) {
+const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent, dotColor, isMenuOpen, onToggleMenu, menuRef, onRemove }) {
   const navigate = useNavigate();
   const btnRef = useRef(null);
 
@@ -35,19 +35,8 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
   return (
     <div className="relative">
       <div
-        className={`relative w-full rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] ${
-          isCompleted
-            ? 'bg-emerald-50 dark:bg-emerald-950/40'
-            : 'bg-[rgb(249,249,249)] dark:bg-card'
-        }`}
+        className={`relative w-full rounded-2xl p-4 transition-all duration-150 hover:scale-[1.01] border border-white/80 dark:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.14),0_2px_8px_rgba(0,0,0,0.06),inset_0_0_0_1px_rgba(255,255,255,0.5)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.1)] bg-[rgb(249,249,249)] dark:bg-card`}
       >
-      {/* Green checkmark — completed today */}
-      {isCompleted && (
-        <div className="absolute top-2 left-2 w-6 h-6 flex items-center justify-center rounded-full bg-emerald-500 text-white z-10 shadow-sm">
-          <Check className="w-4 h-4" strokeWidth={3} />
-        </div>
-      )}
-
       {/* Three-dot menu button — top right */}
       <button
         ref={setBtnRef}
@@ -57,7 +46,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, isCompl
         <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
       </button>
 
-      <div onClick={() => navigate(`/active-workout/${template.id}`)} className={`cursor-pointer ${isCompleted ? 'pl-6' : ''}`}>
+      <div onClick={() => navigate(`/active-workout/${template.id}`)} className="cursor-pointer">
         <h4 className="text-base font-bold text-foreground pr-10">{template.name}</h4>
         <p className="text-xs text-muted-foreground/70 mt-1">
           {template.lastPerformed ? relativeTime(template.lastPerformed) : 'Not yet performed'}

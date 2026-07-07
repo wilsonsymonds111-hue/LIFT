@@ -425,13 +425,11 @@ export default function Home() {
           {currentSplit.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {currentSplit.map((template, idx) => {
-              const isCompleted = template.lastPerformed?.slice(0, 10) === todayStr;
               return (
               <TemplateCard
                 key={template.id}
                 template={template}
                 isTodayCard={idx === todayWorkoutIndex}
-                isCompleted={isCompleted}
                 accent={accent}
                 dotColor={WORKOUT_COLORS[idx % WORKOUT_COLORS.length]}
                 isMenuOpen={menuOpen === template.id}
