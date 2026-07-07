@@ -203,10 +203,31 @@ export default function Home() {
   // --- Split categorization (computed fresh every render — no stale memo) ---
 
   const { currentSplit, currentSplitName } = useMemo(() => {
-    const hasActive = templates.some(t => t.isActiveSplit === true);
-    const split = hasActive
-      ? templates.filter(t => t.isActiveSplit === true)
-      : [];
+    const activeTemplates = templates.filter(t => t.isActiveSplit === true);
+
+    // Group by splitGroup — prevents templates from a different split bleeding in
+    // if isActiveSplit wasn't properly cleared during a split switch.
+    const groups = {};
+    for (const t of activeTemplates) {
+      const key = t.splitGroup || '__none__';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(t);
+    }
+
+    // Pick the group with the most templates; tie-break by most recent updated_date
+    let split = [];
+    const groupArrays = Object.values(groups);
+    if (groupArrays.length > 0) {
+      split = groupArrays.reduce((best, curr) => {
+        if (curr.length > best.length) return curr;
+        if (curr.length === best.length) {
+          const currLatest = Math.max(...curr.map(t => new Date(t.updated_date || 0).getTime()));
+          const bestLatest = Math.max(...best.map(t => new Date(t.updated_date || 0).getTime()));
+          return currLatest > bestLatest ? curr : best;
+        }
+        return best;
+      });
+    }
 
     // Prefer the first template's splitName, then check all templates for a shared splitName,
     // then fall back to joining individual workout names
