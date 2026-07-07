@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useLayoutEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -31,6 +31,35 @@ export default function TemplateDetail() {
   // Reuse React Query cache from Home page — data is already loaded, no refetch
   const { data: templates } = useWorkoutTemplates();
   const template = templates?.find(t => t.id === id);
+
+  const listRef = useRef(null);
+  const [fontScale, setFontScale] = useState(1);
+
+  // Auto-shrink the exercise list so all content fits without scrolling.
+  // The list uses em-based sizing so a single fontSize on the container scales everything.
+  const measure = useCallback(() => {
+    const el = listRef.current;
+    if (!el) return;
+    // Reset to natural size first so we can measure the true content height
+    el.style.fontSize = '';
+    const available = el.clientHeight;
+    const content = el.scrollHeight;
+    if (content > available && available > 0) {
+      const scale = Math.max(0.55, available / content);
+      setFontScale(scale);
+    } else {
+      setFontScale(1);
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    measure();
+    const el = listRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [measure, template?.exerciseList?.length]);
 
   if (!template) {
     return createPortal(
@@ -86,15 +115,21 @@ export default function TemplateDetail() {
 
         <p className="px-5 pt-3 pb-1 text-sm text-muted-foreground">{lastPerformed}</p>
 
-        <div className="px-5 py-3 space-y-3 overflow-y-auto flex-1">
-          {template.exerciseList?.map((exercise, idx) => (
-          <div key={idx} className="flex items-center gap-3">
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-foreground text-sm leading-snug">{exercise.sets || 2} × {exercise.name}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{exercise.muscle}</p>
+        <div
+          ref={listRef}
+          className="px-5 py-3 flex-1 overflow-hidden"
+          style={{ fontSize: `${fontScale}rem` }}
+        >
+          <div className="space-y-[0.75em]">
+            {template.exerciseList?.map((exercise, idx) => (
+            <div key={idx} className="flex items-center gap-[0.75em]">
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-foreground leading-snug" style={{ fontSize: '0.875em' }}>{exercise.sets || 2} × {exercise.name}</p>
+                <p className="text-muted-foreground mt-[0.15em]" style={{ fontSize: '0.75em' }}>{exercise.muscle}</p>
+              </div>
             </div>
+            ))}
           </div>
-          ))}
         </div>
 
         <div className="px-5 py-5">
