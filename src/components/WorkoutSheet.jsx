@@ -45,10 +45,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     dragStartYRef.current = null;
     setIsDragging(false);
     if (shouldMinimize) {
-      framerAnimate(yMotion, 0, { duration: 0.35, ease: [0.33, 1, 0.68, 1] });
+      framerAnimate(yMotion, 0, { type: 'spring', stiffness: 420, damping: 40, mass: 0.7 });
       setMinimized(true);
     } else {
-      framerAnimate(yMotion, 0, { duration: 0.3, ease: [0.33, 1, 0.68, 1] });
+      framerAnimate(yMotion, 0, { type: 'spring', stiffness: 450, damping: 38, mass: 0.6 });
     }
     dragOffsetRef.current = 0;
   };
@@ -293,18 +293,58 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   }
 
   return (
+    <>
+    {/* Dimmed background behind the workout sheet */}
+    <AnimatePresence>
+      {!minimized && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 pointer-events-none"
+          style={{ zIndex: 35, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(3px)' }}
+        />
+      )}
+    </AnimatePresence>
+
+    {/* Status bar blur areas — covers Apple's time/battery region */}
+    {!minimized && (
+      <>
+        <div className="fixed top-0 left-0 w-36 h-14 rounded-b-2xl pointer-events-none"
+             style={{ zIndex: 36, background: 'hsl(var(--background) / 0.55)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }} />
+        <div className="fixed top-0 right-0 w-36 h-14 rounded-b-2xl pointer-events-none"
+             style={{ zIndex: 36, background: 'hsl(var(--background) / 0.55)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }} />
+      </>
+    )}
+
     <motion.div
-      className="fixed inset-x-0 z-40 bg-background rounded-t-3xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
+      className="fixed z-40 bg-background flex flex-col overflow-hidden pointer-events-auto"
       animate={{ 
-        height: minimized ? '64px' : 'calc(100vh - 3rem)',
-        bottom: minimized ? '90px' : '0px'
+        height: minimized ? '60px' : 'calc(100vh - 3rem)',
+        bottom: minimized ? '90px' : '0px',
+        left: minimized ? '12px' : '0px',
+        right: minimized ? '12px' : '0px',
       }}
-      transition={{ duration: 0.35, ease: [0.33, 1, 0.68, 1] }}
-      style={{ y: yMotion, contain: 'layout style' }}
+      transition={{ type: 'spring', stiffness: 380, damping: 36, mass: 0.8 }}
+      style={{ 
+        y: yMotion, 
+        contain: 'layout style',
+        borderRadius: minimized ? '30px' : '24px 24px 0 0',
+        border: minimized ? '2px solid rgba(59, 130, 246, 0.5)' : 'none',
+        boxShadow: minimized 
+          ? '0 10px 40px rgba(0,0,0,0.2), 0 2px 12px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.6)' 
+          : '0 -4px 30px rgba(0,0,0,0.12)',
+      }}
     >
-      {/* Grab bar */}
+      {/* Grab bar — larger tappable area */}
       <div
-        className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+        className="flex justify-center cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+        style={{
+          paddingTop: minimized ? '0px' : 'calc(env(safe-area-inset-top) + 10px)',
+          paddingBottom: minimized ? '0px' : '4px',
+          minHeight: minimized ? '0' : '48px',
+        }}
         onPointerDown={onGrabPointerDown}
         onPointerMove={onGrabPointerMove}
         onPointerUp={onGrabPointerUp}
@@ -313,7 +353,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         <div className="w-10 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
       </div>
 
-      {/* Minimized bar content */}
+      {/* Minimized bar — pill with 3-column layout: title left, grab center, timer right */}
       <AnimatePresence>
         {minimized && (
           <motion.div
@@ -321,12 +361,18 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="flex items-center justify-between px-5 py-2 flex-shrink-0 cursor-pointer"
+            className="flex items-center h-full cursor-pointer"
             onClick={() => setMinimized(false)}
           >
-            <TimerDisplay startTimestamp={startTimeRef.current} className="text-base text-gray-400 dark:text-gray-500 font-display flex-shrink-0" />
-            <p className="font-bold text-foreground text-base absolute left-1/2 -translate-x-1/2 truncate max-w-[50%] text-center">{template.name}</p>
-            <div className="w-12 flex-shrink-0" />
+            <div className="flex-1 flex justify-center px-3">
+              <p className="font-bold text-foreground text-sm truncate max-w-full">{template.name}</p>
+            </div>
+            <div className="flex-1 flex justify-center">
+              <div className="w-8 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+            </div>
+            <div className="flex-1 flex justify-center px-3">
+              <TimerDisplay startTimestamp={startTimeRef.current} className="text-sm text-muted-foreground font-display" />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -338,7 +384,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         className="flex-1 flex flex-col overflow-hidden"
         style={{ pointerEvents: minimized ? 'none' : 'auto' }}
       >
-        <div className="relative flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
+        <div className="relative flex items-center justify-between px-4 pt-1 pb-2 flex-shrink-0">
               {restActive && restMinimized ? (
                 <RestTimerPill
                   seconds={restSeconds}
@@ -451,5 +497,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
             </div>
       </motion.div>
     </motion.div>
+    </>
   );
 }
