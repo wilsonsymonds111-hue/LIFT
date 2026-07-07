@@ -39,12 +39,16 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   const [importing, setImporting] = useState(false);
   const [importMsg, setImportMsg] = useState('');
   const [unit, setUnit] = useState(() => {
-    const stored = localStorage.getItem('weightUnit');
-    if (stored) return stored;
-    // Auto-detect based on browser locale — US, UK, Liberia, Myanmar use lbs
-    const region = (navigator.language || 'en-US').toUpperCase();
-    const lbsRegions = ['US', 'GB', 'LR', 'MM'];
-    return lbsRegions.some(r => region.includes(r)) ? 'lbs' : 'kg';
+    // Auto-detect based on timezone — reflects actual geographic location
+    // (browser language can be en-US even for users in Australia, etc.)
+    const tz = (Intl.DateTimeFormat?.().resolvedOptions?.().timeZone) || '';
+    const isLbsRegion =
+      tz === 'Europe/London' ||   // UK
+      tz === 'Africa/Monrovia' || // Liberia
+      tz === 'Asia/Yangon' ||     // Myanmar
+      /^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Boise|Indiana|Kentucky|Sitka|Juneau|Nome|Adak|Metlakatla|Yakutat|Menominee|North_Dakota)/.test(tz) ||
+      ['Pacific/Honolulu', 'Pacific/Guam', 'Pacific/Saipan', 'America/Puerto_Rico'].includes(tz);
+    return isLbsRegion ? 'lbs' : 'kg';
   });
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || null);
@@ -237,15 +241,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
     return parseFloat(val.toFixed(2)).toString();
   }, [latestEntry, unit]);
 
-  const dateRangeLabel = useMemo(() => {
-    if (filtered.length === 0) return '';
-    const first = filtered[0];
-    const last = filtered[filtered.length - 1];
-    const fmtShort = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    if (first.date === last.date) return fmtShort(first.date);
-    return `${fmtShort(first.date)} – ${fmtShort(last.date)}`;
-  }, [filtered]);
-
   const yDomain = useMemo(() => {
     const values = chartData.flatMap(d => [d.weight, d.weightProjection]).filter(v => v != null);
     if (values.length === 0) return null;
@@ -409,7 +404,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
          ) : (
            <p className="text-3xl font-bold text-gray-300 dark:text-muted-foreground mt-0.5">—</p>
          )}
-         {dateRangeLabel && <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{dateRangeLabel}</p>}
+
          </div>
 
          {/* Time frame pills — full-width Apple Health style */}
