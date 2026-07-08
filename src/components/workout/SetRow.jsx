@@ -7,14 +7,18 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   const [kg, setKg] = useState(initialKg ?? previous?.kg ?? '');
   const [reps, setReps] = useState(initialReps ?? previous?.reps ?? '');
   const [done, setDone] = useState(false);
-  const [swipeX, setSwipeX] = useState(0);
-  const [swiping, setSwiping] = useState(false);
-  const [pastThreshold, setPastThreshold] = useState(false);
+  const [animating, setAnimating] = useState(false);
   const startXRef = useRef(null);
+  const swipingRef = useRef(false);
+  const currentXRef = useRef(0);
+  const rowRef = useRef(null);
+  const bgRef = useRef(null);
+  const trashRef = useRef(null);
   const userEditedKg = useRef(false);
   const userEditedReps = useRef(false);
 
-  // Update suggestions when parent changes them (e.g., after completing set 1, set 2 updates)
+  const DELETE_THRESHOLD = 80;
+
   useEffect(() => {
     if (!done && !userEditedKg.current && initialKg != null && initialKg !== '') {
       setKg(initialKg);
@@ -27,8 +31,6 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
     }
   }, [initialReps, done]);
 
-  const DELETE_THRESHOLD = 80;
-
   const handleToggle = () => {
     const next = !done;
     setDone(next);
@@ -40,43 +42,53 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
     }
   };
 
+  // Direct DOM manipulation — avoids React re-render on every pointermove for 1:1 finger tracking
+  const applyTransform = (x) => {
+    currentXRef.current = x;
+    if (rowRef.current) rowRef.current.style.transform = `translateX(${x}px)`;
+    const progress = Math.min(1, Math.abs(x) / DELETE_THRESHOLD);
+    if (bgRef.current) bgRef.current.style.opacity = String(progress * 0.95);
+    if (trashRef.current) {
+      trashRef.current.style.transform = `scale(${0.7 + progress * 0.5})`;
+      trashRef.current.style.opacity = String(0.4 + progress * 0.6);
+    }
+  };
+
   const onPointerDown = (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
     startXRef.current = e.clientX;
-    setSwiping(true);
-    setPastThreshold(false);
+    swipingRef.current = true;
+    setAnimating(false);
   };
+
   const onPointerMove = (e) => {
-    if (!swiping || startXRef.current === null) return;
+    if (!swipingRef.current || startXRef.current === null) return;
     const dx = Math.min(0, e.clientX - startXRef.current);
-    // Rubber-band resistance beyond threshold
     const clamped = dx < -DELETE_THRESHOLD
       ? -DELETE_THRESHOLD - (Math.min(-dx - DELETE_THRESHOLD, 30)) * 0.4
       : dx;
-    setSwipeX(clamped);
-    const isPast = clamped < -DELETE_THRESHOLD;
-    if (isPast !== pastThreshold) {
-      setPastThreshold(isPast);
-      if (isPast && navigator.vibrate) navigator.vibrate(10);
+    const wasPast = currentXRef.current < -DELETE_THRESHOLD;
+    applyTransform(clamped);
+    if (clamped < -DELETE_THRESHOLD && !wasPast) {
+      if (navigator.vibrate) navigator.vibrate(10);
     }
   };
+
   const onPointerUp = () => {
-    if (!swiping) return;
-    if (swipeX < -DELETE_THRESHOLD) {
-      // Animate slide-out then delete
-      setSwiping(false);
-      setSwipeX(-300);
+    if (!swipingRef.current) return;
+    swipingRef.current = false;
+    if (currentXRef.current < -DELETE_THRESHOLD) {
+      setAnimating(true);
+      applyTransform(-300);
       if (navigator.vibrate) navigator.vibrate(20);
       setTimeout(() => onDelete?.(), 250);
     } else {
-      setSwipeX(0);
-      setSwiping(false);
+      setAnimating(true);
+      applyTransform(0);
     }
-    setPastThreshold(false);
     startXRef.current = null;
   };
 
-  // Scroll the input into view above the native keyboard
   const handleFocus = (e) => {
     const el = e.target;
     setTimeout(() => {
@@ -101,8 +113,6 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
     if (done) onComplete?.({ kg: parseFloat(kg) || 0, reps: parseInt(v) || 0 });
   };
 
-  const deleteProgress = Math.min(1, Math.abs(swipeX) / DELETE_THRESHOLD);
-
   return (
     <div>
       {showHeader && (
@@ -116,26 +126,20 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
       )}
       <div className="relative overflow-hidden rounded-lg">
         <div
+          ref={bgRef}
           className="absolute inset-y-0 right-0 flex items-center justify-end px-4 rounded-lg"
-          style={{
-            backgroundColor: '#ef4444',
-            opacity: deleteProgress * 0.95,
-          }}
+          style={{ backgroundColor: '#ef4444', opacity: 0 }}
         >
-          <Trash2
-            className="w-5 h-5 text-white"
-            style={{
-              transform: `scale(${0.7 + deleteProgress * 0.5})`,
-              transition: swiping ? 'none' : 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              opacity: 0.4 + deleteProgress * 0.6,
-            }}
-          />
+          <span ref={trashRef} style={{ display: 'inline-flex', transform: 'scale(0.7)', opacity: 0.4 }}>
+            <Trash2 className="w-5 h-5 text-white" />
+          </span>
         </div>
         <div
+          ref={rowRef}
           className={`grid grid-cols-[36px_1fr_72px_72px_40px] items-center gap-1 py-1.5 px-3 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
           style={{
-            transform: `translateX(${swipeX}px)`,
-            transition: swiping ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            transform: 'translateX(0px)',
+            transition: animating ? 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none',
             willChange: 'transform',
           }}
           onPointerDown={onPointerDown}

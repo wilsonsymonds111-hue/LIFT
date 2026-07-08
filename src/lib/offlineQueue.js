@@ -56,6 +56,12 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
 
   await base44.entities.WorkoutTemplate.update(templateId, {
     lastPerformed: new Date().toISOString(),
+    exerciseList: exerciseList.map(ex => ({
+      name: ex.name,
+      sets: ex.sets || 1,
+      muscle: ex.muscle || '',
+      history: ex.history || [],
+    })),
   });
 
   await Promise.all(exerciseSaves);

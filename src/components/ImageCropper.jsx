@@ -13,6 +13,7 @@ export default function ImageCropper({ file, onCancel, onCrop }) {
   const dragStart = useRef({ x: 0, y: 0, offsetX: 0, offsetY: 0 });
   const canvasRef = useRef(null);
   const [baseScale, setBaseScale] = useState(1);
+  const pinchRef = useRef({ initialDistance: 0, initialZoom: 1 });
 
   // Load the image from the file
   useEffect(() => {
@@ -83,6 +84,38 @@ export default function ImageCropper({ file, onCancel, onCrop }) {
     setOffset({ x: 0, y: 0 });
   };
 
+  const getTouchDistance = (touches) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      pinchRef.current = {
+        initialDistance: getTouchDistance(e.touches),
+        initialZoom: zoom,
+      };
+      setDragging(false);
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 2 && pinchRef.current.initialDistance > 0) {
+      e.preventDefault();
+      const currentDistance = getTouchDistance(e.touches);
+      const ratio = currentDistance / pinchRef.current.initialDistance;
+      setZoom(Math.max(0.5, Math.min(4, pinchRef.current.initialZoom * ratio)));
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (e.touches.length < 2) {
+      pinchRef.current = { initialDistance: 0, initialZoom: 1 };
+    }
+  };
+
   const handleCrop = () => {
     if (!img) return;
     const canvas = canvasRef.current;
@@ -127,6 +160,9 @@ export default function ImageCropper({ file, onCancel, onCrop }) {
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             {img && (
               <img

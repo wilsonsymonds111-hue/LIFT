@@ -118,6 +118,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const [restTotal, setRestTotal] = useState(0);
   const [restMinimized, setRestMinimized] = useState(false);
   const restIntervalRef = useRef(null);
+  const restTimeoutRef = useRef(null);
   const restEndRef = useRef(null);
   const restNotifiedRef = useRef(false);
   const bestSetsRef = useRef(savedSession?.bestSets || {});
@@ -149,10 +150,26 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       }
     };
     restIntervalRef.current = setInterval(() => tick(false), 250);
+
+    // Schedule a setTimeout for the exact rest end time — more reliable than
+    // setInterval when the app is backgrounded (iOS aggressively throttles intervals).
+    // On Android Chrome this fires even in background; on iOS it fires immediately
+    // when the app regains focus if the rest has already ended.
+    clearTimeout(restTimeoutRef.current);
+    restTimeoutRef.current = setTimeout(() => {
+      if (!restNotifiedRef.current) {
+        restNotifiedRef.current = true;
+        clearInterval(restIntervalRef.current);
+        setRestSeconds(0);
+        setRestActive(false);
+        notifyRestComplete(false);
+      }
+    }, duration * 1000);
   };
 
   const stopRestTimer = () => {
     clearInterval(restIntervalRef.current);
+    clearTimeout(restTimeoutRef.current);
     restEndRef.current = null;
     setRestActive(false);
     setRestMinimized(false);
@@ -175,8 +192,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
           setRestActive(false);
           if (!restNotifiedRef.current) {
             restNotifiedRef.current = true;
-            // Silent on visibility change — don't interrupt Spotify/music
-            notifyRestComplete(true);
+            notifyRestComplete(false);
           }
         } else {
           setRestSeconds(remaining);
@@ -191,6 +207,14 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
+  }, []);
+
+  // Clean up all rest timer resources on unmount
+  useEffect(() => {
+    return () => {
+      clearInterval(restIntervalRef.current);
+      clearTimeout(restTimeoutRef.current);
+    };
   }, []);
 
   const { data: exerciseHistoryData = {} } = useExerciseHistory();
