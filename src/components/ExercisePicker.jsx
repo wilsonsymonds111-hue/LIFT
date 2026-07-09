@@ -1,6 +1,21 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { X, Search, Plus } from 'lucide-react';
 import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
+
+// Tracks the visible viewport height — shrinks when the mobile keyboard opens
+function useVisualViewportHeight() {
+  const [height, setHeight] = useState(() =>
+    typeof window !== 'undefined' ? window.innerHeight : 800
+  );
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setHeight(vv.height);
+    vv.addEventListener('resize', update);
+    return () => vv.removeEventListener('resize', update);
+  }, []);
+  return height;
+}
 
 const MUSCLES = ['All', 'Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders', 'Other'];
 
@@ -22,6 +37,7 @@ export default function ExercisePicker({ onClose, onAdd }) {
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selected, setSelected] = useState([]);
   const [exercises, setExercises] = useState(() => getAllExercises());
+  const viewportHeight = useVisualViewportHeight();
 
   const filtered = useMemo(() => {
     return exercises.filter(ex => {
@@ -53,7 +69,7 @@ export default function ExercisePicker({ onClose, onAdd }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-card rounded-t-3xl w-full max-h-[90vh] flex flex-col shadow-2xl" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="relative bg-card rounded-t-3xl w-full flex flex-col shadow-2xl" style={{ maxHeight: `${viewportHeight * 0.9}px`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-border">
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted">
