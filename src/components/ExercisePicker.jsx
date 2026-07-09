@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { X, Search, Plus, Dumbbell } from 'lucide-react';
 import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
 import { getExerciseDetailList } from '../lib/exerciseCache';
+import ExerciseDetailModal from './ExerciseDetailModal';
 
 // Tracks the visible viewport height — shrinks when the mobile keyboard opens
 function useVisualViewportHeight() {
@@ -39,6 +40,7 @@ export default function ExercisePicker({ onClose, onAdd }) {
   const [selected, setSelected] = useState([]);
   const [exercises, setExercises] = useState(() => getAllExercises());
   const [imageMap, setImageMap] = useState({});
+  const [detailExercise, setDetailExercise] = useState(null);
   const viewportHeight = useVisualViewportHeight();
 
   // Load exercise detail images once on mount
@@ -144,7 +146,10 @@ export default function ExercisePicker({ onClose, onAdd }) {
                     className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 border-b border-border transition ${isSelected ? 'bg-blue-50 dark:bg-blue-950' : 'bg-card'}`}
                   >
                     <div className="flex items-center gap-3 text-left flex-1 min-w-0">
-                      <div className="w-11 h-11 rounded-lg overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
+                      <div
+                        onClick={(e) => { e.stopPropagation(); setDetailExercise(ex); }}
+                        className="w-11 h-11 rounded-lg overflow-hidden bg-muted flex items-center justify-center flex-shrink-0 cursor-pointer"
+                      >
                         {imageMap[ex.name.toLowerCase()] ? (
                           <img src={imageMap[ex.name.toLowerCase()]} alt={ex.name} className="w-full h-full object-cover" loading="lazy" />
                         ) : (
@@ -191,6 +196,14 @@ export default function ExercisePicker({ onClose, onAdd }) {
           )}
         </div>
       </div>
+
+      {detailExercise && (
+        <ExerciseDetailModal
+          exercise={detailExercise}
+          initialImage={imageMap[detailExercise.name.toLowerCase()]}
+          onClose={() => setDetailExercise(null)}
+        />
+      )}
     </div>
   );
 }
