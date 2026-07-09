@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
-import { X, Search, Plus } from 'lucide-react';
+import { X, Search, Plus, Dumbbell } from 'lucide-react';
 import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
+import { getExerciseDetailList } from '../lib/exerciseCache';
 
 // Tracks the visible viewport height — shrinks when the mobile keyboard opens
 function useVisualViewportHeight() {
@@ -37,7 +38,19 @@ export default function ExercisePicker({ onClose, onAdd }) {
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selected, setSelected] = useState([]);
   const [exercises, setExercises] = useState(() => getAllExercises());
+  const [imageMap, setImageMap] = useState({});
   const viewportHeight = useVisualViewportHeight();
+
+  // Load exercise detail images once on mount
+  useEffect(() => {
+    getExerciseDetailList().then((details) => {
+      const map = {};
+      (details || []).forEach(d => {
+        if (d.image_url) map[d.name.toLowerCase()] = d.image_url;
+      });
+      setImageMap(map);
+    });
+  }, []);
 
   const filtered = useMemo(() => {
     return exercises.filter(ex => {
@@ -128,11 +141,20 @@ export default function ExercisePicker({ onClose, onAdd }) {
                   <button
                     key={ex.name}
                     onClick={() => toggle(ex.name)}
-                    className={`w-full flex items-center justify-between px-4 py-3 border-b border-border transition ${isSelected ? 'bg-blue-50 dark:bg-blue-950' : 'bg-card'}`}
+                    className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 border-b border-border transition ${isSelected ? 'bg-blue-50 dark:bg-blue-950' : 'bg-card'}`}
                   >
-                    <div className="text-left">
-                      <p className={`text-sm font-semibold ${isSelected ? 'text-blue-600' : 'text-foreground'}`}>{ex.name}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{ex.muscle}</p>
+                    <div className="flex items-center gap-3 text-left flex-1 min-w-0">
+                      <div className="w-11 h-11 rounded-lg overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
+                        {imageMap[ex.name.toLowerCase()] ? (
+                          <img src={imageMap[ex.name.toLowerCase()]} alt={ex.name} className="w-full h-full object-cover" loading="lazy" />
+                        ) : (
+                          <Dumbbell className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className={`text-sm font-semibold truncate ${isSelected ? 'text-blue-600' : 'text-foreground'}`}>{ex.name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{ex.muscle}</p>
+                      </div>
                     </div>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-[11px] font-extrabold transition ${isSelected ? 'bg-blue-500 border-blue-500 text-white' : 'border-gray-300 text-transparent'}`}>
                       {selected.indexOf(ex.name) + 1}
