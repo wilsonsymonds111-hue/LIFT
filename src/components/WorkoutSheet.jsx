@@ -237,7 +237,18 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         if (detailByName[key]) {
           map[key] = detailByName[key];
         } else {
-          missing.push(ex.name);
+          // Fuzzy fallback: try matching by stripping common suffixes/qualifiers
+          // so "Smith Squat" matches "Smith Machine Squat", "Cable Crunches" matches "Cable Crunch", etc.
+          const normalized = key.replace(/\s*\(.*?\)\s*/g, '').replace(/\s*machine\s*/g, '').replace(/es$/g, '').replace(/s$/g, '').trim();
+          const fuzzyKey = Object.keys(detailByName).find(k => {
+            const normK = k.replace(/\s*\(.*?\)\s*/g, '').replace(/\s*machine\s*/g, '').replace(/es$/g, '').replace(/s$/g, '').trim();
+            return normK === normalized || k.includes(normalized) || normalized.includes(normK);
+          });
+          if (fuzzyKey) {
+            map[key] = detailByName[fuzzyKey];
+          } else {
+            missing.push(ex.name);
+          }
         }
       });
       setExerciseImages(map);
