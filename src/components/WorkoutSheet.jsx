@@ -381,6 +381,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     setIsRestDay(isRestDayToday(allTemplates));
     setShowSummary(true);
     clearWorkoutSession();
+    window.dispatchEvent(new CustomEvent('workoutSessionChanged'));
   }, [exercises, onSaveHistory, template?.id, allTemplates, queryClient]);
 
   if (!template) return null;
@@ -568,7 +569,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                   Add Exercises
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); cancelledRef.current = true; clearWorkoutSession(); onFinish(); }}
+                  onClick={(e) => { e.stopPropagation(); cancelledRef.current = true; clearWorkoutSession(); window.dispatchEvent(new CustomEvent('workoutSessionChanged')); onFinish(); }}
                   className="w-full py-3.5 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition relative z-20"
                   style={{ touchAction: 'manipulation' }}
                 >

@@ -23,7 +23,12 @@ export default function PersistentWorkoutBar() {
     };
     check();
     const interval = setInterval(check, 3000);
-    return () => clearInterval(interval);
+    const onSessionChange = () => check();
+    window.addEventListener('workoutSessionChanged', onSessionChange);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('workoutSessionChanged', onSessionChange);
+    };
   }, []);
 
   const isOnActiveWorkout = location.pathname.startsWith('/active-workout');
