@@ -97,6 +97,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
   const [editing, setEditing] = useState(!!isActiveSplit);
   const [restConfirmed, setRestConfirmed] = useState(false);
   const scrollRef = useRef(null);
+  const templateIdsRef = useRef([]);
 
   const exampleSplit = EXAMPLE_SPLITS_DATA[splitKey];
   const defaultSchedule = exampleSplit?.schedule || [1, 0, 1, 0, 1, 0, 1];
@@ -137,6 +138,14 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
       base44.entities.WorkoutTemplate.list('sort_order', 500).then(data => {
         const templates = (data || []).filter(t => t.splitGroup === splitKey);
         if (templates.length > 0) {
+          templateIdsRef.current = templates.map(t => t.id);
+          // Read persisted cycle from DB templates (survives app reinstall)
+          const dbCycle = templates.find(t => t.cycleOnDays != null);
+          if (dbCycle && dbCycle.cycleStartDayIndex != null && !isNaN(dbCycle.cycleStartDayIndex)) {
+            setOnDays(String(dbCycle.cycleOnDays));
+            setOffDays(String(dbCycle.cycleOffDays));
+            setStartDayIndex(dbCycle.cycleStartDayIndex);
+          }
           setCustomSplit({
             name: templates[0]?.splitName || templates.map(t => t.name.replace(/ Workout$/, '').replace(/(?<!Full) Body$/, '')).join(' / ').toUpperCase(),
             description: `${templates.length} workout${templates.length > 1 ? 's' : ''}`,
@@ -207,6 +216,9 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
               splitGroup: newGroupId,
               sort_order: i,
               splitName: split.name,
+              cycleOnDays: onDaysNum,
+              cycleOffDays: offDaysNum,
+              cycleStartDayIndex: startDayIndex,
             })
           ));
           // Backfill lastPerformed from exercise history
@@ -226,12 +238,29 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
             isActiveSplit: true,
             splitGroup: newGroupId,
             splitName: split.name,
+            cycleOnDays: onDaysNum,
+            cycleOffDays: offDaysNum,
+            cycleStartDayIndex: startDayIndex,
           }));
           await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
         }
       } catch (_) {}
       navigate('/');
     }
+  };
+
+  const persistCycleToDB = async (cycle) => {
+    const ids = templateIdsRef.current;
+    if (!ids || ids.length === 0) return;
+    try {
+      await Promise.all(ids.map(id =>
+        base44.entities.WorkoutTemplate.update(id, {
+          cycleOnDays: cycle.onDays,
+          cycleOffDays: cycle.offDays,
+          cycleStartDayIndex: cycle.startDayIndex,
+        })
+      ));
+    } catch {}
   };
 
   const handleViewWorkout = async (workout) => {
@@ -448,8 +477,10 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
 
                     {/* Done button */}
                     <button
-                      onClick={() => {
-                        saveCycle(splitKey, { onDays: onDaysNum, offDays: offDaysNum, startDayIndex });
+                      onClick={async () => {
+                        const cycle = { onDays: onDaysNum, offDays: offDaysNum, startDayIndex };
+                        saveCycle(splitKey, cycle);
+                        await persistCycleToDB(cycle);
                         if (isActiveSplit) {
                           onClose();
                           if (onCycleSaved) onCycleSaved();

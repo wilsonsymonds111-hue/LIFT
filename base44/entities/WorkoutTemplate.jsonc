@@ -48,6 +48,15 @@
     },
     "backgroundImage": {
       "type": "string"
+    },
+    "cycleOnDays": {
+      "type": "number"
+    },
+    "cycleOffDays": {
+      "type": "number"
+    },
+    "cycleStartDayIndex": {
+      "type": "number"
     }
   },
   "required": [

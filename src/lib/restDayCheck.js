@@ -1,3 +1,5 @@
+import { base44 } from '@/api/base44Client';
+
 const SPLIT_CYCLES = {
   'push-pull-legs': { onDays: 3, offDays: 1 },
   'upper-lower': { onDays: 2, offDays: 1 },
@@ -34,6 +36,17 @@ function loadCycleParams(templates) {
 
   const groupId = split[0].splitGroup;
   const splitKey = deriveSplitKey(split);
+
+  // Check DB templates for persisted cycle settings (survives app reinstall)
+  const dbCycle = split.find(t => t.cycleOnDays != null);
+  if (dbCycle && dbCycle.cycleStartDayIndex != null && !isNaN(dbCycle.cycleStartDayIndex)) {
+    return {
+      onDays: dbCycle.cycleOnDays,
+      offDays: dbCycle.cycleOffDays,
+      savedStartDayIndex: dbCycle.cycleStartDayIndex,
+      storageKey: groupId || splitKey,
+    };
+  }
 
   const defaultCycle = SPLIT_CYCLES[splitKey];
   let onDays = defaultCycle ? defaultCycle.onDays : null;
@@ -91,6 +104,21 @@ export function makeTodayWorkoutDay(templates) {
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
 
-  localStorage.setItem(`splitCycle_${storageKey}`, JSON.stringify({ onDays, offDays, startDayIndex: todayMonSun }));
+  const cycle = { onDays, offDays, startDayIndex: todayMonSun };
+  localStorage.setItem(`splitCycle_${storageKey}`, JSON.stringify(cycle));
+
+  // Persist to DB so it survives app reinstall
+  const split = getActiveSplit(templates);
+  const ids = split.map(t => t.id).filter(Boolean);
+  if (ids.length > 0) {
+    Promise.all(ids.map(id =>
+      base44.entities.WorkoutTemplate.update(id, {
+        cycleOnDays: onDays,
+        cycleOffDays: offDays,
+        cycleStartDayIndex: todayMonSun,
+      })
+    )).catch(() => {});
+  }
+
   window.dispatchEvent(new CustomEvent('scheduleChanged'));
 }

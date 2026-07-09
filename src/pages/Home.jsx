@@ -63,13 +63,22 @@ function onDayIndexForDisplay(k, startDayIdx, onDays, offDays) {
   return cycleNum * onDays + pos;
 }
 
-function resolveSchedule(key, workoutCount, groupId) {
+function resolveSchedule(key, workoutCount, groupId, templates) {
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
 
   const defaultCycle = SPLIT_CYCLES[key];
   let onDays = defaultCycle ? defaultCycle.onDays : null;
   let offDays = defaultCycle ? defaultCycle.offDays : null;
+
+  // Check DB templates for persisted cycle settings (survives app reinstall)
+  const dbCycle = templates?.find(t => t.cycleOnDays != null);
+  if (dbCycle && dbCycle.cycleStartDayIndex != null && !isNaN(dbCycle.cycleStartDayIndex)) {
+    onDays = dbCycle.cycleOnDays;
+    offDays = dbCycle.cycleOffDays;
+    const schedule = cycleToSchedule(onDays, offDays, dbCycle.cycleStartDayIndex);
+    return { schedule, startDayIndex: dbCycle.cycleStartDayIndex, onDays, offDays };
+  }
 
   // Check localStorage for user customizations — overrides defaults even for known types.
   // Try both the split key (stored by RestFrequencyConfirmModal) and the group ID.
@@ -274,7 +283,7 @@ export default function Home() {
       splitKey = 'full-body';
       workoutCount = currentSplit.length;
     }
-    return { key: splitKey, ...resolveSchedule(splitKey, workoutCount, groupId) };
+    return { key: splitKey, ...resolveSchedule(splitKey, workoutCount, groupId, currentSplit) };
   }, [currentSplit, cycleVersion]);
 
   const groupId = currentSplit.length > 0 ? currentSplit[0].splitGroup : null;
