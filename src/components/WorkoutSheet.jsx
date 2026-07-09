@@ -16,6 +16,7 @@ import SummaryScreen from './workout/SummaryScreen';
 import { isRestDayToday } from '../lib/restDayCheck';
 import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { saveWorkoutSession, clearWorkoutSession } from '../lib/workoutSession';
+import { useQueryClient } from '@tanstack/react-query';
 
 const TODAY_STR = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -102,6 +103,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const [finishTimer, setFinishTimer] = useState('00:00');
   const [isRestDay, setIsRestDay] = useState(false);
   const { data: allTemplates = [] } = useWorkoutTemplates();
+  const queryClient = useQueryClient();
   const startTimeRef = useRef(savedSession?.startTime || Date.now());
   const [exercises, setExercises] = useState(() => {
     if (savedSession?.exercises?.length) return savedSession.exercises;
@@ -333,6 +335,31 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         }
       }
     }
+    // Save the updated exercise list (swaps, additions, removals) directly to the
+    // template so the change is permanent. This runs alongside onSaveHistory
+    // (which saves exercise history + lastPerformed) but explicitly persists the
+    // exercise composition so it survives the next time the user opens the workout.
+    const exerciseListForSave = exercises.map(ex => ({
+      name: ex.name,
+      sets: ex.sets || 1,
+      muscle: ex.muscle || '',
+      history: ex.history || [],
+    }));
+    if (!template.id.startsWith('empty-')) {
+      try {
+        await base44.entities.WorkoutTemplate.update(template.id, {
+          exerciseList: exerciseListForSave,
+        });
+        // Optimistically update the React Query cache so the UI is immediately correct
+        queryClient.setQueryData(['workoutTemplates'], (prev) =>
+          (prev || []).map(t =>
+            t.id === template.id ? { ...t, exerciseList: exerciseListForSave } : t
+          )
+        );
+      } catch (e) {
+        console.error('Exercise list save failed:', e);
+      }
+    }
     try {
       await onSaveHistory?.(template.id, allSets, exercises);
     } catch (e) {
@@ -341,7 +368,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     setIsRestDay(isRestDayToday(allTemplates));
     setShowSummary(true);
     clearWorkoutSession();
-  }, [exercises, onSaveHistory, template?.id, allTemplates]);
+  }, [exercises, onSaveHistory, template?.id, allTemplates, queryClient]);
 
   if (!template) return null;
 

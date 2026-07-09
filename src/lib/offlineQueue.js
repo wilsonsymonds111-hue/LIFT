@@ -34,6 +34,20 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
   const exerciseMap = {};
   (allExercises || []).forEach(ex => { exerciseMap[ex.name] = ex; });
 
+  // Save the exercise list composition FIRST — this is the source of truth for
+  // which exercises are in the template (including swaps, additions, removals).
+  const exerciseListForSave = exerciseList.map(ex => ({
+    name: ex.name,
+    sets: ex.sets || 1,
+    muscle: ex.muscle || '',
+    history: ex.history || [],
+  }));
+  await base44.entities.WorkoutTemplate.update(templateId, {
+    lastPerformed: new Date().toISOString(),
+    exerciseList: exerciseListForSave,
+  });
+
+  // Then save exercise history (sets/reps) to Exercise entities
   const exerciseSaves = exerciseList
     .filter(ex => snapshot[ex.name])
     .map(async (ex) => {
@@ -53,16 +67,6 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
         });
       }
     });
-
-  await base44.entities.WorkoutTemplate.update(templateId, {
-    lastPerformed: new Date().toISOString(),
-    exerciseList: exerciseList.map(ex => ({
-      name: ex.name,
-      sets: ex.sets || 1,
-      muscle: ex.muscle || '',
-      history: ex.history || [],
-    })),
-  });
 
   await Promise.all(exerciseSaves);
 }
