@@ -240,9 +240,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         } else {
           // Fuzzy fallback: try matching by stripping common suffixes/qualifiers
           // so "Smith Squat" matches "Smith Machine Squat", "Cable Crunches" matches "Cable Crunch", etc.
-          const normalized = key.replace(/\s*\(.*?\)\s*/g, '').replace(/\s*machine\s*/g, '').replace(/es$/g, '').replace(/s$/g, '').trim();
+          const normalized = key.replace(/\s*\(.*?\)\s*/g, '').replace(/\bmachine\b/gi, ' ').replace(/\s+/g, ' ').replace(/es$/g, '').replace(/s$/g, '').trim();
           const fuzzyKey = Object.keys(detailByName).find(k => {
-            const normK = k.replace(/\s*\(.*?\)\s*/g, '').replace(/\s*machine\s*/g, '').replace(/es$/g, '').replace(/s$/g, '').trim();
+            const normK = k.replace(/\s*\(.*?\)\s*/g, '').replace(/\bmachine\b/gi, ' ').replace(/\s+/g, ' ').replace(/es$/g, '').replace(/s$/g, '').trim();
             return normK === normalized || k.includes(normalized) || normalized.includes(normK);
           });
           if (fuzzyKey) {

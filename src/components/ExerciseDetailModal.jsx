@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, Camera } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
-import { getExerciseDetailList } from '../lib/exerciseCache';
+import { getExerciseDetailList, invalidateExerciseCache } from '../lib/exerciseCache';
 import ProgressGraph from './ProgressGraph';
 import ExerciseHistoryList from './ExerciseHistoryList';
 import { MUSCLE_COLORS } from '../lib/exercises';
@@ -22,6 +22,8 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
   const [detail, setDetail] = useState(initialImage ? { image_url: initialImage } : null);
   const [loadingDetail, setLoadingDetail] = useState(!initialImage);
   const [loadingHistory, setLoadingHistory] = useState(!initialHistory);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef(null);
   // Fetch workout history from the Exercise entity — skip if initialHistory provided
   useEffect(() => {
     if (initialHistory) { setLoadingHistory(false); return; }
@@ -80,6 +82,28 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
       ? allEntries.every(h => { const kg = h.kg ?? 0; return kg === 0 || kg == null; })
       : false;
   }, [history]);
+
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+    setUploadingImage(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      // Find or create an ExerciseDetail record with the EXACT exercise name
+      const allDetails = await getExerciseDetailList();
+      const existing = allDetails?.find(d => d.name.toLowerCase() === exercise.name.toLowerCase());
+      if (existing) {
+        await base44.entities.ExerciseDetail.update(existing.id, { image_url: file_url });
+      } else {
+        await base44.entities.ExerciseDetail.create({ name: exercise.name, image_url: file_url });
+      }
+      invalidateExerciseCache();
+      setDetail(prev => ({ ...prev, image_url: file_url }));
+    } catch (e) {
+      console.error('Image upload failed:', e);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const colors = MUSCLE_COLORS[exercise.muscle] || MUSCLE_COLORS['Full Body'];
 
@@ -142,13 +166,34 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
                 <div className="w-full aspect-video bg-muted rounded-2xl flex items-center justify-center">
                   <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
                 </div>
-              ) : detail?.image_url ? (
-                <div className="relative w-full bg-muted rounded-2xl overflow-hidden">
-                  <img src={detail.image_url} alt={exercise.name} className="w-full block" loading="lazy" decoding="async" />
-                </div>
               ) : (
-                <div className={`w-full aspect-video rounded-2xl flex items-center justify-center ${colors.bg}`}>
-                  <span className={`text-5xl font-extrabold ${colors.text}`}>{exercise.name[0]}</span>
+                <div className="relative w-full bg-muted rounded-2xl overflow-hidden group">
+                  {detail?.image_url ? (
+                    <img src={detail.image_url} alt={exercise.name} className="w-full block" loading="lazy" decoding="async" />
+                  ) : (
+                    <div className={`w-full aspect-video flex items-center justify-center ${colors.bg}`}>
+                      <span className={`text-5xl font-extrabold ${colors.text}`}>{exercise.name[0]}</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingImage}
+                    className="absolute bottom-2 right-2 w-9 h-9 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/80 transition"
+                    title="Replace image"
+                  >
+                    {uploadingImage ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Camera className="w-4 h-4" />
+                    )}
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); e.target.value = ''; }}
+                    className="hidden"
+                  />
                 </div>
               )}
 
