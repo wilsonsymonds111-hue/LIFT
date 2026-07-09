@@ -125,6 +125,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const restNotifiedRef = useRef(false);
   const bestSetsRef = useRef(savedSession?.bestSets || {});
   const saveTimeoutRef = useRef(null);
+  const cancelledRef = useRef(false);
   // Per-exercise state (sets, completedSets, note) for session persistence
   const exerciseStateRef = useRef(savedSession?.exerciseState || {});
 
@@ -295,9 +296,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   }, []);
 
   useEffect(() => {
-    if (showSummary) return;
+    if (showSummary || cancelledRef.current) return;
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
+      if (cancelledRef.current) return;
       saveWorkoutSession({
         templateId: template?.id,
         templateName: template?.name,
@@ -442,9 +444,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
       {/* Minimized bar — fades in as it minimizes, anchored to the bottom of the sheet */}
       <div
-        className="flex items-center justify-between px-5 cursor-pointer absolute inset-x-0 bottom-0"
+        className="flex items-center justify-between px-5 absolute inset-x-0 bottom-0"
         style={{ height: 72, opacity: barOpacity, pointerEvents: minimized ? 'auto' : 'none' }}
-        onClick={handleBarClick}
+        onClick={minimized ? handleBarClick : undefined}
       >
         <p className="font-bold text-foreground text-base truncate">{template.name}</p>
         <TimerDisplay startTimestamp={startTimeRef.current} className="text-base text-muted-foreground font-display" />
@@ -566,8 +568,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                   Add Exercises
                 </button>
                 <button
-                  onClick={() => { clearWorkoutSession(); onFinish(); }}
-                  className="w-full py-3.5 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition"
+                  onClick={(e) => { e.stopPropagation(); cancelledRef.current = true; clearWorkoutSession(); onFinish(); }}
+                  className="w-full py-3.5 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition relative z-20"
+                  style={{ touchAction: 'manipulation' }}
                 >
                   Cancel Workout
                 </button>
