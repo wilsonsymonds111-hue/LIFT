@@ -28,7 +28,9 @@ export function getQueueCount() {
 
 async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
   if (templateId.startsWith('empty-')) return;
-  const today = new Date().toISOString().slice(0, 10);
+
+  // Only count as "performed" if at least one set was actually completed
+  const hasCompletedSets = Object.keys(snapshot || {}).length > 0;
 
   const allExercises = await base44.entities.Exercise.list('name', 500);
   const exerciseMap = {};
@@ -42,12 +44,16 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
     muscle: ex.muscle || '',
     history: ex.history || [],
   }));
-  await base44.entities.WorkoutTemplate.update(templateId, {
-    lastPerformed: new Date().toISOString(),
-    exerciseList: exerciseListForSave,
-  });
+  const templateUpdate = { exerciseList: exerciseListForSave };
+  if (hasCompletedSets) {
+    templateUpdate.lastPerformed = new Date().toISOString();
+  }
+  await base44.entities.WorkoutTemplate.update(templateId, templateUpdate);
+
+  if (!hasCompletedSets) return;
 
   // Then save exercise history (sets/reps) to Exercise entities
+  const today = new Date().toISOString().slice(0, 10);
   const exerciseSaves = exerciseList
     .filter(ex => snapshot[ex.name])
     .map(async (ex) => {

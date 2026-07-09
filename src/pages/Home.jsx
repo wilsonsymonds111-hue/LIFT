@@ -338,7 +338,14 @@ export default function Home() {
       const onDayIdx = onDayIndexForDisplay(k, startDayIndex, onDays, offDays);
       const workoutIdx = ((onDayIdx % sorted.length) + sorted.length) % sorted.length;
       const template = sorted[workoutIdx];
-      const completed = template?.lastPerformed?.slice(0, 10) === todayStr;
+      // Convert lastPerformed to LOCAL date for comparison — slice(0,10) on an
+      // ISO string gives the UTC date, which can differ from the local date.
+      const completed = (() => {
+        if (!template?.lastPerformed) return false;
+        const d = new Date(template.lastPerformed);
+        const localStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        return localStr === todayStr;
+      })();
       return completed ? 2 : 1;
     });
   }, [schedule, startDayIndex, sorted, onDays, offDays, todayStr]);
