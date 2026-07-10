@@ -83,24 +83,24 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
     try {
       const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(igStickerRef.current, {
-        scale: 3,
+        scale: 2,
         useCORS: true,
-        backgroundColor: null,
+        backgroundColor: '#000000',
         logging: false,
         width: 390,
         height: 844,
       });
       canvas.toBlob(async (blob) => {
-        const file = new File([blob], 'workout-story.png', { type: 'image/png' });
+        const file = new File([blob], 'workout-story.jpg', { type: 'image/jpeg' });
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({ files: [file], title: `${template.name} Workout` });
         } else {
           const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = 'workout-story.png'; a.click();
+          const a = document.createElement('a'); a.href = url; a.download = 'workout-story.jpg'; a.click();
           URL.revokeObjectURL(url);
         }
         setIgSharing(false);
-      }, 'image/png');
+      }, 'image/jpeg', 0.85);
     } catch { setIgSharing(false); }
   };
 

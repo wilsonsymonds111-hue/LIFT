@@ -10,29 +10,21 @@ import { drawShareCard } from './drawShareCard';
  */
 export async function shareToInstagram(shareData) {
   const stickerCanvas = drawShareCard(shareData);
-  // JPEG — small enough for iOS URL scheme limits. Solid black background
-  // means no transparency is needed.
-  const blob = await new Promise(resolve => stickerCanvas.toBlob(resolve, 'image/jpeg', 0.85));
 
   // Detect PWA/standalone mode — custom URL schemes are blocked by Apple
-  // in WKWebView (the engine behind home-screen PWAs). Skip the deep link
-  // entirely and go straight to the Web Share API.
+  // in WKWebView (the engine behind home-screen PWAs). In that case, skip
+  // the deep link and go straight to the Web Share API.
   const isStandalone =
     window.navigator.standalone === true ||
     window.matchMedia('(display-mode: standalone)').matches;
 
-  // --- Attempt 1: Instagram deep link (Safari only) ---
+  // --- Attempt 1: Instagram deep link (Safari browser only) ---
+  // toDataURL is synchronous — must stay in the user-gesture call stack.
   if (!isStandalone) {
     const stickerBase64 = stickerCanvas.toDataURL('image/jpeg', 0.85).split(',')[1];
     const deepLink = `instagram-stories://share?background_top_color=%23000000&background_bottom_color=%23000000&sticker_image=${encodeURIComponent(stickerBase64)}`;
 
-    // Anchor-tag click is more reliable than window.location.href on iOS.
-    const a = document.createElement('a');
-    a.href = deepLink;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    window.location.href = deepLink;
 
     let didHide = false;
     const onVis = () => { if (document.hidden) didHide = true; };
@@ -45,6 +37,7 @@ export async function shareToInstagram(shareData) {
 
   // --- Attempt 2: Web Share API (shows share sheet with Instagram option) ---
   if (navigator.share) {
+    const blob = await new Promise(resolve => stickerCanvas.toBlob(resolve, 'image/jpeg', 0.85));
     const file = new File([blob], 'lift-share.jpg', { type: 'image/jpeg' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
