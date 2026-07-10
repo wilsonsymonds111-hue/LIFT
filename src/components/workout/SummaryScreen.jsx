@@ -164,10 +164,10 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
                 return (
                   <div key={i} className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="text-xs text-gray-700 font-medium leading-snug">{ex.sets} × {ex.name}</span>
                       {isPR && (
                         <span className="flex-shrink-0 text-[10px] font-bold bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full leading-none">PR</span>
                       )}
+                      <span className="text-xs text-gray-700 font-medium leading-snug">{ex.sets} × {ex.name}</span>
                     </div>
                     <span className="flex-shrink-0 text-xs text-gray-500 font-semibold">
                       {best ? (best.kg ? `${best.kg} kg × ${best.reps}` : `${best.reps} reps`) : '—'}
