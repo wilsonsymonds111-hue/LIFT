@@ -1,7 +1,8 @@
 import { forwardRef, useMemo } from 'react';
 
-const ACCENT = '#EAD796';
+const ACCENT = '#C5B378';
 const WHITE = '#FFFFFF';
+const DIVIDER = 'rgba(255,255,255,0.12)';
 
 function formatDateShort(dateStr) {
   if (!dateStr) return '';
@@ -10,11 +11,9 @@ function formatDateShort(dateStr) {
 }
 
 const LiftLogo = () => (
-  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M7 4v16" />
-    <path d="M3 8l4-4 4 4" />
-    <path d="M17 20V4" />
-    <path d="M13 16l4 4 4-4" />
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="7" y1="17" x2="17" y2="7" />
+    <polyline points="9 7 17 7 17 15" />
   </svg>
 );
 
@@ -39,14 +38,14 @@ const ShareTemplate = forwardRef(function ShareTemplate({ exerciseName, weight, 
     const max = Math.max(...points);
     const range = max - min || 1;
 
-    const chartWidth = 280;
-    const chartHeight = 48;
+    const chartWidth = 272;
+    const chartHeight = 52;
+    const pad = 4;
     const coords = points.map((p, i) => ({
       x: (i / (points.length - 1)) * chartWidth,
-      y: chartHeight - ((p - min) / range) * chartHeight,
+      y: chartHeight - pad - ((p - min) / range) * (chartHeight - pad * 2),
     }));
 
-    // Limit to last 12 points for visual clarity
     const displayCoords = coords.length > 12 ? coords.slice(-12) : coords;
     if (displayCoords.length > 1) {
       const reScale = chartWidth / (displayCoords.length - 1);
@@ -57,18 +56,23 @@ const ShareTemplate = forwardRef(function ShareTemplate({ exerciseName, weight, 
       coords: displayCoords,
       chartWidth,
       chartHeight,
+      startWeight: Math.round(toKg(byDate[dates[0]])),
+      endWeight: Math.round(toKg(byDate[dates[dates.length - 1]])),
       startDate: formatDateShort(dates[0]),
       endDate: formatDateShort(dates[dates.length - 1]),
     };
   }, [history]);
 
   const isBodyweight = !weight || weight === 0;
+  const showBodyweight = bodyweight && bodyweight > 0 && !isBodyweight;
 
   return (
     <div ref={ref} style={{
-      width: 340,
-      padding: '32px 28px',
-      background: 'transparent',
+      width: 320,
+      padding: '28px 24px',
+      background: 'rgba(10, 10, 10, 0.58)',
+      borderRadius: 20,
+      border: '1px solid rgba(255,255,255,0.06)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -76,46 +80,54 @@ const ShareTemplate = forwardRef(function ShareTemplate({ exerciseName, weight, 
       color: WHITE,
     }}>
       {/* LIFT Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 22 }}>
         <LiftLogo />
-        <span style={{ fontSize: 17, fontWeight: 700, letterSpacing: '0.3em', color: ACCENT }}>LIFT</span>
+        <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.28em', color: ACCENT }}>LIFT</span>
       </div>
 
       {/* Exercise Name */}
       <div style={{
-        fontSize: 12, fontWeight: 600, letterSpacing: '0.15em',
-        textTransform: 'uppercase', opacity: 0.7, marginBottom: 6, textAlign: 'center',
+        fontSize: 13, fontWeight: 600, letterSpacing: '0.1em',
+        textTransform: 'uppercase', opacity: 0.85, marginBottom: 6, textAlign: 'center',
       }}>
         {exerciseName}{isPR ? ' PR' : ''}
       </div>
 
       {/* Weight + Reps */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 22 }}>
         {!isBodyweight && (
-          <span style={{ fontSize: 48, fontWeight: 800, letterSpacing: '-0.02em' }}>
+          <span style={{ fontSize: 42, fontWeight: 800, letterSpacing: '-0.02em' }}>
             {weight}KG
           </span>
         )}
         {reps > 0 && (
-          <span style={{ fontSize: isBodyweight ? 48 : 18, fontWeight: isBodyweight ? 800 : 400, letterSpacing: isBodyweight ? '-0.02em' : '0', opacity: isBodyweight ? 1 : 0.6 }}>
+          <span style={{
+            fontSize: isBodyweight ? 42 : 15,
+            fontWeight: isBodyweight ? 800 : 500,
+            letterSpacing: isBodyweight ? '-0.02em' : '0',
+            opacity: isBodyweight ? 1 : 0.55,
+          }}>
             {isBodyweight ? `${reps} REPS` : `× ${reps} REPS`}
           </span>
         )}
       </div>
 
+      {/* Divider */}
+      <div style={{ width: '100%', height: 1, background: DIVIDER, marginBottom: 18 }} />
+
       {/* Bodyweight Stats */}
-      {bodyweight && bodyweight > 0 && !isBodyweight && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 28 }}>
+      {showBodyweight && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 28, marginBottom: 18 }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 26, fontWeight: 700 }}>{bodyweight}KG</div>
-            <div style={{ fontSize: 9, letterSpacing: '0.15em', opacity: 0.4, textTransform: 'uppercase', marginTop: 2 }}>Bodyweight</div>
+            <div style={{ fontSize: 20, fontWeight: 700 }}>{bodyweight}KG</div>
+            <div style={{ fontSize: 8, letterSpacing: '0.15em', opacity: 0.4, textTransform: 'uppercase', marginTop: 2 }}>Bodyweight</div>
           </div>
           {ratio && ratio > 0 && (
             <>
-              <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.15)' }} />
+              <div style={{ width: 1, height: 26, background: DIVIDER }} />
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 26, fontWeight: 700 }}>{ratio.toFixed(2)}x</div>
-                <div style={{ fontSize: 9, letterSpacing: '0.15em', opacity: 0.4, textTransform: 'uppercase', marginTop: 2 }}>Bodyweight</div>
+                <div style={{ fontSize: 20, fontWeight: 700 }}>{ratio.toFixed(2)}×</div>
+                <div style={{ fontSize: 8, letterSpacing: '0.15em', opacity: 0.4, textTransform: 'uppercase', marginTop: 2 }}>Bodyweight</div>
               </div>
             </>
           )}
@@ -124,29 +136,55 @@ const ShareTemplate = forwardRef(function ShareTemplate({ exerciseName, weight, 
 
       {/* Progress Chart */}
       {chartData && (
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{
-            fontSize: 10, fontWeight: 600, letterSpacing: '0.15em',
-            textTransform: 'uppercase', opacity: 0.5, marginBottom: 10,
-          }}>
-            Progress Over Time
+        <>
+          {(showBodyweight) && <div style={{ width: '100%', height: 1, background: DIVIDER, marginBottom: 18 }} />}
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{
+              fontSize: 9, fontWeight: 600, letterSpacing: '0.15em',
+              textTransform: 'uppercase', opacity: 0.5, marginBottom: 10,
+            }}>
+              Progress Over Time
+            </div>
+            <div style={{ position: 'relative', width: chartData.chartWidth, height: chartData.chartHeight }}>
+              <svg width={chartData.chartWidth} height={chartData.chartHeight} style={{ overflow: 'visible' }}>
+                <polyline
+                  points={chartData.coords.map(c => `${c.x},${c.y}`).join(' ')}
+                  fill="none"
+                  stroke={ACCENT}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                {chartData.coords.map((c, i) => (
+                  <circle key={i} cx={c.x} cy={c.y} r="3" fill={ACCENT} />
+                ))}
+              </svg>
+              {/* Y-axis weight labels — positioned near first/last data points */}
+              <span style={{
+                position: 'absolute', left: 0,
+                top: chartData.coords[0].y,
+                transform: 'translateY(10px)',
+                fontSize: 8, opacity: 0.4,
+              }}>
+                {chartData.startWeight}KG
+              </span>
+              <span style={{
+                position: 'absolute', right: 0,
+                top: chartData.coords[chartData.coords.length - 1].y,
+                transform: 'translateY(-14px)',
+                fontSize: 8, opacity: 0.4,
+              }}>
+                {chartData.endWeight}KG
+              </span>
+            </div>
+            {/* X-axis date labels */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: chartData.chartWidth, marginTop: 6 }}>
+              <span style={{ fontSize: 8, opacity: 0.4 }}>{chartData.startDate}</span>
+              <span style={{ fontSize: 8, opacity: 0.4 }}>{chartData.endDate}</span>
+            </div>
           </div>
-          <svg width={chartData.chartWidth} height={chartData.chartHeight} style={{ overflow: 'visible' }}>
-            <polyline
-              points={chartData.coords.map(c => `${c.x},${c.y}`).join(' ')}
-              fill="none"
-              stroke={ACCENT}
-              strokeWidth="1.5"
-            />
-            {chartData.coords.map((c, i) => (
-              <circle key={i} cx={c.x} cy={c.y} r="2.5" fill={ACCENT} />
-            ))}
-          </svg>
-          <div style={{ display: 'flex', justifyContent: 'space-between', width: chartData.chartWidth, marginTop: 6 }}>
-            <span style={{ fontSize: 9, opacity: 0.4 }}>{chartData.startDate}</span>
-            <span style={{ fontSize: 9, opacity: 0.4 }}>{chartData.endDate}</span>
-          </div>
-        </div>
+          <div style={{ width: '100%', height: 1, background: DIVIDER, marginTop: 18 }} />
+        </>
       )}
     </div>
   );
