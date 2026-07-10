@@ -36,14 +36,24 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
   const exerciseMap = {};
   (allExercises || []).forEach(ex => { exerciseMap[ex.name] = ex; });
 
-  // Save the exercise list composition FIRST — this is the source of truth for
-  // which exercises are in the template (including swaps, additions, removals).
-  const exerciseListForSave = exerciseList.map(ex => ({
-    name: ex.name,
-    sets: ex.sets || 1,
-    muscle: ex.muscle || '',
-    history: ex.history || [],
-  }));
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Build the exercise list with UPDATED history (existing + new entries) so
+  // the template stays in sync with the Exercise entities after each workout.
+  // Previously this saved ex.history (stale, pre-workout data), causing the
+  // template to always be one workout behind the Exercise entity.
+  const exerciseListForSave = exerciseList.map(ex => {
+    const existing = exerciseMap[ex.name];
+    const sets = snapshot[ex.name];
+    const newEntries = sets ? sets.map(s => ({ kg: s.kg, reps: s.reps, date: today })) : [];
+    return {
+      name: ex.name,
+      sets: ex.sets || 1,
+      muscle: ex.muscle || '',
+      history: [...(existing?.history || ex.history || []), ...newEntries],
+    };
+  });
+
   const templateUpdate = { exerciseList: exerciseListForSave };
   if (hasCompletedSets) {
     templateUpdate.lastPerformed = new Date().toISOString();
@@ -51,9 +61,6 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
   await base44.entities.WorkoutTemplate.update(templateId, templateUpdate);
 
   if (!hasCompletedSets) return;
-
-  // Then save exercise history (sets/reps) to Exercise entities
-  const today = new Date().toISOString().slice(0, 10);
   const exerciseSaves = exerciseList
     .filter(ex => snapshot[ex.name])
     .map(async (ex) => {
