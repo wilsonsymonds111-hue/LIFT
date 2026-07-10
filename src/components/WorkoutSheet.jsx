@@ -534,7 +534,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 <Clock className="w-4 h-4 text-gray-700 dark:text-gray-200" strokeWidth={2} />
                 <TimerDisplay startTimestamp={startTimeRef.current} className="text-base font-bold text-gray-900 dark:text-gray-100 font-display" />
               </div>
-              <textarea placeholder="Note" rows={1} className="w-full text-sm font-semibold text-blue-600 dark:text-blue-400 placeholder-gray-400 dark:placeholder-gray-500 mb-6 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 focus:border-blue-400 dark:focus:border-blue-600 rounded-full px-4 py-2 resize-none font-display" />
+              <textarea placeholder="Note" rows={1} className="w-full text-sm font-semibold text-blue-600 dark:text-blue-400 placeholder-gray-400 dark:placeholder-gray-500 mb-6 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-2 resize-none font-display placeholder-shown:bg-transparent placeholder-shown:border-transparent transition-colors" />
 
               <DragDropContext onDragEnd={({ source, destination }) => {
                 if (!destination) return;
