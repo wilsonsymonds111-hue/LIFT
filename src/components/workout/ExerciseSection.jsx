@@ -5,6 +5,7 @@ import ProgressGraph, { getRepCap } from '../ProgressGraph';
 import SetRow from './SetRow';
 import RepGoalNotification from './RepGoalNotification';
 import RestTimeModal from './RestTimeModal';
+import ExerciseShareButton from '../share/ExerciseShareButton';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
 const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange }) {
@@ -98,7 +99,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
           <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing leading-snug" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
-          <div className="relative -ml-1 mt-0.5">
+          <div className="relative -ml-1 mt-0.5 flex items-center gap-0.5">
+            <ExerciseShareButton exercise={exercise} sessionResults={sessionResults} pr={pr} />
             <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
               <MoreHorizontal className="w-4 h-4 text-gray-700 dark:text-gray-200" />
             </button>
