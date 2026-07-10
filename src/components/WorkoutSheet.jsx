@@ -502,11 +502,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-3xl font-bold text-gray-900">{template.name}</h1>
               </div>
-              <div className="flex items-center gap-1.5 mb-0.5">
+              <div className="flex items-center gap-1.5 mt-3 mb-0.5">
                 <CalendarDays className="w-4 h-4 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
                 <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 font-display">{TODAY_STR}</p>
               </div>
-              <div className="flex items-center gap-1.5 mb-4">
+              <div className="flex items-center gap-1.5 mb-3">
                 <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
                 <TimerDisplay startTimestamp={startTimeRef.current} className="text-sm font-semibold text-gray-500 dark:text-gray-400 font-display" />
               </div>
@@ -516,7 +516,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 data-placeholder="Note…"
                 onFocus={() => setNoteFocused(true)}
                 onBlur={() => setNoteFocused(false)}
-                className={`w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-6 -ml-1 focus:outline-none border rounded-full px-4 py-2 font-display transition-colors empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold ${
+                className={`w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-4 -ml-1 focus:outline-none border rounded-full px-4 py-2 font-display transition-colors empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold ${
                   noteFocused
                     ? 'bg-blue-50 dark:bg-blue-950/40 border-white'
                     : 'bg-transparent border-transparent'
