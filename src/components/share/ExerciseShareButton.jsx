@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
-import { Loader2, Instagram } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { shareToInstagram } from '../../lib/shareToInstagram';
+import InstagramIcon from '../InstagramIcon';
 
 export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
   const [isSharing, setIsSharing] = useState(false);
@@ -51,7 +52,7 @@ export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
       {isSharing ? (
         <Loader2 className="w-4 h-4 text-gray-700 dark:text-gray-200 animate-spin" />
       ) : (
-        <Instagram className="w-4 h-4 text-gray-700 dark:text-gray-200" />
+        <InstagramIcon className="w-4 h-4" />
       )}
     </button>
   );
