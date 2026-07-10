@@ -56,40 +56,75 @@ function generateDefaultBackground() {
 }
 
 /**
- * Shares a template element to Instagram Stories via deep link.
- * The template becomes a draggable/resizable sticker over a default background.
+ * Composites the sticker canvas onto the center of the background canvas.
+ */
+function compositeStickerOnBackground(stickerCanvas, bgCanvas) {
+  const ctx = bgCanvas.getContext('2d');
+  const targetWidth = bgCanvas.width * 0.62;
+  const scale = targetWidth / stickerCanvas.width;
+  const targetHeight = stickerCanvas.height * scale;
+  const x = (bgCanvas.width - targetWidth) / 2;
+  const y = (bgCanvas.height - targetHeight) / 2;
+  ctx.drawImage(stickerCanvas, x, y, targetWidth, targetHeight);
+  return bgCanvas;
+}
+
+/**
+ * Shares a template element to Instagram.
  *
- * Falls back to downloading the sticker image if Instagram isn't installed.
+ * Primary: Web Share API with files — opens the native iOS share sheet,
+ *          which includes Instagram Stories. Most reliable on iPhone.
+ * Fallback: Instagram Stories deep link (sticker + background).
+ * Last resort: download the sticker image.
  */
 export async function shareToInstagram(element) {
   const stickerCanvas = await captureElementAsSticker(element);
-  const bgCanvas = generateDefaultBackground();
 
-  const stickerBase64 = stickerCanvas.toDataURL('image/png').split(',')[1];
-  const bgBase64 = bgCanvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+  // --- Primary: Web Share API with files (native iOS share sheet) ---
+  if (navigator.share && navigator.canShare) {
+    const bgCanvas = generateDefaultBackground();
+    const composited = compositeStickerOnBackground(stickerCanvas, bgCanvas);
 
-  const url = `instagram-stories://share?source_image=${encodeURIComponent(bgBase64)}&sticker_image=${encodeURIComponent(stickerBase64)}`;
+    const blob = await new Promise(resolve => composited.toBlob(resolve, 'image/png'));
+    const file = new File([blob], 'lift-share.png', { type: 'image/png' });
 
-  // Track whether the app was hidden (= Instagram opened)
-  let didHide = false;
-  const onVisChange = () => { if (document.hidden) didHide = true; };
-  document.addEventListener('visibilitychange', onVisChange);
-
-  window.location.href = url;
-
-  // If still visible after 1.5s, Instagram didn't open — download as fallback
-  return new Promise(resolve => {
-    setTimeout(() => {
-      document.removeEventListener('visibilitychange', onVisChange);
-      if (!didHide) {
-        const link = document.createElement('a');
-        link.href = stickerCanvas.toDataURL('image/png');
-        link.download = 'lift-pr-share.png';
-        link.click();
-        resolve({ shared: false, fallback: 'download' });
-      } else {
-        resolve({ shared: true });
+    if (navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'LIFT',
+        });
+        return { shared: true, method: 'web-share' };
+      } catch (e) {
+        // User cancelled — don't fall through to other methods
+        if (e.name === 'AbortError') return { shared: false, cancelled: true };
       }
-    }, 1500);
-  });
+    }
+  }
+
+  // --- Fallback: Instagram Stories deep link ---
+  try {
+    const bgCanvas = generateDefaultBackground();
+    const stickerBase64 = stickerCanvas.toDataURL('image/png').split(',')[1];
+    const bgBase64 = bgCanvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+    const url = `instagram-stories://share?source_image=${encodeURIComponent(bgBase64)}&sticker_image=${encodeURIComponent(stickerBase64)}`;
+
+    let didHide = false;
+    const onVisChange = () => { if (document.hidden) didHide = true; };
+    document.addEventListener('visibilitychange', onVisChange);
+
+    window.location.href = url;
+
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    document.removeEventListener('visibilitychange', onVisChange);
+
+    if (didHide) return { shared: true, method: 'deep-link' };
+  } catch {}
+
+  // --- Last resort: download the sticker image ---
+  const link = document.createElement('a');
+  link.href = stickerCanvas.toDataURL('image/png');
+  link.download = 'lift-share.png';
+  link.click();
+  return { shared: false, fallback: 'download' };
 }

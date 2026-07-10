@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo, useCallback } from 'react';
 import { Share2, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { useToast } from '@/components/ui/use-toast';
 import ShareTemplate from './ShareTemplate';
 import { shareToInstagram } from '../../lib/shareToInstagram';
 
@@ -8,6 +9,7 @@ export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
   const [isSharing, setIsSharing] = useState(false);
   const [bodyweight, setBodyweight] = useState(null);
   const templateRef = useRef(null);
+  const { toast } = useToast();
 
   const shareData = useMemo(() => {
     const toKg = (h) => typeof h === 'object' ? (h.kg || 0) : (h || 0);
@@ -41,18 +43,30 @@ export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
       } catch {}
 
       // Wait for template to render with bodyweight data
-      await new Promise(r => setTimeout(r, 350));
+      await new Promise(r => setTimeout(r, 400));
 
-      if (templateRef.current) {
-        await shareToInstagram(templateRef.current);
+      if (!templateRef.current) {
+        toast({ title: 'Share failed', description: 'Could not generate share image. Please try again.', variant: 'destructive' });
+        return;
+      }
+
+      const result = await shareToInstagram(templateRef.current);
+
+      if (result?.cancelled) return; // user dismissed the share sheet
+
+      if (result?.shared) {
+        toast({ title: 'Shared!', description: 'Your workout stats have been shared.' });
+      } else if (result?.fallback === 'download') {
+        toast({ title: 'Image saved', description: 'Share image downloaded to your device.' });
       }
     } catch (e) {
       console.error('Share failed:', e);
+      toast({ title: 'Share failed', description: 'Something went wrong. Please try again.', variant: 'destructive' });
     } finally {
       setIsSharing(false);
       setBodyweight(null);
     }
-  }, []);
+  }, [toast]);
 
   return (
     <>
