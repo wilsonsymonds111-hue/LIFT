@@ -11,15 +11,15 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
     if (user.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
 
-    const allDetails = await base44.asServiceRole.entities.ExerciseDetail.list('name', 500);
-    const toProcess = allDetails.filter(d => {
-      if (!d.image_url) return false;
-      if (d.image_url.endsWith('.jpg') || d.image_url.endsWith('.jpeg')) return false;
-      return true;
-    });
+    let body = {};
+    try { body = await req.json(); } catch {}
+    const skip = body.skip || 0;
 
-    const batch = toProcess.slice(0, BATCH_SIZE);
-    const results = { processed: 0, failed: 0, remaining: toProcess.length - batch.length, total: toProcess.length, errors: [] };
+    const allDetails = await base44.asServiceRole.entities.ExerciseDetail.list('name', 500);
+    const toProcess = allDetails.filter(d => d.image_url);
+
+    const batch = toProcess.slice(skip, skip + BATCH_SIZE);
+    const results = { processed: 0, failed: 0, remaining: Math.max(0, toProcess.length - skip - batch.length), total: toProcess.length, skip, errors: [] };
 
     // Import pure-JS image libraries
     const upngMod = await import('npm:upng-js@2.1.0');
@@ -70,11 +70,14 @@ Deno.serve(async (req) => {
             const fx = srcX - x0;
             const fy = srcY - y0;
 
-            for (let c = 0; c < 4; c++) {
+            // Bilinear sample RGB, then alpha-composite onto white (JPEG has no alpha)
+            for (let c = 0; c < 3; c++) {
               const top = rgba[(y0 * width + x0) * 4 + c] * (1 - fx) + rgba[(y0 * width + x1) * 4 + c] * fx;
               const bot = rgba[(y1 * width + x0) * 4 + c] * (1 - fx) + rgba[(y1 * width + x1) * 4 + c] * fx;
-              resized[(y * newW + x) * 4 + c] = Math.round(top * (1 - fy) + bot * fy);
+              const val = top * (1 - fy) + bot * fy;
+              resized[(y * newW + x) * 4 + c] = Math.round(val);
             }
+            resized[(y * newW + x) * 4 + 3] = 255; // opaque
           }
         }
 
