@@ -20,14 +20,12 @@ function drawSpacedText(ctx, text, x, y, spacing) {
   return cx;
 }
 
-export function drawShareCard({ exerciseName, weight, reps, bodyweight, ratio, history, isPR }) {
-  // 1x scale — keeps base64 small enough for instagram-stories:// URL scheme
+export function drawShareCard({ exerciseName, weight, reps, history, isPR }) {
   const W = 320;
   const padX = 24;
   const padY = 28;
 
   const isBodyweight = !weight || weight === 0;
-  const showBodyweight = bodyweight && bodyweight > 0 && !isBodyweight;
 
   // Process history for chart
   let chartData = null;
@@ -75,9 +73,7 @@ export function drawShareCard({ exerciseName, weight, reps, bodyweight, ratio, h
   h += 42; // weight/reps
   h += 22; // gap
   h += 1 + 18; // divider + gap
-  if (showBodyweight) h += 44; // bodyweight row
   if (chartData) {
-    if (showBodyweight) h += 1 + 18; // extra divider
     h += 9 + 10; // title + gap
     h += chartData.chartHeight + 6; // chart + gap
     h += 10; // date labels
@@ -166,49 +162,8 @@ export function drawShareCard({ exerciseName, weight, reps, bodyweight, ratio, h
   ctx.stroke();
   y += 18;
 
-  // Bodyweight stats — left-aligned, side by side
-  if (showBodyweight) {
-    const bwText = `${bodyweight}KG`;
-    ctx.font = `700 20px ${FONT}`;
-    ctx.fillStyle = WHITE;
-    ctx.textAlign = 'left';
-    ctx.fillText(bwText, padX, y);
-    ctx.font = `600 8px ${FONT}`;
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.fillText('BODYWEIGHT', padX, y + 24);
-
-    if (ratio && ratio > 0) {
-      const ratioText = `${ratio.toFixed(2)}×`;
-      const ratioX = padX + 140;
-      ctx.strokeStyle = DIVIDER;
-      ctx.beginPath();
-      ctx.moveTo(ratioX - 14, y + 2);
-      ctx.lineTo(ratioX - 14, y + 28);
-      ctx.stroke();
-
-      ctx.font = `700 20px ${FONT}`;
-      ctx.fillStyle = WHITE;
-      ctx.fillText(ratioText, ratioX, y);
-      ctx.font = `600 8px ${FONT}`;
-      ctx.fillStyle = 'rgba(255,255,255,0.4)';
-      ctx.fillText('RATIO', ratioX, y + 24);
-    }
-
-    y += 44;
-  }
-
   // Progress chart
   if (chartData) {
-    if (showBodyweight) {
-      ctx.strokeStyle = DIVIDER;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(padX, y);
-      ctx.lineTo(W - padX, y);
-      ctx.stroke();
-      y += 18;
-    }
-
     // Chart title
     ctx.font = `600 9px ${FONT}`;
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
