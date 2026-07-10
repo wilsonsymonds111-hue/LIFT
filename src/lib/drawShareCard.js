@@ -1,21 +1,7 @@
-const ACCENT = '#C5B378';
+const ACCENT = '#EAD98A';
 const WHITE = '#FFFFFF';
 const DIVIDER = 'rgba(255,255,255,0.12)';
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif';
-
-function drawRoundedRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
 
 function formatDateShort(dateStr) {
   if (!dateStr) return '';
@@ -34,18 +20,11 @@ function drawSpacedText(ctx, text, x, y, spacing) {
   return cx;
 }
 
-function drawCenteredSpacedText(ctx, text, centerX, y, spacing) {
-  let totalWidth = 0;
-  for (const ch of text) totalWidth += ctx.measureText(ch).width + spacing;
-  totalWidth -= spacing;
-  drawSpacedText(ctx, text, centerX - totalWidth / 2, y, spacing);
-}
-
 export function drawShareCard({ exerciseName, weight, reps, bodyweight, ratio, history, isPR }) {
-  const s = 2; // retina scale
-  const W = 320 * s;
-  const padX = 24 * s;
-  const padY = 28 * s;
+  // 1x scale — keeps base64 small enough for instagram-stories:// URL scheme
+  const W = 320;
+  const padX = 24;
+  const padY = 28;
 
   const isBodyweight = !weight || weight === 0;
   const showBodyweight = bodyweight && bodyweight > 0 && !isBodyweight;
@@ -67,7 +46,7 @@ export function drawShareCard({ exerciseName, weight, reps, bodyweight, ratio, h
       const min = Math.min(...points);
       const max = Math.max(...points);
       const range = max - min || 1;
-      const cw = 272 * s, ch = 52 * s, pad = 4 * s;
+      const cw = 272, ch = 52, pad = 4;
       let coords = points.map((p, i) => ({
         x: (i / (points.length - 1)) * cw,
         y: ch - pad - ((p - min) / range) * (ch - pad * 2),
@@ -89,20 +68,20 @@ export function drawShareCard({ exerciseName, weight, reps, bodyweight, ratio, h
 
   // Calculate total height
   let h = padY;
-  h += 18 * s; // logo
-  h += 22 * s; // gap after logo
-  h += 17 * s; // exercise name line
-  h += 6 * s;  // gap
-  h += 42 * s; // weight/reps
-  h += 22 * s; // gap
-  h += 1 * s + 18 * s; // divider + gap
-  if (showBodyweight) h += 44 * s; // bodyweight row
+  h += 18; // logo
+  h += 22; // gap after logo
+  h += 17; // exercise name line
+  h += 6;  // gap
+  h += 42; // weight/reps
+  h += 22; // gap
+  h += 1 + 18; // divider + gap
+  if (showBodyweight) h += 44; // bodyweight row
   if (chartData) {
-    if (showBodyweight) h += 1 * s + 18 * s; // extra divider
-    h += 9 * s + 10 * s; // title + gap
-    h += chartData.chartHeight + 6 * s; // chart + gap
-    h += 10 * s; // date labels
-    h += 1 * s + 18 * s; // bottom divider
+    if (showBodyweight) h += 1 + 18; // extra divider
+    h += 9 + 10; // title + gap
+    h += chartData.chartHeight + 6; // chart + gap
+    h += 10; // date labels
+    h += 1 + 18; // bottom divider
   }
   h += padY;
 
@@ -111,174 +90,136 @@ export function drawShareCard({ exerciseName, weight, reps, bodyweight, ratio, h
   canvas.height = h;
   const ctx = canvas.getContext('2d');
 
-  // Background — rounded rect with semi-transparent dark fill
-  ctx.fillStyle = 'rgba(10, 10, 10, 0.85)';
-  drawRoundedRect(ctx, 0, 0, W, h, 20 * s);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-  ctx.lineWidth = 1 * s;
-  drawRoundedRect(ctx, 0, 0, W, h, 20 * s);
-  ctx.stroke();
+  // Solid black background
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, W, h);
 
   let y = padY;
   ctx.textBaseline = 'top';
 
-  // LIFT logo — arrow icon + spaced text
-  const logoFontSize = 14 * s;
+  // LIFT logo — top-LEFT, arrow icon + spaced text
+  const logoFontSize = 14;
   ctx.font = `700 ${logoFontSize}px ${FONT}`;
   ctx.fillStyle = ACCENT;
-  // Measure "LIFT" with letter spacing
   const ls = 0.28 * logoFontSize;
-  let liftW = 0;
-  for (const ch of 'LIFT') liftW += ctx.measureText(ch).width + ls;
-  liftW -= ls;
-  // Arrow icon width ~18px
-  const arrowW = 18 * s;
-  const gap = 6 * s;
-  const totalLogoW = arrowW + gap + liftW;
-  let logoX = W / 2 - totalLogoW / 2;
+  const arrowW = 18;
+  const gap = 6;
+  let logoX = padX;
 
   // Draw arrow (diagonal line + arrowhead)
   ctx.strokeStyle = ACCENT;
-  ctx.lineWidth = 2.5 * s;
+  ctx.lineWidth = 2.5;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.beginPath();
-  ctx.moveTo(logoX + 4 * s, y + 12 * s);
-  ctx.lineTo(logoX + 14 * s, y + 2 * s);
+  ctx.moveTo(logoX + 4, y + 12);
+  ctx.lineTo(logoX + 14, y + 2);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(logoX + 7 * s, y + 2 * s);
-  ctx.lineTo(logoX + 14 * s, y + 2 * s);
-  ctx.lineTo(logoX + 14 * s, y + 9 * s);
+  ctx.moveTo(logoX + 7, y + 2);
+  ctx.lineTo(logoX + 14, y + 2);
+  ctx.lineTo(logoX + 14, y + 9);
   ctx.stroke();
 
   drawSpacedText(ctx, 'LIFT', logoX + arrowW + gap, y, ls);
 
-  y += 18 * s + 22 * s;
+  y += 18 + 22;
 
-  // Exercise name (uppercase, letter-spaced)
-  const nameFontSize = 13 * s;
+  // Exercise name (uppercase, letter-spaced) — left-aligned
+  const nameFontSize = 13;
   ctx.font = `600 ${nameFontSize}px ${FONT}`;
   ctx.fillStyle = 'rgba(255,255,255,0.85)';
   const nameText = (exerciseName + (isPR ? ' PR' : '')).toUpperCase();
-  drawCenteredSpacedText(ctx, nameText, W / 2, y, 0.1 * nameFontSize);
+  drawSpacedText(ctx, nameText, padX, y, 0.1 * nameFontSize);
 
-  y += 17 * s + 6 * s;
+  y += 17 + 6;
 
-  // Weight + Reps
+  // Weight + Reps — left-aligned
   if (!isBodyweight) {
-    ctx.font = `800 ${42 * s}px ${FONT}`;
+    ctx.font = `800 42px ${FONT}`;
     ctx.fillStyle = WHITE;
     ctx.textAlign = 'left';
     const weightText = `${weight}KG`;
     const wMetrics = ctx.measureText(weightText);
+    ctx.fillText(weightText, padX, y);
 
-    ctx.font = `500 ${15 * s}px ${FONT}`;
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    const repsText = reps > 0 ? `× ${reps} REPS` : '';
-    const rMetrics = repsText ? ctx.measureText(repsText) : { width: 0 };
-    const gap2 = 8 * s;
-    const totalW = wMetrics.width + (repsText ? gap2 + rMetrics.width : 0);
-    let wx = W / 2 - totalW / 2;
-
-    ctx.font = `800 ${42 * s}px ${FONT}`;
-    ctx.fillStyle = WHITE;
-    ctx.fillText(weightText, wx, y);
-    wx += wMetrics.width + gap2;
-
-    if (repsText) {
-      ctx.font = `500 ${15 * s}px ${FONT}`;
+    if (reps > 0) {
+      ctx.font = `500 15px ${FONT}`;
       ctx.fillStyle = 'rgba(255,255,255,0.55)';
-      ctx.fillText(repsText, wx, y + 27 * s);
+      ctx.fillText(`× ${reps} REPS`, padX + wMetrics.width + 8, y + 27);
     }
   } else if (reps > 0) {
-    ctx.font = `800 ${42 * s}px ${FONT}`;
+    ctx.font = `800 42px ${FONT}`;
     ctx.fillStyle = WHITE;
-    ctx.textAlign = 'center';
-    ctx.fillText(`${reps} REPS`, W / 2, y);
+    ctx.textAlign = 'left';
+    ctx.fillText(`${reps} REPS`, padX, y);
   }
 
-  y += 42 * s + 22 * s;
+  y += 42 + 22;
 
   // Divider
   ctx.strokeStyle = DIVIDER;
-  ctx.lineWidth = 1 * s;
+  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(padX, y);
   ctx.lineTo(W - padX, y);
   ctx.stroke();
-  y += 18 * s;
+  y += 18;
 
-  // Bodyweight stats
+  // Bodyweight stats — left-aligned, side by side
   if (showBodyweight) {
     const bwText = `${bodyweight}KG`;
-    ctx.font = `700 ${20 * s}px ${FONT}`;
+    ctx.font = `700 20px ${FONT}`;
     ctx.fillStyle = WHITE;
-    ctx.textAlign = 'center';
-    const bwW = ctx.measureText(bwText).width;
-
-    let totalBwW = bwW;
-    let ratioText = '';
-    let ratioW = 0;
-    if (ratio && ratio > 0) {
-      ratioText = `${ratio.toFixed(2)}×`;
-      ctx.font = `700 ${20 * s}px ${FONT}`;
-      ratioW = ctx.measureText(ratioText).width;
-      totalBwW += 28 * s + ratioW;
-    }
-
-    let bx = W / 2 - totalBwW / 2;
-    ctx.font = `700 ${20 * s}px ${FONT}`;
-    ctx.fillStyle = WHITE;
-    ctx.fillText(bwText, bx + bwW / 2, y);
-    ctx.font = `600 ${8 * s}px ${FONT}`;
+    ctx.textAlign = 'left';
+    ctx.fillText(bwText, padX, y);
+    ctx.font = `600 8px ${FONT}`;
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.fillText('BODYWEIGHT', bx + bwW / 2, y + 24 * s);
-    bx += bwW;
+    ctx.fillText('BODYWEIGHT', padX, y + 24);
 
-    if (ratioText) {
-      bx += 28 * s;
+    if (ratio && ratio > 0) {
+      const ratioText = `${ratio.toFixed(2)}×`;
+      const ratioX = padX + 140;
       ctx.strokeStyle = DIVIDER;
       ctx.beginPath();
-      ctx.moveTo(bx - 14 * s, y + 2 * s);
-      ctx.lineTo(bx - 14 * s, y + 28 * s);
+      ctx.moveTo(ratioX - 14, y + 2);
+      ctx.lineTo(ratioX - 14, y + 28);
       ctx.stroke();
 
-      ctx.font = `700 ${20 * s}px ${FONT}`;
+      ctx.font = `700 20px ${FONT}`;
       ctx.fillStyle = WHITE;
-      ctx.fillText(ratioText, bx + ratioW / 2, y);
-      ctx.font = `600 ${8 * s}px ${FONT}`;
+      ctx.fillText(ratioText, ratioX, y);
+      ctx.font = `600 8px ${FONT}`;
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
-      ctx.fillText('RATIO', bx + ratioW / 2, y + 24 * s);
+      ctx.fillText('RATIO', ratioX, y + 24);
     }
 
-    y += 44 * s;
+    y += 44;
   }
 
   // Progress chart
   if (chartData) {
     if (showBodyweight) {
       ctx.strokeStyle = DIVIDER;
-      ctx.lineWidth = 1 * s;
+      ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(padX, y);
       ctx.lineTo(W - padX, y);
       ctx.stroke();
-      y += 18 * s;
+      y += 18;
     }
 
     // Chart title
-    ctx.font = `600 ${9 * s}px ${FONT}`;
+    ctx.font = `600 9px ${FONT}`;
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    drawCenteredSpacedText(ctx, 'PROGRESS OVER TIME', W / 2, y, 0.15 * 9 * s);
-    y += 9 * s + 10 * s;
+    drawSpacedText(ctx, 'PROGRESS OVER TIME', padX, y, 0.15 * 9);
+    y += 9 + 10;
 
-    const chartX = (W - chartData.chartWidth) / 2;
+    const chartX = padX;
 
     // Polyline
     ctx.strokeStyle = ACCENT;
-    ctx.lineWidth = 2 * s;
+    ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.beginPath();
@@ -292,32 +233,32 @@ export function drawShareCard({ exerciseName, weight, reps, bodyweight, ratio, h
     chartData.coords.forEach(c => {
       ctx.fillStyle = ACCENT;
       ctx.beginPath();
-      ctx.arc(chartX + c.x, y + c.y, 3 * s, 0, Math.PI * 2);
+      ctx.arc(chartX + c.x, y + c.y, 3, 0, Math.PI * 2);
       ctx.fill();
     });
 
     // Weight labels
-    ctx.font = `${8 * s}px ${FONT}`;
+    ctx.font = `8px ${FONT}`;
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
     ctx.textAlign = 'left';
-    ctx.fillText(`${chartData.startWeight}KG`, chartX, y + chartData.chartHeight - 8 * s);
+    ctx.fillText(`${chartData.startWeight}KG`, chartX, y + chartData.chartHeight + 4);
     ctx.textAlign = 'right';
-    ctx.fillText(`${chartData.endWeight}KG`, chartX + chartData.chartWidth, y - 4 * s);
+    ctx.fillText(`${chartData.endWeight}KG`, chartX + chartData.chartWidth, y - 12);
 
-    y += chartData.chartHeight + 6 * s;
+    y += chartData.chartHeight + 6;
 
     // Date labels
-    ctx.font = `${8 * s}px ${FONT}`;
+    ctx.font = `8px ${FONT}`;
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
     ctx.textAlign = 'left';
     ctx.fillText(chartData.startDate, chartX, y);
     ctx.textAlign = 'right';
     ctx.fillText(chartData.endDate, chartX + chartData.chartWidth, y);
-    y += 10 * s;
+    y += 10;
 
     // Bottom divider
     ctx.strokeStyle = DIVIDER;
-    ctx.lineWidth = 1 * s;
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(padX, y);
     ctx.lineTo(W - padX, y);
