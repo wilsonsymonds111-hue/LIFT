@@ -15,6 +15,7 @@ import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
 import { TouchHold } from '../lib/useTouchHold';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 const PAST_DAYS = 3;
 const DISPLAY_DAYS = 14;
@@ -164,6 +165,7 @@ export default function Home() {
   const [showCalendarSync, setShowCalendarSync] = useState(false);
   const [showSplitEditor, setShowSplitEditor] = useState(false);
   const [cycleVersion, setCycleVersion] = useState(0);
+  const [isReorderMode, setIsReorderMode] = useState(false);
   const punchControls = useAnimationControls();
   const menuRef = useRef({});
   const splitMenuBtnRef = useRef(null);
@@ -209,6 +211,13 @@ export default function Home() {
     invalidateWorkoutTemplates(queryClient);
   }, [queryClient]);
 
+  const handleCardLongPress = useCallback(() => {
+    if (navigator.vibrate) navigator.vibrate(10);
+    setMenuOpen(null);
+    setSplitMenuOpen(false);
+    setIsReorderMode(true);
+  }, []);
+
   const handleSyncToCalendar = useCallback(() => {
     setSplitMenuOpen(false);
     setShowCalendarSync(true);
@@ -251,6 +260,26 @@ export default function Home() {
 
     return { currentSplit: [...split].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)), currentSplitName: name };
   }, [templates]);
+
+  const handleReorder = useCallback(async (result) => {
+    if (!result.destination || result.source.index === result.destination.index) return;
+    const reordered = Array.from(currentSplit);
+    const [moved] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, moved);
+    const updates = reordered.map((t, i) => ({ id: t.id, sort_order: i }));
+    queryClient.setQueryData(['workoutTemplates'], (prev) =>
+      prev?.map(t => {
+        const u = updates.find(s => s.id === t.id);
+        return u ? { ...t, sort_order: u.sort_order } : t;
+      })
+    );
+    try {
+      await base44.entities.WorkoutTemplate.bulkUpdate(updates);
+    } catch (e) {
+      console.error('Reorder failed:', e);
+      invalidateWorkoutTemplates(queryClient);
+    }
+  }, [currentSplit, queryClient]);
 
   // Split detection + schedule — memoized on currentSplit + cycleVersion
   const splitDetection = useMemo(() => {
@@ -453,15 +482,22 @@ export default function Home() {
       <div className="px-4 py-2">
         <div>
           <div className="flex items-end justify-between mb-4">
-            <div>
-              <div className="mb-1">
-                <h3 className="font-semibold text-muted-foreground text-sm">Current Split</h3>
-              </div>
-              {currentSplitName && (
-                <h2 className="text-xl font-extrabold text-foreground tracking-tight">{currentSplitName}</h2>
-              )}
-            </div>
-            {currentSplit.length > 0 && (
+                <div>
+                  <div className="mb-1">
+                    <h3 className="font-semibold text-muted-foreground text-sm">{isReorderMode ? 'Drag to reorder' : 'Current Split'}</h3>
+                  </div>
+                  {currentSplitName && !isReorderMode && (
+                    <h2 className="text-xl font-extrabold text-foreground tracking-tight">{currentSplitName}</h2>
+                  )}
+                </div>
+                {isReorderMode ? (
+                  <button
+                    onClick={() => setIsReorderMode(false)}
+                    className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition"
+                  >
+                    Done
+                  </button>
+                ) : currentSplit.length > 0 && (
               <button
                 ref={splitMenuBtnRef}
                 onClick={(e) => { e.stopPropagation(); setSplitMenuOpen(!splitMenuOpen); setMenuOpen(null); }}
@@ -473,23 +509,36 @@ export default function Home() {
           </div>
 
           {currentSplit.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {currentSplit.map((template, idx) => {
-              return (
-              <TemplateCard
-                key={template.id}
-                template={template}
-                isTodayCard={idx === todayWorkoutIndex}
-                accent={accent}
-                dotColor={WORKOUT_COLORS[idx % WORKOUT_COLORS.length]}
-                isMenuOpen={menuOpen === template.id}
-                onToggleMenu={handleToggleMenu}
-                menuRef={menuRef}
-                onRemove={handleRemoveFromSplit}
-              />
-              );
-            })}
-            </div>
+          <DragDropContext onDragEnd={handleReorder} onDragStart={() => { if (navigator.vibrate) navigator.vibrate(5); }}>
+          <Droppable droppableId="split-cards" direction="vertical">
+          {(provided) => (
+          <div ref={provided.innerRef} {...provided.droppableProps} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {currentSplit.map((template, idx) => (
+              <Draggable key={template.id} draggableId={template.id} index={idx} isDragDisabled={!isReorderMode}>
+                {(dragProvided) => (
+                  <div ref={dragProvided.innerRef} {...dragProvided.draggableProps} style={dragProvided.draggableProps.style}>
+                    <TemplateCard
+                      template={template}
+                      isTodayCard={idx === todayWorkoutIndex}
+                      accent={accent}
+                      dotColor={WORKOUT_COLORS[idx % WORKOUT_COLORS.length]}
+                      isMenuOpen={menuOpen === template.id}
+                      onToggleMenu={handleToggleMenu}
+                      menuRef={menuRef}
+                      onRemove={handleRemoveFromSplit}
+                      isReorderMode={isReorderMode}
+                      dragHandleProps={dragProvided.dragHandleProps}
+                      onLongPress={handleCardLongPress}
+                    />
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+          )}
+          </Droppable>
+          </DragDropContext>
           ) : (
             <>
               <button

@@ -1,7 +1,8 @@
 import { memo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { MoreHorizontal, Pencil, Dumbbell } from 'lucide-react';
+import { MoreHorizontal, Pencil, Dumbbell, GripVertical } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { TouchHold } from '../lib/useTouchHold';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -21,7 +22,7 @@ const relativeTime = (dateStr) => {
   return `${Math.floor(diffDays / 7)}w ago`;
 };
 
-const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent, dotColor, isMenuOpen, onToggleMenu, menuRef, onRemove }) {
+const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent, dotColor, isMenuOpen, onToggleMenu, menuRef, onRemove, isReorderMode, dragHandleProps, onLongPress }) {
   const navigate = useNavigate();
   const btnRef = useRef(null);
 
@@ -31,17 +32,25 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
   };
 
   const exercises = template.exerciseList || [];
+  const holdProps = TouchHold(onLongPress, 400);
 
   return (
-    <div className="relative">
+    <div
+      {...(isReorderMode ? dragHandleProps : holdProps)}
+    >
       <div
-        className={`relative w-full rounded-2xl p-5 transition-all duration-150 active:scale-[0.99] border bg-white dark:bg-card overflow-hidden ${
-          isTodayCard
-            ? 'border-border shadow-[0_10px_36px_rgba(0,0,0,0.10),0_2px_8px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(255,255,255,0.7)] dark:shadow-[0_10px_36px_rgba(0,0,0,0.25),inset_0_0_0_1px_rgba(255,255,255,0.08)]'
-            : 'border-border shadow-[0_6px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.03),inset_0_0_0_1px_rgba(255,255,255,0.6)] dark:shadow-[0_6px_24px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.06)]'
+        className={`relative w-full rounded-2xl p-5 transition-all duration-150 border bg-white dark:bg-card overflow-hidden ${
+          isReorderMode
+            ? 'border-blue-400 dark:border-blue-500 shadow-[0_12px_40px_rgba(59,130,246,0.18)] scale-[1.02] cursor-grab active:cursor-grabbing'
+            : `active:scale-[0.99] ${
+                isTodayCard
+                  ? 'border-border shadow-[0_10px_36px_rgba(0,0,0,0.10),0_2px_8px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(255,255,255,0.7)] dark:shadow-[0_10px_36px_rgba(0,0,0,0.25),inset_0_0_0_1px_rgba(255,255,255,0.08)]'
+                  : 'border-border shadow-[0_6px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.03),inset_0_0_0_1px_rgba(255,255,255,0.6)] dark:shadow-[0_6px_24px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.06)]'
+              }`
         }`}
       >
-      {/* Three-dot menu button — top right */}
+      {/* Three-dot menu button — top right (hidden in reorder mode) */}
+      {!isReorderMode && (
       <button
         ref={setBtnRef}
         onClick={(e) => { e.stopPropagation(); onToggleMenu(template.id); }}
@@ -49,12 +58,20 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
       >
         <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
       </button>
+      )}
 
-      <div onClick={() => navigate(`/active-workout/${template.id}`)} className={`cursor-pointer ${isTodayCard ? 'pl-1.5' : ''}`}>
+      {/* Grip indicator — shown in reorder mode */}
+      {isReorderMode && (
+        <div className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center z-10">
+          <GripVertical className="w-4 h-4 text-blue-500" />
+        </div>
+      )}
+
+      <div onClick={isReorderMode ? undefined : () => navigate(`/active-workout/${template.id}`)} className={`${isReorderMode ? '' : 'cursor-pointer'} ${isTodayCard && !isReorderMode ? 'pl-1.5' : ''}`}>
         {/* Title row */}
         <div className="flex items-center gap-2 pr-10">
           <h4 className="text-lg font-extrabold text-foreground tracking-tight">{template.name}</h4>
-          {isTodayCard && (
+          {isTodayCard && !isReorderMode && (
             <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">
               Today
             </span>
@@ -86,7 +103,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
         )}
       </div>
 
-      {isMenuOpen && createPortal(
+      {!isReorderMode && isMenuOpen && createPortal(
         <div
           onClick={e => e.stopPropagation()}
           className="fixed bg-card rounded-xl shadow-2xl border border-border py-1 min-w-[220px]"
