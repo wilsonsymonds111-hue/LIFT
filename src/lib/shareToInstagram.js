@@ -25,33 +25,49 @@ function generateDefaultBackground() {
   return canvas;
 }
 
-function compositeStickerOnBackground(stickerCanvas, bgCanvas) {
-  const ctx = bgCanvas.getContext('2d');
-  const targetWidth = bgCanvas.width * 0.62;
-  const scale = targetWidth / stickerCanvas.width;
-  const targetHeight = stickerCanvas.height * scale;
-  const x = (bgCanvas.width - targetWidth) / 2;
-  const y = (bgCanvas.height - targetHeight) / 2;
-  ctx.drawImage(stickerCanvas, x, y, targetWidth, targetHeight);
-  return bgCanvas;
-}
-
 /**
- * Shares workout stats to Instagram.
+ * Shares workout stats directly to Instagram Stories.
  *
- * Primary: Web Share API with files — opens the native iOS share sheet.
- * Fallback: Instagram Stories deep link (sticker + background).
+ * Primary: Instagram Stories deep link — opens Instagram app with the
+ *          sticker + background ready to post as a story.
+ * Fallback: Web Share API with files — native iOS share sheet.
  * Last resort: download the image.
  */
 export async function shareToInstagram(shareData) {
   const stickerCanvas = drawShareCard(shareData);
+  const bgCanvas = generateDefaultBackground();
 
-  // --- Primary: Web Share API with files (native iOS share sheet) ---
+  // --- Primary: Instagram Stories deep link ---
+  try {
+    const stickerBase64 = stickerCanvas.toDataURL('image/png').split(',')[1];
+    const bgBase64 = bgCanvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+    const url = `instagram-stories://share?source_image=${encodeURIComponent(bgBase64)}&sticker_image=${encodeURIComponent(stickerBase64)}`;
+
+    let didHide = false;
+    const onVisChange = () => { if (document.hidden) didHide = true; };
+    document.addEventListener('visibilitychange', onVisChange);
+
+    window.location.href = url;
+
+    // Wait to see if Instagram opens
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    document.removeEventListener('visibilitychange', onVisChange);
+
+    if (didHide) return { shared: true, method: 'instagram-deep-link' };
+  } catch {}
+
+  // --- Fallback: Web Share API with files (native iOS share sheet) ---
   if (navigator.share && navigator.canShare) {
-    const bgCanvas = generateDefaultBackground();
-    const composited = compositeStickerOnBackground(stickerCanvas, bgCanvas);
+    // Composite sticker onto background
+    const ctx = bgCanvas.getContext('2d');
+    const targetWidth = bgCanvas.width * 0.62;
+    const scale = targetWidth / stickerCanvas.width;
+    const targetHeight = stickerCanvas.height * scale;
+    const x = (bgCanvas.width - targetWidth) / 2;
+    const y = (bgCanvas.height - targetHeight) / 2;
+    ctx.drawImage(stickerCanvas, x, y, targetWidth, targetHeight);
 
-    const blob = await new Promise(resolve => composited.toBlob(resolve, 'image/png'));
+    const blob = await new Promise(resolve => bgCanvas.toBlob(resolve, 'image/png'));
     const file = new File([blob], 'lift-share.png', { type: 'image/png' });
 
     if (navigator.canShare({ files: [file] })) {
@@ -63,25 +79,6 @@ export async function shareToInstagram(shareData) {
       }
     }
   }
-
-  // --- Fallback: Instagram Stories deep link ---
-  try {
-    const bgCanvas = generateDefaultBackground();
-    const stickerBase64 = stickerCanvas.toDataURL('image/png').split(',')[1];
-    const bgBase64 = bgCanvas.toDataURL('image/jpeg', 0.85).split(',')[1];
-    const url = `instagram-stories://share?source_image=${encodeURIComponent(bgBase64)}&sticker_image=${encodeURIComponent(stickerBase64)}`;
-
-    let didHide = false;
-    const onVisChange = () => { if (document.hidden) didHide = true; };
-    document.addEventListener('visibilitychange', onVisChange);
-
-    window.location.href = url;
-
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    document.removeEventListener('visibilitychange', onVisChange);
-
-    if (didHide) return { shared: true, method: 'deep-link' };
-  } catch {}
 
   // --- Last resort: download the sticker image ---
   const link = document.createElement('a');
