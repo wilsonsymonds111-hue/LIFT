@@ -23,6 +23,7 @@ const TODAY_STR = new Date().toLocaleDateString('en-GB', { day: 'numeric', month
 export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedSession }) {
   const [minimized, setMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [noteFocused, setNoteFocused] = useState(false);
   const yMotion = useMotionValue(0);
   const dragStartYRef = useRef(null);
   const draggingRef = useRef(false);
@@ -538,7 +539,13 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 contentEditable
                 suppressContentEditableWarning
                 data-placeholder="Note…"
-                className="w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-6 -ml-1 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-2 font-display empty:bg-transparent empty:border-transparent empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold transition-colors"
+                onFocus={() => setNoteFocused(true)}
+                onBlur={() => setNoteFocused(false)}
+                className={`w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-6 -ml-1 focus:outline-none border rounded-full px-4 py-2 font-display transition-colors empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold ${
+                  noteFocused
+                    ? 'bg-blue-50 dark:bg-blue-950/40 border-white'
+                    : 'bg-transparent border-transparent'
+                }`}
               />
 
               <DragDropContext onDragEnd={({ source, destination }) => {
