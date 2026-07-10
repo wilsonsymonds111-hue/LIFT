@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Share2, Loader2 } from 'lucide-react';
+import { Loader2, Instagram } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { shareToInstagram } from '../../lib/shareToInstagram';
 
@@ -51,7 +51,7 @@ export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
       {isSharing ? (
         <Loader2 className="w-4 h-4 text-gray-700 dark:text-gray-200 animate-spin" />
       ) : (
-        <Share2 className="w-4 h-4 text-gray-700 dark:text-gray-200" />
+        <Instagram className="w-4 h-4 text-gray-700 dark:text-gray-200" />
       )}
     </button>
   );
