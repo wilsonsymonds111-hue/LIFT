@@ -6,7 +6,7 @@ import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
-import { getExerciseDetailList } from '../lib/exerciseCache';
+import { getExerciseImageMap, getExerciseDetailList } from '../lib/exerciseCache';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
 import TimerDisplay from './workout/TimerDisplay';
 import { notifyRestComplete } from '../lib/workoutSounds';
@@ -228,6 +228,14 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
+    // Start from localStorage cache instantly, then fetch full details for fuzzy matching
+    const cachedMap = getExerciseImageMap();
+    const initialMap = {};
+    Object.entries(cachedMap).forEach(([name, url]) => {
+      initialMap[name.toLowerCase()] = url;
+    });
+    setExerciseImages(initialMap);
+
     getExerciseDetailList().then(async (results) => {
       const detailByName = {};
       (results || []).forEach(d => {
