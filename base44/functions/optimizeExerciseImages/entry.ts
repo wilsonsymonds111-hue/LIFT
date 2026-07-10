@@ -1,8 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-const BATCH_SIZE = 15;
+const BATCH_SIZE = 5;
 const TARGET_WIDTH = 400;
 const JPEG_QUALITY = 80;
+
+const IMAGE_PROMPT = (name, muscles) => `Two side-by-side anatomical figures showing the "${name}" exercise: the left figure shows the starting position, the right figure shows the finishing position. Both figures are identical in size, proportions, camera angle, body composition, and anatomical detail. Clean solid white background (not transparent). Grayscale anatomical style with visible musculature, no skin texture, like a fitness anatomy reference diagram. ONLY the following muscles must be highlighted in red: ${muscles}. No other muscles should be red. No text, labels, arrows, numbers, logos, watermarks, or annotations. Exercise equipment accurately represented for each phase. Professional museum-quality medical illustration style.`;
 
 Deno.serve(async (req) => {
   try {
@@ -16,10 +18,8 @@ Deno.serve(async (req) => {
     const skip = body.skip || 0;
 
     const allDetails = await base44.asServiceRole.entities.ExerciseDetail.list('name', 500);
-    const toProcess = allDetails.filter(d => d.image_url);
-
-    const batch = toProcess.slice(skip, skip + BATCH_SIZE);
-    const results = { processed: 0, failed: 0, remaining: Math.max(0, toProcess.length - skip - batch.length), total: toProcess.length, skip, errors: [] };
+    const batch = allDetails.slice(skip, skip + BATCH_SIZE);
+    const results = { processed: 0, failed: 0, remaining: Math.max(0, allDetails.length - skip - batch.length), total: allDetails.length, skip, errors: [] };
 
     // Import pure-JS image libraries
     const upngMod = await import('npm:upng-js@2.1.0');
@@ -29,9 +29,17 @@ Deno.serve(async (req) => {
 
     for (const detail of batch) {
       try {
-        const imgResp = await fetch(detail.image_url);
+        // Regenerate image from scratch using AI
+        const muscles = detail.muscles_worked || 'various muscle groups';
+        const imgRes = await base44.asServiceRole.integrations.Core.GenerateImage({
+          prompt: IMAGE_PROMPT(detail.name, muscles)
+        });
+        const generatedUrl = imgRes?.url;
+        if (!generatedUrl) { results.errors.push(`${detail.name}: no image URL from AI`); results.failed++; continue; }
+
+        // Fetch the generated image
+        const imgResp = await fetch(generatedUrl);
         if (!imgResp.ok) { results.errors.push(`${detail.name}: fetch ${imgResp.status}`); results.failed++; continue; }
-        const contentType = imgResp.headers.get('content-type') || '';
         const arrayBuffer = await imgResp.arrayBuffer();
         const headerBytes = new Uint8Array(arrayBuffer.slice(0, 4));
         const isJpeg = headerBytes[0] === 0xff && headerBytes[1] === 0xd8;
@@ -47,8 +55,8 @@ Deno.serve(async (req) => {
           width = img.width; height = img.height;
           rgba = img.data;
         } else {
-          results.errors.push(`${detail.name}: unknown format, content-type=${contentType}`);
-          results.processed++;
+          results.errors.push(`${detail.name}: unknown image format`);
+          results.failed++;
           continue;
         }
 
@@ -57,7 +65,7 @@ Deno.serve(async (req) => {
         const newW = Math.round(width * scale);
         const newH = Math.round(height * scale);
 
-        // Bilinear resize
+        // Bilinear resize with proper alpha compositing onto white background
         const resized = new Uint8Array(newW * newH * 4);
         for (let y = 0; y < newH; y++) {
           for (let x = 0; x < newW; x++) {
@@ -70,12 +78,21 @@ Deno.serve(async (req) => {
             const fx = srcX - x0;
             const fy = srcY - y0;
 
-            // Bilinear sample RGB, then alpha-composite onto white (JPEG has no alpha)
+            // Bilinear sample alpha channel
+            const a00 = rgba[(y0 * width + x0) * 4 + 3];
+            const a01 = rgba[(y0 * width + x1) * 4 + 3];
+            const a10 = rgba[(y1 * width + x0) * 4 + 3];
+            const a11 = rgba[(y1 * width + x1) * 4 + 3];
+            const alphaTop = a00 * (1 - fx) + a01 * fx;
+            const alphaBot = a10 * (1 - fx) + a11 * fx;
+            const alpha = (alphaTop * (1 - fy) + alphaBot * fy) / 255;
+
+            // Alpha-composite RGB onto white: output = src * alpha + white * (1 - alpha)
             for (let c = 0; c < 3; c++) {
               const top = rgba[(y0 * width + x0) * 4 + c] * (1 - fx) + rgba[(y0 * width + x1) * 4 + c] * fx;
               const bot = rgba[(y1 * width + x0) * 4 + c] * (1 - fx) + rgba[(y1 * width + x1) * 4 + c] * fx;
-              const val = top * (1 - fy) + bot * fy;
-              resized[(y * newW + x) * 4 + c] = Math.round(val);
+              const srcVal = top * (1 - fy) + bot * fy;
+              resized[(y * newW + x) * 4 + c] = Math.round(srcVal * alpha + 255 * (1 - alpha));
             }
             resized[(y * newW + x) * 4 + 3] = 255; // opaque
           }
