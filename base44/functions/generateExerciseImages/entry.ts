@@ -38,9 +38,14 @@ Deno.serve(async (req) => {
     }
 
     const existingDetails = await base44.asServiceRole.entities.ExerciseDetail.list('name', 500);
-    const existingNames = new Set((existingDetails || []).map(d => d.name));
+    const existingWithImages = new Set(
+      (existingDetails || []).filter(d => d.image_url).map(d => d.name)
+    );
 
-    const needed = ALL_EXERCISES.filter(name => !existingNames.has(name));
+    // NEVER overwrite an exercise that already has an image.
+    // This is a hard safeguard — user-uploaded or previously generated
+    // images must be preserved at all costs.
+    const needed = ALL_EXERCISES.filter(name => !existingWithImages.has(name));
 
     if (needed.length === 0) {
       return Response.json({ message: 'All exercises already have detail records', generated: 0, remaining: 0 });
