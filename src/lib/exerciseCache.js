@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 // In-memory cache with TTL
 const cache = {};
 const DEFAULT_TTL = 5 * 60 * 1000;
-const LS_IMAGE_KEY = 'lift_exercise_images';
+const LS_IMAGE_KEY = 'lift_exercise_images_v2';
 
 function now() { return Date.now(); }
 

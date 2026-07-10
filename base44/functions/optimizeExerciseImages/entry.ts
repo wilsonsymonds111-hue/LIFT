@@ -31,12 +31,26 @@ Deno.serve(async (req) => {
       try {
         const imgResp = await fetch(detail.image_url);
         if (!imgResp.ok) { results.errors.push(`${detail.name}: fetch ${imgResp.status}`); results.failed++; continue; }
+        const contentType = imgResp.headers.get('content-type') || '';
         const arrayBuffer = await imgResp.arrayBuffer();
+        const headerBytes = new Uint8Array(arrayBuffer.slice(0, 4));
+        const isJpeg = headerBytes[0] === 0xff && headerBytes[1] === 0xd8;
+        const isPng = headerBytes[0] === 0x89 && headerBytes[1] === 0x50;
 
-        // Decode PNG
-        const img = UPNG.decode(arrayBuffer);
-        const { width, height } = img;
-        const rgba = UPNG.toRGBA8(img)[0]; // Uint8Array of RGBA pixels
+        let width, height, rgba;
+        if (isPng) {
+          const img = UPNG.decode(arrayBuffer);
+          width = img.width; height = img.height;
+          rgba = UPNG.toRGBA8(img)[0];
+        } else if (isJpeg) {
+          const img = JPEG.decode(arrayBuffer);
+          width = img.width; height = img.height;
+          rgba = img.data;
+        } else {
+          results.errors.push(`${detail.name}: unknown format, content-type=${contentType}`);
+          results.processed++;
+          continue;
+        }
 
         // Calculate resize dimensions (fit inside TARGET_WIDTH x TARGET_WIDTH)
         const scale = Math.min(TARGET_WIDTH / width, TARGET_WIDTH / height);
@@ -73,7 +87,7 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.ExerciseDetail.update(detail.id, { image_url: file_url });
         results.processed++;
       } catch (e) {
-        results.errors.push(`${detail.name}: ${e.message}`);
+        results.errors.push(`${detail.name}: ${e.message || e.toString() || JSON.stringify(e)}`);
         results.failed++;
       }
     }
