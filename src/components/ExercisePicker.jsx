@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { X, Search, Plus, Dumbbell } from 'lucide-react';
 import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
-import { getExerciseDetailList } from '../lib/exerciseCache';
+import { getExerciseDetailList, invalidateExerciseCache } from '../lib/exerciseCache';
 import ExerciseDetailModal from './ExerciseDetailModal';
 
 // Tracks the visible viewport height — shrinks when the mobile keyboard opens
@@ -43,8 +43,10 @@ export default function ExercisePicker({ onClose, onAdd }) {
   const [detailExercise, setDetailExercise] = useState(null);
   const viewportHeight = useVisualViewportHeight();
 
-  // Load exercise detail images once on mount
+  // Load exercise detail images once on mount — invalidate cache first so
+  // any image updates (e.g. from ExerciseDetailModal uploads) are reflected
   useEffect(() => {
+    invalidateExerciseCache();
     getExerciseDetailList().then((details) => {
       const map = {};
       (details || []).forEach(d => {
