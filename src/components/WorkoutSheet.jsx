@@ -527,12 +527,12 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 <h1 className="text-2xl font-bold text-gray-900">{template.name}</h1>
               </div>
               <div className="flex items-center gap-1.5 mb-0.5">
-                <CalendarDays className="w-4 h-4 text-gray-700 dark:text-gray-200" strokeWidth={2} />
-                <p className="text-base font-bold text-gray-900 dark:text-gray-100 font-display">{TODAY_STR}</p>
+                <CalendarDays className="w-4 h-4 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 font-display">{TODAY_STR}</p>
               </div>
               <div className="flex items-center gap-1.5 mb-4">
-                <Clock className="w-4 h-4 text-gray-700 dark:text-gray-200" strokeWidth={2} />
-                <TimerDisplay startTimestamp={startTimeRef.current} className="text-base font-bold text-gray-900 dark:text-gray-100 font-display" />
+                <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+                <TimerDisplay startTimestamp={startTimeRef.current} className="text-sm font-semibold text-gray-500 dark:text-gray-400 font-display" />
               </div>
               <textarea placeholder="Note" rows={1} className="w-full text-sm font-semibold text-blue-600 dark:text-blue-400 placeholder-gray-400 dark:placeholder-gray-500 mb-6 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-2 resize-none font-display placeholder-shown:bg-transparent placeholder-shown:border-transparent transition-colors" />
 
