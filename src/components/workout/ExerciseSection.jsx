@@ -145,12 +145,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         )}
       </div>
             {showNote && (
-        <textarea
-          value={note}
-          onChange={e => setNote(e.target.value)}
-          placeholder="Add a note…"
-          rows={1}
-          className="w-full text-sm font-semibold text-blue-600 dark:text-blue-400 placeholder-gray-400 dark:placeholder-gray-500 mb-2 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-1.5 resize-none placeholder-shown:bg-transparent placeholder-shown:border-transparent transition-colors"
+        <div
+          ref={el => { if (el && document.activeElement !== el && el.textContent !== note) el.textContent = note; }}
+          contentEditable
+          suppressContentEditableWarning
+          data-placeholder="Add a note…"
+          onInput={e => setNote(e.currentTarget.textContent)}
+          className="w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-1.5 empty:bg-transparent empty:border-transparent empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold transition-colors"
         />
       )}
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
