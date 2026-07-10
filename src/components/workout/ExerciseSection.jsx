@@ -54,7 +54,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   });
   const [completedSets, setCompletedSets] = useState(() => initialState?.completedSets || {});
   const [showMenu, setShowMenu] = useState(false);
-  const [note, setNote] = useState(() => initialState?.note || exercise.note || '');
+  const [note, setNote] = useState(() => initialState?.note || '');
   const [showNote, setShowNote] = useState(false);
   const [restDuration, setRestDuration] = useState(() => getDefaultRestDuration(exercise.name));
   const [restEnabled, setRestEnabled] = useState(true);

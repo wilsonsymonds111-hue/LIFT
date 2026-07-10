@@ -11,7 +11,6 @@ import BottomNav from './components/BottomNav';
 import PersistentWorkoutBar from './components/PersistentWorkoutBar';
 import { NavProvider } from '@/lib/NavContext';
 import ImportErrorBoundary from './components/ImportErrorBoundary';
-import { preloadExerciseImages } from './lib/preloadImages';
 
 // Retry wrapper for lazy imports — recovers from transient Vite HMR
 // "Failed to fetch dynamically imported module" errors after recompiles.
@@ -293,9 +292,6 @@ function App() {
   useEffect(() => {
     const stored = localStorage.getItem('darkMode');
     document.documentElement.classList.toggle('dark', stored === 'true');
-    // Start preloading exercise images into browser cache as soon as the
-    // app mounts — URLs are already in localStorage from previous sessions.
-    preloadExerciseImages();
   }, []);
 
   return (

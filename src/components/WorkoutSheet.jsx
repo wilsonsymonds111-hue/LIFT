@@ -6,7 +6,7 @@ import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
-import { getExerciseImageMap, getExerciseDetailList } from '../lib/exerciseCache';
+import { getExerciseDetailList } from '../lib/exerciseCache';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
 import TimerDisplay from './workout/TimerDisplay';
 import { notifyRestComplete } from '../lib/workoutSounds';
@@ -23,9 +23,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const [minimized, setMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [noteFocused, setNoteFocused] = useState(false);
-  const [workoutNote, setWorkoutNote] = useState(() => savedSession?.workoutNote || template?.note || '');
-  const workoutNoteRef = useRef(workoutNote);
-  workoutNoteRef.current = workoutNote;
   const yMotion = useMotionValue(0);
   const dragStartYRef = useRef(null);
   const draggingRef = useRef(false);
@@ -231,14 +228,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
-    // Start from localStorage cache instantly, then fetch full details for fuzzy matching
-    const cachedMap = getExerciseImageMap();
-    const initialMap = {};
-    Object.entries(cachedMap).forEach(([name, url]) => {
-      initialMap[name.toLowerCase()] = url;
-    });
-    setExerciseImages(initialMap);
-
     getExerciseDetailList().then(async (results) => {
       const detailByName = {};
       (results || []).forEach(d => {
@@ -321,7 +310,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         exercises: exercisesRef.current,
         bestSets: bestSetsRef.current,
         exerciseState: exerciseStateRef.current,
-        workoutNote: workoutNoteRef.current,
       });
     }, 1000);
   }, []);
@@ -338,11 +326,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         exercises,
         bestSets: bestSetsRef.current,
         exerciseState: exerciseStateRef.current,
-        workoutNote: workoutNoteRef.current,
       });
     }, 500);
     return () => { if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current); };
-  }, [exercises, showSummary, template?.id, template?.name, workoutNote]);
+  }, [exercises, showSummary, template?.id, template?.name]);
 
   const handleFinish = useCallback(async () => {
     const snapshot = { ...bestSetsRef.current };
@@ -380,15 +367,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         }
       }
     }
-    // Attach per-exercise notes from session state so they persist on the template
-    const exercisesWithNotes = exercises.map(ex => ({
-      ...ex,
-      note: exerciseStateRef.current[ex.name]?.note || ex.note || '',
-    }));
     // onSaveHistory (→ processWorkoutSave) handles saving the exercise
-    // composition, updated history, notes, and lastPerformed all together.
+    // composition, updated history, and lastPerformed all together.
     try {
-      await onSaveHistory?.(template.id, allSets, exercisesWithNotes, workoutNoteRef.current);
+      await onSaveHistory?.(template.id, allSets, exercises);
     } catch (e) {
       console.error('Save failed:', e);
     }
@@ -549,13 +531,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 <TimerDisplay startTimestamp={startTimeRef.current} className="text-sm font-semibold text-gray-500 dark:text-gray-400 font-display" />
               </div>
               <div
-                ref={el => { if (el && document.activeElement !== el && el.textContent !== workoutNote) el.textContent = workoutNote; }}
                 contentEditable
                 suppressContentEditableWarning
                 data-placeholder="Note…"
                 onFocus={() => setNoteFocused(true)}
                 onBlur={() => setNoteFocused(false)}
-                onInput={e => setWorkoutNote(e.currentTarget.textContent)}
                 className={`w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-4 -ml-1 focus:outline-none border rounded-full px-4 py-2 font-display transition-colors empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold ${
                   noteFocused
                     ? 'bg-blue-50 dark:bg-blue-950/40 border-white'

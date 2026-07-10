@@ -16,9 +16,9 @@ export default function ActiveWorkout() {
     ? { id, name: 'Evening Workout', exerciseList: [] }
     : templates?.find(t => t.id === id);
 
-  const handleSaveHistory = async (templateId, snapshot, exerciseList, workoutNote) => {
+  const handleSaveHistory = async (templateId, snapshot, exerciseList) => {
     if (templateId.startsWith('empty-')) return;
-    await saveWorkout(templateId, snapshot, exerciseList, workoutNote);
+    await saveWorkout(templateId, snapshot, exerciseList);
   };
 
   // Sync any queued workouts when back online

@@ -8,7 +8,7 @@ import NoResultsSuggestion from '../components/exercises/NoResultsSuggestion';
 import CreateExerciseModal from '../components/exercises/CreateExerciseModal';
 import { Plus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { getExerciseImageMap, getExerciseDetailList } from '../lib/exerciseCache';
+import { getExerciseDetailList } from '../lib/exerciseCache';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
 import { useLocation } from 'react-router-dom';
 import ExerciseList from '../components/ExerciseList';
@@ -124,16 +124,14 @@ export default function Exercises() {
     return historyMap;
   }, [exerciseHistoryData]);
 
-  // Load images instantly from localStorage cache, then refresh from API
   useEffect(() => {
-    setExerciseImages(getExerciseImageMap());
-    getExerciseDetailList().then(details => {
+    getExerciseDetailList().then(detailResults => {
       const imageMap = {};
-      (details || []).forEach(d => {
+      (detailResults || []).forEach(d => {
         if (d.image_url) imageMap[d.name] = d.image_url;
       });
       setExerciseImages(imageMap);
-    }).catch(() => {});
+    });
   }, []);
 
   const allExercises = useMemo(() => getAllExercises(), [customExercisesVersion]);

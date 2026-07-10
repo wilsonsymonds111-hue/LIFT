@@ -83,24 +83,24 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
     try {
       const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(igStickerRef.current, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
-        backgroundColor: '#000000',
+        backgroundColor: null,
         logging: false,
         width: 390,
         height: 844,
       });
       canvas.toBlob(async (blob) => {
-        const file = new File([blob], 'workout-story.jpg', { type: 'image/jpeg' });
+        const file = new File([blob], 'workout-story.png', { type: 'image/png' });
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({ files: [file], title: `${template.name} Workout` });
         } else {
           const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = 'workout-story.jpg'; a.click();
+          const a = document.createElement('a'); a.href = url; a.download = 'workout-story.png'; a.click();
           URL.revokeObjectURL(url);
         }
         setIgSharing(false);
-      }, 'image/jpeg', 0.85);
+      }, 'image/png');
     } catch { setIgSharing(false); }
   };
 
@@ -164,10 +164,10 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
                 return (
                   <div key={i} className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-xs text-gray-700 font-medium leading-snug">{ex.sets} × {ex.name}</span>
                       {isPR && (
                         <span className="flex-shrink-0 text-[10px] font-bold bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full leading-none">PR</span>
                       )}
-                      <span className="text-xs text-gray-700 font-medium leading-snug">{ex.sets} × {ex.name}</span>
                     </div>
                     <span className="flex-shrink-0 text-xs text-gray-500 font-semibold">
                       {best ? (best.kg ? `${best.kg} kg × ${best.reps}` : `${best.reps} reps`) : '—'}

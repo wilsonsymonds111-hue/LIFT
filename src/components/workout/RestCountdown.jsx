@@ -25,32 +25,14 @@ const RestCountdown = memo(function RestCountdown({ duration }) {
       }
     };
 
-    // Restart the interval — iOS kills setInterval when the PWA is backgrounded
-    const startInterval = () => {
-      clearInterval(intervalRef.current);
-      intervalRef.current = setInterval(() => tick(false), 1000);
-    };
+    intervalRef.current = setInterval(() => tick(false), 1000);
 
-    startInterval();
-
-    // iOS PWAs don't reliably fire visibilitychange when switching apps.
-    // pageshow + focus catch the resume event where visibilitychange doesn't.
-    const onResume = () => {
-      if (!document.hidden) {
-        tick(true);
-        startInterval();
-      }
-    };
-
-    document.addEventListener('visibilitychange', onResume);
-    window.addEventListener('pageshow', onResume);
-    window.addEventListener('focus', onResume);
+    const onVisible = () => { if (!document.hidden) tick(true); };
+    document.addEventListener('visibilitychange', onVisible);
 
     return () => {
       clearInterval(intervalRef.current);
-      document.removeEventListener('visibilitychange', onResume);
-      window.removeEventListener('pageshow', onResume);
-      window.removeEventListener('focus', onResume);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);
 

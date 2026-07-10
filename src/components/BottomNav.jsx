@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { memo } from 'react';
 import { Dumbbell, Layers, PersonStanding } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -13,19 +13,8 @@ const tabs = [
 const BottomNav = memo(function BottomNav() {
   const location = useLocation();
   const { hideNav } = useNavVisibility();
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const check = () => {
-      setKeyboardVisible(window.innerHeight - vv.height > 100);
-    };
-    vv.addEventListener('resize', check);
-    return () => vv.removeEventListener('resize', check);
-  }, []);
-
-  if (hideNav || location.pathname.startsWith('/support-chat') || keyboardVisible) return null;
+  if (hideNav || location.pathname.startsWith('/support-chat')) return null;
 
   return (
     <div

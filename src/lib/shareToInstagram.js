@@ -1,45 +1,39 @@
 import { drawShareCard } from './drawShareCard';
 
 /**
- * Shares workout stats to Instagram Stories.
+ * Shares workout stats directly to Instagram Stories.
  *
- * 1. Try the instagram-stories:// deep link (works in Safari, NOT in PWA mode).
- * 2. Fallback: Web Share API with the image as a file — shows the iOS share
- *    sheet where Instagram appears as an option.
- * 3. Last resort: download the image.
+ * Primary: instagram-stories:// deep link — opens Instagram with the sticker
+ *          ready to post as a story.
+ * Fallback: Web Share API with files — native iOS share sheet.
+ * Last resort: download the image.
  */
 export async function shareToInstagram(shareData) {
   const stickerCanvas = drawShareCard(shareData);
+  const stickerBase64 = stickerCanvas.toDataURL('image/png').split(',')[1];
 
-  // Detect PWA/standalone mode — custom URL schemes are blocked by Apple
-  // in WKWebView (the engine behind home-screen PWAs). In that case, skip
-  // the deep link and go straight to the Web Share API.
-  const isStandalone =
-    window.navigator.standalone === true ||
-    window.matchMedia('(display-mode: standalone)').matches;
+  const url = `instagram-stories://share?background_top_color=%23000000&background_bottom_color=%23000000&sticker_image=${encodeURIComponent(stickerBase64)}`;
 
-  // --- Attempt 1: Instagram deep link (Safari browser only) ---
-  // toDataURL is synchronous — must stay in the user-gesture call stack.
-  if (!isStandalone) {
-    const stickerBase64 = stickerCanvas.toDataURL('image/jpeg', 0.85).split(',')[1];
-    const deepLink = `instagram-stories://share?background_top_color=%23000000&background_bottom_color=%23000000&sticker_image=${encodeURIComponent(stickerBase64)}`;
+  // Navigate BEFORE any await — iOS requires this within the user-gesture
+  // call stack or the URL scheme is silently blocked.
+  window.location.href = url;
 
-    window.location.href = deepLink;
+  // Brief wait to detect if Instagram opened (page becomes hidden)
+  let didHide = false;
+  const onVisChange = () => { if (document.hidden) didHide = true; };
+  document.addEventListener('visibilitychange', onVisChange);
 
-    let didHide = false;
-    const onVis = () => { if (document.hidden) didHide = true; };
-    document.addEventListener('visibilitychange', onVis);
-    await new Promise(r => setTimeout(r, 600));
-    document.removeEventListener('visibilitychange', onVis);
+  await new Promise(resolve => setTimeout(resolve, 600));
+  document.removeEventListener('visibilitychange', onVisChange);
 
-    if (didHide) return { shared: true, method: 'instagram-deep-link' };
-  }
+  if (didHide) return { shared: true, method: 'instagram-deep-link' };
 
-  // --- Attempt 2: Web Share API (shows share sheet with Instagram option) ---
-  if (navigator.share) {
-    const blob = await new Promise(resolve => stickerCanvas.toBlob(resolve, 'image/jpeg', 0.85));
-    const file = new File([blob], 'lift-share.jpg', { type: 'image/jpeg' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+  // --- Fallback: Web Share API with the sticker as a file ---
+  if (navigator.share && navigator.canShare) {
+    const blob = await new Promise(resolve => stickerCanvas.toBlob(resolve, 'image/png'));
+    const file = new File([blob], 'lift-share.png', { type: 'image/png' });
+
+    if (navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({ files: [file], title: 'LIFT' });
         return { shared: true, method: 'web-share' };
@@ -51,8 +45,8 @@ export async function shareToInstagram(shareData) {
 
   // --- Last resort: download ---
   const link = document.createElement('a');
-  link.href = stickerCanvas.toDataURL('image/jpeg', 0.85);
-  link.download = 'lift-share.jpg';
+  link.href = stickerCanvas.toDataURL('image/png');
+  link.download = 'lift-share.png';
   link.click();
   return { shared: false, fallback: 'download' };
 }
