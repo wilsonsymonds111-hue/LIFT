@@ -150,7 +150,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           onChange={e => setNote(e.target.value)}
           placeholder="Add a note…"
           rows={2}
-          className="w-full text-blue-500 font-semibold text-base bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none placeholder-blue-300 dark:placeholder-blue-700"
+          className="w-full text-sm font-semibold text-blue-600 dark:text-blue-400 placeholder-gray-400 dark:placeholder-gray-500 mb-2 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-2 resize-none placeholder-shown:bg-transparent placeholder-shown:border-transparent transition-colors"
         />
       )}
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
