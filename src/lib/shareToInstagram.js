@@ -1,32 +1,4 @@
-import html2canvas from 'html2canvas';
-
-/**
- * Captures a DOM element as a transparent PNG canvas (the sticker).
- * Resizes to keep the base64 output under Instagram's limits.
- */
-async function captureElementAsSticker(element) {
-  const canvas = await html2canvas(element, {
-    backgroundColor: null,
-    scale: 2,
-    logging: false,
-    useCORS: true,
-    allowTaint: true,
-  });
-
-  // Cap sticker width to keep base64 compact
-  const maxStickerWidth = 680;
-  if (canvas.width > maxStickerWidth) {
-    const scale = maxStickerWidth / canvas.width;
-    const resized = document.createElement('canvas');
-    resized.width = Math.round(canvas.width * scale);
-    resized.height = Math.round(canvas.height * scale);
-    const ctx = resized.getContext('2d');
-    ctx.drawImage(canvas, 0, 0, resized.width, resized.height);
-    return resized;
-  }
-
-  return canvas;
-}
+import { drawShareCard } from './drawShareCard';
 
 /**
  * Generates a dark, aesthetic gradient background for Instagram Stories (1080×1920).
@@ -37,7 +9,6 @@ function generateDefaultBackground() {
   canvas.height = 1920;
   const ctx = canvas.getContext('2d');
 
-  // Base gradient
   const gradient = ctx.createLinearGradient(0, 0, 0, 1920);
   gradient.addColorStop(0, '#1a1a2e');
   gradient.addColorStop(0.5, '#121220');
@@ -45,7 +16,6 @@ function generateDefaultBackground() {
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 1080, 1920);
 
-  // Subtle warm radial glow in center
   const radial = ctx.createRadialGradient(540, 800, 0, 540, 800, 700);
   radial.addColorStop(0, 'rgba(234, 215, 150, 0.07)');
   radial.addColorStop(1, 'rgba(234, 215, 150, 0)');
@@ -55,9 +25,6 @@ function generateDefaultBackground() {
   return canvas;
 }
 
-/**
- * Composites the sticker canvas onto the center of the background canvas.
- */
 function compositeStickerOnBackground(stickerCanvas, bgCanvas) {
   const ctx = bgCanvas.getContext('2d');
   const targetWidth = bgCanvas.width * 0.62;
@@ -70,15 +37,14 @@ function compositeStickerOnBackground(stickerCanvas, bgCanvas) {
 }
 
 /**
- * Shares a template element to Instagram.
+ * Shares workout stats to Instagram.
  *
- * Primary: Web Share API with files — opens the native iOS share sheet,
- *          which includes Instagram Stories. Most reliable on iPhone.
+ * Primary: Web Share API with files — opens the native iOS share sheet.
  * Fallback: Instagram Stories deep link (sticker + background).
- * Last resort: download the sticker image.
+ * Last resort: download the image.
  */
-export async function shareToInstagram(element) {
-  const stickerCanvas = await captureElementAsSticker(element);
+export async function shareToInstagram(shareData) {
+  const stickerCanvas = drawShareCard(shareData);
 
   // --- Primary: Web Share API with files (native iOS share sheet) ---
   if (navigator.share && navigator.canShare) {
@@ -90,13 +56,9 @@ export async function shareToInstagram(element) {
 
     if (navigator.canShare({ files: [file] })) {
       try {
-        await navigator.share({
-          files: [file],
-          title: 'LIFT',
-        });
+        await navigator.share({ files: [file], title: 'LIFT' });
         return { shared: true, method: 'web-share' };
       } catch (e) {
-        // User cancelled — don't fall through to other methods
         if (e.name === 'AbortError') return { shared: false, cancelled: true };
       }
     }
