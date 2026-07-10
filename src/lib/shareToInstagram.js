@@ -20,33 +20,26 @@ function downscaleCanvas(canvas, maxWidth) {
  * Last resort: download the image.
  */
 export async function shareToInstagram(shareData) {
-  const stickerCanvas = downscaleCanvas(drawShareCard(shareData), 400);
+  // drawShareCard produces a 640px retina canvas — downscale to ~300px
+  // to keep the base64 URL small enough for iOS URL schemes.
+  const stickerCanvas = downscaleCanvas(drawShareCard(shareData), 300);
+  const stickerBase64 = stickerCanvas.toDataURL('image/png').split(',')[1];
 
-  // --- Primary: Instagram Stories deep link ---
-  // Uses solid background colors instead of a source_image to keep the URL
-  // payload small enough for iOS to handle.
-  try {
-    const stickerBase64 = stickerCanvas.toDataURL('image/png').split(',')[1];
-    const url = `instagram-stories://share?background_top_color=1a1a2e&background_bottom_color=080808&sticker_image=${encodeURIComponent(stickerBase64)}`;
+  const url = `instagram-stories://share?background_top_color=%231a1a2e&background_bottom_color=%23080808&sticker_image=${encodeURIComponent(stickerBase64)}`;
 
-    // Anchor tag click is more reliable than window.location.href on iOS
-    const link = document.createElement('a');
-    link.href = url;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // Navigate BEFORE any await — iOS requires this to be within the
+  // user-gesture call stack or the URL scheme is silently blocked.
+  window.location.href = url;
 
-    // Wait to see if Instagram opens (page becomes hidden)
-    let didHide = false;
-    const onVisChange = () => { if (document.hidden) didHide = true; };
-    document.addEventListener('visibilitychange', onVisChange);
+  // Wait to see if Instagram opens (page becomes hidden)
+  let didHide = false;
+  const onVisChange = () => { if (document.hidden) didHide = true; };
+  document.addEventListener('visibilitychange', onVisChange);
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    document.removeEventListener('visibilitychange', onVisChange);
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  document.removeEventListener('visibilitychange', onVisChange);
 
-    if (didHide) return { shared: true, method: 'instagram-deep-link' };
-  } catch {}
+  if (didHide) return { shared: true, method: 'instagram-deep-link' };
 
   // --- Fallback: Web Share API with files (native iOS share sheet) ---
   if (navigator.share && navigator.canShare) {
