@@ -127,6 +127,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const cancelledRef = useRef(false);
   // Per-exercise state (sets, completedSets, note) for session persistence
   const exerciseStateRef = useRef(savedSession?.exerciseState || {});
+  // Refs for session saving inside stable callbacks
+  const exercisesRef = useRef(exercises);
+  exercisesRef.current = exercises;
+  const templateRef = useRef(template);
+  templateRef.current = template;
 
   const startRestTimer = (duration) => {
     clearInterval(restIntervalRef.current);
@@ -292,6 +297,21 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   // Persist the live workout session so it survives app kills
   const handleExerciseStateChange = useCallback((name, state) => {
     exerciseStateRef.current[name] = state;
+    // Debounced session save — ensures completed sets survive app kills
+    // (the previous save only fired when the exercise LIST changed, not when
+    // individual sets were completed, so mid-workout kills lost all set data)
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      if (cancelledRef.current || showSummary) return;
+      saveWorkoutSession({
+        templateId: templateRef.current?.id,
+        templateName: templateRef.current?.name,
+        startTime: startTimeRef.current,
+        exercises: exercisesRef.current,
+        bestSets: bestSetsRef.current,
+        exerciseState: exerciseStateRef.current,
+      });
+    }, 1000);
   }, []);
 
   useEffect(() => {

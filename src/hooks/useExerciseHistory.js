@@ -10,8 +10,19 @@ export function useExerciseHistory() {
     queryFn: async () => {
       const results = await base44.entities.Exercise.list('name', 500);
       const map = {};
+      // Case-insensitive merge — combines history from duplicate entities
+      // so the UI always shows the full history regardless of casing
+      const byLowerName = {};
       (results || []).forEach(ex => {
-        map[ex.name] = ex.history || [];
+        const key = ex.name.toLowerCase();
+        if (!byLowerName[key]) byLowerName[key] = [];
+        byLowerName[key].push(...(ex.history || []));
+      });
+      // Return map keyed by the original casing the app uses (title-cased)
+      (results || []).forEach(ex => {
+        if (!map[ex.name]) {
+          map[ex.name] = byLowerName[ex.name.toLowerCase()] || [];
+        }
       });
       return map;
     },

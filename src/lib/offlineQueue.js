@@ -33,24 +33,39 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
   const hasCompletedSets = Object.keys(snapshot || {}).length > 0;
 
   const allExercises = await base44.entities.Exercise.list('name', 500);
+  // Case-insensitive map — also merges histories from duplicate entities
+  // so history isn't fragmented across multiple records with the same name
   const exerciseMap = {};
-  (allExercises || []).forEach(ex => { exerciseMap[ex.name] = ex; });
+  (allExercises || []).forEach(ex => {
+    const key = ex.name.toLowerCase();
+    if (!exerciseMap[key]) {
+      exerciseMap[key] = { primary: ex, all: [ex] };
+    } else {
+      exerciseMap[key].all.push(ex);
+      // Keep the one with the most history as "primary" for updating
+      if ((ex.history?.length || 0) > (exerciseMap[key].primary.history?.length || 0)) {
+        exerciseMap[key].primary = ex;
+      }
+    }
+  });
 
   const today = new Date().toISOString().slice(0, 10);
 
   // Build the exercise list with UPDATED history (existing + new entries) so
   // the template stays in sync with the Exercise entities after each workout.
-  // Previously this saved ex.history (stale, pre-workout data), causing the
-  // template to always be one workout behind the Exercise entity.
   const exerciseListForSave = exerciseList.map(ex => {
-    const existing = exerciseMap[ex.name];
+    const entry = exerciseMap[ex.name.toLowerCase()];
+    // Merge history from ALL duplicates to avoid fragmentation
+    const mergedHistory = entry
+      ? entry.all.flatMap(e => e.history || [])
+      : (ex.history || []);
     const sets = snapshot[ex.name];
     const newEntries = sets ? sets.map(s => ({ kg: s.kg, reps: s.reps, date: today })) : [];
     return {
       name: ex.name,
       sets: ex.sets || 1,
       muscle: ex.muscle || '',
-      history: [...(existing?.history || ex.history || []), ...newEntries],
+      history: [...mergedHistory, ...newEntries],
     };
   });
 
@@ -66,12 +81,17 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
     .map(async (ex) => {
       const sets = snapshot[ex.name];
       const newEntries = sets.map(s => ({ kg: s.kg, reps: s.reps, date: today }));
-      const existing = exerciseMap[ex.name];
-      if (existing) {
-        await base44.entities.Exercise.update(existing.id, {
-          history: [...(existing.history || []), ...newEntries],
-          muscle: ex.muscle || existing.muscle,
+      const entry = exerciseMap[ex.name.toLowerCase()];
+      if (entry) {
+        // Update the primary entity with merged history from all duplicates
+        const mergedHistory = entry.all.flatMap(e => e.history || []);
+        await base44.entities.Exercise.update(entry.primary.id, {
+          history: [...mergedHistory, ...newEntries],
+          muscle: ex.muscle || entry.primary.muscle,
         });
+        // Delete non-primary duplicates to prevent future fragmentation
+        const duplicates = entry.all.filter(e => e.id !== entry.primary.id);
+        await Promise.all(duplicates.map(d => base44.entities.Exercise.delete(d.id)));
       } else {
         await base44.entities.Exercise.create({
           name: ex.name,
