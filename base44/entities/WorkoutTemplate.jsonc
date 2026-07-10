@@ -27,9 +27,15 @@
             "items": {
               "type": "object"
             }
+          },
+          "note": {
+            "type": "string"
           }
         }
       }
+    },
+    "note": {
+      "type": "string"
     },
     "lastPerformed": {
       "type": "string"

@@ -26,7 +26,7 @@ export function getQueueCount() {
   return getQueuedSaves().length;
 }
 
-async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
+async function processWorkoutSave({ templateId, snapshot, exerciseList, workoutNote }) {
   if (templateId.startsWith('empty-')) return;
 
   // Only count as "performed" if at least one set was actually completed
@@ -66,10 +66,14 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
       sets: ex.sets || 1,
       muscle: ex.muscle || '',
       history: [...mergedHistory, ...newEntries],
+      note: ex.note || '',
     };
   });
 
   const templateUpdate = { exerciseList: exerciseListForSave };
+  if (workoutNote !== undefined) {
+    templateUpdate.note = workoutNote;
+  }
   if (hasCompletedSets) {
     templateUpdate.lastPerformed = new Date().toISOString();
   }
@@ -104,14 +108,14 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
   await Promise.all(exerciseSaves);
 }
 
-export async function saveWorkout(templateId, snapshot, exerciseList) {
+export async function saveWorkout(templateId, snapshot, exerciseList, workoutNote) {
   try {
-    await processWorkoutSave({ templateId, snapshot, exerciseList });
+    await processWorkoutSave({ templateId, snapshot, exerciseList, workoutNote });
     queryClientInstance.invalidateQueries({ queryKey: ['exercise-history'] });
     queryClientInstance.invalidateQueries({ queryKey: ['workout-templates'] });
     return { saved: true, queued: false };
   } catch (e) {
-    queueWorkoutSave({ templateId, snapshot, exerciseList });
+    queueWorkoutSave({ templateId, snapshot, exerciseList, workoutNote });
     return { saved: false, queued: true };
   }
 }
