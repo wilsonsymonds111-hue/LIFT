@@ -537,8 +537,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
               <div
                 contentEditable
                 suppressContentEditableWarning
-                data-placeholder="Note"
-                className="w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-6 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-2 font-display empty:bg-transparent empty:border-transparent empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold transition-colors"
+                data-placeholder="Note…"
+                className="w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-6 -ml-1 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-2 font-display empty:bg-transparent empty:border-transparent empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold transition-colors"
               />
 
               <DragDropContext onDragEnd={({ source, destination }) => {
