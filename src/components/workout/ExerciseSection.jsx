@@ -165,7 +165,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         const suggestedReps = isDone ? completedResult.reps : (s.suggestedReps ?? (prevSet ? prevSet.reps + 1 : (i === 0 && prev ? prev.reps + 1 : null)));
         return (
         <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
-        <SetRow setNum={i + 1} previous={prevSet ?? (i === 0 ? prev : null)} initialKg={suggestedKg} initialReps={suggestedReps} initialDone={isDone} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
+        <SetRow setNum={i + 1} previous={i === 0 ? (prevSet ?? prev) : null} initialKg={suggestedKg} initialReps={suggestedReps} initialDone={isDone} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
           onComplete={(result) => {
             const setIndex = sets.findIndex(r => r.id === s.id);
             const wasCompleted = !!completedSets[s.id];
