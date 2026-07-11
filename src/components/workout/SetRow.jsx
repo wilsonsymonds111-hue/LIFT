@@ -3,10 +3,10 @@ import { Check, Trash2 } from 'lucide-react';
 import { playTick } from '../../lib/workoutSounds';
 import RestCountdown from './RestCountdown';
 
-const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, onComplete, onDelete, restDuration = 120, showHeader = false }) {
+const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, initialDone, onComplete, onDelete, restDuration = 120, showHeader = false }) {
   const [kg, setKg] = useState(initialKg ?? previous?.kg ?? '');
   const [reps, setReps] = useState(initialReps ?? previous?.reps ?? '');
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState(initialDone || false);
   const [animating, setAnimating] = useState(false);
   const startXRef = useRef(null);
   const swipingRef = useRef(false);

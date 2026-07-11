@@ -159,11 +159,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
       {sets.map((s, i) => {
         const prevSet = i < lastSessionSets.length ? lastSessionSets[i] : null;
-        const suggestedKg = s.suggestedKg ?? prevSet?.kg ?? (i === 0 && prev ? prev.kg : null);
-        const suggestedReps = s.suggestedReps ?? (prevSet ? prevSet.reps + 1 : (i === 0 && prev ? prev.reps + 1 : null));
+        const completedResult = completedSets[s.id];
+        const isDone = !!completedResult;
+        const suggestedKg = isDone ? completedResult.kg : (s.suggestedKg ?? prevSet?.kg ?? (i === 0 && prev ? prev.kg : null));
+        const suggestedReps = isDone ? completedResult.reps : (s.suggestedReps ?? (prevSet ? prevSet.reps + 1 : (i === 0 && prev ? prev.reps + 1 : null)));
         return (
         <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
-        <SetRow setNum={i + 1} previous={prevSet ?? (i === 0 ? prev : null)} initialKg={suggestedKg} initialReps={suggestedReps} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
+        <SetRow setNum={i + 1} previous={prevSet ?? (i === 0 ? prev : null)} initialKg={suggestedKg} initialReps={suggestedReps} initialDone={isDone} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
           onComplete={(result) => {
             const setIndex = sets.findIndex(r => r.id === s.id);
             const wasCompleted = !!completedSets[s.id];
