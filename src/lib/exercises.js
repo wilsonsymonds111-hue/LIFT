@@ -53,7 +53,7 @@ export const ALL_EXERCISES = [
   { name: 'Lat Pulldown', muscle: 'Back' },
   { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders' },
   { name: 'Lateral Raise (Machine)', muscle: 'Shoulders' },
-  { name: 'Seated Leg hamstring curl machine', muscle: 'Legs' },
+  { name: 'Seated Hamstring Curl', muscle: 'Legs' },
   { name: 'Leg Extension (Machine)', muscle: 'Legs' },
   { name: 'Leg Press', muscle: 'Legs' },
   { name: 'Leg Press Calf Raise', muscle: 'Legs' },
