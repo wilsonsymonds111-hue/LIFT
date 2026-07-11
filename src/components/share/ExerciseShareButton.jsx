@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
-import { Instagram, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+
+const INSTAGRAM_ICON_URL = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/427c77c15_image.png';
 import { useToast } from '@/components/ui/use-toast';
 import { shareToInstagram } from '../../lib/shareToInstagram';
 
@@ -45,14 +47,13 @@ export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
     <button
       onClick={handleShare}
       disabled={isSharing}
-      className="w-7 h-7 flex items-center justify-center rounded-lg transition flex-shrink-0 hover:opacity-80"
-      style={{ background: 'linear-gradient(135deg, #833AB4 0%, #FD1D1D 45%, #FCB045 100%)' }}
+      className="w-7 h-7 flex items-center justify-center rounded-lg transition flex-shrink-0 hover:opacity-80 overflow-hidden"
       aria-label="Share to Instagram"
     >
       {isSharing ? (
-        <Loader2 className="w-4 h-4 text-white animate-spin" />
+        <Loader2 className="w-4 h-4 text-gray-700 dark:text-gray-200 animate-spin" />
       ) : (
-        <Instagram className="w-4 h-4 text-white" />
+        <img src={INSTAGRAM_ICON_URL} alt="Share to Instagram" className="w-5 h-5 object-contain" />
       )}
     </button>
   );
