@@ -91,9 +91,11 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
 
   const handleFocus = (e) => {
     const el = e.target;
-    setTimeout(() => {
+    const len = el.value.length;
+    requestAnimationFrame(() => {
+      el.setSelectionRange(len, len);
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300);
+    });
   };
 
   const handleKgChange = (e) => {
