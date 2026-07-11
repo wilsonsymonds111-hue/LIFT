@@ -103,14 +103,46 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const [finishTimer, setFinishTimer] = useState('00:00');
   const [isRestDay, setIsRestDay] = useState(false);
   const { data: allTemplates = [] } = useWorkoutTemplates();
+  // Compute initial exercises + migrated state once.
+  // When restoring a saved session, exercise names are refreshed from the
+  // current template (by index) so renames propagate to in-progress workouts.
+  // exerciseState/bestSets keys are migrated from old names to new names.
+  const initialWorkoutRef = useRef(null);
+  if (initialWorkoutRef.current === null) {
+    const capitalize = (s) => s.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    const templateExs = template?.exerciseList || [];
+    let initialExercises;
+    const nameMap = {}; // old saved name → new template name
+
+    if (savedSession?.exercises?.length && savedSession.templateId === template?.id) {
+      initialExercises = savedSession.exercises.map((savedEx, idx) => {
+        const tEx = templateExs[idx];
+        const newName = tEx ? capitalize(tEx.name) : capitalize(savedEx.name);
+        if (tEx && capitalize(tEx.name) !== capitalize(savedEx.name)) {
+          nameMap[capitalize(savedEx.name)] = newName;
+        }
+        return tEx
+          ? { ...savedEx, name: newName, muscle: tEx.muscle || savedEx.muscle, history: tEx.history?.length ? tEx.history : savedEx.history }
+          : { ...savedEx, name: newName };
+      });
+    } else {
+      initialExercises = templateExs.map(ex => ({ ...ex, name: capitalize(ex.name) }));
+    }
+
+    const migratedState = {};
+    Object.entries(savedSession?.exerciseState || {}).forEach(([key, val]) => {
+      migratedState[nameMap[key] || key] = val;
+    });
+    const migratedBestSets = {};
+    Object.entries(savedSession?.bestSets || {}).forEach(([key, val]) => {
+      migratedBestSets[nameMap[key] || key] = val;
+    });
+
+    initialWorkoutRef.current = { initialExercises, migratedState, migratedBestSets };
+  }
+
   const startTimeRef = useRef(savedSession?.startTime || Date.now());
-  const [exercises, setExercises] = useState(() => {
-    if (savedSession?.exercises?.length && savedSession.templateId === template?.id) return savedSession.exercises;
-    return (template?.exerciseList || []).map(ex => ({
-      ...ex,
-      name: ex.name.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()),
-    }))
-  });
+  const [exercises, setExercises] = useState(initialWorkoutRef.current.initialExercises);
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [showRestTimerPicker, setShowRestTimerPicker] = useState(false);
   const [globalRestDuration, setGlobalRestDuration] = useState(120);
@@ -122,11 +154,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const restTimeoutRef = useRef(null);
   const restEndRef = useRef(null);
   const restNotifiedRef = useRef(false);
-  const bestSetsRef = useRef(savedSession?.bestSets || {});
+  const bestSetsRef = useRef(initialWorkoutRef.current.migratedBestSets);
   const saveTimeoutRef = useRef(null);
   const cancelledRef = useRef(false);
   // Per-exercise state (sets, completedSets, note) for session persistence
-  const exerciseStateRef = useRef(savedSession?.exerciseState || {});
+  const exerciseStateRef = useRef(initialWorkoutRef.current.migratedState);
   // Refs for session saving inside stable callbacks
   const exercisesRef = useRef(exercises);
   exercisesRef.current = exercises;
