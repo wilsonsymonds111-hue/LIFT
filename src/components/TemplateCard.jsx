@@ -90,11 +90,11 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
 
         {/* Exercise pills */}
         {exercises.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
+          <div className="flex flex-wrap gap-1.5 mt-3">
             {exercises.map((ex, i) => (
               <span
                 key={i}
-                className="text-xs font-medium px-3 py-1.5 rounded-lg bg-muted dark:bg-muted/60 text-foreground/80 dark:text-foreground/70"
+                className="text-[11px] font-medium px-2.5 py-1 rounded-md bg-muted dark:bg-muted/60 text-foreground/80 dark:text-foreground/70"
               >
                 {ex.name}
               </span>
