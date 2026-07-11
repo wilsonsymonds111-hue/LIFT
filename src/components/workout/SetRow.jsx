@@ -150,8 +150,14 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           onPointerLeave={onPointerUp}
         >
           <span className="text-sm font-semibold text-center text-gray-500">{setNum}</span>
-          <span className="text-sm text-gray-400 text-center whitespace-nowrap">
-            {previous ? `${previous.kg}kg × ${previous.reps}` : '—'}
+          <span className="text-sm text-gray-400 text-center leading-tight">
+            {previous ? (
+              <>
+                <span className="whitespace-nowrap">{previous.kg}kg</span>
+                <br />
+                <span className="whitespace-nowrap">× {previous.reps}</span>
+              </>
+            ) : '—'}
           </span>
           <input
             type="text"
