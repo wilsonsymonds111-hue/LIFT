@@ -105,7 +105,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const { data: allTemplates = [] } = useWorkoutTemplates();
   const startTimeRef = useRef(savedSession?.startTime || Date.now());
   const [exercises, setExercises] = useState(() => {
-    if (savedSession?.exercises?.length) return savedSession.exercises;
+    if (savedSession?.exercises?.length && savedSession.templateId === template?.id) return savedSession.exercises;
     return (template?.exerciseList || []).map(ex => ({
       ...ex,
       name: ex.name.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()),
