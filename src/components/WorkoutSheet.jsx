@@ -302,6 +302,31 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     });
   }, [template?.id]);
 
+  // Sync exercise names + metadata when the template prop updates (e.g. after
+  // a React Query background refetch delivers fresh data with renamed exercises).
+  // Without this, stale cached names persist forever in the workout state.
+  useEffect(() => {
+    if (!template?.exerciseList) return;
+    const capitalize = (s) => s.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    setExercises(prev => {
+      let changed = false;
+      const next = prev.map((ex, idx) => {
+        const tEx = template.exerciseList[idx];
+        if (!tEx) return ex;
+        const newName = capitalize(tEx.name);
+        if (ex.name === newName) return ex;
+        changed = true;
+        // Migrate per-exercise state from old name → new name
+        const oldState = exerciseStateRef.current[ex.name];
+        if (oldState) { delete exerciseStateRef.current[ex.name]; exerciseStateRef.current[newName] = oldState; }
+        const oldBest = bestSetsRef.current[ex.name];
+        if (oldBest) { delete bestSetsRef.current[ex.name]; bestSetsRef.current[newName] = oldBest; }
+        return { ...ex, name: newName, muscle: tEx.muscle || ex.muscle };
+      });
+      return changed ? next : prev;
+    });
+  }, [template]);
+
   useEffect(() => {
     if (Object.keys(exerciseHistoryData).length === 0) return;
     setExercises(prev => {

@@ -7,8 +7,9 @@ export function useWorkoutTemplates() {
   return useQuery({
     queryKey: QUERY_KEY,
     queryFn: () => base44.entities.WorkoutTemplate.list('sort_order', 500),
-    staleTime: 30 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,
+    staleTime: 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 }
 
