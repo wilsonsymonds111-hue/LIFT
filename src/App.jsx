@@ -9,7 +9,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import BottomNav from './components/BottomNav';
 import PersistentWorkoutBar from './components/PersistentWorkoutBar';
-import { NavProvider } from '@/lib/NavContext';
+import { NavProvider, useNavVisibility } from '@/lib/NavContext';
 import ImportErrorBoundary from './components/ImportErrorBoundary';
 
 // Retry wrapper for lazy imports — recovers from transient Vite HMR
@@ -87,6 +87,7 @@ const TAB_CONTENT = [Home, Splits, BodyStats];
 const SwipeableTabs = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { scrollToTopSignal } = useNavVisibility();
   const rawIndex = TABS.indexOf(location.pathname);
   const activeIndex = rawIndex === -1 ? 0 : rawIndex;
   const containerRef = useRef(null);
@@ -161,7 +162,7 @@ const SwipeableTabs = memo(() => {
         className="flex absolute top-0 bottom-0 overflow-hidden"
       >
         {TAB_CONTENT.map((Component, i) => (
-          <TabPanel key={TABS[i]} width={width} visited={visitedRef.current.has(i)} Component={Component} />
+          <TabPanel key={TABS[i]} width={width} visited={visitedRef.current.has(i)} Component={Component} scrollToTopSignal={scrollToTopSignal} isActive={i === activeIndex} />
         ))}
       </motion.div>
     </div>
@@ -170,9 +171,16 @@ const SwipeableTabs = memo(() => {
 
 // Plain div — no per-frame useTransform recalculations. The slide alone is smooth
 // and keeps all three panels from forcing simultaneous GPU compositing layers.
-const TabPanel = memo(function TabPanel({ width, visited, Component }) {
+const TabPanel = memo(function TabPanel({ width, visited, Component, scrollToTopSignal, isActive }) {
+  const scrollRef = useRef(null);
+  useEffect(() => {
+    if (isActive && scrollToTopSignal > 0 && scrollRef.current) {
+      scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [scrollToTopSignal, isActive]);
   return (
     <div
+      ref={scrollRef}
       className="flex-shrink-0 overflow-y-auto"
       style={{ width, contain: 'layout style paint' }}
     >

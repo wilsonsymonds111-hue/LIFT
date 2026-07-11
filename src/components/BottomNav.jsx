@@ -12,7 +12,7 @@ const tabs = [
 
 const BottomNav = memo(function BottomNav() {
   const location = useLocation();
-  const { hideNav } = useNavVisibility();
+  const { hideNav, triggerScrollToTop } = useNavVisibility();
 
   if (hideNav || location.pathname.startsWith('/support-chat')) return null;
 
@@ -36,6 +36,7 @@ const BottomNav = memo(function BottomNav() {
             <Link
               key={path}
               to={path}
+              onClick={(e) => { if (active) { e.preventDefault(); triggerScrollToTop(); } }}
               className="relative flex-1 flex items-center justify-center h-full"
             >
               {active && (
