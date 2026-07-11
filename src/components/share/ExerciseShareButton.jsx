@@ -45,13 +45,14 @@ export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
     <button
       onClick={handleShare}
       disabled={isSharing}
-      className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition flex-shrink-0"
+      className="w-7 h-7 flex items-center justify-center rounded-lg transition flex-shrink-0 hover:opacity-80"
+      style={{ background: 'linear-gradient(135deg, #833AB4 0%, #FD1D1D 45%, #FCB045 100%)' }}
       aria-label="Share to Instagram"
     >
       {isSharing ? (
-        <Loader2 className="w-4 h-4 text-gray-700 dark:text-gray-200 animate-spin" />
+        <Loader2 className="w-4 h-4 text-white animate-spin" />
       ) : (
-        <Instagram className="w-4 h-4 text-gray-700 dark:text-gray-200" />
+        <Instagram className="w-4 h-4 text-white" />
       )}
     </button>
   );
