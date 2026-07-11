@@ -15,7 +15,7 @@ export const ALL_EXERCISES = [
   { name: 'Cable Chest Fly', muscle: 'Chest' },
   { name: 'Side Cable Lateral Raise', muscle: 'Shoulders' },
   { name: 'Cable Row', muscle: 'Back' },
-  { name: 'Calf Raise (Machine)', muscle: 'Legs' },
+
   { name: 'Chest Dip', muscle: 'Chest' },
   { name: 'Chin Up', muscle: 'Back' },
   { name: 'Clean and Press', muscle: 'Full Body' },
