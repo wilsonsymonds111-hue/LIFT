@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Reorder, useDragControls, useMotionValue, motion, animate } from 'framer-motion';
+import { Reorder, useDragControls, useMotionValue, animate } from 'framer-motion';
 import ExerciseSection from './ExerciseSection';
 
 const EDGE_ZONE = 100;
@@ -16,6 +16,7 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
   // glued to the finger. Without this, scrollTop changes move the card
   // with the container while the pointer stays still — causing drift.
   const yCompensation = useMotionValue(0);
+  const lastPointerYRef = useRef(0);
 
   const tick = () => {
     const container = scrollContainerRef.current;
@@ -45,6 +46,7 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
     const rect = scrollRectRef.current;
     if (!rect) return;
     const y = info.point.y;
+    lastPointerYRef.current = y;
 
     if (y < rect.top + EDGE_ZONE) {
       const intensity = 1 - Math.max(0, (y - rect.top) / EDGE_ZONE);
@@ -93,12 +95,11 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       style={{
         position: 'relative',
         zIndex: isDragging ? 9999 : 'auto',
+        y: yCompensation,
       }}
       className="list-none"
     >
-      <motion.div style={{ y: yCompensation }}>
-        <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
-      </motion.div>
+      <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
     </Reorder.Item>
   );
 }
