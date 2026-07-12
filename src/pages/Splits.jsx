@@ -15,6 +15,7 @@ import { base44 } from '@/api/base44Client';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
 import { backfillLastPerformed } from '../lib/backfillLastPerformed';
+import { activateExampleSplit } from '../lib/activateSplit';
 
 const SAFE_AREA_PT = { paddingTop: 'calc(0.5rem + env(safe-area-inset-top))' };
 const DIALOG_BG = { background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(18px)' };
@@ -256,10 +257,6 @@ export default function Splits() {
 
     // Run DB migration in background while animation plays
     try {
-      await Promise.all(currentActive.map(t =>
-        base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false })
-      ));
-      // Compute default cycle from the split's schedule pattern
       const schedule = splitData.schedule;
       let cycleOn = 1, cycleOff = 1, cycleStart = 0;
       if (schedule) {
@@ -275,23 +272,7 @@ export default function Splits() {
         const todayIndex = new Date().getDay();
         cycleStart = todayIndex === 0 ? 6 : todayIndex - 1;
       }
-      const newTemplates = splitData.workouts.map((w, i) => ({
-        name: w.name,
-        exercises: w.exercises.map(e => e.name).join(', '),
-        exerciseList: w.exercises.map(e => ({ ...e, history: [] })),
-        lastPerformed: null,
-        sort_order: i,
-        isActiveSplit: true,
-        splitGroup: newGroupId,
-        splitName: splitData.name,
-        cycleOnDays: cycleOn,
-        cycleOffDays: cycleOff,
-        cycleStartDayIndex: cycleStart,
-      }));
-      await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
-      // Backfill lastPerformed from exercise history for the newly created templates
-      try { await backfillLastPerformed(newTemplates); } catch {}
-      invalidateWorkoutTemplates(queryClient);
+      await activateExampleSplit(splitData, { cycleOn, cycleOff, cycleStart }, currentActive, queryClient, invalidateWorkoutTemplates);
     } catch (_) {
       invalidateWorkoutTemplates(queryClient);
       setSwapping(false);
@@ -588,9 +569,8 @@ export default function Splits() {
                 setSwapPhase(null);
               }
             } else {
-              // Example split — create new templates (they don't exist in DB yet)
-              const newGroupId = 'active_example_' + Date.now().toString();
-              const fakeId = `temp_${newGroupId}`;
+              // Example split — reuse existing templates if they exist, only create missing ones
+              const fakeId = `temp_${Date.now()}`;
               const fakeTemplates = workouts.map((w, i) => ({
                 id: `${fakeId}_${i}`,
                 name: w.name,
@@ -599,7 +579,6 @@ export default function Splits() {
                 lastPerformed: null,
                 sort_order: i,
                 isActiveSplit: true,
-                splitGroup: newGroupId,
                 splitName: splitData.name,
                 created_date: new Date().toISOString(),
                 updated_date: new Date().toISOString(),
@@ -613,23 +592,15 @@ export default function Splits() {
               ]);
 
               try {
-                await Promise.all(currentActive.map(t =>
-                  base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false })
-                ));
-                const newTemplates = workouts.map((w, i) => ({
-                  name: w.name,
-                  exercises: (w.exercises || []).map(e => e.name).join(', '),
-                  exerciseList: (w.exercises || []).map(e => ({ ...e, history: [] })),
-                  lastPerformed: null,
-                  sort_order: i,
-                  isActiveSplit: true,
-                  splitGroup: newGroupId,
-                  splitName: splitData.name,
-                }));
-                await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
-                // Backfill lastPerformed from exercise history
-                try { await backfillLastPerformed(newTemplates); } catch {}
-                invalidateWorkoutTemplates(queryClient);
+                const todayIndex = new Date().getDay();
+                const cycleStart = todayIndex === 0 ? 6 : todayIndex - 1;
+                await activateExampleSplit(
+                  { name: splitData.name, workouts },
+                  { cycleOn: 1, cycleOff: 1, cycleStart },
+                  currentActive,
+                  queryClient,
+                  invalidateWorkoutTemplates
+                );
               } catch (_) {
                 invalidateWorkoutTemplates(queryClient);
                 setSwapping(false);
