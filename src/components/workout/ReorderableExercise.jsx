@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Reorder, useDragControls, useMotionValue, animate } from 'framer-motion';
+import { Reorder, useDragControls } from 'framer-motion';
 import ExerciseSection from './ExerciseSection';
 
 const EDGE_ZONE = 100;
@@ -12,11 +12,20 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
   const scrollRectRef = useRef(null);
   const rafRef = useRef(null);
   const speedRef = useRef(0);
-  // Compensates the card's Y position during auto-scroll so it stays
-  // glued to the finger. Without this, scrollTop changes move the card
-  // with the container while the pointer stays still — causing drift.
-  const yCompensation = useMotionValue(0);
-  const lastPointerYRef = useRef(0);
+  const compensationRef = useRef(0);
+  const innerRef = useRef(null);
+  const lastScrollTopRef = useRef(0);
+  const settleRafRef = useRef(null);
+
+  // Direct DOM update — no motion value batching delay.
+  // Applied inside the scroll event (fires before paint) so the
+  // compensation lands in the SAME visual frame as the scroll.
+  const applyCompensation = () => {
+    if (innerRef.current) {
+      const v = compensationRef.current;
+      innerRef.current.style.transform = v !== 0 ? `translateY(${v}px)` : '';
+    }
+  };
 
   const tick = () => {
     const container = scrollContainerRef.current;
@@ -24,29 +33,56 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       rafRef.current = null;
       return;
     }
-    const delta = speedRef.current;
-    container.scrollTop += delta;
-    // Counter-scroll: move the card by the same delta so it visually
-    // stays exactly where the finger is.
-    yCompensation.set(yCompensation.get() + delta);
+    // Apply scroll + compensation synchronously in the same rAF callback
+    const prevScroll = container.scrollTop;
+    container.scrollTop += speedRef.current;
+    const actualDelta = container.scrollTop - prevScroll;
+    if (actualDelta !== 0) {
+      compensationRef.current += actualDelta;
+      applyCompensation();
+    }
     rafRef.current = requestAnimationFrame(tick);
   };
 
-  // Cache scroll container + its rect at drag start so we never touch the DOM during drag moves
+  // Listen to ALL scroll changes during drag — catches our manual auto-scroll
+  // AND any scroll from framer-motion's built-in drag auto-scroll. The scroll
+  // event fires before paint, so compensation is applied before the user
+  // sees the scrolled frame. This is what keeps the card glued to the finger.
+  useEffect(() => {
+    if (!isDragging) return;
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    lastScrollTopRef.current = container.scrollTop;
+
+    const onScroll = () => {
+      const delta = container.scrollTop - lastScrollTopRef.current;
+      lastScrollTopRef.current = container.scrollTop;
+      if (delta !== 0) {
+        compensationRef.current += delta;
+        applyCompensation();
+      }
+    };
+
+    container.addEventListener('scroll', onScroll, { passive: true });
+    return () => container.removeEventListener('scroll', onScroll);
+  }, [isDragging]);
+
   const handleDragStart = () => {
     setIsDragging(true);
     onDragActiveChange?.(true);
-    yCompensation.set(0);
+    compensationRef.current = 0;
+    applyCompensation();
     const container = document.querySelector('[data-workout-scroll]');
     scrollContainerRef.current = container;
     scrollRectRef.current = container?.getBoundingClientRect() ?? null;
+    lastScrollTopRef.current = container?.scrollTop ?? 0;
   };
 
   const handleDrag = (_, info) => {
     const rect = scrollRectRef.current;
     if (!rect) return;
     const y = info.point.y;
-    lastPointerYRef.current = y;
 
     if (y < rect.top + EDGE_ZONE) {
       const intensity = 1 - Math.max(0, (y - rect.top) / EDGE_ZONE);
@@ -65,18 +101,39 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
     setIsDragging(false);
     onDragActiveChange?.(false);
     speedRef.current = 0;
-    // Smoothly return compensation to 0 so the card settles into its
-    // natural slot without a jump. Spring matches Reorder.Item's transition
-    // so the combined motion is a single smooth spring.
-    animate(yCompensation, 0, { type: 'spring', stiffness: 700, damping: 35, mass: 0.4 });
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
+    }
+    // Smoothly settle compensation back to 0 so the card doesn't jump
+    // when it snaps into its final slot.
+    if (innerRef.current && compensationRef.current !== 0) {
+      const start = compensationRef.current;
+      const startTime = performance.now();
+      const duration = 300;
+      const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+      const step = (now) => {
+        const t = Math.min(1, (now - startTime) / duration);
+        const val = start * (1 - ease(t));
+        compensationRef.current = val;
+        if (innerRef.current) {
+          innerRef.current.style.transform = val !== 0 ? `translateY(${val}px)` : '';
+        }
+        if (t < 1) {
+          settleRafRef.current = requestAnimationFrame(step);
+        } else {
+          compensationRef.current = 0;
+          if (innerRef.current) innerRef.current.style.transform = '';
+        }
+      };
+      settleRafRef.current = requestAnimationFrame(step);
     }
   };
 
   useEffect(() => () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (settleRafRef.current) cancelAnimationFrame(settleRafRef.current);
   }, []);
 
   return (
@@ -95,11 +152,15 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       style={{
         position: 'relative',
         zIndex: isDragging ? 9999 : 'auto',
-        y: yCompensation,
       }}
       className="list-none"
     >
-      <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
+      {/* Plain div — framer-motion's drag system can't override its transform.
+          Compensation is applied here via direct DOM style, synced to the
+          scroll event so it's painted in the same frame as the scroll. */}
+      <div ref={innerRef}>
+        <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
+      </div>
     </Reorder.Item>
   );
 }
