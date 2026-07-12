@@ -44,13 +44,7 @@ export default function Splits() {
   const cardRefs = useRef({});
 
   // Default to "examples" on first visit, otherwise remember preference
-  const [activeTab, setActiveTab] = useState(() => {
-    const stored = localStorage.getItem('splitsActiveTab');
-    return stored || 'examples';
-  });
-  useEffect(() => {
-    localStorage.setItem('splitsActiveTab', activeTab);
-  }, [activeTab]);
+  const [activeTab, setActiveTab] = useState('examples');
 
 
 
@@ -265,6 +259,22 @@ export default function Splits() {
       await Promise.all(currentActive.map(t =>
         base44.entities.WorkoutTemplate.update(t.id, { isActiveSplit: false })
       ));
+      // Compute default cycle from the split's schedule pattern
+      const schedule = splitData.schedule;
+      let cycleOn = 1, cycleOff = 1, cycleStart = 0;
+      if (schedule) {
+        let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
+        for (let i = 0; i < schedule.length; i++) {
+          if (schedule[i] >= 1) { curOn++; if (curOff > maxOff) maxOff = curOff; curOff = 0; }
+          else { curOff++; if (curOn > maxOn) maxOn = curOn; curOn = 0; }
+        }
+        if (curOn > maxOn) maxOn = curOn;
+        if (curOff > maxOff) maxOff = curOff;
+        cycleOn = maxOn || 1;
+        cycleOff = maxOff || 1;
+        const todayIndex = new Date().getDay();
+        cycleStart = todayIndex === 0 ? 6 : todayIndex - 1;
+      }
       const newTemplates = splitData.workouts.map((w, i) => ({
         name: w.name,
         exercises: w.exercises.map(e => e.name).join(', '),
@@ -274,28 +284,14 @@ export default function Splits() {
         isActiveSplit: true,
         splitGroup: newGroupId,
         splitName: splitData.name,
+        cycleOnDays: cycleOn,
+        cycleOffDays: cycleOff,
+        cycleStartDayIndex: cycleStart,
       }));
       await base44.entities.WorkoutTemplate.bulkCreate(newTemplates);
       // Backfill lastPerformed from exercise history for the newly created templates
       try { await backfillLastPerformed(newTemplates); } catch {}
       invalidateWorkoutTemplates(queryClient);
-      // Persist default cycle only if the user hasn't already saved one via the
-      // RestFrequencyConfirmModal — otherwise we'd overwrite their chosen start day.
-      const schedule = splitData.schedule;
-      if (schedule && !localStorage.getItem(`splitCycle_${splitKey}`)) {
-        let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
-        for (let i = 0; i < schedule.length; i++) {
-          if (schedule[i] >= 1) { curOn++; if (curOff > maxOff) maxOff = curOff; curOff = 0; }
-          else { curOff++; if (curOn > maxOn) maxOn = curOn; curOn = 0; }
-        }
-        if (curOn > maxOn) maxOn = curOn;
-        if (curOff > maxOff) maxOff = curOff;
-        const todayIndex = new Date().getDay();
-        const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
-        localStorage.setItem(`splitCycle_${splitKey}`, JSON.stringify({
-          onDays: maxOn || 1, offDays: maxOff || 1, startDayIndex: todayMonSun,
-        }));
-      }
     } catch (_) {
       invalidateWorkoutTemplates(queryClient);
       setSwapping(false);
@@ -485,7 +481,7 @@ export default function Splits() {
               setShowBuilder(false);
               invalidateWorkoutTemplates(queryClient);
               setActiveTab('mine');
-              localStorage.setItem('splitsActiveTab', 'mine');
+              // Tab preference no longer persisted — stays on 'mine' visually until re-render
             }}
           />
         </Suspense>

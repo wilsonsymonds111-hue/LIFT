@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { RefreshCw, X, BookOpen, ChevronRight, TrendingUp, TrendingDown, Activity, BicepsFlexed, Zap, Flame } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import {
   calculateMuscleMass,
   generateSummary,
@@ -16,6 +17,7 @@ const CACHE_KEY = 'muscleMassPrediction_v2';
 const CACHE_TTL = 6 * 60 * 60 * 1000;
 
 export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
+  const { user } = useAuth();
   const [weightEntries, setWeightEntries] = useState([]);
   const [weightLoading, setWeightLoading] = useState(true);
   const [prediction, setPrediction] = useState(null);
@@ -23,19 +25,12 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
   const [refreshing, setRefreshing] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
   const [showMuscleModal, setShowMuscleModal] = useState(false);
-  const [goalMode, setGoalMode] = useState(() => {
-    try { return localStorage.getItem('goalMode') || null; } catch { return null; }
-  });
+  const [goalMode, setGoalMode] = useState(() => user?.goalMode || null);
 
-  // Load goalMode from the cloud user entity so it syncs across devices.
+  // Sync goalMode from cloud user entity
   useEffect(() => {
-    base44.auth.me().then(user => {
-      if (user?.goalMode) {
-        setGoalMode(user.goalMode);
-        localStorage.setItem('goalMode', user.goalMode);
-      }
-    }).catch(() => {});
-  }, []);
+    if (user?.goalMode) setGoalMode(user.goalMode);
+  }, [user]);
 
   const fetchEntries = useCallback(async () => {
     try {

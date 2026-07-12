@@ -81,22 +81,8 @@ function resolveSchedule(key, workoutCount, groupId, templates) {
     return { schedule, startDayIndex: dbCycle.cycleStartDayIndex, onDays, offDays };
   }
 
-  // Check localStorage for user customizations — overrides defaults even for known types.
-  // Try both the split key (stored by RestFrequencyConfirmModal) and the group ID.
-  let savedStartDayIndex = null;
-  try {
-    const keysToTry = [groupId, key].filter(Boolean);
-    for (const k of keysToTry) {
-      const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
-      if (cycleRaw) {
-        const parsed = JSON.parse(cycleRaw);
-        onDays = Number(parsed.onDays) || onDays;
-        offDays = Number(parsed.offDays) || offDays;
-        savedStartDayIndex = Number(parsed.startDayIndex);
-        break;
-      }
-    }
-  } catch {}
+  // No localStorage fallback — cycle data lives in the DB (WorkoutTemplate entity)
+  const savedStartDayIndex = null;
 
   if (!onDays) onDays = Math.max(workoutCount, 1);
   if (!offDays) offDays = 1;

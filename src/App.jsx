@@ -273,7 +273,13 @@ const AnimatedRoutes = memo(() => {
 });
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, isGuest, isAuthenticated } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, isGuest, isAuthenticated, user } = useAuth();
+
+  // Apply dark mode from cloud user entity (falls back to localStorage for guests)
+  useEffect(() => {
+    const stored = user?.darkMode ?? (localStorage.getItem('darkMode') === 'true');
+    document.documentElement.classList.toggle('dark', stored);
+  }, [user]);
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return LOADING_SPINNER;

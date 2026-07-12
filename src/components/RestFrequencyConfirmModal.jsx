@@ -15,17 +15,7 @@ function loadCycle(splitKey, fallbackSchedule) {
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
   const defaults = KNOWN_CYCLES[splitKey] || null;
 
-  try {
-    const raw = localStorage.getItem(`splitCycle_${splitKey}`);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (defaults && parsed.onDays === defaults.onDays && parsed.offDays === defaults.offDays) {
-        return { ...defaults, startDayIndex: todayMonSun };
-      }
-      return { ...parsed, startDayIndex: todayMonSun };
-    }
-  } catch {}
-
+  // DB cycle data is loaded by the parent component — use defaults here
   if (defaults) return { ...defaults, startDayIndex: todayMonSun };
 
   let maxOn = 0, maxOff = 0, curOn = 0, curOff = 0;
@@ -93,7 +83,6 @@ export default function RestFrequencyConfirmModal({ splitKey, defaultSchedule, o
   }, [onDays, offDays]);
 
   const handleLooksGood = () => {
-    localStorage.setItem(`splitCycle_${splitKey}`, JSON.stringify({ onDays, offDays, startDayIndex }));
     onClose();
     onConfirm({ onDays, offDays, startDayIndex });
   };

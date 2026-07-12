@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, Apple, Target, F
 import { TouchHold } from '@/lib/useTouchHold';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Dot } from 'recharts';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import WeightEntryKeypad from './WeightEntryKeypad';
 import TargetArrowIcon from './TargetArrowIcon';
 import EditEntryModal from './EditEntryModal';
@@ -50,27 +51,18 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       ['Pacific/Honolulu', 'Pacific/Guam', 'Pacific/Saipan', 'America/Puerto_Rico'].includes(tz);
     return isLbsRegion ? 'lbs' : 'kg';
   });
+  const { user } = useAuth();
   const [showGoalModal, setShowGoalModal] = useState(false);
-  const [goalMode, setGoalMode] = useState(() => localStorage.getItem('goalMode') || null);
+  const [goalMode, setGoalMode] = useState(() => user?.goalMode || null);
 
-  // Sync goalMode + goalData from the cloud user entity so goals set on
-  // another device carry over after login.
+  // Sync goalMode + goalData from the cloud user entity
   useEffect(() => {
-    base44.auth.me().then(user => {
-      if (user?.goalMode) {
-        setGoalMode(user.goalMode);
-        localStorage.setItem('goalMode', user.goalMode);
-      }
-      if (user?.bodyWeightGoal) {
-        setGoalData(user.bodyWeightGoal);
-        localStorage.setItem('bodyWeightGoal', JSON.stringify(user.bodyWeightGoal));
-      }
-    }).catch(() => {});
-  }, []);
+    if (user?.goalMode) setGoalMode(user.goalMode);
+    if (user?.bodyWeightGoal) setGoalData(user.bodyWeightGoal);
+  }, [user]);
 
   const changeGoalMode = (mode) => {
     setGoalMode(mode);
-    localStorage.setItem('goalMode', mode);
     base44.auth.updateMe({ goalMode: mode }).catch(() => {});
     onGoalModeChange?.(mode);
   };
@@ -79,12 +71,7 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   const [showRateHelp, setShowRateHelp] = useState(false);
   const [showGoalRateHelp, setShowGoalRateHelp] = useState(false);
   const [showWeighInTip, setShowWeighInTip] = useState(false);
-  const [goalData, setGoalData] = useState(() => {
-    try {
-      const raw = localStorage.getItem('bodyWeightGoal');
-      return raw ? JSON.parse(raw) : null;
-    } catch { return null; }
-  });
+  const [goalData, setGoalData] = useState(() => user?.bodyWeightGoal || null);
   const [goalError, setGoalError] = useState('');
   const fileInputRef = useRef(null);
   const [projectionReveal, setProjectionReveal] = useState(2);
@@ -145,7 +132,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
       goalDate: goalDate.toISOString().split('T')[0],
     };
     setGoalData(newGoal);
-    localStorage.setItem('bodyWeightGoal', JSON.stringify(newGoal));
     base44.auth.updateMe({ bodyWeightGoal: newGoal }).catch(() => {});
     setShowGoalModal(false);
     setGoalWeight('');
@@ -153,7 +139,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
 
   const handleDeleteGoal = () => {
     setGoalData(null);
-    localStorage.removeItem('bodyWeightGoal');
     base44.auth.updateMe({ bodyWeightGoal: null }).catch(() => {});
   };
 

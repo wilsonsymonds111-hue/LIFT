@@ -43,6 +43,10 @@
         "bulking"
       ],
       "description": "Whether the user is cutting or bulking"
+    },
+    "darkMode": {
+      "type": "boolean",
+      "description": "Whether dark mode is enabled"
     }
   },
   "required": [

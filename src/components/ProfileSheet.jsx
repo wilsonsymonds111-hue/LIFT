@@ -50,6 +50,7 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
   const goalMode = (() => {
     try { return localStorage.getItem('goalMode') || 'cutting'; } catch { return 'cutting'; }
   })();
+  // Note: goalMode is also synced to the cloud user entity by BodyWeightChartModal
   const isCutting = goalMode === 'cutting';
 
   // Hide bottom nav while profile sheet is open
@@ -90,9 +91,10 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
     setUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file: croppedFile });
-      localStorage.setItem('profilePhoto', file_url);
       if (isAuthenticated) {
         await base44.auth.updateMe({ profilePhoto: file_url });
+      } else {
+        localStorage.setItem('profilePhoto', file_url);
       }
       onPhotoChange(file_url);
     } catch {}

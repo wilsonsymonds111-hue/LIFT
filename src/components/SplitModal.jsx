@@ -37,20 +37,7 @@ function loadCycle(splitKey, fallbackSchedule) {
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
   const defaults = KNOWN_CYCLES[splitKey] || null;
 
-  try {
-    const raw = localStorage.getItem(`splitCycle_${splitKey}`);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const savedStart = Number(parsed.startDayIndex);
-      const startDayIndex = (!isNaN(savedStart)) ? savedStart : todayMonSun;
-      // If a known split with no user customization, use the authoritative defaults
-      if (defaults && parsed.onDays === defaults.onDays && parsed.offDays === defaults.offDays) {
-        return { ...defaults, startDayIndex };
-      }
-      return { ...parsed, startDayIndex };
-    }
-  } catch {}
-
+  // DB cycle data is loaded later via useEffect in the component — use defaults here
   if (defaults) return { ...defaults, startDayIndex: todayMonSun };
 
   // Compute default cycle from the fallback schedule for custom splits
@@ -69,10 +56,6 @@ function loadCycle(splitKey, fallbackSchedule) {
   if (curOn > maxOn) maxOn = curOn;
   if (curOff > maxOff) maxOff = curOff;
   return { onDays: maxOn || 1, offDays: maxOff || 1, startDayIndex: todayMonSun };
-}
-
-function saveCycle(splitKey, cycle) {
-  localStorage.setItem(`splitCycle_${splitKey}`, JSON.stringify(cycle));
 }
 
 function cycleToSchedule(onDays, offDays, startDayIndex) {
@@ -181,8 +164,7 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
 
   const handleMakeCurrent = async () => {
     setApplying(true);
-    // Save the cycle so the Home page can read it
-    saveCycle(splitKey, { onDays: onDaysNum, offDays: offDaysNum, startDayIndex });
+    // Cycle is persisted to DB templates below in handleMakeCurrent
     const workouts = orderedWorkouts.length > 0 ? orderedWorkouts : split.workouts;
     setApplying(false);
     onClose();
@@ -479,7 +461,6 @@ export default function SplitModal({ splitKey, onClose, onMakeCurrent, isActiveS
                     <button
                       onClick={async () => {
                         const cycle = { onDays: onDaysNum, offDays: offDaysNum, startDayIndex };
-                        saveCycle(splitKey, cycle);
                         await persistCycleToDB(cycle);
                         if (isActiveSplit) {
                           onClose();

@@ -1,5 +1,6 @@
 import { useState, useEffect, memo } from 'react';
 import { UserCircle } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import ProfileSheet from './ProfileSheet';
 
@@ -7,29 +8,30 @@ const ProfileButton = memo(function ProfileButton({ bodyStatsProps }) {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const { user, isAuthenticated } = useAuth();
-  const [profilePhoto, setProfilePhoto] = useState(() => isAuthenticated ? (localStorage.getItem('profilePhoto') || user?.profilePhoto || null) : null);
+  const [profilePhoto, setProfilePhoto] = useState(() => user?.profilePhoto || null);
 
   // Sync cloud photo when auth user becomes available; clear when logged out
   useEffect(() => {
     if (isAuthenticated && user?.profilePhoto) {
       setProfilePhoto(user.profilePhoto);
-      localStorage.setItem('profilePhoto', user.profilePhoto);
     } else if (!isAuthenticated) {
       setProfilePhoto(null);
-      localStorage.removeItem('profilePhoto');
     }
   }, [user, isAuthenticated]);
 
   const handleToggleDark = () => {
     const next = !darkMode;
     setDarkMode(next);
-    localStorage.setItem('darkMode', String(next));
     document.documentElement.classList.toggle('dark', next);
+    if (isAuthenticated) {
+      base44.auth.updateMe({ darkMode: next }).catch(() => {});
+    } else {
+      localStorage.setItem('darkMode', String(next));
+    }
   };
 
   const handlePhotoChange = (url) => {
     setProfilePhoto(url);
-    localStorage.setItem('profilePhoto', url);
   };
 
   return (

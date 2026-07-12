@@ -39,20 +39,6 @@ export default function BodyStats() {
     const defaults = SPLIT_CYCLES[splitKey];
     if (defaults) { onDays = defaults.onDays; offDays = defaults.offDays; }
 
-    // Check localStorage for user customizations
-    try {
-      const keysToTry = [splitKey, groupId].filter(Boolean);
-      for (const k of keysToTry) {
-        const raw = localStorage.getItem(`splitCycle_${k}`);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          onDays = Number(parsed.onDays) || onDays;
-          offDays = Number(parsed.offDays) || offDays;
-          break;
-        }
-      }
-    } catch {}
-
     if (!onDays) onDays = Math.max(sorted.length, 1) || 3;
     if (!offDays) offDays = 1;
 

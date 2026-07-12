@@ -109,13 +109,14 @@ export default function SplitBuilder({ onClose, onSaved }) {
         splitName: splitDisplayName,
         backgroundImage: backgroundImage || null,
       }));
-      await base44.entities.WorkoutTemplate.bulkCreate(templates);
-      // Save the rest day cycle so it's available when the split is made current
-      localStorage.setItem(`splitCycle_${groupId}`, JSON.stringify({
-        onDays: restOnDays,
-        offDays: restOffDays,
-        startDayIndex: restStartDay,
+      // Include cycle fields directly in the template data so it persists to the cloud
+      const templatesWithCycle = templates.map(t => ({
+        ...t,
+        cycleOnDays: restOnDays,
+        cycleOffDays: restOffDays,
+        cycleStartDayIndex: restStartDay,
       }));
+      await base44.entities.WorkoutTemplate.bulkCreate(templatesWithCycle);
       setSaved(true);
       setTimeout(() => {
         setSaving(false);

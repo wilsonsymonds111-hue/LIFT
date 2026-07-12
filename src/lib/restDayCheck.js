@@ -52,26 +52,11 @@ function loadCycleParams(templates) {
   let onDays = defaultCycle ? defaultCycle.onDays : null;
   let offDays = defaultCycle ? defaultCycle.offDays : null;
   let savedStartDayIndex = null;
-  let storageKey = null;
-
-  try {
-    const keysToTry = [splitKey, groupId].filter(Boolean);
-    for (const k of keysToTry) {
-      const cycleRaw = localStorage.getItem(`splitCycle_${k}`);
-      if (cycleRaw) {
-        const parsed = JSON.parse(cycleRaw);
-        onDays = Number(parsed.onDays) || onDays;
-        offDays = Number(parsed.offDays) || offDays;
-        savedStartDayIndex = Number(parsed.startDayIndex);
-        storageKey = k;
-        break;
-      }
-    }
-  } catch {}
 
   if (!onDays) onDays = Math.max(split.length, 1);
   if (!offDays) offDays = 1;
-  if (!storageKey) storageKey = groupId || splitKey;
+
+  const storageKey = groupId || splitKey;
 
   return { onDays, offDays, savedStartDayIndex, storageKey };
 }
@@ -103,9 +88,6 @@ export function makeTodayWorkoutDay(templates) {
 
   const todayIndex = new Date().getDay();
   const todayMonSun = todayIndex === 0 ? 6 : todayIndex - 1;
-
-  const cycle = { onDays, offDays, startDayIndex: todayMonSun };
-  localStorage.setItem(`splitCycle_${storageKey}`, JSON.stringify(cycle));
 
   // Persist to DB so it survives app reinstall
   const split = getActiveSplit(templates);
