@@ -93,11 +93,15 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
 
   return (
     <>
-    <motion.div className={`mb-2 bg-white dark:bg-gray-800 rounded-xl p-3 overflow-hidden transition-shadow ${isDragging ? 'ring-2 ring-blue-500 shadow-lg' : 'bg-gray-50 dark:bg-gray-800/50'}`}>
+    <motion.div
+      animate={{ scale: isDragging ? 1.02 : 1 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      className={`mb-2 bg-white dark:bg-gray-800 rounded-xl p-3 overflow-hidden transition-shadow ${isDragging ? 'ring-2 ring-blue-500 shadow-lg' : 'bg-gray-50 dark:bg-gray-800/50'}`}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
           <h3
             onPointerDown={(e) => dragControls?.start(e)}
+            style={{ touchAction: 'none' }}
             className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing leading-snug"
             onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
           >

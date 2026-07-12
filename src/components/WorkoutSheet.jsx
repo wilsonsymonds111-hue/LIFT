@@ -575,7 +575,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 Finish
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-24">
+            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-24" data-workout-scroll>
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-3xl font-bold text-gray-900">{template.name}</h1>
               </div>
