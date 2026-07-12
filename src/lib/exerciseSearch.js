@@ -28,6 +28,18 @@ function tokenize(str) {
   return str.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
 }
 
+// Common misspellings → correct spelling. Ensures searches like "dumbell"
+// (one B) match "dumbbell" (two B's) without relying solely on Levenshtein.
+const COMMON_MISSPELLINGS = {
+  'dumbell': 'dumbbell',
+  'dumbel': 'dumbbell',
+  'dumbellpress': 'dumbbellpress',
+};
+
+function correctSpelling(token) {
+  return COMMON_MISSPELLINGS[token] || token;
+}
+
 /**
  * Checks if a single query token matches an exercise name.
  * Uses exact substring match first, then falls back to word-level fuzzy
@@ -35,13 +47,14 @@ function tokenize(str) {
  */
 export function tokenMatchesName(token, name) {
   const nameLower = name.toLowerCase();
-  const qt = token.toLowerCase();
+  // Correct common misspellings (e.g. "dumbell" → "dumbbell") before matching
+  const qt = correctSpelling(token.toLowerCase());
   if (!qt) return false;
 
   // 1. Exact substring match on full name (handles "curl" → "Bicep Curl (Dumbbell)")
   if (nameLower.includes(qt)) return true;
 
-  // 2. Word-level fuzzy match (handles "dumbell" → "dumbbell")
+  // 2. Word-level fuzzy match (handles remaining typos via Levenshtein)
   const eTokens = tokenize(name);
   return eTokens.some(et => {
     const ml = Math.max(qt.length, et.length);
