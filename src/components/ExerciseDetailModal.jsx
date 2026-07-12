@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Trash2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import { getExerciseDetailList, invalidateExerciseCache } from '../lib/exerciseCache';
 import ProgressGraph from './ProgressGraph';
 import ExerciseHistoryList from './ExerciseHistoryList';
 import { MUSCLE_COLORS } from '../lib/exercises';
-import { isCustomExercise, deleteCustomExercise } from '../lib/customExercises';
+
 
 const TABS = ['Charts', 'About'];
 
@@ -98,22 +98,7 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
             <X className="w-5 h-5 text-foreground" />
           </button>
           <h2 className="font-bold text-lg text-foreground tracking-tight text-center flex-1 px-2 truncate">{exercise.name}</h2>
-          {isCustomExercise(exercise.name) ? (
-            <button
-              onClick={async () => {
-                if (window.confirm(`Delete "${exercise.name}" from your exercise list?`)) {
-                  await deleteCustomExercise(exercise.name);
-                  onExerciseDeleted?.();
-                  onClose();
-                }
-              }}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-950/30 transition"
-            >
-              <Trash2 className="w-5 h-5 text-red-500" />
-            </button>
-          ) : (
-            <div className="w-10" />
-          )}
+          <div className="w-10" />
         </div>
 
         {/* Tabs */}

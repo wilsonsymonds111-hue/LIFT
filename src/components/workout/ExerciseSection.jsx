@@ -93,7 +93,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBes
 
   return (
     <>
-    <motion.div layout className="mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
+    <motion.div className="mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 overflow-hidden">
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
           <h3
@@ -141,13 +141,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBes
           <img
             src={exerciseImage}
             alt={exercise.name}
-            className={`rounded-xl object-contain cursor-pointer transition-all duration-200 flex-shrink-0 ${compact ? 'w-10 h-8' : 'w-28 h-20 hover:scale-105 active:scale-95'}`}
+            className={`rounded-xl object-contain cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] flex-shrink-0 ${compact ? 'w-10 h-8' : 'w-28 h-20 hover:scale-105 active:scale-95'}`}
             decoding="async"
             loading="lazy"
             onClick={compact ? undefined : () => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
           />
         ) : (
-          <div className={`rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-all duration-200 ${compact ? 'w-10 h-8' : 'w-28 h-20'}`}>
+          <div className={`rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${compact ? 'w-10 h-8' : 'w-28 h-20'}`}>
             <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
           </div>
         )}
@@ -158,7 +158,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBes
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
             {showNote && (
