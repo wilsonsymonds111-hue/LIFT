@@ -11,8 +11,9 @@ export default function ReorderableExercise({ exercise, onDragStart, onDragEnd, 
       dragListener={false}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      layout
-      transition={{ type: 'spring', stiffness: 500, damping: 35, mass: 0.5 }}
+      layout="position"
+      transition={{ type: 'spring', stiffness: 380, damping: 30, mass: 0.8, restSpeed: 0.01, restDelta: 0.5 }}
+      whileDrag={{ scale: 1.03, zIndex: 20 }}
       className="list-none"
     >
       <ExerciseSection exercise={exercise} dragControls={dragControls} {...props} />
