@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Reorder, useDragControls } from 'framer-motion';
+import { Reorder, useDragControls, useMotionValue, motion, animate } from 'framer-motion';
 import ExerciseSection from './ExerciseSection';
 
 const EDGE_ZONE = 100;
@@ -12,6 +12,10 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
   const scrollRectRef = useRef(null);
   const rafRef = useRef(null);
   const speedRef = useRef(0);
+  // Compensates the card's Y position during auto-scroll so it stays
+  // glued to the finger. Without this, scrollTop changes move the card
+  // with the container while the pointer stays still — causing drift.
+  const yCompensation = useMotionValue(0);
 
   const tick = () => {
     const container = scrollContainerRef.current;
@@ -19,7 +23,11 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       rafRef.current = null;
       return;
     }
-    container.scrollTop += speedRef.current;
+    const delta = speedRef.current;
+    container.scrollTop += delta;
+    // Counter-scroll: move the card by the same delta so it visually
+    // stays exactly where the finger is.
+    yCompensation.set(yCompensation.get() + delta);
     rafRef.current = requestAnimationFrame(tick);
   };
 
@@ -27,6 +35,7 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
   const handleDragStart = () => {
     setIsDragging(true);
     onDragActiveChange?.(true);
+    yCompensation.set(0);
     const container = document.querySelector('[data-workout-scroll]');
     scrollContainerRef.current = container;
     scrollRectRef.current = container?.getBoundingClientRect() ?? null;
@@ -54,6 +63,10 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
     setIsDragging(false);
     onDragActiveChange?.(false);
     speedRef.current = 0;
+    // Smoothly return compensation to 0 so the card settles into its
+    // natural slot without a jump. Spring matches Reorder.Item's transition
+    // so the combined motion is a single smooth spring.
+    animate(yCompensation, 0, { type: 'spring', stiffness: 700, damping: 35, mass: 0.4 });
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
@@ -83,7 +96,9 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       }}
       className="list-none"
     >
-      <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
+      <motion.div style={{ y: yCompensation }}>
+        <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
+      </motion.div>
     </Reorder.Item>
   );
 }
