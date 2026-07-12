@@ -12,18 +12,6 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
   const scrollRectRef = useRef(null);
   const rafRef = useRef(null);
   const speedRef = useRef(0);
-  const compensationRef = useRef(0);
-  const innerRef = useRef(null);
-  const settleRafRef = useRef(null);
-
-  // Direct DOM update — no motion value batching, applied synchronously
-  // in the same rAF callback as the scrollTop change.
-  const applyCompensation = () => {
-    if (innerRef.current) {
-      const v = compensationRef.current;
-      innerRef.current.style.transform = v !== 0 ? `translateY(${v}px)` : '';
-    }
-  };
 
   const tick = () => {
     const container = scrollContainerRef.current;
@@ -31,23 +19,13 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       rafRef.current = null;
       return;
     }
-    // Change scrollTop and apply compensation in the SAME synchronous
-    // block — the browser paints them together so there's zero drift.
-    const prevScroll = container.scrollTop;
     container.scrollTop += speedRef.current;
-    const actualDelta = container.scrollTop - prevScroll;
-    if (actualDelta !== 0) {
-      compensationRef.current += actualDelta;
-      applyCompensation();
-    }
     rafRef.current = requestAnimationFrame(tick);
   };
 
   const handleDragStart = () => {
     setIsDragging(true);
     onDragActiveChange?.(true);
-    compensationRef.current = 0;
-    applyCompensation();
     const container = document.querySelector('[data-workout-scroll]');
     scrollContainerRef.current = container;
     scrollRectRef.current = container?.getBoundingClientRect() ?? null;
@@ -79,34 +57,10 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
-    // Settle compensation to 0 so the card snaps into its final slot smoothly
-    if (innerRef.current && compensationRef.current !== 0) {
-      const start = compensationRef.current;
-      const startTime = performance.now();
-      const duration = 300;
-      const ease = (t) => 1 - Math.pow(1 - t, 3);
-
-      const step = (now) => {
-        const t = Math.min(1, (now - startTime) / duration);
-        const val = start * (1 - ease(t));
-        compensationRef.current = val;
-        if (innerRef.current) {
-          innerRef.current.style.transform = val !== 0 ? `translateY(${val}px)` : '';
-        }
-        if (t < 1) {
-          settleRafRef.current = requestAnimationFrame(step);
-        } else {
-          compensationRef.current = 0;
-          if (innerRef.current) innerRef.current.style.transform = '';
-        }
-      };
-      settleRafRef.current = requestAnimationFrame(step);
-    }
   };
 
   useEffect(() => () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    if (settleRafRef.current) cancelAnimationFrame(settleRafRef.current);
   }, []);
 
   return (
@@ -116,24 +70,13 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       dragControls={dragControls}
       dragListener={false}
       dragMomentum={false}
-      dragElastic={0}
-      layout={isDragging ? false : "position"}
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
-      transition={isDragging ? { duration: 0 } : { type: 'spring', stiffness: 700, damping: 35, mass: 0.4 }}
-      style={{
-        position: 'relative',
-        zIndex: isDragging ? 9999 : 'auto',
-      }}
       className="list-none"
+      style={{ zIndex: isDragging ? 9999 : 'auto' }}
     >
-      {/* Plain div — framer-motion can't override its transform.
-          Compensation is applied synchronously in tick() so it paints
-          in the same frame as the scrollTop change. */}
-      <div ref={innerRef}>
-        <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
-      </div>
+      <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
     </Reorder.Item>
   );
 }
