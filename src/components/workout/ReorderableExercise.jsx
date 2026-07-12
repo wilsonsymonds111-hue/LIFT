@@ -16,7 +16,7 @@ export default function ReorderableExercise({ exercise, ...props }) {
       onDragStart={() => setIsDragging(true)}
       onDragEnd={() => setIsDragging(false)}
       transition={{ type: 'spring', stiffness: 1200, damping: 50, mass: 0.15, restSpeed: 0.01, restDelta: 0.5 }}
-      whileDrag={{ zIndex: 50 }}
+      whileDrag={{ zIndex: 9999 }}
       className="list-none"
     >
       <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} {...props} />

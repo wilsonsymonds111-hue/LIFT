@@ -93,7 +93,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
 
   return (
     <>
-    <motion.div className="mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 overflow-hidden">
+    <motion.div className={`mb-2 bg-white dark:bg-gray-800 rounded-xl p-3 overflow-hidden transition-shadow ${isDragging ? 'ring-2 ring-blue-500 shadow-lg' : 'bg-gray-50 dark:bg-gray-800/50'}`}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
           <h3
