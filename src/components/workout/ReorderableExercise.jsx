@@ -1,7 +1,7 @@
 import { Reorder, useDragControls } from 'framer-motion';
 import ExerciseSection from './ExerciseSection';
 
-export default function ReorderableExercise({ exercise, onDragStart, onDragEnd, ...props }) {
+export default function ReorderableExercise({ exercise, ...props }) {
   const dragControls = useDragControls();
   return (
     <Reorder.Item
@@ -9,8 +9,6 @@ export default function ReorderableExercise({ exercise, onDragStart, onDragEnd, 
       value={exercise}
       dragControls={dragControls}
       dragListener={false}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
       layout="position"
       transition={{ type: 'spring', stiffness: 380, damping: 30, mass: 0.8, restSpeed: 0.01, restDelta: 0.5 }}
       whileDrag={{ scale: 1.03, zIndex: 20 }}

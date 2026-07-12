@@ -9,7 +9,7 @@ import RestTimeModal from './RestTimeModal';
 import ExerciseShareButton from '../share/ExerciseShareButton';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
-const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBestSet, dragControls, onDeleteExercise, exerciseImage, initialState, onStateChange }) {
+const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragControls, onDeleteExercise, exerciseImage, initialState, onStateChange }) {
   const pr = useMemo(() => {
     const history = exercise.history || [];
     if (history.length === 0) return null;
@@ -99,11 +99,11 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBes
           <h3
             onPointerDown={(e) => dragControls?.start(e)}
             className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing leading-snug"
-            onClick={compact ? undefined : () => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
+            onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
           >
             {exercise.name}
           </h3>
-          {!compact && (
+          {(
             <div className="relative -ml-1 mt-0.5 flex items-center gap-0.5">
               <ExerciseShareButton exercise={exercise} sessionResults={sessionResults} pr={pr} />
               <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
@@ -141,19 +141,18 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBes
           <img
             src={exerciseImage}
             alt={exercise.name}
-            className={`rounded-xl object-contain cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] flex-shrink-0 ${compact ? 'w-10 h-8' : 'w-28 h-20 hover:scale-105 active:scale-95'}`}
+            className="rounded-xl object-contain cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] flex-shrink-0 w-28 h-20 hover:scale-105 active:scale-95"
             decoding="async"
             loading="lazy"
-            onClick={compact ? undefined : () => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
+            onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
           />
         ) : (
-          <div className={`rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${compact ? 'w-10 h-8' : 'w-28 h-20'}`}>
+          <div className="rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] w-28 h-20">
             <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
           </div>
         )}
       </div>
       <AnimatePresence initial={false}>
-        {!compact && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -238,7 +237,6 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBes
               + Add Set
             </button>
           </motion.div>
-        )}
       </AnimatePresence>
     </motion.div>
     {showExerciseDetail && (

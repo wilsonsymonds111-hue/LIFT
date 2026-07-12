@@ -22,7 +22,6 @@ const TODAY_STR = new Date().toLocaleDateString('en-GB', { day: 'numeric', month
 export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedSession }) {
   const [minimized, setMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [isReordering, setIsReordering] = useState(false);
   const [noteFocused, setNoteFocused] = useState(false);
   const yMotion = useMotionValue(0);
   const dragStartYRef = useRef(null);
@@ -606,9 +605,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                   <ReorderableExercise
                     key={exercise.name}
                     exercise={exercise}
-                    compact={isReordering}
-                    onDragStart={() => setIsReordering(true)}
-                    onDragEnd={() => setIsReordering(false)}
                     onBestSet={handleBestSet}
                     exerciseImage={exerciseImages[exercise.name.toLowerCase()]}
                     onDeleteExercise={() => handleDeleteExercise(idx)}
