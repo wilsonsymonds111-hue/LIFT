@@ -69,7 +69,7 @@ export default function Splits() {
         setSwapping(false);
         setSwapPhase(null);
         navigate('/');
-      }, 2000);
+      }, 1000);
       return () => clearTimeout(t);
     }
   }, [swapPhase, swapOriginRect, navigate]);
@@ -697,7 +697,7 @@ export default function Splits() {
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 0.25 }}
-                      transition={{ duration: 0.6 }}
+                      transition={{ duration: 0.35 }}
                       className="absolute inset-0 bg-emerald-400 rounded-2xl pointer-events-none"
                     />
                   )}
@@ -711,7 +711,7 @@ export default function Splits() {
                           <motion.div
                             initial={{ scale: 0, rotate: -90 }}
                             animate={{ scale: 1, rotate: 0 }}
-                            transition={{ type: 'spring', stiffness: 220, damping: 18, delay: 0.1 }}
+                            transition={{ type: 'spring', stiffness: 220, damping: 18, delay: 0.05 }}
                             className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0"
                           >
                             <Check className="w-3 h-3 text-white" strokeWidth={3} />
@@ -725,7 +725,7 @@ export default function Splits() {
                         <motion.p
                           initial={{ opacity: 0, y: 4 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.35, delay: 0.4 }}
+                          transition={{ duration: 0.25, delay: 0.15 }}
                           className="text-xs font-semibold text-emerald-500 mt-1 relative z-10"
                         >
                           Now your current split
