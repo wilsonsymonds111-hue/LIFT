@@ -14,12 +14,10 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
   const speedRef = useRef(0);
   const compensationRef = useRef(0);
   const innerRef = useRef(null);
-  const lastScrollTopRef = useRef(0);
   const settleRafRef = useRef(null);
 
-  // Direct DOM update — no motion value batching delay.
-  // Applied inside the scroll event (fires before paint) so the
-  // compensation lands in the SAME visual frame as the scroll.
+  // Direct DOM update — no motion value batching, applied synchronously
+  // in the same rAF callback as the scrollTop change.
   const applyCompensation = () => {
     if (innerRef.current) {
       const v = compensationRef.current;
@@ -33,7 +31,8 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       rafRef.current = null;
       return;
     }
-    // Apply scroll + compensation synchronously in the same rAF callback
+    // Change scrollTop and apply compensation in the SAME synchronous
+    // block — the browser paints them together so there's zero drift.
     const prevScroll = container.scrollTop;
     container.scrollTop += speedRef.current;
     const actualDelta = container.scrollTop - prevScroll;
@@ -44,30 +43,6 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
     rafRef.current = requestAnimationFrame(tick);
   };
 
-  // Listen to ALL scroll changes during drag — catches our manual auto-scroll
-  // AND any scroll from framer-motion's built-in drag auto-scroll. The scroll
-  // event fires before paint, so compensation is applied before the user
-  // sees the scrolled frame. This is what keeps the card glued to the finger.
-  useEffect(() => {
-    if (!isDragging) return;
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    lastScrollTopRef.current = container.scrollTop;
-
-    const onScroll = () => {
-      const delta = container.scrollTop - lastScrollTopRef.current;
-      lastScrollTopRef.current = container.scrollTop;
-      if (delta !== 0) {
-        compensationRef.current += delta;
-        applyCompensation();
-      }
-    };
-
-    container.addEventListener('scroll', onScroll, { passive: true });
-    return () => container.removeEventListener('scroll', onScroll);
-  }, [isDragging]);
-
   const handleDragStart = () => {
     setIsDragging(true);
     onDragActiveChange?.(true);
@@ -76,7 +51,6 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
     const container = document.querySelector('[data-workout-scroll]');
     scrollContainerRef.current = container;
     scrollRectRef.current = container?.getBoundingClientRect() ?? null;
-    lastScrollTopRef.current = container?.scrollTop ?? 0;
   };
 
   const handleDrag = (_, info) => {
@@ -105,8 +79,7 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
-    // Smoothly settle compensation back to 0 so the card doesn't jump
-    // when it snaps into its final slot.
+    // Settle compensation to 0 so the card snaps into its final slot smoothly
     if (innerRef.current && compensationRef.current !== 0) {
       const start = compensationRef.current;
       const startTime = performance.now();
@@ -155,9 +128,9 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       }}
       className="list-none"
     >
-      {/* Plain div — framer-motion's drag system can't override its transform.
-          Compensation is applied here via direct DOM style, synced to the
-          scroll event so it's painted in the same frame as the scroll. */}
+      {/* Plain div — framer-motion can't override its transform.
+          Compensation is applied synchronously in tick() so it paints
+          in the same frame as the scrollTop change. */}
       <div ref={innerRef}>
         <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
       </div>
