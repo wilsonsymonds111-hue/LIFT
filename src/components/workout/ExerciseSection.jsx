@@ -95,7 +95,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     <>
     <motion.div
       animate={{ scale: isDragging ? 1.02 : 1 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      transition={isDragging ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 30 }}
       className={`mb-2 bg-white dark:bg-gray-800 rounded-xl p-3 overflow-hidden transition-shadow ${isDragging ? 'ring-2 ring-blue-500 shadow-lg' : 'bg-gray-50 dark:bg-gray-800/50'}`}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
@@ -161,7 +161,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: isDragging ? 0 : 1, height: isDragging ? 0 : 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            transition={isDragging ? { duration: 0 } : { duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
             {showNote && (
