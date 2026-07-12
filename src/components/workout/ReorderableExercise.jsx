@@ -72,7 +72,7 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       dragListener={false}
       dragMomentum={false}
       dragElastic={0}
-      layout="position"
+      layout={isDragging ? false : "position"}
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
