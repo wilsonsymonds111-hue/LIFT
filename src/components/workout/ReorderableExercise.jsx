@@ -74,7 +74,7 @@ export default function ReorderableExercise({ exercise, ...props }) {
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
-      transition={{ duration: 0 }}
+      transition={isDragging ? { duration: 0 } : { type: 'spring', stiffness: 700, damping: 35, mass: 0.4 }}
       style={{
         position: 'relative',
         zIndex: isDragging ? 9999 : 'auto',
