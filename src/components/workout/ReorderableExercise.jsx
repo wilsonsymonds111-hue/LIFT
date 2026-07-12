@@ -5,7 +5,7 @@ import ExerciseSection from './ExerciseSection';
 const EDGE_ZONE = 100;
 const MAX_SPEED = 14;
 
-export default function ReorderableExercise({ exercise, ...props }) {
+export default function ReorderableExercise({ exercise, onDragActiveChange, dragActive, ...props }) {
   const dragControls = useDragControls();
   const [isDragging, setIsDragging] = useState(false);
   const scrollContainerRef = useRef(null);
@@ -26,6 +26,7 @@ export default function ReorderableExercise({ exercise, ...props }) {
   // Cache scroll container + its rect at drag start so we never touch the DOM during drag moves
   const handleDragStart = () => {
     setIsDragging(true);
+    onDragActiveChange?.(true);
     const container = document.querySelector('[data-workout-scroll]');
     scrollContainerRef.current = container;
     scrollRectRef.current = container?.getBoundingClientRect() ?? null;
@@ -51,6 +52,7 @@ export default function ReorderableExercise({ exercise, ...props }) {
 
   const handleDragEnd = () => {
     setIsDragging(false);
+    onDragActiveChange?.(false);
     speedRef.current = 0;
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
@@ -81,7 +83,7 @@ export default function ReorderableExercise({ exercise, ...props }) {
       }}
       className="list-none"
     >
-      <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} {...props} />
+      <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
     </Reorder.Item>
   );
 }

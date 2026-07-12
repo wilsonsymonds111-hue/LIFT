@@ -9,7 +9,7 @@ import RestTimeModal from './RestTimeModal';
 import ExerciseShareButton from '../share/ExerciseShareButton';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
-const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragControls, onDeleteExercise, exerciseImage, initialState, onStateChange, isDragging }) {
+const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragControls, onDeleteExercise, exerciseImage, initialState, onStateChange, isDragging, dragActive }) {
   const pr = useMemo(() => {
     const history = exercise.history || [];
     if (history.length === 0) return null;
@@ -159,9 +159,9 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       <AnimatePresence initial={false}>
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: dragActive ? 0 : 1, height: dragActive ? 0 : 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: dragActive ? 0.15 : 0.28, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
             {showNote && (

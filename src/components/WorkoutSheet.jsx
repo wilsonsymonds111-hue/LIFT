@@ -23,6 +23,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const [minimized, setMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [noteFocused, setNoteFocused] = useState(false);
+  const [exerciseDragActive, setExerciseDragActive] = useState(false);
   const yMotion = useMotionValue(0);
   const dragStartYRef = useRef(null);
   const draggingRef = useRef(false);
@@ -603,13 +604,15 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
               <Reorder.Group as="div" axis="y" values={exercises} onReorder={setExercises}>
                 {exercises.map((exercise, idx) => (
                   <ReorderableExercise
-                    key={exercise.name}
-                    exercise={exercise}
-                    onBestSet={handleBestSet}
-                    exerciseImage={exerciseImages[exercise.name.toLowerCase()]}
-                    onDeleteExercise={() => handleDeleteExercise(idx)}
-                    initialState={exerciseStateRef.current[exercise.name]}
-                    onStateChange={(state) => handleExerciseStateChange(exercise.name, state)}
+                  key={exercise.name}
+                  exercise={exercise}
+                  onBestSet={handleBestSet}
+                  exerciseImage={exerciseImages[exercise.name.toLowerCase()]}
+                  onDeleteExercise={() => handleDeleteExercise(idx)}
+                  initialState={exerciseStateRef.current[exercise.name]}
+                  onStateChange={(state) => handleExerciseStateChange(exercise.name, state)}
+                  dragActive={exerciseDragActive}
+                  onDragActiveChange={setExerciseDragActive}
                   />
                 ))}
               </Reorder.Group>
