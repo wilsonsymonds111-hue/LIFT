@@ -38,10 +38,15 @@ export default function ExercisePicker({ onClose, onAdd }) {
   const [search, setSearch] = useState('');
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selected, setSelected] = useState([]);
-  const [exercises, setExercises] = useState(() => getAllExercises());
+  const [exercises, setExercises] = useState([]);
   const [imageMap, setImageMap] = useState({});
   const [detailExercise, setDetailExercise] = useState(null);
   const viewportHeight = useVisualViewportHeight();
+
+  // Load exercises from cloud (custom exercises are stored per-user)
+  useEffect(() => {
+    getAllExercises().then(setExercises);
+  }, []);
 
   // Load exercise detail images once on mount — invalidate cache first so
   // any image updates (e.g. from ExerciseDetailModal uploads) are reflected
@@ -177,11 +182,11 @@ export default function ExercisePicker({ onClose, onAdd }) {
             <div className="px-4 pt-4 pb-2">
               <p className="text-sm text-gray-400 text-center mb-3">No results for "{search}"</p>
               <button
-                onClick={() => {
+                onClick={async () => {
                   const titleName = search.trim().replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
                   const newEx = { name: titleName, muscle: detectMuscle(titleName) };
-                  saveCustomExercise(newEx);
-                  setExercises(getAllExercises());
+                  await saveCustomExercise(newEx);
+                  setExercises(await getAllExercises());
                   onAdd([newEx]);
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-2xl transition"

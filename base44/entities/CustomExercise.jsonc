@@ -1,0 +1,15 @@
+{
+  "name": "CustomExercise",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "muscle": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

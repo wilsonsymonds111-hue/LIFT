@@ -134,7 +134,10 @@ export default function Exercises() {
     });
   }, []);
 
-  const allExercises = useMemo(() => getAllExercises(), [customExercisesVersion]);
+  const [allExercises, setAllExercises] = useState([]);
+  useEffect(() => {
+    getAllExercises().then(setAllExercises);
+  }, [customExercisesVersion]);
   
   const filtered = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase();
@@ -187,7 +190,7 @@ export default function Exercises() {
         });
         muscle = res?.muscle || 'Full Body';
       } catch {}
-      saveCustomExercise({ name: capitalizedName, muscle });
+      await saveCustomExercise({ name: capitalizedName, muscle });
       setCustomExercisesVersion(v => v + 1);
       setSearch('');
       setDebouncedSearch('');
@@ -215,7 +218,7 @@ export default function Exercises() {
         });
         muscle = res?.muscle || 'Full Body';
       } catch {}
-      saveCustomExercise({ name: capitalizedName, muscle });
+      await saveCustomExercise({ name: capitalizedName, muscle });
       setCustomExercisesVersion(v => v + 1);
       setShowCreateModal(false);
       setSelectedExercise({ name: capitalizedName, muscle });

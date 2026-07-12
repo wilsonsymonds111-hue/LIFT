@@ -100,9 +100,9 @@ export default function ExerciseDetailModal({ exercise, onClose, initialTab, ini
           <h2 className="font-bold text-lg text-foreground tracking-tight text-center flex-1 px-2 truncate">{exercise.name}</h2>
           {isCustomExercise(exercise.name) ? (
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (window.confirm(`Delete "${exercise.name}" from your exercise list?`)) {
-                  deleteCustomExercise(exercise.name);
+                  await deleteCustomExercise(exercise.name);
                   onExerciseDeleted?.();
                   onClose();
                 }
