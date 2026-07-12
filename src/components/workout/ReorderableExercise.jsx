@@ -74,7 +74,8 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
       className="list-none"
-      style={{ zIndex: isDragging ? 9999 : 'auto' }}
+      style={{ position: 'relative' }}
+      whileDrag={{ zIndex: 9999 }}
     >
       <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
     </Reorder.Item>
