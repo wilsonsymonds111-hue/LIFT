@@ -69,7 +69,10 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
     };
   });
 
-  const templateUpdate = { exerciseList: exerciseListForSave };
+  const templateUpdate = {
+    exerciseList: exerciseListForSave,
+    exercises: exerciseListForSave.map(e => e.name).join(', '),
+  };
   if (hasCompletedSets) {
     templateUpdate.lastPerformed = new Date().toISOString();
   }
