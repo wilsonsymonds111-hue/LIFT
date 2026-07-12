@@ -70,17 +70,10 @@ export default function ReorderableExercise({ exercise, ...props }) {
       dragListener={false}
       dragMomentum={false}
       dragElastic={0}
-      layout="position"
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
-      // duration:0 while dragging = layout corrections are instant, so the
-      // card never lags behind the finger. Spring when NOT dragging so items
-      // settle smoothly into place after drop.
-      transition={isDragging
-        ? { duration: 0 }
-        : { type: 'spring', stiffness: 700, damping: 35, mass: 0.4 }
-      }
+      transition={{ duration: 0 }}
       style={{
         position: 'relative',
         zIndex: isDragging ? 9999 : 'auto',
