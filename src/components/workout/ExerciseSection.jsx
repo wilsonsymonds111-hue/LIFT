@@ -8,7 +8,7 @@ import RestTimeModal from './RestTimeModal';
 import ExerciseShareButton from '../share/ExerciseShareButton';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
-const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange }) {
+const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange }) {
   const pr = useMemo(() => {
     const history = exercise.history || [];
     if (history.length === 0) return null;
@@ -92,6 +92,15 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       }), [allEntries]);
   const displayHistory = graphHistory;
   const displayBodyweight = isBodyweight;
+
+  if (compact) {
+    return (
+      <div className="mb-1.5 bg-gray-50 dark:bg-gray-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
+        <h3 className="text-blue-500 font-semibold text-sm select-none cursor-grab active:cursor-grabbing leading-snug flex-1 min-w-0 truncate" {...dragHandleProps}>{exercise.name}</h3>
+        {exerciseImage && <img src={exerciseImage} alt={exercise.name} className="w-10 h-8 rounded object-contain flex-shrink-0" />}
+      </div>
+    );
+  }
 
   return (
     <>

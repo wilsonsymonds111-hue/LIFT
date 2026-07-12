@@ -22,6 +22,7 @@ const TODAY_STR = new Date().toLocaleDateString('en-GB', { day: 'numeric', month
 export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedSession }) {
   const [minimized, setMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isReordering, setIsReordering] = useState(false);
   const [noteFocused, setNoteFocused] = useState(false);
   const yMotion = useMotionValue(0);
   const dragStartYRef = useRef(null);
@@ -600,7 +601,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 }`}
               />
 
-              <DragDropContext onDragEnd={({ source, destination }) => {
+              <DragDropContext onDragStart={() => setIsReordering(true)} onDragEnd={({ source, destination }) => {
+                setIsReordering(false);
                 if (!destination) return;
                 const next = [...exercises];
                 const [moved] = next.splice(source.index, 1);
@@ -614,7 +616,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                         <Draggable key={exercise.name + idx} draggableId={exercise.name + idx} index={idx}>
                           {(p) => (
                             <div ref={p.innerRef} {...p.draggableProps}>
-                              <ExerciseSection key={`${exercise.name}-${idx}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name.toLowerCase()]} onDeleteExercise={() => handleDeleteExercise(idx)} initialState={exerciseStateRef.current[exercise.name]} onStateChange={(state) => handleExerciseStateChange(exercise.name, state)} />
+                              <ExerciseSection key={`${exercise.name}-${idx}`} exercise={exercise} compact={isReordering} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name.toLowerCase()]} onDeleteExercise={() => handleDeleteExercise(idx)} initialState={exerciseStateRef.current[exercise.name]} onStateChange={(state) => handleExerciseStateChange(exercise.name, state)} />
                             </div>
                           )}
                         </Draggable>
