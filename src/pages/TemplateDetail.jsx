@@ -29,8 +29,25 @@ export default function TemplateDetail() {
   const queryClient = useQueryClient();
 
   // Reuse React Query cache from Home page — data is already loaded, no refetch
-  const { data: templates } = useWorkoutTemplates();
-  const template = templates?.find(t => t.id === id);
+  const { data: templates, isLoading: templatesLoading } = useWorkoutTemplates();
+  const cachedTemplate = templates?.find(t => t.id === id);
+
+  // Fallback: if the template isn't in the cache (e.g. just created from an
+  // example split), fetch it directly by ID instead of spinning forever.
+  const [fetchedTemplate, setFetchedTemplate] = useState(null);
+  const [fetchFailed, setFetchFailed] = useState(false);
+
+  useEffect(() => {
+    if (cachedTemplate || !id) { setFetchedTemplate(null); setFetchFailed(false); return; }
+    if (templatesLoading) return;
+    setFetchedTemplate(null);
+    setFetchFailed(false);
+    base44.entities.WorkoutTemplate.get(id)
+      .then(t => setFetchedTemplate(t))
+      .catch(() => setFetchFailed(true));
+  }, [id, cachedTemplate, templatesLoading]);
+
+  const template = cachedTemplate || fetchedTemplate;
 
   const listRef = useRef(null);
   const [fontScale, setFontScale] = useState(1);
@@ -67,7 +84,11 @@ export default function TemplateDetail() {
   if (!template) {
     return createPortal(
       <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
-        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+        {fetchFailed ? (
+          <p className="text-muted-foreground">Workout not found</p>
+        ) : (
+          <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+        )}
       </div>,
       document.body
     );
