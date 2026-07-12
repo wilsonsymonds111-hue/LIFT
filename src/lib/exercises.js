@@ -60,6 +60,7 @@ export const ALL_EXERCISES = [
   { name: 'Leg Press Calf Raise', muscle: 'Legs' },
   { name: 'Lunge (Barbell)', muscle: 'Legs' },
   { name: 'Lunge (Dumbbell)', muscle: 'Legs' },
+  { name: 'Machine Chest Fly', muscle: 'Chest' },
   { name: 'Meadows Row', muscle: 'Back' },
   { name: 'Mountain Climber', muscle: 'Core' },
   { name: 'Nordic Curl', muscle: 'Legs' },
