@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import ProgressGraph, { getRepCap } from '../ProgressGraph';
@@ -8,7 +9,7 @@ import RestTimeModal from './RestTimeModal';
 import ExerciseShareButton from '../share/ExerciseShareButton';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
-const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange }) {
+const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBestSet, dragControls, onDeleteExercise, exerciseImage, initialState, onStateChange }) {
   const pr = useMemo(() => {
     const history = exercise.history || [];
     if (history.length === 0) return null;
@@ -25,7 +26,6 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBes
     return { kg: maxKg, reps: maxReps, bodyweight: false };
   }, [exercise.history]);
 
-  // Extract the most recent workout session's sets for "Previous" column display
   const lastSessionSets = useMemo(() => {
     const history = exercise.history || [];
     if (history.length === 0) return [];
@@ -75,12 +75,10 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBes
   const animDir = sessionResults.length >= prevCountRef.current ? 'add' : 'remove';
   useEffect(() => { prevCountRef.current = sessionResults.length; }, [sessionResults.length]);
 
-  // Report state changes to parent for session persistence
   useEffect(() => {
     onStateChange?.({ sets, completedSets, note });
   }, [sets, completedSets, note, onStateChange]);
 
-  // Preload the detail modal chunk so it opens instantly when the image is clicked
   useEffect(() => { import('../ExerciseDetailModal'); }, []);
 
   const allEntries = useMemo(() => [...(exercise.history || []), ...sessionResults], [exercise.history, sessionResults]);
@@ -93,145 +91,156 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, compact, onBes
   const displayHistory = graphHistory;
   const displayBodyweight = isBodyweight;
 
-  if (compact) {
-    return (
-      <div className="mb-1.5 bg-gray-50 dark:bg-gray-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
-        <h3 className="text-blue-500 font-semibold text-sm select-none cursor-grab active:cursor-grabbing leading-snug flex-1 min-w-0 truncate" {...dragHandleProps}>{exercise.name}</h3>
-        {exerciseImage && <img src={exerciseImage} alt={exercise.name} className="w-10 h-8 rounded object-contain flex-shrink-0" />}
-      </div>
-    );
-  }
-
   return (
     <>
-    <div className="mb-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
+    <motion.div layout className="mb-2 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
-          <h3 className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing leading-snug" {...dragHandleProps} onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}>{exercise.name}</h3>
-          <div className="relative -ml-1 mt-0.5 flex items-center gap-0.5">
-            <ExerciseShareButton exercise={exercise} sessionResults={sessionResults} pr={pr} />
-            <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-              <MoreHorizontal className="w-4 h-4 text-gray-700 dark:text-gray-200" />
-            </button>
-            {showMenu && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-                <div className="absolute left-0 top-8 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 min-w-[190px]">
-                  <button
-                    onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
-                  >
-                    {showNote ? 'Hide Note' : 'Add a Note'}
-                  </button>
-                  <button
-                    onClick={() => { setShowMenu(false); setShowRestTimeModal(true); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
-                  >
-                    Change Default Rest Time
-                  </button>
-                  <button
-                    onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
-                  >
-                    Remove Exercise
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+          <h3
+            onPointerDown={(e) => dragControls?.start(e)}
+            className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing leading-snug"
+            onClick={compact ? undefined : () => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
+          >
+            {exercise.name}
+          </h3>
+          {!compact && (
+            <div className="relative -ml-1 mt-0.5 flex items-center gap-0.5">
+              <ExerciseShareButton exercise={exercise} sessionResults={sessionResults} pr={pr} />
+              <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <MoreHorizontal className="w-4 h-4 text-gray-700 dark:text-gray-200" />
+              </button>
+              {showMenu && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+                  <div className="absolute left-0 top-8 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 min-w-[190px]">
+                    <button
+                      onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
+                    >
+                      {showNote ? 'Hide Note' : 'Add a Note'}
+                    </button>
+                    <button
+                      onClick={() => { setShowMenu(false); setShowRestTimeModal(true); }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
+                    >
+                      Change Default Rest Time
+                    </button>
+                    <button
+                      onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
+                    >
+                      Remove Exercise
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
         {exerciseImage ? (
           <img
             src={exerciseImage}
             alt={exercise.name}
-            className="w-28 h-20 rounded-xl object-contain cursor-pointer hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
+            className={`rounded-xl object-contain cursor-pointer transition-all duration-200 flex-shrink-0 ${compact ? 'w-10 h-8' : 'w-28 h-20 hover:scale-105 active:scale-95'}`}
             decoding="async"
             loading="lazy"
-            onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
+            onClick={compact ? undefined : () => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
           />
         ) : (
-          <div className="w-28 h-20 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+          <div className={`rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-all duration-200 ${compact ? 'w-10 h-8' : 'w-28 h-20'}`}>
             <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
           </div>
         )}
       </div>
+      <AnimatePresence initial={false}>
+        {!compact && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
             {showNote && (
-        <div
-          ref={el => { if (el && document.activeElement !== el && el.textContent !== note) el.textContent = note; }}
-          contentEditable
-          suppressContentEditableWarning
-          data-placeholder="Add a note…"
-          onInput={e => setNote(e.currentTarget.textContent)}
-          className="w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-1.5 empty:bg-transparent empty:border-transparent empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold transition-colors"
-        />
-      )}
-      <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
-      {sets.map((s, i) => {
-        const prevSet = i < lastSessionSets.length ? lastSessionSets[i] : null;
-        const completedResult = completedSets[s.id];
-        const isDone = !!completedResult;
-        const suggestedKg = isDone ? completedResult.kg : (s.suggestedKg ?? prevSet?.kg ?? (i === 0 && prev ? prev.kg : null));
-        const suggestedReps = isDone ? completedResult.reps : (s.suggestedReps ?? (prevSet ? prevSet.reps + 1 : (i === 0 && prev ? prev.reps + 1 : null)));
-        return (
-        <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
-        <SetRow setNum={i + 1} previous={i === 0 ? (prevSet ?? prev) : null} initialKg={suggestedKg} initialReps={suggestedReps} initialDone={isDone} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
-          onComplete={(result) => {
-            const setIndex = sets.findIndex(r => r.id === s.id);
-            const wasCompleted = !!completedSets[s.id];
-            setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
-            if (result) {
-              onBestSet?.(exercise.name, result.kg, result.reps);
-              if (result.reps >= repCap && !goalNoteShownRef.current) {
-                goalNoteShownRef.current = true;
-                setGoalNotification(`Great work hitting ${repCap} reps! Time to move up to a heavier weight for maximum muscle growth.`);
-              }
-              if (!wasCompleted && setIndex < sets.length - 1) {
-                setSets(prev => prev.map((r, i) => {
-                  if (i <= setIndex) return r;
-                  if (i === setIndex + 1) {
-                    return {
-                      ...r,
-                      suggestedKg: result.kg || r.suggestedKg,
-                      suggestedReps: result.reps + 1
-                    };
+              <div
+                ref={el => { if (el && document.activeElement !== el && el.textContent !== note) el.textContent = note; }}
+                contentEditable
+                suppressContentEditableWarning
+                data-placeholder="Add a note…"
+                onInput={e => setNote(e.currentTarget.textContent)}
+                className="w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-1.5 empty:bg-transparent empty:border-transparent empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold transition-colors"
+              />
+            )}
+            <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
+            {sets.map((s, i) => {
+              const prevSet = i < lastSessionSets.length ? lastSessionSets[i] : null;
+              const completedResult = completedSets[s.id];
+              const isDone = !!completedResult;
+              const suggestedKg = isDone ? completedResult.kg : (s.suggestedKg ?? prevSet?.kg ?? (i === 0 && prev ? prev.kg : null));
+              const suggestedReps = isDone ? completedResult.reps : (s.suggestedReps ?? (prevSet ? prevSet.reps + 1 : (i === 0 && prev ? prev.reps + 1 : null)));
+              return (
+              <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
+              <SetRow setNum={i + 1} previous={i === 0 ? (prevSet ?? prev) : null} initialKg={suggestedKg} initialReps={suggestedReps} initialDone={isDone} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
+                onComplete={(result) => {
+                  const setIndex = sets.findIndex(r => r.id === s.id);
+                  const wasCompleted = !!completedSets[s.id];
+                  setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
+                  if (result) {
+                    onBestSet?.(exercise.name, result.kg, result.reps);
+                    if (result.reps >= repCap && !goalNoteShownRef.current) {
+                      goalNoteShownRef.current = true;
+                      setGoalNotification(`Great work hitting ${repCap} reps! Time to move up to a heavier weight for maximum muscle growth.`);
+                    }
+                    if (!wasCompleted && setIndex < sets.length - 1) {
+                      setSets(prev => prev.map((r, i) => {
+                        if (i <= setIndex) return r;
+                        if (i === setIndex + 1) {
+                          return {
+                            ...r,
+                            suggestedKg: result.kg || r.suggestedKg,
+                            suggestedReps: result.reps + 1
+                          };
+                        }
+                        return r;
+                      }));
+                    }
                   }
-                  return r;
-                }));
-              }
-            }
-          }}
-          onDelete={() => {
-            setSets(p => p.filter(r => r.id !== s.id));
-            setCompletedSets(prev => { const next = {...prev}; delete next[s.id]; return next; });
-          }} />
-        </div>
-      );
-      })}
-      <button
-        onClick={() => {
-          const sessionCompleted = Object.values(completedSets).filter(Boolean);
-          let suggestedKg = null, suggestedReps = null;
-          if (sessionCompleted.length > 0) {
-            const last = sessionCompleted[sessionCompleted.length - 1];
-            suggestedKg = last.kg;
-            suggestedReps = last.reps + 1;
-          } else if (pr) {
-            suggestedKg = pr.bodyweight ? null : pr.kg;
-            suggestedReps = pr.reps + sets.length + 1;
-          } else {
-            const lastEntry = exercise.history?.[exercise.history.length - 1];
-            if (lastEntry) {
-              suggestedKg = typeof lastEntry === 'object' ? lastEntry.kg : lastEntry;
-              suggestedReps = (typeof lastEntry === 'object' ? lastEntry.reps : 8) + 1;
-            }
-          }
-          setSets(p => [...p, { id: Date.now(), suggestedKg, suggestedReps }]);
-        }}
-        className="mt-2 w-full py-1.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
-      >
-        + Add Set
-      </button>
-    </div>
+                }}
+                onDelete={() => {
+                  setSets(p => p.filter(r => r.id !== s.id));
+                  setCompletedSets(prev => { const next = {...prev}; delete next[s.id]; return next; });
+                }} />
+              </div>
+            );
+            })}
+            <button
+              onClick={() => {
+                const sessionCompleted = Object.values(completedSets).filter(Boolean);
+                let suggestedKg = null, suggestedReps = null;
+                if (sessionCompleted.length > 0) {
+                  const last = sessionCompleted[sessionCompleted.length - 1];
+                  suggestedKg = last.kg;
+                  suggestedReps = last.reps + 1;
+                } else if (pr) {
+                  suggestedKg = pr.bodyweight ? null : pr.kg;
+                  suggestedReps = pr.reps + sets.length + 1;
+                } else {
+                  const lastEntry = exercise.history?.[exercise.history.length - 1];
+                  if (lastEntry) {
+                    suggestedKg = typeof lastEntry === 'object' ? lastEntry.kg : lastEntry;
+                    suggestedReps = (typeof lastEntry === 'object' ? lastEntry.reps : 8) + 1;
+                  }
+                }
+                setSets(p => [...p, { id: Date.now(), suggestedKg, suggestedReps }]);
+              }}
+              className="mt-2 w-full py-1.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
+            >
+              + Add Set
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
     {showExerciseDetail && (
       <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" /></div>}>
         <ExerciseDetailModal
