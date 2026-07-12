@@ -614,7 +614,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                         <Draggable key={exercise.name + idx} draggableId={exercise.name + idx} index={idx}>
                           {(p) => (
                             <div ref={p.innerRef} {...p.draggableProps}>
-                              <ExerciseSection key={`${exercise.name}-${idx}`} exercise={exercise} cardIndex={idx + 1} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name.toLowerCase()]} onDeleteExercise={() => handleDeleteExercise(idx)} initialState={exerciseStateRef.current[exercise.name]} onStateChange={(state) => handleExerciseStateChange(exercise.name, state)} />
+                              <ExerciseSection key={`${exercise.name}-${idx}`} exercise={exercise} onBestSet={handleBestSet} dragHandleProps={p.dragHandleProps} exerciseImage={exerciseImages[exercise.name.toLowerCase()]} onDeleteExercise={() => handleDeleteExercise(idx)} initialState={exerciseStateRef.current[exercise.name]} onStateChange={(state) => handleExerciseStateChange(exercise.name, state)} />
                             </div>
                           )}
                         </Draggable>
