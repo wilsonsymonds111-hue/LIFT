@@ -4,7 +4,7 @@ export const ALL_EXERCISES = [
   { name: 'Back Extension', muscle: 'Back' },
   { name: 'Ball Slams', muscle: 'Full Body' },
   { name: 'Barbell Row', muscle: 'Back' },
-  { name: 'Bench Press (Barbell)', muscle: 'Chest' },
+  { name: 'Flat Barbell Bench Press', muscle: 'Chest' },
   { name: 'Bench Press (Dumbbell)', muscle: 'Chest' },
   { name: 'Bicep Curl (Barbell)', muscle: 'Arms' },
   { name: 'Bicep Curl Dumbbell Supinated', muscle: 'Arms' },

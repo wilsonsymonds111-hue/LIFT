@@ -9,7 +9,7 @@ export const EXAMPLE_SPLITS_DATA = {
         name: 'Upper Body Workout',
         emoji: '💪',
         exercises: [
-          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 2 },
+          { name: 'Flat Barbell Bench Press', muscle: 'Chest', sets: 2 },
           { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 2 },
           { name: 'Pull Up', muscle: 'Back', sets: 2 },
           { name: 'Barbell Row', muscle: 'Back', sets: 2 },
@@ -98,7 +98,7 @@ export const EXAMPLE_SPLITS_DATA = {
         emoji: '💪',
         subtitle: 'Chest • Back • Shoulders • Arms',
         exercises: [
-          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 2 },
+          { name: 'Flat Barbell Bench Press', muscle: 'Chest', sets: 2 },
           { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 2 },
           { name: 'Pull Up', muscle: 'Back', sets: 2 },
           { name: 'Barbell Row', muscle: 'Back', sets: 2 },
@@ -128,7 +128,7 @@ export const EXAMPLE_SPLITS_DATA = {
         emoji: '🏋️',
         subtitle: 'Chest • Shoulders • Triceps',
         exercises: [
-          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 2 },
+          { name: 'Flat Barbell Bench Press', muscle: 'Chest', sets: 2 },
           { name: 'Incline Bench Press (Dumbbell)', muscle: 'Chest', sets: 2 },
           { name: 'Dumbbell Fly', muscle: 'Chest', sets: 2 },
           { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 2 },
@@ -179,7 +179,7 @@ export const EXAMPLE_SPLITS_DATA = {
         emoji: '🏋️',
         subtitle: 'Chest + Triceps',
         exercises: [
-          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 2 },
+          { name: 'Flat Barbell Bench Press', muscle: 'Chest', sets: 2 },
           { name: 'Incline Bench Press (Dumbbell)', muscle: 'Chest', sets: 2 },
           { name: 'Dumbbell Fly', muscle: 'Chest', sets: 2 },
           { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 2 },
@@ -231,7 +231,7 @@ export const EXAMPLE_SPLITS_DATA = {
         subtitle: 'Chest • Back • Shoulders • Arms • Legs • Core',
         exercises: [
           { name: 'Squat (Barbell)', muscle: 'Legs', sets: 2 },
-          { name: 'Bench Press (Barbell)', muscle: 'Chest', sets: 2 },
+          { name: 'Flat Barbell Bench Press', muscle: 'Chest', sets: 2 },
           { name: 'Barbell Row', muscle: 'Back', sets: 2 },
           { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 2 },
           { name: 'Romanian Deadlift (Barbell)', muscle: 'Legs', sets: 2 },
