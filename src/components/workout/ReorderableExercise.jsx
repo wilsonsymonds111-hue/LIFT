@@ -12,6 +12,16 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
   const scrollRectRef = useRef(null);
   const rafRef = useRef(null);
   const speedRef = useRef(0);
+  const compensationRef = useRef(0);
+  const innerRef = useRef(null);
+
+  // Apply compensation directly to DOM — synchronous, same frame as scroll
+  const applyComp = () => {
+    const el = innerRef.current;
+    if (!el) return;
+    const v = compensationRef.current;
+    el.style.transform = v !== 0 ? `translateY(${v}px)` : '';
+  };
 
   const tick = () => {
     const container = scrollContainerRef.current;
@@ -19,13 +29,23 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       rafRef.current = null;
       return;
     }
+    // Change scrollTop and compensate in the SAME synchronous block —
+    // browser paints them together so the card never drifts.
+    const prev = container.scrollTop;
     container.scrollTop += speedRef.current;
+    const delta = container.scrollTop - prev;
+    if (delta !== 0) {
+      compensationRef.current += delta;
+      applyComp();
+    }
     rafRef.current = requestAnimationFrame(tick);
   };
 
   const handleDragStart = () => {
     setIsDragging(true);
     onDragActiveChange?.(true);
+    compensationRef.current = 0;
+    applyComp();
     const container = document.querySelector('[data-workout-scroll]');
     scrollContainerRef.current = container;
     scrollRectRef.current = container?.getBoundingClientRect() ?? null;
@@ -57,6 +77,24 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
+    // Smoothly settle compensation back to 0 so card snaps into its slot
+    if (compensationRef.current !== 0 && innerRef.current) {
+      const start = compensationRef.current;
+      const startTime = performance.now();
+      const duration = 250;
+      const ease = (t) => 1 - Math.pow(1 - t, 3);
+      const step = (now) => {
+        const t = Math.min(1, (now - startTime) / duration);
+        const val = start * (1 - ease(t));
+        compensationRef.current = val;
+        if (innerRef.current) {
+          innerRef.current.style.transform = val !== 0 ? `translateY(${val}px)` : '';
+        }
+        if (t < 1) requestAnimationFrame(step);
+        else { compensationRef.current = 0; if (innerRef.current) innerRef.current.style.transform = ''; }
+      };
+      requestAnimationFrame(step);
+    }
   };
 
   useEffect(() => () => {
@@ -77,7 +115,12 @@ export default function ReorderableExercise({ exercise, onDragActiveChange, drag
       style={{ position: 'relative' }}
       whileDrag={{ zIndex: 9999 }}
     >
-      <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
+      {/* Plain div — framer-motion can't override its transform.
+          Compensation applied synchronously in tick() so it paints
+          in the same frame as the scrollTop change. */}
+      <div ref={innerRef}>
+        <ExerciseSection exercise={exercise} dragControls={dragControls} isDragging={isDragging} dragActive={dragActive} {...props} />
+      </div>
     </Reorder.Item>
   );
 }
