@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { MoreHorizontal, CalendarPlus, Plus, Moon, Layers } from 'lucide-react';
+import { MoreHorizontal, CalendarPlus, Plus, Moon, Layers, Pencil } from 'lucide-react';
 import { motion, useAnimationControls } from 'framer-motion';
 import CalendarSyncModal from '../components/CalendarSyncModal';
 import SplitModal from '../components/SplitModal';
@@ -580,7 +580,7 @@ export default function Home() {
                   onClick={() => { setSplitMenuOpen(false); setShowRenameSplit(true); }}
                   className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
                 >
-                  <MoreHorizontal className="w-4 h-4 text-blue-500" />
+                  <Pencil className="w-4 h-4 text-blue-500" />
                   Rename split
                 </button>
                 <button
