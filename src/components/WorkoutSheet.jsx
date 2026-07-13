@@ -7,7 +7,7 @@ import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
-import { getExerciseDetailList } from '../lib/exerciseCache';
+import { getExerciseDetailList, getCachedImageMap, saveCachedImageMap } from '../lib/exerciseCache';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
 import TimerDisplay from './workout/TimerDisplay';
 import { notifyRestComplete, showNotification } from '../lib/workoutSounds';
@@ -261,38 +261,70 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const { data: exerciseHistoryData = { history: {}, notes: {} } } = useExerciseHistory();
 
   const [exerciseImages, setExerciseImages] = useState({});
+
+  // Build the name→image_url map from a detail list, with fuzzy fallback.
+  const buildImageMap = useCallback((results, exerciseList) => {
+    const detailByName = {};
+    (results || []).forEach(d => {
+      if (d.image_url) detailByName[d.name.toLowerCase()] = d.image_url;
+    });
+    const map = {};
+    const missing = [];
+    (exerciseList || []).forEach(ex => {
+      const key = ex.name.toLowerCase();
+      if (detailByName[key]) {
+        map[key] = detailByName[key];
+      } else {
+        const normalized = key.replace(/\s*\(.*?\)\s*/g, '').replace(/\bmachine\b/gi, ' ').replace(/\s+/g, ' ').replace(/es$/g, '').replace(/s$/g, '').trim();
+        const fuzzyKey = Object.keys(detailByName).find(k => {
+          const normK = k.replace(/\s*\(.*?\)\s*/g, '').replace(/\bmachine\b/gi, ' ').replace(/\s+/g, ' ').replace(/es$/g, '').replace(/s$/g, '').trim();
+          return normK === normalized || k.includes(normalized) || normalized.includes(normK);
+        });
+        if (fuzzyKey) {
+          map[key] = detailByName[fuzzyKey];
+        } else {
+          missing.push(ex.name);
+        }
+      }
+    });
+    return { map, missing };
+  }, []);
+
+  // Preload actual image files so the <img> tags render instantly
+  const preloadImages = useCallback((map) => {
+    Object.values(map).forEach(url => {
+      if (url) { const img = new Image(); img.src = url; }
+    });
+  }, []);
+
   useEffect(() => {
+    const exerciseList = template?.exerciseList || [];
+
+    // 1. Show cached images immediately from localStorage (instant on repeat opens)
+    const cachedMap = getCachedImageMap();
+    if (cachedMap) {
+      const { map } = buildImageMap(
+        Object.entries(cachedMap).map(([name, url]) => ({ name, image_url: url })),
+        exerciseList
+      );
+      setExerciseImages(map);
+      preloadImages(map);
+    }
+
+    // 2. Fetch fresh data in background — updates if anything changed
     getExerciseDetailList().then(async (results) => {
+      const { map, missing } = buildImageMap(results, exerciseList);
+      setExerciseImages(map);
+      preloadImages(map);
+
+      // Persist the full detail map for instant loads next time
       const detailByName = {};
       (results || []).forEach(d => {
         if (d.image_url) detailByName[d.name.toLowerCase()] = d.image_url;
       });
+      saveCachedImageMap(detailByName);
 
-      // Set known images immediately — don't block on missing ones
-      const map = {};
-      const missing = [];
-      (template?.exerciseList || []).forEach(ex => {
-        const key = ex.name.toLowerCase();
-        if (detailByName[key]) {
-          map[key] = detailByName[key];
-        } else {
-          // Fuzzy fallback: try matching by stripping common suffixes/qualifiers
-          // so "Smith Squat" matches "Smith Machine Squat", "Cable Crunches" matches "Cable Crunch", etc.
-          const normalized = key.replace(/\s*\(.*?\)\s*/g, '').replace(/\bmachine\b/gi, ' ').replace(/\s+/g, ' ').replace(/es$/g, '').replace(/s$/g, '').trim();
-          const fuzzyKey = Object.keys(detailByName).find(k => {
-            const normK = k.replace(/\s*\(.*?\)\s*/g, '').replace(/\bmachine\b/gi, ' ').replace(/\s+/g, ' ').replace(/es$/g, '').replace(/s$/g, '').trim();
-            return normK === normalized || k.includes(normalized) || normalized.includes(normK);
-          });
-          if (fuzzyKey) {
-            map[key] = detailByName[fuzzyKey];
-          } else {
-            missing.push(ex.name);
-          }
-        }
-      });
-      setExerciseImages(map);
-
-      // Generate missing images in background, update as each completes
+      // Resolve missing images in background
       missing.forEach(async (name) => {
         try {
           const detail = await ensureExerciseDetail(name);
@@ -302,7 +334,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         } catch {}
       });
     });
-  }, [template?.id]);
+  }, [template?.id, buildImageMap, preloadImages]);
 
   // Sync exercise names + metadata when the template prop updates (e.g. after
   // a React Query background refetch delivers fresh data with renamed exercises).

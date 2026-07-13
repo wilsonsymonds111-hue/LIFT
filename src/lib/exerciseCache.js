@@ -4,6 +4,11 @@ import { base44 } from '@/api/base44Client';
 const cache = {};
 const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes — image data rarely changes
 
+// localStorage-backed image map — survives page reloads so workout images
+// appear instantly on repeat opens while the API refreshes in the background.
+const LS_KEY = 'exerciseImageMap';
+const LS_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
 function now() { return Date.now(); }
 
 export async function getExerciseList() {
@@ -24,6 +29,26 @@ export async function getExerciseDetailList() {
   const data = await base44.entities.ExerciseDetail.list('name', 500);
   cache[key] = { data, time: now() };
   return data;
+}
+
+/** Returns a name→image_url map from localStorage (or null if stale/missing). */
+export function getCachedImageMap() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed.time || (now() - parsed.time) > LS_TTL) return null;
+    return parsed.map || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Persists the name→image_url map to localStorage. */
+export function saveCachedImageMap(map) {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ map, time: now() }));
+  } catch {}
 }
 
 export function invalidateExerciseCache() {
