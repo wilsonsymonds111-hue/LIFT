@@ -4,6 +4,7 @@ import { MoreHorizontal, CalendarPlus, Plus, Moon, Layers } from 'lucide-react';
 import { motion, useAnimationControls } from 'framer-motion';
 import CalendarSyncModal from '../components/CalendarSyncModal';
 import SplitModal from '../components/SplitModal';
+import RenameSplitModal from '../components/RenameSplitModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -150,6 +151,7 @@ export default function Home() {
   const [splitMenuOpen, setSplitMenuOpen] = useState(false);
   const [showCalendarSync, setShowCalendarSync] = useState(false);
   const [showSplitEditor, setShowSplitEditor] = useState(false);
+  const [showRenameSplit, setShowRenameSplit] = useState(false);
   const [cycleVersion, setCycleVersion] = useState(0);
   const [isReorderMode, setIsReorderMode] = useState(false);
   const punchControls = useAnimationControls();
@@ -208,6 +210,23 @@ export default function Home() {
     setSplitMenuOpen(false);
     setShowCalendarSync(true);
   }, []);
+
+  const handleRenameSplit = useCallback(async (newName) => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setShowRenameSplit(false);
+    queryClient.setQueryData(['workoutTemplates'], (prev) =>
+      prev?.map(t =>
+        currentSplit.some(ct => ct.id === t.id)
+          ? { ...t, splitName: trimmed }
+          : t
+      )
+    );
+    await Promise.all(currentSplit.map(t =>
+      base44.entities.WorkoutTemplate.update(t.id, { splitName: trimmed })
+    ));
+    invalidateWorkoutTemplates(queryClient);
+  }, [queryClient, currentSplit]);
 
   // --- Split categorization (computed fresh every render — no stale memo) ---
 
@@ -558,6 +577,13 @@ export default function Home() {
                 style={{ top: `${top}px`, right: `${right}px`, zIndex: 100 }}
               >
                 <button
+                  onClick={() => { setSplitMenuOpen(false); setShowRenameSplit(true); }}
+                  className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
+                >
+                  <MoreHorizontal className="w-4 h-4 text-blue-500" />
+                  Rename split
+                </button>
+                <button
                   onClick={() => { setSplitMenuOpen(false); setShowSplitEditor(true); }}
                   className="w-full text-left px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition rounded-xl flex items-center gap-2"
                 >
@@ -595,6 +621,14 @@ export default function Home() {
             setShowSplitEditor(false);
             invalidateWorkoutTemplates(queryClient);
           }}
+        />
+      )}
+
+      {showRenameSplit && (
+        <RenameSplitModal
+          initialName={currentSplit[0]?.splitName || currentSplitName || ''}
+          onClose={() => setShowRenameSplit(false)}
+          onConfirm={handleRenameSplit}
         />
       )}
 
