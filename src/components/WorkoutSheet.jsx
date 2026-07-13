@@ -572,14 +572,27 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                     const lowerHistory = {};
                     Object.entries(notesMap).forEach(([k, v]) => { lowerNotes[k.toLowerCase()] = v; });
                     Object.entries(historyMap).forEach(([k, v]) => { lowerHistory[k.toLowerCase()] = v; });
+                    // Also search workout templates for notes — notes may live on a
+                    // template's exerciseList rather than the Exercise entity
+                    const templateNotes = {};
+                    allTemplates.forEach(t => {
+                      (t.exerciseList || []).forEach(ex => {
+                        if (ex.note && !templateNotes[ex.name.toLowerCase()]) {
+                          templateNotes[ex.name.toLowerCase()] = ex.note;
+                        }
+                      });
+                    });
                     setExercises(prev => {
                       const existing = new Set(prev.map(e => e.name));
-                      const newOnes = picked.filter(e => !existing.has(e.name)).map(e => ({
-                        ...e,
-                        sets: 1,
-                        history: lowerHistory[e.name.toLowerCase()] || [],
-                        note: lowerNotes[e.name.toLowerCase()] ?? '',
-                      }));
+                      const newOnes = picked.filter(e => !existing.has(e.name)).map(e => {
+                        const key = e.name.toLowerCase();
+                        return {
+                          ...e,
+                          sets: 1,
+                          history: lowerHistory[key] || [],
+                          note: lowerNotes[key] || templateNotes[key] || '',
+                        };
+                      });
                       return [...prev, ...newOnes];
                     });
                     const newNames = picked.filter(e => !exerciseImages[e.name.toLowerCase()]).map(e => e.name);
