@@ -43,7 +43,7 @@ export async function shareToInstagram(shareData) {
 
     if (navigator.canShare({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], title: 'LIFT' });
+        await navigator.share({ files: [file], ...(shareData.isPR ? { title: 'New PR' } : {}) });
         return { shared: true, method: 'web-share' };
       } catch (e) {
         if (e.name === 'AbortError') return { shared: false, cancelled: true };
