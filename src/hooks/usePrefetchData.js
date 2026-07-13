@@ -18,7 +18,12 @@ export function usePrefetchData() {
         (results || []).forEach(d => {
           if (d.image_url) map[d.name.toLowerCase()] = d.image_url;
         });
-        if (Object.keys(map).length > 0) saveCachedImageMap(map);
+        if (Object.keys(map).length > 0) {
+          saveCachedImageMap(map);
+          // Preload actual image files into the browser HTTP cache so they
+          // render instantly when a workout is opened
+          Object.values(map).forEach(url => { const img = new Image(); img.src = url; });
+        }
       });
       queryClient.prefetchQuery({
         queryKey: EXERCISE_HISTORY_KEY,

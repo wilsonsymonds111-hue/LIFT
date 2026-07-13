@@ -153,7 +153,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             alt={exercise.name}
             className="rounded-xl object-contain cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] flex-shrink-0 w-28 h-20 hover:scale-105 active:scale-95"
             decoding="async"
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
             onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
           />
         ) : (
