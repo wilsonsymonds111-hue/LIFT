@@ -13,7 +13,7 @@ export async function shareToInstagram(shareData) {
   // JPEG keeps the base64 small enough for the deep-link URL
   const stickerBase64 = stickerCanvas.toDataURL('image/png').split(',')[1];
 
-  const url = `instagram-stories://share?background_top_color=%230a0a0a&background_bottom_color=%230a0a0a&sticker_image=${encodeURIComponent(stickerBase64)}`;
+  const url = `instagram-stories://share?sticker_image=${encodeURIComponent(stickerBase64)}`;
 
   const blobPromise = new Promise(resolve => stickerCanvas.toBlob(resolve, 'image/png'));
 

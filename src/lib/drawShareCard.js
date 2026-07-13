@@ -159,7 +159,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   ctx.textBaseline = 'top';
   ctx.textAlign = 'left';
 
-  let y = 72;
+  let y = 440;
 
   // --- Header: LIFT logo (left) + date (right) ---
   const arrowSize = 13;
