@@ -8,6 +8,8 @@ const GREEN = '#22c55e';
 const GOLD = '#d4a017';
 const DIVIDER = '#e5e7eb';
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif';
+const SCALE = 2;
+const LOGO_BAR_H = 36;
 
 function formatDateShort(dateStr) {
   if (!dateStr) return '';
@@ -55,15 +57,6 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   const sets = (sessionResults && sessionResults.length > 0)
     ? sessionResults
     : (weight || reps ? [{ kg: weight, reps }] : []);
-
-  // Find best set index for PR star
-  const bestSetIdx = sets.length > 0
-    ? sets.reduce((bestIdx, s, i, arr) => {
-        const currVal = isBodyweight ? toReps(s) : toKg(s);
-        const bestVal = isBodyweight ? toReps(arr[bestIdx]) : toKg(arr[bestIdx]);
-        return currVal > bestVal ? i : bestIdx;
-      }, 0)
-    : -1;
 
   // Process history for chart
   // Build chart data — show EVERY history point (matching the in-app graph),
@@ -121,7 +114,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   }
 
   // Calculate total height
-  let h = padY;
+  let h = LOGO_BAR_H + padY;
   h += Math.max(IMG_H, 22 + (isPR ? 24 : 0)); // header
   h += 14; // gap
   if (chartData) {
@@ -130,22 +123,42 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   if (sets.length > 0) {
     h += 22 + sets.length * 28 + 6; // set header + rows
   }
-  h += 14; // gap before logo
-  h += 14; // logo
   h += padY;
 
   const canvas = document.createElement('canvas');
-  canvas.width = W;
-  canvas.height = h;
+  canvas.width = W * SCALE;
+  canvas.height = h * SCALE;
   const ctx = canvas.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
 
   // White rounded card background
   ctx.fillStyle = WHITE;
   roundRect(ctx, 0, 0, W, h, 16);
   ctx.fill();
 
-  let y = padY;
+  // Black header bar with LIFT logo (clipped to card's rounded corners)
+  ctx.save();
+  roundRect(ctx, 0, 0, W, h, 16);
+  ctx.clip();
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, W, LOGO_BAR_H);
+  ctx.restore();
+
+  // LIFT logo text (white on black)
   ctx.textBaseline = 'top';
+  ctx.font = `800 14px ${FONT}`;
+  ctx.fillStyle = WHITE;
+  ctx.textAlign = 'center';
+  const logoText = 'LIFT';
+  const ls = 0.2 * 14;
+  let totalW = 0;
+  for (const ch of logoText) totalW += ctx.measureText(ch).width + ls;
+  totalW -= ls;
+  drawSpacedText(ctx, logoText, W / 2 - totalW / 2, (LOGO_BAR_H - 14) / 2, ls);
+
+  let y = LOGO_BAR_H + padY;
 
   // --- Exercise name ---
   ctx.font = `700 17px ${FONT}`;
@@ -320,8 +333,6 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       const setY = y + i * 28;
       const setKg = toKg(s);
       const setReps = toReps(s);
-      const isBestSet = i === bestSetIdx && isPR;
-
       // Set number
       ctx.font = `600 13px ${FONT}`;
       ctx.fillStyle = GRAY;
@@ -337,13 +348,6 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       ctx.font = `600 13px ${FONT}`;
       ctx.fillStyle = GRAY;
       ctx.fillText(`${setReps} reps`, padX + 140, setY);
-
-      // PR star
-      if (isBestSet) {
-        const starX = W - padX - 38;
-        const starY = setY + 6;
-        drawStar(ctx, starX, starY, 7, GOLD);
-      }
 
       // Checkmark
       const checkX = W - padX - 14;
@@ -366,17 +370,6 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     y += sets.length * 28 + 14;
     ctx.textAlign = 'left';
   }
-
-  // --- LIFT logo ---
-  ctx.font = `800 13px ${FONT}`;
-  ctx.fillStyle = GOLD;
-  ctx.textAlign = 'center';
-  const logoText = 'LIFT';
-  const ls = 0.2 * 13;
-  let totalW = 0;
-  for (const ch of logoText) totalW += ctx.measureText(ch).width + ls;
-  totalW -= ls;
-  drawSpacedText(ctx, logoText, W / 2 - totalW / 2, y, ls);
 
   return canvas;
 }
