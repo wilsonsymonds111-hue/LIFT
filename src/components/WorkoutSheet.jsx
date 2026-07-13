@@ -316,14 +316,15 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         const tEx = template.exerciseList[idx];
         if (!tEx) return ex;
         const newName = capitalize(tEx.name);
-        if (ex.name === newName) return ex;
+        const newNote = tEx.note ?? '';
+        if (ex.name === newName && (ex.note ?? '') === newNote) return ex;
         changed = true;
         // Migrate per-exercise state from old name → new name
         const oldState = exerciseStateRef.current[ex.name];
         if (oldState) { delete exerciseStateRef.current[ex.name]; exerciseStateRef.current[newName] = oldState; }
         const oldBest = bestSetsRef.current[ex.name];
         if (oldBest) { delete bestSetsRef.current[ex.name]; bestSetsRef.current[newName] = oldBest; }
-        return { ...ex, name: newName, muscle: tEx.muscle || ex.muscle };
+        return { ...ex, name: newName, muscle: tEx.muscle || ex.muscle, note: newNote || ex.note };
       });
       return changed ? next : prev;
     });

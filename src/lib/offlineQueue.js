@@ -112,7 +112,7 @@ export async function saveWorkout(templateId, snapshot, exerciseList) {
   try {
     await processWorkoutSave({ templateId, snapshot, exerciseList });
     queryClientInstance.invalidateQueries({ queryKey: ['exercise-history'] });
-    queryClientInstance.invalidateQueries({ queryKey: ['workout-templates'] });
+    queryClientInstance.invalidateQueries({ queryKey: ['workoutTemplates'] });
     return { saved: true, queued: false };
   } catch (e) {
     queueWorkoutSave({ templateId, snapshot, exerciseList });
@@ -139,7 +139,7 @@ export async function syncOfflineQueue() {
 
   if (synced > 0) {
     queryClientInstance.invalidateQueries({ queryKey: ['exercise-history'] });
-    queryClientInstance.invalidateQueries({ queryKey: ['workout-templates'] });
+    queryClientInstance.invalidateQueries({ queryKey: ['workoutTemplates'] });
   }
 
   return { synced, failed };

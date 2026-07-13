@@ -56,6 +56,14 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [showMenu, setShowMenu] = useState(false);
   const [note, setNote] = useState(() => initialState?.note || exercise.note || '');
   const [showNote, setShowNote] = useState(() => !!(initialState?.note || exercise.note));
+
+  // Sync note from template when it arrives after mount (e.g. after cache refetch)
+  useEffect(() => {
+    if (!note && exercise.note) {
+      setNote(exercise.note);
+      setShowNote(true);
+    }
+  }, [exercise.note]);
   const [restDuration, setRestDuration] = useState(() => getDefaultRestDuration(exercise.name));
   const [restEnabled, setRestEnabled] = useState(true);
   const [showRestTimeModal, setShowRestTimeModal] = useState(false);
