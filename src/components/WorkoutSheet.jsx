@@ -10,7 +10,7 @@ import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 import { getExerciseDetailList } from '../lib/exerciseCache';
 import { useExerciseHistory } from '../hooks/useExerciseHistory';
 import TimerDisplay from './workout/TimerDisplay';
-import { notifyRestComplete } from '../lib/workoutSounds';
+import { notifyRestComplete, showNotification } from '../lib/workoutSounds';
 import ExerciseSection from './workout/ExerciseSection';
 import SummaryScreen from './workout/SummaryScreen';
 import { isRestDayToday } from '../lib/restDayCheck';
@@ -483,6 +483,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       } catch {}
       clearWorkoutSession();
       window.dispatchEvent(new CustomEvent('workoutSessionChanged'));
+      showNotification('Workout auto-saved 💾', 'Your 2-hour workout was automatically finished and saved.');
       onFinish();
     }, msUntilStale);
     return () => clearTimeout(timer);
