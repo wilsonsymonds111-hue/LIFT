@@ -82,25 +82,31 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       byDate[today] = bestSet;
     }
     const dates = Object.keys(byDate).sort();
-    if (dates.length >= 2) {
+    if (dates.length >= 1) {
       const points = dates.map(d => isBodyweight ? toReps(byDate[d]) : toKg(byDate[d]));
       const min = Math.min(...points);
       const max = Math.max(...points);
-      const range = max - min || 1;
+      const range = (max - min) || 1;
       const cw = contentW - 24;
       const ch = 76;
       const pad = 8;
-      let coords = points.map((p, i) => ({
-        x: (i / (points.length - 1)) * cw,
-        y: ch - pad - ((p - min) / range) * (ch - pad * 2),
-      }));
-      if (coords.length > 15) coords = coords.slice(-15);
-      if (coords.length > 1) {
-        const rs = cw / (coords.length - 1);
-        coords.forEach((c, i) => { c.x = i * rs; });
+      let coords;
+      if (points.length === 1) {
+        // Single point — center it on a flat baseline
+        coords = [{ x: cw / 2, y: ch - pad - (range / range) * (ch - pad * 2) * 0.5 }];
+      } else {
+        coords = points.map((p, i) => ({
+          x: (i / (points.length - 1)) * cw,
+          y: ch - pad - ((p - min) / range) * (ch - pad * 2),
+        }));
+        if (coords.length > 15) coords = coords.slice(-15);
+        if (coords.length > 1) {
+          const rs = cw / (coords.length - 1);
+          coords.forEach((c, i) => { c.x = i * rs; });
+        }
       }
       chartData = {
-        coords, chartWidth: cw, chartHeight: ch,
+        coords, chartWidth: cw, chartHeight: ch, singlePoint: points.length === 1,
         startVal: Math.round(isBodyweight ? toReps(byDate[dates[0]]) : toKg(byDate[dates[0]])),
         endVal: Math.round(isBodyweight ? toReps(byDate[dates[dates.length - 1]]) : toKg(byDate[dates[dates.length - 1]])),
         startDate: formatDateShort(dates[0]),
@@ -213,32 +219,44 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     const lineX = graphX + 12;
     const lineY = y + 30;
 
-    // Area under line
-    ctx.beginPath();
-    chartData.coords.forEach((c, i) => {
-      if (i === 0) ctx.moveTo(lineX + c.x, lineY + c.y);
-      else ctx.lineTo(lineX + c.x, lineY + c.y);
-    });
-    ctx.lineTo(lineX + chartData.coords[chartData.coords.length - 1].x, lineY + chartData.chartHeight);
-    ctx.lineTo(lineX + chartData.coords[0].x, lineY + chartData.chartHeight);
-    ctx.closePath();
-    const areaGrad = ctx.createLinearGradient(0, lineY, 0, lineY + chartData.chartHeight);
-    areaGrad.addColorStop(0, 'rgba(59, 130, 246, 0.15)');
-    areaGrad.addColorStop(1, 'rgba(59, 130, 246, 0)');
-    ctx.fillStyle = areaGrad;
-    ctx.fill();
+    // Area under line (skip for single point — no line to fill under)
+    if (!chartData.singlePoint) {
+      ctx.beginPath();
+      chartData.coords.forEach((c, i) => {
+        if (i === 0) ctx.moveTo(lineX + c.x, lineY + c.y);
+        else ctx.lineTo(lineX + c.x, lineY + c.y);
+      });
+      ctx.lineTo(lineX + chartData.coords[chartData.coords.length - 1].x, lineY + chartData.chartHeight);
+      ctx.lineTo(lineX + chartData.coords[0].x, lineY + chartData.chartHeight);
+      ctx.closePath();
+      const areaGrad = ctx.createLinearGradient(0, lineY, 0, lineY + chartData.chartHeight);
+      areaGrad.addColorStop(0, 'rgba(59, 130, 246, 0.15)');
+      areaGrad.addColorStop(1, 'rgba(59, 130, 246, 0)');
+      ctx.fillStyle = areaGrad;
+      ctx.fill();
 
-    // Line
-    ctx.strokeStyle = BLUE;
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    chartData.coords.forEach((c, i) => {
-      if (i === 0) ctx.moveTo(lineX + c.x, lineY + c.y);
-      else ctx.lineTo(lineX + c.x, lineY + c.y);
-    });
-    ctx.stroke();
+      // Line
+      ctx.strokeStyle = BLUE;
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      chartData.coords.forEach((c, i) => {
+        if (i === 0) ctx.moveTo(lineX + c.x, lineY + c.y);
+        else ctx.lineTo(lineX + c.x, lineY + c.y);
+      });
+      ctx.stroke();
+    } else {
+      // Single point — draw a dashed baseline at the value
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(lineX, lineY + chartData.coords[0].y);
+      ctx.lineTo(lineX + chartData.chartWidth, lineY + chartData.coords[0].y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
 
     // Dots
     chartData.coords.forEach((c, i) => {
@@ -257,13 +275,17 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.fillStyle = LIGHT_GRAY;
     ctx.textAlign = 'left';
     ctx.fillText(`${chartData.startVal}${isBodyweight ? '' : 'kg'}`, lineX, lineY + chartData.chartHeight + 6);
-    ctx.textAlign = 'right';
-    ctx.fillText(`${chartData.endVal}${isBodyweight ? '' : 'kg'}`, lineX + chartData.chartWidth, lineY + chartData.chartHeight + 6);
+    if (!chartData.singlePoint) {
+      ctx.textAlign = 'right';
+      ctx.fillText(`${chartData.endVal}${isBodyweight ? '' : 'kg'}`, lineX + chartData.chartWidth, lineY + chartData.chartHeight + 6);
+    }
     ctx.textAlign = 'left';
     ctx.fillStyle = '#d1d5db';
     ctx.fillText(chartData.startDate, lineX, lineY + chartData.chartHeight + 18);
-    ctx.textAlign = 'right';
-    ctx.fillText(chartData.endDate, lineX + chartData.chartWidth, lineY + chartData.chartHeight + 18);
+    if (!chartData.singlePoint) {
+      ctx.textAlign = 'right';
+      ctx.fillText(chartData.endDate, lineX + chartData.chartWidth, lineY + chartData.chartHeight + 18);
+    }
 
     y += graphH + 14;
     ctx.textAlign = 'left';
