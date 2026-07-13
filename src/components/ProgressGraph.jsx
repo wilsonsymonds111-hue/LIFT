@@ -132,8 +132,8 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     const rangeMin = min - padding;
     const rangeMax = max + padding;
     const span = rangeMax - rangeMin;
-    // Pick 5 or 10 as the step — whichever gives ~3-6 ticks
-    const step = span <= 50 ? 5 : 10;
+    // Pick 2.5, 5, or 10 as the step — whichever gives ~3-6 ticks
+    const step = span <= 15 ? 2.5 : span <= 50 ? 5 : 10;
     const niceMin = Math.floor(rangeMin / step) * step;
     const niceMax = Math.ceil(rangeMax / step) * step;
     const ticks = [];
