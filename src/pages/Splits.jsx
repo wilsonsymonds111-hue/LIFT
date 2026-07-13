@@ -5,6 +5,7 @@ import { Plus, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import SplitCard from '../components/SplitCard';
 import RestFrequencyConfirmModal from '../components/RestFrequencyConfirmModal';
+import RenameSplitModal from '../components/RenameSplitModal';
 
 const SplitBuilder = lazy(() => import('../components/SplitBuilder'));
 const SplitModal = lazy(() => import('../components/SplitModal'));
@@ -38,6 +39,7 @@ export default function Splits() {
   const [swapOriginRect, setSwapOriginRect] = useState(null);
   const [showBuilder, setShowBuilder] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null); // group to confirm deletion
+  const [renamingSplit, setRenamingSplit] = useState(null); // group to rename
   const [activeSplit, setActiveSplit] = useState(null);
   const [frequencyConfirmSplit, setFrequencyConfirmSplit] = useState(null);
   const [frequencyConfirmDefaults, setFrequencyConfirmDefaults] = useState(null);
@@ -178,6 +180,23 @@ export default function Splits() {
       setSwapping(false);
       setSwapPhase(null);
     }
+  }, [queryClient]);
+
+  const handleRenameSplit = useCallback(async (group, newName) => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setRenamingSplit(null);
+    queryClient.setQueryData(['workoutTemplates'], (prev) =>
+      prev?.map(t =>
+        group.templates.some(gt => gt.id === t.id)
+          ? { ...t, splitName: trimmed }
+          : t
+      )
+    );
+    await Promise.all(group.templates.map(t =>
+      base44.entities.WorkoutTemplate.update(t.id, { splitName: trimmed })
+    ));
+    invalidateWorkoutTemplates(queryClient);
   }, [queryClient]);
 
   const handleDeleteMySplit = useCallback(async (group) => {
@@ -416,6 +435,16 @@ export default function Splits() {
             onClick={() => {
               setMenuOpen(null);
               const g = mySplitGroups.find(x => x.groupId === menuOpen);
+              if (g) setRenamingSplit(g);
+            }}
+            className="w-full text-left px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
+          >
+            Rename split
+          </button>
+          <button
+            onClick={() => {
+              setMenuOpen(null);
+              const g = mySplitGroups.find(x => x.groupId === menuOpen);
               if (g) setDeleteTarget(g);
             }}
             className="w-full text-left px-4 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
@@ -450,6 +479,16 @@ export default function Splits() {
             </div>
           </div>
         </div>,
+        document.body
+      )}
+
+      {/* Rename split modal */}
+      {renamingSplit && createPortal(
+        <RenameSplitModal
+          initialName={renamingSplit.templates[0]?.splitName || ''}
+          onClose={() => setRenamingSplit(null)}
+          onConfirm={(newName) => handleRenameSplit(renamingSplit, newName)}
+        />,
         document.body
       )}
 
