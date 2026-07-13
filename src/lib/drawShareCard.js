@@ -357,8 +357,8 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.textAlign = 'left';
   }
 
-  // --- Today's sets ---
-  if (sets.length > 0) {
+  // --- Today's sets (removed per user request) ---
+  if (false && sets.length > 0) {
     ctx.strokeStyle = DIVIDER;
     ctx.lineWidth = 1;
     ctx.beginPath();
