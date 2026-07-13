@@ -117,7 +117,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   return (
     <div>
       {showHeader && (
-        <div className="grid grid-cols-[36px_1fr_72px_72px_40px] gap-1 px-2 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+        <div className="grid grid-cols-[36px_1fr_72px_72px_40px] gap-1 px-2 mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
           <span className="text-center">Set</span>
           <span className="text-center">Previous</span>
           <span className="text-center">kg</span>
@@ -137,7 +137,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
         </div>
         <div
           ref={rowRef}
-          className={`grid grid-cols-[36px_1fr_72px_72px_40px] items-center gap-1 py-1.5 px-3 rounded-lg transition-colors ${done ? 'bg-green-200' : 'bg-white'}`}
+          className={`grid grid-cols-[36px_1fr_72px_72px_40px] items-center gap-1 py-1.5 px-3 rounded-lg transition-colors ${done ? 'bg-green-200 dark:bg-green-900/50' : 'bg-white dark:bg-neutral-700'}`}
           style={{
             transform: 'translateX(0px)',
             transition: animating ? 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none',
@@ -148,8 +148,8 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           onPointerUp={onPointerUp}
           onPointerLeave={onPointerUp}
         >
-          <span className="text-sm font-semibold text-center text-gray-500">{setNum}</span>
-          <span className="text-sm text-gray-400 text-center leading-tight">
+          <span className="text-sm font-semibold text-center text-gray-500 dark:text-gray-400">{setNum}</span>
+          <span className="text-sm text-gray-400 dark:text-gray-500 text-center leading-tight">
             {previous ? (
               <>
                 <span className="whitespace-nowrap">{previous.kg}kg</span>
@@ -166,7 +166,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
             onFocus={handleFocus}
             onPointerDown={(e) => e.stopPropagation()}
             placeholder="—"
-            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
+            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none ${done ? 'bg-green-400 text-white dark:bg-green-600' : 'bg-gray-100 dark:bg-neutral-600 dark:text-white'}`}
           />
           <input
             type="text"
@@ -178,11 +178,11 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
             onPointerDown={(e) => e.stopPropagation()}
             onBlur={(e) => { if (reps !== '' && !done && !e.relatedTarget) { handleToggle(); } }}
             placeholder="—"
-            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none ${done ? 'bg-green-400 text-white' : 'bg-gray-100'}`}
+            className={`rounded-lg text-center text-sm font-semibold py-1.5 w-full focus:outline-none ${done ? 'bg-green-400 text-white dark:bg-green-600' : 'bg-gray-100 dark:bg-neutral-600 dark:text-white'}`}
           />
           <button
             onClick={handleToggle}
-            className={`w-10 h-10 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-400 text-white' : 'bg-gray-200 text-gray-400'}`}
+            className={`w-10 h-10 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-400 text-white dark:bg-green-600' : 'bg-gray-200 dark:bg-neutral-600 text-gray-400 dark:text-gray-300'}`}
           >
             <Check className="w-5 h-5" />
           </button>

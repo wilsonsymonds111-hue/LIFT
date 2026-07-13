@@ -209,6 +209,14 @@
 .new-seg-in  { animation: segmentFadeIn  0.5s ease forwards; }
 .new-seg-out { animation: segmentFadeOut 0.35s ease forwards; }
 
+/* ProgressGraph background — light blue/purple gradient in light mode, dark grey in dark mode */
+.progress-graph-bg {
+  background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+}
+.dark .progress-graph-bg {
+  background: hsl(0 0% 14%);
+}
+
 /* WorkoutSheet graph fade-in */
 @keyframes graphFadeIn { from { opacity: 0.3; transform: scaleY(0.96); } to { opacity: 1; transform: scaleY(1); } }
 

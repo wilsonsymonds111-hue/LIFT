@@ -22,7 +22,7 @@ const BottomNav = memo(function BottomNav() {
       style={{ bottom: '16px' }}
     >
       <nav
-        className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden border border-white/60 dark:border-white/10 bg-white/55 dark:bg-white/8"
+        className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden border border-white/60 dark:border-white/10 bg-white/55 dark:bg-neutral-900/90"
         style={{
           backdropFilter: 'blur(60px) saturate(160%)',
           WebkitBackdropFilter: 'blur(60px) saturate(160%)',
@@ -42,7 +42,7 @@ const BottomNav = memo(function BottomNav() {
               {active && (
                 <motion.div
                   layoutId="navBubble"
-                  className="absolute inset-y-1.5 inset-x-1 rounded-full bg-white/70 dark:bg-white/15 border border-white/90 dark:border-white/25"
+                  className="absolute inset-y-1.5 inset-x-1 rounded-full bg-white/70 dark:bg-neutral-700 border border-white/90 dark:border-white/20"
                   transition={{ type: 'spring', stiffness: 500, damping: 38, mass: 0.7 }}
                   style={{
                     backdropFilter: 'blur(30px) saturate(180%) brightness(1.12)',

@@ -184,7 +184,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
   if (result.empty) return null;
 
   return (
-    <div className={`rounded-xl overflow-hidden ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%)', padding: '12px 4px 8px' }}>
+    <div className={`rounded-xl overflow-hidden progress-graph-bg ${animDir === 'remove' ? 'new-seg-out' : 'new-seg-in'}`} style={{ padding: '12px 4px 8px' }}>
       {!hideLabel && (
         <p className="text-xs font-bold text-blue-500 uppercase tracking-wider text-center mb-2">
           {labelOverride || (isBodyweight ? 'Reps Progress' : 'Weight Progress (kg)')}

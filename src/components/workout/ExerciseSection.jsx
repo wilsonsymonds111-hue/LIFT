@@ -102,7 +102,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   return (
     <>
     <div
-      className={`mb-2 bg-white dark:bg-gray-800 rounded-xl p-3 overflow-hidden transition-shadow ${isDragging ? 'ring-2 ring-blue-500 shadow-2xl scale-[1.02]' : 'bg-gray-50 dark:bg-gray-800/50'}`}>
+      className={`mb-2 bg-white dark:bg-neutral-800 rounded-xl p-3 overflow-hidden transition-shadow ${isDragging ? 'ring-2 ring-blue-500 shadow-2xl scale-[1.02]' : 'bg-gray-50 dark:bg-neutral-800/60'}`}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
           <h3
@@ -116,28 +116,28 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           {(
             <div className="relative -ml-1 mt-0.5 flex items-center gap-0.5">
               <ExerciseShareButton exercise={exercise} sessionResults={sessionResults} pr={pr} exerciseImage={exerciseImage} />
-              <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+              <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition">
                 <MoreHorizontal className="w-4 h-4 text-gray-700 dark:text-gray-200" />
               </button>
               {showMenu && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-                  <div className="absolute left-0 top-8 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 min-w-[190px]">
+                  <div className="absolute left-0 top-8 z-20 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-gray-100 dark:border-neutral-700 py-1 min-w-[190px]">
                     <button
                       onClick={() => { setShowNote(n => !n); setShowMenu(false); }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-neutral-700 transition"
                     >
                       {showNote ? 'Hide Note' : 'Add a Note'}
                     </button>
                     <button
                       onClick={() => { setShowMenu(false); setShowRestTimeModal(true); }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 transition"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-neutral-700 transition"
                     >
                       Change Default Rest Time
                     </button>
                     <button
                       onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 transition"
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 dark:hover:bg-red-950/50 transition"
                     >
                       Remove Exercise
                     </button>
@@ -157,7 +157,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
           />
         ) : (
-          <div className="rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] w-28 h-20">
+          <div className="rounded-xl bg-gray-100 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] w-28 h-20">
             <span className="text-base font-bold text-gray-400">{exercise.name[0]}</span>
           </div>
         )}
@@ -242,7 +242,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                 }
                 setSets(p => [...p, { id: Date.now(), suggestedKg, suggestedReps }]);
               }}
-              className="mt-2 w-full py-1.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
+              className="mt-2 w-full py-1.5 bg-white dark:bg-neutral-700 hover:bg-gray-100 dark:hover:bg-neutral-600 border border-gray-200 dark:border-neutral-600 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 transition"
             >
               + Add Set
             </button>
