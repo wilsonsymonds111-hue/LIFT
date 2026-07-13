@@ -258,7 +258,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     };
   }, []);
 
-  const { data: exerciseHistoryData = {} } = useExerciseHistory();
+  const { data: exerciseHistoryData = { history: {}, notes: {} } } = useExerciseHistory();
 
   const [exerciseImages, setExerciseImages] = useState({});
   useEffect(() => {
@@ -331,16 +331,19 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   }, [template]);
 
   useEffect(() => {
-    if (Object.keys(exerciseHistoryData).length === 0) return;
+    const { history: historyMap = {}, notes: notesMap = {} } = exerciseHistoryData;
+    if (Object.keys(historyMap).length === 0 && Object.keys(notesMap).length === 0) return;
     setExercises(prev => {
       const hasChange = prev.some(ex => {
-        const newHist = exerciseHistoryData[ex.name] || ex.history || [];
-        return newHist !== ex.history;
+        const newHist = historyMap[ex.name] || ex.history || [];
+        const newNote = notesMap[ex.name] ?? (ex.note || '');
+        return newHist !== ex.history || newNote !== (ex.note || '');
       });
       if (!hasChange) return prev;
       return prev.map(ex => ({
         ...ex,
-        history: exerciseHistoryData[ex.name] || ex.history || [],
+        history: historyMap[ex.name] || ex.history || [],
+        note: notesMap[ex.name] ?? ex.note ?? '',
       }));
     });
   }, [exerciseHistoryData]);

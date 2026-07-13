@@ -79,21 +79,25 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
   }
   await base44.entities.WorkoutTemplate.update(templateId, templateUpdate);
 
-  if (!hasCompletedSets) return;
+  // Save notes + history to Exercise entities.
+  // Notes are saved even without completed sets so they follow the exercise
+  // across all workouts and splits.
   const exerciseSaves = exerciseList
-    .filter(ex => snapshot[ex.name])
+    .filter(ex => snapshot[ex.name] || (ex.note ?? ''))
     .map(async (ex) => {
       const sets = snapshot[ex.name];
-      const newEntries = sets.map(s => ({ kg: s.kg, reps: s.reps, date: today }));
+      const newEntries = sets ? sets.map(s => ({ kg: s.kg, reps: s.reps, date: today })) : [];
       const entry = exerciseMap[ex.name.toLowerCase()];
       if (entry) {
-        // Update the primary entity with merged history from all duplicates
         const mergedHistory = entry.all.flatMap(e => e.history || []);
-        await base44.entities.Exercise.update(entry.primary.id, {
-          history: [...mergedHistory, ...newEntries],
+        const update = {
           muscle: ex.muscle || entry.primary.muscle,
-        });
-        // Delete non-primary duplicates to prevent future fragmentation
+          note: ex.note ?? '',
+        };
+        if (newEntries.length > 0) {
+          update.history = [...mergedHistory, ...newEntries];
+        }
+        await base44.entities.Exercise.update(entry.primary.id, update);
         const duplicates = entry.all.filter(e => e.id !== entry.primary.id);
         await Promise.all(duplicates.map(d => base44.entities.Exercise.delete(d.id)));
       } else {
@@ -101,6 +105,7 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
           name: ex.name,
           muscle: ex.muscle || '',
           history: newEntries,
+          note: ex.note ?? '',
         });
       }
     });

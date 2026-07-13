@@ -110,11 +110,11 @@ export default function Exercises() {
     setSelectedExercise(ex);
   }, []);
 
-  const { data: exerciseHistoryData = {} } = useExerciseHistory();
+  const { data: exerciseHistoryData = { history: {}, notes: {} } } = useExerciseHistory();
 
   const exerciseHistory = useMemo(() => {
     const historyMap = {};
-    Object.entries(exerciseHistoryData).forEach(([name, history]) => {
+    Object.entries(exerciseHistoryData.history || {}).forEach(([name, history]) => {
       if (history?.length > 0) {
         historyMap[name] = history
           .map(h => ({ kg: h.kg || 0, v: h.reps || 0, date: h.date || null }))
