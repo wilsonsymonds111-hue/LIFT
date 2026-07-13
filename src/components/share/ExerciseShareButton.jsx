@@ -1,13 +1,26 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 
 const INSTAGRAM_ICON_URL = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/427c77c15_image.png';
 import { useToast } from '@/components/ui/use-toast';
 import { shareToInstagram } from '../../lib/shareToInstagram';
 
-export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
+export default function ExerciseShareButton({ exercise, sessionResults, pr, exerciseImage }) {
   const [isSharing, setIsSharing] = useState(false);
   const { toast } = useToast();
+  const imageRef = useRef(null);
+
+  // Pre-load the exercise image so it's available synchronously when the
+  // share button is tapped (Instagram deep link requires no async work
+  // within the user gesture).
+  useEffect(() => {
+    if (!exerciseImage) { imageRef.current = null; return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { imageRef.current = img; };
+    img.onerror = () => { imageRef.current = null; };
+    img.src = exerciseImage;
+  }, [exerciseImage]);
 
   const handleShare = useCallback(() => {
     setIsSharing(true);
@@ -27,6 +40,8 @@ export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
       exerciseName: exercise.name,
       weight, reps, isPR,
       history: exercise.history,
+      sessionResults,
+      exerciseImage: imageRef.current,
     })
       .then(result => {
         if (result?.cancelled) return;

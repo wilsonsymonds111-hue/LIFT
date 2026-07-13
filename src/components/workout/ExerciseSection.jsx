@@ -115,7 +115,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           </h3>
           {(
             <div className="relative -ml-1 mt-0.5 flex items-center gap-0.5">
-              <ExerciseShareButton exercise={exercise} sessionResults={sessionResults} pr={pr} />
+              <ExerciseShareButton exercise={exercise} sessionResults={sessionResults} pr={pr} exerciseImage={exerciseImage} />
               <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                 <MoreHorizontal className="w-4 h-4 text-gray-700 dark:text-gray-200" />
               </button>
