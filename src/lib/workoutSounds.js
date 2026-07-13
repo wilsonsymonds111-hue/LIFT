@@ -19,26 +19,4 @@ export function notifyRestComplete(silent = false) {
   if (navigator.vibrate) {
     try { navigator.vibrate([200, 100, 200]); } catch (_) {}
   }
-  showNotification("Rest's up! 🏋️", 'Get back to work');
-}
-
-export function showNotification(title, body) {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const opts = {
-    body,
-    tag: title,
-    requireInteraction: true,
-    silent: false,
-  };
-  try {
-    // Service Worker notifications work on Android Chrome and are required
-    // for iOS 16.4+ PWA push. Falls back to the synchronous API on desktop.
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.ready.then(reg =>
-        reg.showNotification(title, opts)
-      ).catch(() => new Notification(title, opts));
-    } else {
-      new Notification(title, opts);
-    }
-  } catch (_) {}
 }

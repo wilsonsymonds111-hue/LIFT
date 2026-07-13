@@ -2,9 +2,9 @@ import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'reac
 import { AnimatePresence, motion } from 'framer-motion';
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
-import ProgressGraph, { getRepCap } from '../ProgressGraph';
+import ProgressGraph from '../ProgressGraph';
 import SetRow from './SetRow';
-import RepGoalNotification from './RepGoalNotification';
+
 import RestTimeModal from './RestTimeModal';
 import ExerciseShareButton from '../share/ExerciseShareButton';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
@@ -69,9 +69,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [showRestTimeModal, setShowRestTimeModal] = useState(false);
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
-  const [goalNotification, setGoalNotification] = useState(null);
-  const repCap = getRepCap(exercise.name);
-  const goalNoteShownRef = useRef(false);
+
+
   const lastEntry = useMemo(() => exercise.history?.[exercise.history.length - 1], [exercise.history]);
   const prev = useMemo(() => lastEntry ? (typeof lastEntry === 'object' ? lastEntry : { kg: lastEntry, reps: 8 }) : null, [lastEntry]);
   const sessionResults = useMemo(() => Object.values(completedSets).filter(Boolean), [completedSets]);
@@ -197,10 +196,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                   setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
                   if (result) {
                     onBestSet?.(exercise.name, result.kg, result.reps);
-                    if (result.reps >= repCap && !goalNoteShownRef.current) {
-                      goalNoteShownRef.current = true;
-                      setGoalNotification(`Great work hitting ${repCap} reps! Time to move up to a heavier weight for maximum muscle growth.`);
-                    }
+
                     if (!wasCompleted && setIndex < sets.length - 1) {
                       setSets(prev => prev.map((r, i) => {
                         if (i <= setIndex) return r;
@@ -261,12 +257,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         />
       </Suspense>
     )}
-    {goalNotification && (
-      <RepGoalNotification
-        message={goalNotification}
-        onDismiss={() => setGoalNotification(null)}
-      />
-    )}
+
     {showRestTimeModal && (
       <RestTimeModal
         currentSeconds={restDuration}
