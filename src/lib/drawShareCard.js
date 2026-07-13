@@ -1,11 +1,13 @@
-const BLUE = '#3b82f6';
-const YELLOW = '#fcd34d';
+const BLUE = '#5B9AFE';
+const YELLOW = '#F7E967';
 const WHITE = '#FFFFFF';
-const MUTED = 'rgba(255,255,255,0.85)';
-const FAINT = 'rgba(255,255,255,0.7)';
-const GRID = 'rgba(255,255,255,0.12)';
-const DIVIDER = 'rgba(255,255,255,0.3)';
+const MUTED = 'rgba(255,255,255,0.7)';
+const FAINT = 'rgba(255,255,255,0.55)';
+const GRID = 'rgba(255,255,255,0.08)';
+const DIVIDER = 'rgba(255,255,255,0.15)';
 const DARK_BG = '#0a0a0a';
+const CARD_BG = 'rgba(20,20,20,0.92)';
+const BORDER = '#C84637';
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif';
 const SCALE = 2;
 const W = 540;
@@ -65,21 +67,18 @@ const toKg = (v) => typeof v === 'object' ? (v.kg || 0) : (v || 0);
 const toReps = (v) => typeof v === 'object' ? (v.reps || 0) : (v || 0);
 
 /**
- * Draws the share card canvas.
- * mode: 'transparent' (no background, text shadow for legibility, content in bottom third)
- *       'card' (dark gradient background, content centered higher)
+ * Draws the share card as a self-contained overlay card.
+ * mode: 'transparent' (card floats over any background, positioned in bottom third)
+ *       'card' (dark canvas background, card centered — for text message sharing)
  */
 export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessionResults, mode = 'transparent' }) {
-  const padX = 44;
-  const contentW = W - padX * 2;
   const isCard = mode === 'card';
-
   const isBodyweight = !weight || weight === 0;
   const sets = (sessionResults && sessionResults.length > 0)
     ? sessionResults
     : (weight || reps ? [{ kg: weight, reps }] : []);
 
-  // Calculate delta from previous PR
+  // Delta from previous PR
   let delta = null;
   if (isPR && history && history.length > 0) {
     if (isBodyweight) {
@@ -109,19 +108,13 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       const min = Math.min(...vals);
       const max = Math.max(...vals);
       const range = (max - min) || 1;
-      const chartH = 130;
+      const chartH = 120;
       const chartPad = 14;
-      let coords;
-      if (allPoints.length === 1) {
-        coords = [{ x: contentW / 2, y: chartH - chartPad - (chartH - chartPad * 2) * 0.5 }];
-      } else {
-        coords = allPoints.map((p, i) => ({
-          x: (i / (allPoints.length - 1)) * contentW,
-          y: chartH - chartPad - ((p.val - min) / range) * (chartH - chartPad * 2),
-        }));
-      }
       chartData = {
-        coords, chartW: contentW, chartH, singlePoint: allPoints.length === 1,
+        points: allPoints,
+        min, max, range,
+        chartH, chartPad,
+        singlePoint: allPoints.length === 1,
         startVal: Math.round(allPoints[0].val),
         endVal: Math.round(allPoints[allPoints.length - 1].val),
         startDate: formatDateShort(allPoints[0].date),
@@ -130,6 +123,27 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     }
   }
 
+  // --- Calculate content height for dynamic card sizing ---
+  const cardPad = 28;
+  let contentH = cardPad; // top padding
+  contentH += 22 + 16; // header row + gap
+  contentH += 32; // exercise name
+  if (isPR) contentH += 10 + 24; // gap + badge
+  contentH += 12; // gap before weight
+  contentH += 72; // weight (60px)
+  contentH += 34; // reps (26px, below weight)
+  if (delta) contentH += 8 + 20; // gap + delta
+  contentH += 10 + 1 + 14; // gap + divider + gap
+  if (chartData) contentH += 18 + 6 + chartData.chartH + 24; // label + gap + chart + axis labels
+  contentH += cardPad; // bottom padding
+
+  const cardW = 484;
+  const cardH = contentH;
+  const cardX = (W - cardW) / 2;
+  const cardY = isCard ? Math.round((H - cardH) / 2) : H - cardH - 40;
+  const drawW = cardW - cardPad * 2;
+
+  // --- Create canvas ---
   const canvas = document.createElement('canvas');
   canvas.width = W * SCALE;
   canvas.height = H * SCALE;
@@ -138,143 +152,168 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  // Card mode: dark gradient background
+  // Card mode: dark canvas background
   if (isCard) {
     const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#1a1a1a');
-    grad.addColorStop(1, '#0a0a0a');
+    grad.addColorStop(0, '#0a0a0a');
+    grad.addColorStop(1, '#000000');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
   }
 
-  // Transparent mode: text shadow for legibility over any background photo
-  if (!isCard) {
-    ctx.shadowColor = 'rgba(0,0,0,0.85)';
-    ctx.shadowBlur = 6;
-    ctx.shadowOffsetY = 1;
-  }
+  // Card background
+  ctx.fillStyle = CARD_BG;
+  roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+  ctx.fill();
 
+  // Card border with glow
+  ctx.shadowColor = BORDER;
+  ctx.shadowBlur = 14;
+  ctx.strokeStyle = BORDER;
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+  ctx.stroke();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  // --- Content (no text shadow — card provides dark background) ---
   ctx.textBaseline = 'top';
   ctx.textAlign = 'left';
 
-  let y = isCard ? 200 : 410;
+  const cx = cardX + cardPad;
+  let y = cardY + cardPad;
 
-  // --- Date (top right) ---
-  ctx.font = `700 13px ${FONT}`;
+  // --- Header: LIFT. (left) + date (right) ---
+  ctx.font = `800 16px ${FONT}`;
+  ctx.fillStyle = WHITE;
+  drawSpacedText(ctx, 'LIFT.', cx, y, 1.5);
+
+  ctx.font = `700 12px ${FONT}`;
   ctx.fillStyle = MUTED;
   ctx.textAlign = 'right';
-  ctx.fillText(formatDateHeader(), W - padX, y + 3);
+  ctx.fillText(formatDateHeader(), cx + drawW, y + 2);
   ctx.textAlign = 'left';
-
-  y += 40;
+  y += 22 + 16;
 
   // --- Exercise name ---
-  ctx.font = `800 26px ${FONT}`;
+  ctx.font = `800 24px ${FONT}`;
   ctx.fillStyle = WHITE;
   let nameText = exerciseName.toUpperCase();
-  while (ctx.measureText(nameText).width > contentW && nameText.length > 0) {
+  while (ctx.measureText(nameText).width > drawW && nameText.length > 0) {
     nameText = nameText.slice(0, -1);
   }
   if (nameText !== exerciseName.toUpperCase()) nameText = nameText.slice(0, -2) + '…';
-  ctx.fillText(nameText, padX, y);
-  y += 38;
+  ctx.fillText(nameText, cx, y);
+  y += 32;
 
   // --- PR badge ---
   if (isPR) {
+    y += 10;
     ctx.font = `800 11px ${FONT}`;
     const badgeText = 'NEW PR';
     const badgeW = ctx.measureText(badgeText).width + 20;
     ctx.fillStyle = YELLOW;
-    roundRect(ctx, padX, y, badgeW, 22, 11);
+    roundRect(ctx, cx, y, badgeW, 22, 11);
     ctx.fill();
     ctx.fillStyle = DARK_BG;
-    drawSpacedText(ctx, badgeText, padX + 10, y + 5, 1);
-    y += 32;
+    drawSpacedText(ctx, badgeText, cx + 10, y + 5, 1);
+    y += 24;
   }
 
-  // --- Primary stat ---
+  // --- Weight ---
+  y += 12;
   const statText = isBodyweight ? `${reps}` : `${Math.round(weight)}KG`;
-  ctx.font = `800 64px ${FONT}`;
+  ctx.font = `800 60px ${FONT}`;
   ctx.fillStyle = WHITE;
-  ctx.fillText(statText, padX, y);
-  const statW = ctx.measureText(statText).width;
+  ctx.fillText(statText, cx, y);
+  y += 72;
 
-  // Reps — bigger and bolder
-  ctx.font = `800 30px ${FONT}`;
+  // --- Reps (below weight) ---
+  ctx.font = `800 26px ${FONT}`;
   ctx.fillStyle = WHITE;
   if (!isBodyweight && reps) {
-    ctx.fillText(`× ${reps} REPS`, padX + statW + 14, y + 34);
+    ctx.fillText(`× ${reps} REPS`, cx, y);
   } else if (isBodyweight) {
-    ctx.fillText('REPS', padX + statW + 14, y + 34);
+    ctx.fillText('REPS', cx, y);
   }
-  y += 88;
+  y += 34;
 
-  // --- Delta from last PR (white, not blue) ---
+  // --- Delta from last PR ---
   if (delta) {
+    y += 8;
     const deltaVal = delta.value % 1 === 0 ? delta.value.toString() : delta.value.toFixed(1);
     const deltaText = `+${deltaVal}${delta.unit.toUpperCase()} FROM LAST PR`;
     const dArrowSize = 10;
-    drawUpArrow(ctx, padX + dArrowSize / 2, y + 3, dArrowSize, WHITE);
+    drawUpArrow(ctx, cx + dArrowSize / 2, y + 3, dArrowSize, WHITE);
     ctx.font = `800 12px ${FONT}`;
     ctx.fillStyle = WHITE;
-    drawSpacedText(ctx, deltaText, padX + dArrowSize + 7, y + 3, 0.8);
-    y += 28;
+    drawSpacedText(ctx, deltaText, cx + dArrowSize + 7, y + 3, 0.8);
+    y += 20;
   }
 
   // --- Divider ---
-  y += 12;
+  y += 10;
   ctx.strokeStyle = DIVIDER;
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(padX, y);
-  ctx.lineTo(W - padX, y);
+  ctx.moveTo(cx, y);
+  ctx.lineTo(cx + drawW, y);
   ctx.stroke();
-  y += 28;
+  y += 1 + 14;
 
   // --- Progress chart ---
   if (chartData) {
-    const { coords, chartW, chartH, singlePoint, startVal, endVal, startDate, endDate } = chartData;
+    const { points, min, range, chartH, chartPad, singlePoint, startVal, endVal, startDate, endDate } = chartData;
 
-    // Label — white bold
+    // Calculate coords for actual draw width
+    const coords = points.map((p, i) => ({
+      x: singlePoint ? drawW / 2 : (i / (points.length - 1)) * drawW,
+      y: chartH - chartPad - ((p.val - min) / range) * (chartH - chartPad * 2),
+    }));
+
+    // Label
     ctx.font = `800 11px ${FONT}`;
     ctx.fillStyle = WHITE;
-    drawSpacedText(ctx, 'PROGRESS OVER TIME', padX, y, 2);
-    y += 26;
+    drawSpacedText(ctx, 'PROGRESS OVER TIME', cx, y, 2);
+    y += 18 + 6;
 
-    // Grid lines
+    // Grid — horizontal lines
     for (let g = 1; g < 3; g++) {
       const gy = y + (chartH / 3) * g;
       ctx.strokeStyle = GRID;
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(padX, gy);
-      ctx.lineTo(padX + chartW, gy);
+      ctx.moveTo(cx, gy);
+      ctx.lineTo(cx + drawW, gy);
+      ctx.stroke();
+    }
+    // Grid — vertical lines
+    for (let g = 1; g < 4; g++) {
+      const gx = cx + (drawW / 4) * g;
+      ctx.strokeStyle = GRID;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(gx, y);
+      ctx.lineTo(gx, y + chartH);
       ctx.stroke();
     }
 
     if (!singlePoint) {
-      // Area under line — disable shadow temporarily
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetY = 0;
+      // Area fill under line
       ctx.beginPath();
       coords.forEach((c, i) => {
-        if (i === 0) ctx.moveTo(padX + c.x, y + c.y);
-        else ctx.lineTo(padX + c.x, y + c.y);
+        if (i === 0) ctx.moveTo(cx + c.x, y + c.y);
+        else ctx.lineTo(cx + c.x, y + c.y);
       });
-      ctx.lineTo(padX + coords[coords.length - 1].x, y + chartH);
-      ctx.lineTo(padX + coords[0].x, y + chartH);
+      ctx.lineTo(cx + coords[coords.length - 1].x, y + chartH);
+      ctx.lineTo(cx + coords[0].x, y + chartH);
       ctx.closePath();
       const areaGrad = ctx.createLinearGradient(0, y, 0, y + chartH);
-      areaGrad.addColorStop(0, 'rgba(59,130,246,0.25)');
-      areaGrad.addColorStop(1, 'rgba(59,130,246,0)');
+      areaGrad.addColorStop(0, 'rgba(91,154,254,0.3)');
+      areaGrad.addColorStop(1, 'rgba(91,154,254,0)');
       ctx.fillStyle = areaGrad;
       ctx.fill();
-      // Re-enable shadow for line/dots (transparent mode only)
-      if (!isCard) {
-        ctx.shadowColor = 'rgba(0,0,0,0.85)';
-        ctx.shadowBlur = 6;
-        ctx.shadowOffsetY = 1;
-      }
 
       // Line
       ctx.strokeStyle = BLUE;
@@ -283,17 +322,18 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       ctx.lineJoin = 'round';
       ctx.beginPath();
       coords.forEach((c, i) => {
-        if (i === 0) ctx.moveTo(padX + c.x, y + c.y);
-        else ctx.lineTo(padX + c.x, y + c.y);
+        if (i === 0) ctx.moveTo(cx + c.x, y + c.y);
+        else ctx.lineTo(cx + c.x, y + c.y);
       });
       ctx.stroke();
     } else {
-      ctx.strokeStyle = 'rgba(59,130,246,0.4)';
+      // Single point — dashed reference line
+      ctx.strokeStyle = 'rgba(91,154,254,0.4)';
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
       ctx.beginPath();
-      ctx.moveTo(padX, y + coords[0].y);
-      ctx.lineTo(padX + chartW, y + coords[0].y);
+      ctx.moveTo(cx, y + coords[0].y);
+      ctx.lineTo(cx + drawW, y + coords[0].y);
       ctx.stroke();
       ctx.setLineDash([]);
     }
@@ -304,18 +344,18 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       if (isLast) {
         ctx.fillStyle = BLUE;
         ctx.beginPath();
-        ctx.arc(padX + c.x, y + c.y, 5, 0, Math.PI * 2);
+        ctx.arc(cx + c.x, y + c.y, 5, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = DARK_BG;
         ctx.beginPath();
-        ctx.arc(padX + c.x, y + c.y, 2.5, 0, Math.PI * 2);
+        ctx.arc(cx + c.x, y + c.y, 2.5, 0, Math.PI * 2);
         ctx.fill();
       } else {
         ctx.fillStyle = DARK_BG;
         ctx.strokeStyle = BLUE;
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(padX + c.x, y + c.y, 3.5, 0, Math.PI * 2);
+        ctx.arc(cx + c.x, y + c.y, 3.5, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
       }
@@ -323,35 +363,17 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
 
     y += chartH;
 
-    // Value labels
-    ctx.font = `700 13px ${FONT}`;
+    // Combined axis labels: "60KG JUN 2025" left, "70KG JUL 2026" right
+    ctx.font = `700 12px ${FONT}`;
     ctx.fillStyle = MUTED;
     ctx.textAlign = 'left';
-    ctx.fillText(`${startVal}${isBodyweight ? '' : 'kg'}`, padX, y + 8);
+    ctx.fillText(`${startVal}${isBodyweight ? '' : 'kg'} ${startDate}`, cx, y + 8);
     if (!singlePoint) {
       ctx.textAlign = 'right';
-      ctx.fillText(`${endVal}${isBodyweight ? '' : 'kg'}`, W - padX, y + 8);
+      ctx.fillText(`${endVal}${isBodyweight ? '' : 'kg'} ${endDate}`, cx + drawW, y + 8);
     }
-
-    // Date labels
-    ctx.font = `700 11px ${FONT}`;
-    ctx.fillStyle = FAINT;
-    ctx.textAlign = 'left';
-    ctx.fillText(startDate, padX, y + 28);
-    if (!singlePoint) {
-      ctx.textAlign = 'right';
-      ctx.fillText(endDate, W - padX, y + 28);
-    }
-    y += 56;
     ctx.textAlign = 'left';
   }
-
-  // --- LIFT logo at bottom center (like Strava) ---
-  ctx.font = `800 28px ${FONT}`;
-  ctx.fillStyle = WHITE;
-  ctx.textAlign = 'center';
-  ctx.fillText('LIFT.', W / 2, H - 50);
-  ctx.textAlign = 'left';
 
   return canvas;
 }
