@@ -567,9 +567,19 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 <ExercisePicker
                   onClose={() => setShowExercisePicker(false)}
                   onAdd={async (picked) => {
+                    const { history: historyMap = {}, notes: notesMap = {} } = exerciseHistoryData;
+                    const lowerNotes = {};
+                    const lowerHistory = {};
+                    Object.entries(notesMap).forEach(([k, v]) => { lowerNotes[k.toLowerCase()] = v; });
+                    Object.entries(historyMap).forEach(([k, v]) => { lowerHistory[k.toLowerCase()] = v; });
                     setExercises(prev => {
                       const existing = new Set(prev.map(e => e.name));
-                      const newOnes = picked.filter(e => !existing.has(e.name)).map(e => ({ ...e, sets: 1, history: [] }));
+                      const newOnes = picked.filter(e => !existing.has(e.name)).map(e => ({
+                        ...e,
+                        sets: 1,
+                        history: lowerHistory[e.name.toLowerCase()] || [],
+                        note: lowerNotes[e.name.toLowerCase()] ?? '',
+                      }));
                       return [...prev, ...newOnes];
                     });
                     const newNames = picked.filter(e => !exerciseImages[e.name.toLowerCase()]).map(e => e.name);
