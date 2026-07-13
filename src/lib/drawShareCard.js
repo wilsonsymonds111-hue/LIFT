@@ -66,51 +66,56 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     : -1;
 
   // Process history for chart
+  // Build chart data — show EVERY history point (matching the in-app graph),
+  // not aggregated by date. This ensures multi-set sessions show as multiple
+  // points instead of being collapsed into one.
   let chartData = null;
   if (history && history.length > 0) {
-    const byDate = {};
-    history.forEach(h => {
+    // Every history entry is a point — same as ProgressGraph
+    let allPoints = history.map(h => {
       const entry = typeof h === 'object' ? h : { kg: h, reps: 8 };
-      const d = entry.date || '';
-      if (!d) return;
-      if (!byDate[d] || toKg(entry) > toKg(byDate[d])) byDate[d] = entry;
+      return {
+        val: isBodyweight ? toReps(entry) : toKg(entry),
+        date: entry.date || '',
+      };
     });
-    // Include today's session in the chart
+    // Append today's session results
     if (sets.length > 0) {
       const today = new Date().toISOString().slice(0, 10);
-      const bestSet = sets[bestSetIdx] || sets[0];
-      byDate[today] = bestSet;
+      sets.forEach(s => {
+        allPoints.push({ val: isBodyweight ? toReps(s) : toKg(s), date: today });
+      });
     }
-    const dates = Object.keys(byDate).sort();
-    if (dates.length >= 1) {
-      const points = dates.map(d => isBodyweight ? toReps(byDate[d]) : toKg(byDate[d]));
-      const min = Math.min(...points);
-      const max = Math.max(...points);
+
+    // Cap to most recent 20 points to keep the chart readable
+    if (allPoints.length > 20) allPoints = allPoints.slice(-20);
+
+    if (allPoints.length >= 1) {
+      const vals = allPoints.map(p => p.val);
+      const min = Math.min(...vals);
+      const max = Math.max(...vals);
       const range = (max - min) || 1;
       const cw = contentW - 24;
       const ch = 76;
       const pad = 8;
       let coords;
-      if (points.length === 1) {
-        // Single point — center it on a flat baseline
-        coords = [{ x: cw / 2, y: ch - pad - (range / range) * (ch - pad * 2) * 0.5 }];
+      if (allPoints.length === 1) {
+        coords = [{ x: cw / 2, y: ch - pad - (ch - pad * 2) * 0.5 }];
       } else {
-        coords = points.map((p, i) => ({
-          x: (i / (points.length - 1)) * cw,
-          y: ch - pad - ((p - min) / range) * (ch - pad * 2),
+        coords = allPoints.map((p, i) => ({
+          x: (i / (allPoints.length - 1)) * cw,
+          y: ch - pad - ((p.val - min) / range) * (ch - pad * 2),
         }));
-        if (coords.length > 15) coords = coords.slice(-15);
-        if (coords.length > 1) {
-          const rs = cw / (coords.length - 1);
-          coords.forEach((c, i) => { c.x = i * rs; });
-        }
       }
+      // Date labels: first and last
+      const firstDate = allPoints[0].date;
+      const lastDate = allPoints[allPoints.length - 1].date;
       chartData = {
-        coords, chartWidth: cw, chartHeight: ch, singlePoint: points.length === 1,
-        startVal: Math.round(isBodyweight ? toReps(byDate[dates[0]]) : toKg(byDate[dates[0]])),
-        endVal: Math.round(isBodyweight ? toReps(byDate[dates[dates.length - 1]]) : toKg(byDate[dates[dates.length - 1]])),
-        startDate: formatDateShort(dates[0]),
-        endDate: formatDateShort(dates[dates.length - 1]),
+        coords, chartWidth: cw, chartHeight: ch, singlePoint: allPoints.length === 1,
+        startVal: Math.round(allPoints[0].val),
+        endVal: Math.round(allPoints[allPoints.length - 1].val),
+        startDate: formatDateShort(firstDate),
+        endDate: formatDateShort(lastDate),
       };
     }
   }
