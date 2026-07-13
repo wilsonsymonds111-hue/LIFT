@@ -66,6 +66,7 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
       sets: ex.sets || 1,
       muscle: ex.muscle || '',
       history: [...mergedHistory, ...newEntries],
+      note: ex.note ?? '',
     };
   });
 

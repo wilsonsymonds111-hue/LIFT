@@ -426,10 +426,15 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         }
       }
     }
+    // Attach per-exercise notes so they persist on the template's exerciseList
+    const exercisesWithNotes = exercises.map(ex => ({
+      ...ex,
+      note: exerciseStateRef.current[ex.name]?.note ?? ex.note ?? '',
+    }));
     // onSaveHistory (→ processWorkoutSave) handles saving the exercise
     // composition, updated history, and lastPerformed all together.
     try {
-      await onSaveHistory?.(template.id, allSets, exercises);
+      await onSaveHistory?.(template.id, allSets, exercisesWithNotes);
     } catch (e) {
       console.error('Save failed:', e);
     }
