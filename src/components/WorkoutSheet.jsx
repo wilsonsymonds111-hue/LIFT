@@ -333,20 +333,30 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   useEffect(() => {
     const { history: historyMap = {}, notes: notesMap = {} } = exerciseHistoryData;
     if (Object.keys(historyMap).length === 0 && Object.keys(notesMap).length === 0) return;
+    // Case-insensitive lookups — the maps are keyed by DB name casing,
+    // but workout exercise names are title-cased, so they may differ
+    const lowerHistory = {};
+    const lowerNotes = {};
+    Object.entries(historyMap).forEach(([k, v]) => { lowerHistory[k.toLowerCase()] = v; });
+    Object.entries(notesMap).forEach(([k, v]) => { lowerNotes[k.toLowerCase()] = v; });
     setExercises(prev => {
       const hasChange = prev.some(ex => {
-        const newHist = historyMap[ex.name] || ex.history || [];
-        const newNote = notesMap[ex.name] ?? (ex.note || '');
+        const key = ex.name.toLowerCase();
+        const newHist = lowerHistory[key] || ex.history || [];
+        const newNote = lowerNotes[key] ?? (ex.note || '');
         return newHist !== ex.history || newNote !== (ex.note || '');
       });
       if (!hasChange) return prev;
-      return prev.map(ex => ({
-        ...ex,
-        history: historyMap[ex.name] || ex.history || [],
-        note: notesMap[ex.name] ?? ex.note ?? '',
-      }));
+      return prev.map(ex => {
+        const key = ex.name.toLowerCase();
+        return {
+          ...ex,
+          history: lowerHistory[key] || ex.history || [],
+          note: lowerNotes[key] ?? ex.note ?? '',
+        };
+      });
     });
-  }, [exerciseHistoryData]);
+  }, [exerciseHistoryData, exercises]);
 
   const handleBestSet = useCallback((name, kg, reps) => {
     const today = new Date().toISOString().slice(0, 10);
