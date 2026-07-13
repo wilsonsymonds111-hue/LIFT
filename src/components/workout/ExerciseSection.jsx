@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import ProgressGraph, { getRepCap } from '../ProgressGraph';
@@ -93,10 +93,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
 
   return (
     <>
-    <motion.div
-      animate={{ scale: isDragging ? 1.02 : 1 }}
-      transition={isDragging ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 30 }}
-      className={`mb-2 bg-white dark:bg-gray-800 rounded-xl p-3 overflow-hidden transition-shadow ${isDragging ? 'ring-2 ring-blue-500 shadow-2xl' : 'bg-gray-50 dark:bg-gray-800/50'}`}>
+    <div
+      className={`mb-2 bg-white dark:bg-gray-800 rounded-xl p-3 overflow-hidden transition-shadow ${isDragging ? 'ring-2 ring-blue-500 shadow-2xl scale-[1.02]' : 'bg-gray-50 dark:bg-gray-800/50'}`}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
           <h3
@@ -242,7 +240,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             </button>
           </motion.div>
       </AnimatePresence>
-    </motion.div>
+    </div>
     {showExerciseDetail && (
       <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" /></div>}>
         <ExerciseDetailModal
