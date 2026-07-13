@@ -11,11 +11,11 @@ import { drawShareCard } from './drawShareCard';
 export async function shareToInstagram(shareData) {
   const stickerCanvas = drawShareCard(shareData);
   // JPEG keeps the base64 small enough for the deep-link URL
-  const stickerBase64 = stickerCanvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+  const stickerBase64 = stickerCanvas.toDataURL('image/png').split(',')[1];
 
   const url = `instagram-stories://share?background_top_color=%230a0a0a&background_bottom_color=%230a0a0a&sticker_image=${encodeURIComponent(stickerBase64)}`;
 
-  const blobPromise = new Promise(resolve => stickerCanvas.toBlob(resolve, 'image/jpeg', 0.85));
+  const blobPromise = new Promise(resolve => stickerCanvas.toBlob(resolve, 'image/png'));
 
   // Navigate BEFORE any await — iOS requires this within the user-gesture
   // call stack or the URL scheme is silently blocked.
@@ -33,7 +33,7 @@ export async function shareToInstagram(shareData) {
   // --- Fallback: Web Share API ---
   if (navigator.share && navigator.canShare) {
     const blob = await blobPromise;
-    const file = new File([blob], 'lift-share.jpg', { type: 'image/jpeg' });
+    const file = new File([blob], 'lift-share.png', { type: 'image/png' });
 
     if (navigator.canShare({ files: [file] })) {
       try {
@@ -47,7 +47,7 @@ export async function shareToInstagram(shareData) {
 
   // --- Last resort: download ---
   const link = document.createElement('a');
-  link.href = stickerCanvas.toDataURL('image/jpeg', 0.85);
+  link.href = stickerCanvas.toDataURL('image/png');
   link.download = 'lift-share.jpg';
   link.click();
   return { shared: false, fallback: 'download' };

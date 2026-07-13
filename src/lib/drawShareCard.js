@@ -1,10 +1,10 @@
 const BLUE = '#60a5fa';
 const YELLOW = '#fcd34d';
 const WHITE = '#FFFFFF';
-const MUTED = 'rgba(255,255,255,0.5)';
-const FAINT = 'rgba(255,255,255,0.3)';
-const GRID = 'rgba(255,255,255,0.04)';
-const DIVIDER = 'rgba(255,255,255,0.12)';
+const MUTED = 'rgba(255,255,255,0.8)';
+const FAINT = 'rgba(255,255,255,0.65)';
+const GRID = 'rgba(255,255,255,0.1)';
+const DIVIDER = 'rgba(255,255,255,0.25)';
 const DARK_BG = '#0a0a0a';
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif';
 const SCALE = 2;
@@ -82,7 +82,7 @@ function drawUpArrow(ctx, cx, topY, size, color) {
 const toKg = (v) => typeof v === 'object' ? (v.kg || 0) : (v || 0);
 const toReps = (v) => typeof v === 'object' ? (v.reps || 0) : (v || 0);
 
-export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessionResults, backgroundPhoto }) {
+export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessionResults }) {
   const padX = 44;
   const contentW = W - padX * 2;
 
@@ -150,24 +150,11 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  // --- Background ---
-  if (backgroundPhoto && backgroundPhoto.complete && backgroundPhoto.naturalWidth > 0) {
-    drawCoverImage(ctx, backgroundPhoto, 0, 0, W, H);
-    const overlay = ctx.createLinearGradient(0, 0, 0, H);
-    overlay.addColorStop(0, 'rgba(0,0,0,0.82)');
-    overlay.addColorStop(0.3, 'rgba(0,0,0,0.45)');
-    overlay.addColorStop(0.7, 'rgba(0,0,0,0.45)');
-    overlay.addColorStop(1, 'rgba(0,0,0,0.85)');
-    ctx.fillStyle = overlay;
-    ctx.fillRect(0, 0, W, H);
-  } else {
-    const bg = ctx.createLinearGradient(0, 0, W, H);
-    bg.addColorStop(0, '#0a0a0a');
-    bg.addColorStop(0.5, '#161616');
-    bg.addColorStop(1, '#0a0a0a');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-  }
+  // --- Transparent background — PNG supports alpha, so the user can add
+  // their own photo behind it in Instagram Stories or Messages ---
+  ctx.shadowColor = 'rgba(0,0,0,0.85)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetY = 1;
 
   ctx.textBaseline = 'top';
   ctx.textAlign = 'left';
@@ -284,8 +271,13 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       const areaGrad = ctx.createLinearGradient(0, y, 0, y + chartH);
       areaGrad.addColorStop(0, 'rgba(96,165,250,0.25)');
       areaGrad.addColorStop(1, 'rgba(96,165,250,0)');
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
       ctx.fillStyle = areaGrad;
       ctx.fill();
+      ctx.shadowColor = 'rgba(0,0,0,0.85)';
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetY = 1;
 
       // Line
       ctx.strokeStyle = BLUE;
