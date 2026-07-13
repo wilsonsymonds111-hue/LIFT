@@ -2,7 +2,7 @@ import { base44 } from '@/api/base44Client';
 
 // Simple in-memory cache with TTL to avoid redundant API calls
 const cache = {};
-const DEFAULT_TTL = 10 * 1000; // 10 seconds — short so image updates appear quickly
+const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes — image data rarely changes
 
 function now() { return Date.now(); }
 

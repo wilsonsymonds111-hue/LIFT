@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { X, Search, Plus, Dumbbell } from 'lucide-react';
 import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
-import { getExerciseDetailList, invalidateExerciseCache } from '../lib/exerciseCache';
+import { ALL_EXERCISES } from '../lib/exercises';
+import { getExerciseDetailList } from '../lib/exerciseCache';
 import ExerciseDetailModal from './ExerciseDetailModal';
 
 // Tracks the visible viewport height — shrinks when the mobile keyboard opens
@@ -38,20 +39,19 @@ export default function ExercisePicker({ onClose, onAdd }) {
   const [search, setSearch] = useState('');
   const [muscleFilter, setMuscleFilter] = useState('All');
   const [selected, setSelected] = useState([]);
-  const [exercises, setExercises] = useState([]);
+  // Show built-in exercises instantly — custom exercises merge in when loaded
+  const [exercises, setExercises] = useState(ALL_EXERCISES);
   const [imageMap, setImageMap] = useState({});
   const [detailExercise, setDetailExercise] = useState(null);
   const viewportHeight = useVisualViewportHeight();
 
-  // Load exercises from cloud (custom exercises are stored per-user)
+  // Merge custom exercises into the list (built-in list is already shown)
   useEffect(() => {
     getAllExercises().then(setExercises);
   }, []);
 
-  // Load exercise detail images once on mount — invalidate cache first so
-  // any image updates (e.g. from ExerciseDetailModal uploads) are reflected
+  // Load exercise detail images from cache (5-min TTL — warm from WorkoutSheet)
   useEffect(() => {
-    invalidateExerciseCache();
     getExerciseDetailList().then((details) => {
       const map = {};
       (details || []).forEach(d => {
