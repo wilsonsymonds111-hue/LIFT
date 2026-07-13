@@ -9,7 +9,7 @@ import RestTimeModal from './RestTimeModal';
 import ExerciseShareButton from '../share/ExerciseShareButton';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
-const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragControls, onDeleteExercise, exerciseImage, initialState, onStateChange, isDragging, dragActive }) {
+const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange, isDragging, dragActive }) {
   const pr = useMemo(() => {
     const history = exercise.history || [];
     if (history.length === 0) return null;
@@ -100,7 +100,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
           <h3
-            onPointerDown={(e) => dragControls?.start(e)}
+            {...dragHandleProps}
             style={{ touchAction: 'none' }}
             className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing leading-snug"
             onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}

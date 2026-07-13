@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import ReorderableExercise from './workout/ReorderableExercise';
 import { Timer, CalendarDays, Clock } from 'lucide-react';
-import { AnimatePresence, motion, Reorder, useMotionValue, useTransform, useMotionTemplate, animate as framerAnimate } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, useTransform, useMotionTemplate, animate as framerAnimate } from 'framer-motion';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import ExercisePicker from './ExercisePicker';
 import RestTimerPicker from './RestTimerPicker';
 import { RestTimerModal, RestTimerPill } from './RestTimerModal';
@@ -601,21 +602,38 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 }`}
               />
 
-              <Reorder.Group as="div" axis="y" values={exercises} onReorder={setExercises}>
-                {exercises.map((exercise, idx) => (
-                  <ReorderableExercise
-                  key={exercise.name}
-                  exercise={exercise}
-                  onBestSet={handleBestSet}
-                  exerciseImage={exerciseImages[exercise.name.toLowerCase()]}
-                  onDeleteExercise={() => handleDeleteExercise(idx)}
-                  initialState={exerciseStateRef.current[exercise.name]}
-                  onStateChange={(state) => handleExerciseStateChange(exercise.name, state)}
-                  dragActive={exerciseDragActive}
-                  onDragActiveChange={setExerciseDragActive}
-                  />
-                ))}
-              </Reorder.Group>
+              <DragDropContext
+                onDragStart={() => setExerciseDragActive(true)}
+                onDragEnd={(result) => {
+                  setExerciseDragActive(false);
+                  if (!result.destination || result.source.index === result.destination.index) return;
+                  const reordered = Array.from(exercises);
+                  const [moved] = reordered.splice(result.source.index, 1);
+                  reordered.splice(result.destination.index, 0, moved);
+                  setExercises(reordered);
+                }}
+              >
+                <Droppable droppableId="workout-exercises" direction="vertical">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {exercises.map((exercise, idx) => (
+                        <ReorderableExercise
+                          key={exercise.name}
+                          exercise={exercise}
+                          index={idx}
+                          onBestSet={handleBestSet}
+                          exerciseImage={exerciseImages[exercise.name.toLowerCase()]}
+                          onDeleteExercise={() => handleDeleteExercise(idx)}
+                          initialState={exerciseStateRef.current[exercise.name]}
+                          onStateChange={(state) => handleExerciseStateChange(exercise.name, state)}
+                          dragActive={exerciseDragActive}
+                        />
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
 
               <div className="mt-6 flex flex-col gap-2">
                 <button
