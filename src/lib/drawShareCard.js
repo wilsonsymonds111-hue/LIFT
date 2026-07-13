@@ -1,13 +1,20 @@
-const GOLD = '#D4B483';
+const BLUE = '#60a5fa';
+const YELLOW = '#fcd34d';
 const WHITE = '#FFFFFF';
 const MUTED = 'rgba(255,255,255,0.5)';
 const FAINT = 'rgba(255,255,255,0.3)';
+const GRID = 'rgba(255,255,255,0.04)';
 const DIVIDER = 'rgba(255,255,255,0.12)';
 const DARK_BG = '#0a0a0a';
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif';
 const SCALE = 2;
 const W = 540;
 const H = 960;
+
+function formatDateHeader() {
+  const d = new Date();
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+}
 
 function formatDateShort(dateStr) {
   if (!dateStr) return '';
@@ -60,9 +67,9 @@ function drawCoverImage(ctx, img, x, y, w, h) {
 
 function drawUpArrow(ctx, cx, topY, size, color) {
   ctx.fillStyle = color;
-  const headH = size * 0.6;
-  const shaftW = size * 0.3;
-  const shaftH = size * 0.4;
+  const headH = size * 0.55;
+  const shaftW = size * 0.32;
+  const shaftH = size * 0.45;
   ctx.beginPath();
   ctx.moveTo(cx, topY);
   ctx.lineTo(cx + size / 2, topY + headH);
@@ -84,7 +91,19 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ? sessionResults
     : (weight || reps ? [{ kg: weight, reps }] : []);
 
-  // Build chart data — show every history point, plus today's session
+  // Calculate delta from previous PR
+  let delta = null;
+  if (isPR && history && history.length > 0) {
+    if (isBodyweight) {
+      const prevMaxReps = Math.max(...history.map(toReps));
+      if (reps > prevMaxReps) delta = { value: reps - prevMaxReps, unit: 'reps' };
+    } else {
+      const prevMaxKg = Math.max(...history.map(toKg));
+      if (weight > prevMaxKg) delta = { value: weight - prevMaxKg, unit: 'kg' };
+    }
+  }
+
+  // Build chart data
   let chartData = null;
   if (history && history.length > 0) {
     let allPoints = history.map(h => {
@@ -136,8 +155,8 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     drawCoverImage(ctx, backgroundPhoto, 0, 0, W, H);
     const overlay = ctx.createLinearGradient(0, 0, 0, H);
     overlay.addColorStop(0, 'rgba(0,0,0,0.82)');
-    overlay.addColorStop(0.25, 'rgba(0,0,0,0.5)');
-    overlay.addColorStop(0.75, 'rgba(0,0,0,0.5)');
+    overlay.addColorStop(0.3, 'rgba(0,0,0,0.45)');
+    overlay.addColorStop(0.7, 'rgba(0,0,0,0.45)');
     overlay.addColorStop(1, 'rgba(0,0,0,0.85)');
     ctx.fillStyle = overlay;
     ctx.fillRect(0, 0, W, H);
@@ -155,12 +174,18 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
 
   let y = 72;
 
-  // --- LIFT logo with up arrow ---
-  const arrowSize = 14;
-  drawUpArrow(ctx, padX + arrowSize / 2, y, arrowSize, GOLD);
+  // --- Header: LIFT logo (left) + date (right) ---
+  const arrowSize = 13;
+  drawUpArrow(ctx, padX + arrowSize / 2, y + 2, arrowSize, WHITE);
   ctx.font = `800 17px ${FONT}`;
-  ctx.fillStyle = GOLD;
-  drawSpacedText(ctx, 'LIFT', padX + arrowSize + 8, y + 1, 2);
+  ctx.fillStyle = WHITE;
+  drawSpacedText(ctx, 'LIFT.', padX + arrowSize + 8, y + 1, 1.5);
+
+  ctx.font = `600 12px ${FONT}`;
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = 'right';
+  ctx.fillText(formatDateHeader(), W - padX, y + 3);
+  ctx.textAlign = 'left';
 
   y += 48;
 
@@ -177,34 +202,47 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
 
   // --- PR badge ---
   if (isPR) {
-    ctx.font = `700 11px ${FONT}`;
+    ctx.font = `800 11px ${FONT}`;
     const badgeText = 'NEW PR';
     const badgeW = ctx.measureText(badgeText).width + 20;
-    ctx.fillStyle = GOLD;
+    ctx.fillStyle = YELLOW;
     roundRect(ctx, padX, y, badgeW, 22, 11);
     ctx.fill();
     ctx.fillStyle = DARK_BG;
     drawSpacedText(ctx, badgeText, padX + 10, y + 5, 1);
-    y += 34;
+    y += 32;
   }
 
   // --- Primary stat ---
   const statText = isBodyweight ? `${reps}` : `${Math.round(weight)}KG`;
-  ctx.font = `800 60px ${FONT}`;
+  ctx.font = `800 64px ${FONT}`;
   ctx.fillStyle = WHITE;
   ctx.fillText(statText, padX, y);
   const statW = ctx.measureText(statText).width;
 
   ctx.font = `500 22px ${FONT}`;
-  ctx.fillStyle = MUTED;
+  ctx.fillStyle = WHITE;
   if (!isBodyweight && reps) {
-    ctx.fillText(`× ${reps} REPS`, padX + statW + 14, y + 34);
+    ctx.fillText(`× ${reps} REPS`, padX + statW + 14, y + 36);
   } else if (isBodyweight) {
-    ctx.fillText('REPS', padX + statW + 14, y + 34);
+    ctx.fillText('REPS', padX + statW + 14, y + 36);
   }
-  y += 80;
+  y += 84;
+
+  // --- Delta from last PR ---
+  if (delta) {
+    const deltaVal = delta.value % 1 === 0 ? delta.value.toString() : delta.value.toFixed(1);
+    const deltaText = `+${deltaVal}${delta.unit.toUpperCase()} FROM LAST PR`;
+    const dArrowSize = 10;
+    drawUpArrow(ctx, padX + dArrowSize / 2, y + 3, dArrowSize, BLUE);
+    ctx.font = `700 12px ${FONT}`;
+    ctx.fillStyle = BLUE;
+    drawSpacedText(ctx, deltaText, padX + dArrowSize + 7, y + 3, 0.8);
+    y += 28;
+  }
 
   // --- Divider ---
+  y += 12;
   ctx.strokeStyle = DIVIDER;
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -218,9 +256,20 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     const { coords, chartW, chartH, singlePoint, startVal, endVal, startDate, endDate } = chartData;
 
     ctx.font = `700 11px ${FONT}`;
-    ctx.fillStyle = GOLD;
+    ctx.fillStyle = BLUE;
     drawSpacedText(ctx, 'PROGRESS OVER TIME', padX, y, 2);
     y += 26;
+
+    // Grid lines
+    for (let g = 1; g < 3; g++) {
+      const gy = y + (chartH / 3) * g;
+      ctx.strokeStyle = GRID;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padX, gy);
+      ctx.lineTo(padX + chartW, gy);
+      ctx.stroke();
+    }
 
     if (!singlePoint) {
       // Area under line
@@ -233,13 +282,13 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       ctx.lineTo(padX + coords[0].x, y + chartH);
       ctx.closePath();
       const areaGrad = ctx.createLinearGradient(0, y, 0, y + chartH);
-      areaGrad.addColorStop(0, 'rgba(212,180,131,0.25)');
-      areaGrad.addColorStop(1, 'rgba(212,180,131,0)');
+      areaGrad.addColorStop(0, 'rgba(96,165,250,0.25)');
+      areaGrad.addColorStop(1, 'rgba(96,165,250,0)');
       ctx.fillStyle = areaGrad;
       ctx.fill();
 
       // Line
-      ctx.strokeStyle = GOLD;
+      ctx.strokeStyle = BLUE;
       ctx.lineWidth = 2.5;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
@@ -250,7 +299,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       });
       ctx.stroke();
     } else {
-      ctx.strokeStyle = 'rgba(212,180,131,0.35)';
+      ctx.strokeStyle = 'rgba(96,165,250,0.35)';
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
       ctx.beginPath();
@@ -264,13 +313,17 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     coords.forEach((c, i) => {
       const isLast = i === coords.length - 1;
       if (isLast) {
-        ctx.fillStyle = GOLD;
+        ctx.fillStyle = BLUE;
         ctx.beginPath();
         ctx.arc(padX + c.x, y + c.y, 5, 0, Math.PI * 2);
         ctx.fill();
+        ctx.fillStyle = DARK_BG;
+        ctx.beginPath();
+        ctx.arc(padX + c.x, y + c.y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
       } else {
         ctx.fillStyle = DARK_BG;
-        ctx.strokeStyle = GOLD;
+        ctx.strokeStyle = BLUE;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(padX + c.x, y + c.y, 3.5, 0, Math.PI * 2);
@@ -315,11 +368,11 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     y += 24;
 
     ctx.font = `700 11px ${FONT}`;
-    ctx.fillStyle = GOLD;
+    ctx.fillStyle = BLUE;
     drawSpacedText(ctx, "TODAY'S SETS", padX, y, 2);
     y += 28;
 
-    const maxSets = 8;
+    const maxSets = 7;
     const visibleSets = sets.slice(0, maxSets);
     visibleSets.forEach((s, i) => {
       const setKg = toKg(s);
@@ -341,7 +394,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       // Checkmark
       const checkX = W - padX - 12;
       const checkY = y + 10;
-      ctx.fillStyle = GOLD;
+      ctx.fillStyle = BLUE;
       ctx.beginPath();
       ctx.arc(checkX, checkY, 9, 0, Math.PI * 2);
       ctx.fill();

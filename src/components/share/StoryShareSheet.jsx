@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { X, Image as ImageIcon, Share2, Loader2, Trash2 } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 import { drawShareCard } from '../../lib/drawShareCard';
 import { shareToInstagram } from '../../lib/shareToInstagram';
 import { useToast } from '@/components/ui/use-toast';
@@ -9,25 +10,55 @@ export default function StoryShareSheet({ exercise, sessionResults, pr, exercise
   const [backgroundPhoto, setBackgroundPhoto] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [isSharing, setIsSharing] = useState(false);
+  const [fetchedHistory, setFetchedHistory] = useState(null);
   const fileInputRef = useRef(null);
   const { toast } = useToast();
+
+  // Fetch exercise history directly if not passed from workout context
+  // (ensures the chart + PR features always show in the share card)
+  useEffect(() => {
+    if (exercise.history && exercise.history.length > 0) return;
+    let cancelled = false;
+    base44.entities.Exercise.list('name', 500).then(allExs => {
+      if (cancelled) return;
+      const match = (allExs || []).find(e => e.name.toLowerCase() === exercise.name.toLowerCase());
+      if (match?.history?.length) setFetchedHistory(match.history);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [exercise.name, exercise.history]);
 
   const shareData = useMemo(() => {
     const toKg = (h) => typeof h === 'object' ? (h.kg || 0) : (h || 0);
     const toReps = (h) => typeof h === 'object' ? (h.reps || 8) : 8;
+    const history = (exercise.history && exercise.history.length > 0)
+      ? exercise.history
+      : (fetchedHistory || []);
+
+    // Recalculate PR from history if not provided by parent
+    const calculatedPr = pr || (() => {
+      if (!history.length) return null;
+      const isBodyweight = history.every(h => toKg(h) === 0);
+      if (isBodyweight) {
+        return { kg: 0, reps: Math.max(...history.map(toReps)), bodyweight: true };
+      }
+      const maxKg = Math.max(...history.map(toKg));
+      const entriesAtMax = history.filter(h => toKg(h) === maxKg);
+      return { kg: maxKg, reps: Math.max(...entriesAtMax.map(toReps)), bodyweight: false };
+    })();
+
     const bestSet = sessionResults.length > 0
       ? sessionResults.reduce((best, s) => (toKg(s) > toKg(best) ? s : best), sessionResults[0])
-      : pr;
+      : calculatedPr;
     const weight = bestSet ? toKg(bestSet) : 0;
     const reps = bestSet ? toReps(bestSet) : 0;
-    const isPR = sessionResults.length > 0 && pr && !pr.bodyweight && weight >= pr.kg && weight > 0;
+    const isPR = sessionResults.length > 0 && calculatedPr && !calculatedPr.bodyweight && weight >= calculatedPr.kg && weight > 0;
     return {
       exerciseName: exercise.name,
       weight, reps, isPR,
-      history: exercise.history,
+      history,
       sessionResults,
     };
-  }, [exercise, sessionResults, pr]);
+  }, [exercise, sessionResults, pr, fetchedHistory]);
 
   // Live preview — redraws whenever data or photo changes
   useEffect(() => {
@@ -129,7 +160,7 @@ export default function StoryShareSheet({ exercise, sessionResults, pr, exercise
         <button
           onClick={handleShare}
           disabled={isSharing}
-          className="w-full py-3.5 bg-[#D4B483] active:bg-[#C9A961] text-black font-bold rounded-xl flex items-center justify-center gap-2 transition disabled:opacity-50"
+          className="w-full py-3.5 bg-[#60a5fa] active:bg-[#3b82f6] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition disabled:opacity-50"
         >
           {isSharing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Share2 className="w-5 h-5" />}
           Share to Instagram Story
