@@ -211,23 +211,6 @@ export default function Home() {
     setShowCalendarSync(true);
   }, []);
 
-  const handleRenameSplit = useCallback(async (newName) => {
-    const trimmed = newName.trim();
-    if (!trimmed) return;
-    setShowRenameSplit(false);
-    queryClient.setQueryData(['workoutTemplates'], (prev) =>
-      prev?.map(t =>
-        currentSplit.some(ct => ct.id === t.id)
-          ? { ...t, splitName: trimmed }
-          : t
-      )
-    );
-    await Promise.all(currentSplit.map(t =>
-      base44.entities.WorkoutTemplate.update(t.id, { splitName: trimmed })
-    ));
-    invalidateWorkoutTemplates(queryClient);
-  }, [queryClient, currentSplit]);
-
   // --- Split categorization (computed fresh every render — no stale memo) ---
 
   const { currentSplit, currentSplitName } = useMemo(() => {
@@ -265,6 +248,23 @@ export default function Home() {
 
     return { currentSplit: [...split].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)), currentSplitName: name };
   }, [templates]);
+
+  const handleRenameSplit = useCallback(async (newName) => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setShowRenameSplit(false);
+    queryClient.setQueryData(['workoutTemplates'], (prev) =>
+      prev?.map(t =>
+        currentSplit.some(ct => ct.id === t.id)
+          ? { ...t, splitName: trimmed }
+          : t
+      )
+    );
+    await Promise.all(currentSplit.map(t =>
+      base44.entities.WorkoutTemplate.update(t.id, { splitName: trimmed })
+    ));
+    invalidateWorkoutTemplates(queryClient);
+  }, [queryClient, currentSplit]);
 
   const handleReorder = useCallback(async (result) => {
     if (!result.destination || result.source.index === result.destination.index) return;
