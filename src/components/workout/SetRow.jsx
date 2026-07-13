@@ -94,7 +94,6 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
     const len = el.value.length;
     requestAnimationFrame(() => {
       el.setSelectionRange(len, len);
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   };
 
