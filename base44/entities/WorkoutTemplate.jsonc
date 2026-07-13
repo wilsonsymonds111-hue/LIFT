@@ -27,6 +27,9 @@
             "items": {
               "type": "object"
             }
+          },
+          "note": {
+            "type": "string"
           }
         }
       }
