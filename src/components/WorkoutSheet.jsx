@@ -458,6 +458,36 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     window.dispatchEvent(new CustomEvent('workoutSessionChanged'));
   }, [exercises, onSaveHistory, template?.id, allTemplates]);
 
+  // Auto-finish the workout silently after 2 hours — saves progress and closes
+  // without showing the summary or any notification.
+  useEffect(() => {
+    const TWO_HOURS = 2 * 60 * 60 * 1000;
+    const msUntilStale = startTimeRef.current + TWO_HOURS - Date.now();
+    if (msUntilStale <= 0) return; // already stale — handled on mount
+    const timer = setTimeout(async () => {
+      if (cancelledRef.current || showSummary) return;
+      const allSets = {};
+      for (const ex of exercisesRef.current) {
+        const state = exerciseStateRef.current[ex.name];
+        if (state?.completedSets) {
+          const completed = Object.values(state.completedSets).filter(Boolean);
+          if (completed.length > 0) allSets[ex.name] = completed;
+        }
+      }
+      const exercisesWithNotes = exercisesRef.current.map(ex => ({
+        ...ex,
+        note: exerciseStateRef.current[ex.name]?.note ?? ex.note ?? '',
+      }));
+      try {
+        await onSaveHistory?.(templateRef.current?.id, allSets, exercisesWithNotes);
+      } catch {}
+      clearWorkoutSession();
+      window.dispatchEvent(new CustomEvent('workoutSessionChanged'));
+      onFinish();
+    }, msUntilStale);
+    return () => clearTimeout(timer);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!template) return null;
 
   if (showSummary) {
