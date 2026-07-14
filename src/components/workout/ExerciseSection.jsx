@@ -169,7 +169,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       <AnimatePresence initial={false}>
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={(dragActive && !isDragging) ? { opacity: 0, height: 0 } : { opacity: 1, height: 'auto' }}
+            animate={dragActive ? { opacity: 0, height: 0 } : { opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: dragActive ? 0.15 : 0.28, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden exercise-card-content"
