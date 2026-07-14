@@ -429,6 +429,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   }, [handleDragPointerMove, dragAutoScroll]);
 
   const handleDragEnd = useCallback((result) => {
+    scrollContainerRef.current?.classList.remove('drag-active');
     isDraggingRef.current = false;
     setExerciseDragActive(false);
     window.removeEventListener('pointermove', handleDragPointerMove);
@@ -758,6 +759,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
               />
 
               <DragDropContext
+                onBeforeCapture={() => {
+                  scrollContainerRef.current?.classList.add('drag-active');
+                }}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
               >
