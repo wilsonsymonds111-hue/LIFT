@@ -549,11 +549,16 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         }
       }
     }
-    // Attach per-exercise notes so they persist on the template's exerciseList
-    const exercisesWithNotes = exercises.map(ex => ({
-      ...ex,
-      note: exerciseStateRef.current[ex.name]?.note ?? ex.note ?? '',
-    }));
+    // Attach per-exercise notes and set counts so they persist on the template's
+    // exerciseList — without this, added/removed sets are lost on finish.
+    const exercisesWithNotes = exercises.map(ex => {
+      const state = exerciseStateRef.current[ex.name];
+      return {
+        ...ex,
+        sets: state?.sets?.length || ex.sets || 1,
+        note: state?.note ?? ex.note ?? '',
+      };
+    });
     // onSaveHistory (→ processWorkoutSave) handles saving the exercise
     // composition, updated history, and lastPerformed all together.
     try {
@@ -583,10 +588,14 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
           if (completed.length > 0) allSets[ex.name] = completed;
         }
       }
-      const exercisesWithNotes = exercisesRef.current.map(ex => ({
-        ...ex,
-        note: exerciseStateRef.current[ex.name]?.note ?? ex.note ?? '',
-      }));
+      const exercisesWithNotes = exercisesRef.current.map(ex => {
+        const state = exerciseStateRef.current[ex.name];
+        return {
+          ...ex,
+          sets: state?.sets?.length || ex.sets || 1,
+          note: state?.note ?? ex.note ?? '',
+        };
+      });
       try {
         await onSaveHistory?.(templateRef.current?.id, allSets, exercisesWithNotes);
       } catch {}
