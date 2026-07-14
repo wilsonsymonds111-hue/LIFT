@@ -11,6 +11,7 @@ export default function ReorderableExercise({ exercise, index, dragActive, ...pr
           style={{
             ...provided.draggableProps.style,
             zIndex: snapshot.isDragging ? 9999 : 'auto',
+            ...(snapshot.isDragging ? { willChange: 'transform' } : {}),
           }}
         >
           <ExerciseSection

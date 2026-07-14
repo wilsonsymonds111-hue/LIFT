@@ -398,6 +398,10 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const dragPointerYRef = useRef(null);
   const isDraggingRef = useRef(false);
   const autoScrollRAFRef = useRef(null);
+  // Cached at drag start — avoids calling getBoundingClientRect() every
+  // frame, which forces a synchronous layout reflow that makes the dragged
+  // card lag behind the finger.
+  const dragContainerRectRef = useRef(null);
 
   const handleDragPointerMove = useCallback((e) => {
     dragPointerYRef.current = e.touches?.[0]?.clientY ?? e.clientY;
@@ -406,8 +410,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const dragAutoScroll = useCallback(() => {
     if (!isDraggingRef.current) return;
     const container = scrollContainerRef.current;
-    if (container && dragPointerYRef.current != null) {
-      const rect = container.getBoundingClientRect();
+    const rect = dragContainerRectRef.current;
+    if (container && rect && dragPointerYRef.current != null) {
       const y = dragPointerYRef.current - rect.top;
       const threshold = 130;
       const maxSpeed = 20;
@@ -423,6 +427,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const handleDragStart = useCallback(() => {
     setExerciseDragActive(true);
     isDraggingRef.current = true;
+    dragContainerRectRef.current = scrollContainerRef.current?.getBoundingClientRect() ?? null;
     window.addEventListener('pointermove', handleDragPointerMove, { passive: true });
     window.addEventListener('touchmove', handleDragPointerMove, { passive: true });
     autoScrollRAFRef.current = requestAnimationFrame(dragAutoScroll);
