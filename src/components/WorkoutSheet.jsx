@@ -437,10 +437,16 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     dragPointerYRef.current = null;
     if (autoScrollRAFRef.current) cancelAnimationFrame(autoScrollRAFRef.current);
     if (!result.destination || result.source.index === result.destination.index) return;
+    // Preserve scroll position across the re-render so the view stays
+    // at the drop location instead of snapping back to the top.
+    const savedScrollTop = scrollContainerRef.current?.scrollTop ?? 0;
     const reordered = Array.from(exercisesRef.current);
     const [moved] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, moved);
     setExercises(reordered);
+    requestAnimationFrame(() => {
+      if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = savedScrollTop;
+    });
   }, [handleDragPointerMove]);
 
   useEffect(() => {
