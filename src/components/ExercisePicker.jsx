@@ -45,29 +45,26 @@ export default function ExercisePicker({ onClose, onAdd }) {
   const [detailExercise, setDetailExercise] = useState(null);
   const viewportHeight = useVisualViewportHeight();
 
-  // Merge custom exercises into the list (built-in list is already shown)
+  // Fetch built-in + custom exercises AND library details (ExerciseDetail) in
+  // parallel, then merge into a single list. Doing both in one effect avoids a
+  // race condition where getAllExercises() resolves last and overwrites the
+  // library exercises merged by the detail fetch.
   useEffect(() => {
-    getAllExercises().then(setExercises);
-  }, []);
-
-  // Load exercise detail images from cache (5-min TTL — warm from WorkoutSheet)
-  // Also merge library exercises (ExerciseDetail) into the picker list so they
-  // appear in search — the built-in list doesn't cover every library exercise.
-  useEffect(() => {
-    getExerciseDetailList().then((details) => {
+    Promise.all([
+      getAllExercises(),
+      getExerciseDetailList().catch(() => []),
+    ]).then(([all, details]) => {
       const map = {};
       (details || []).forEach(d => {
         if (d.image_url) map[d.name.toLowerCase()] = d.image_url;
       });
       setImageMap(map);
 
-      setExercises(prev => {
-        const existing = new Set(prev.map(e => e.name.toLowerCase()));
-        const fromDetails = (details || [])
-          .filter(d => !existing.has(d.name.toLowerCase()))
-          .map(d => ({ name: d.name, muscle: detectMuscle(d.name) }));
-        return fromDetails.length ? [...prev, ...fromDetails] : prev;
-      });
+      const existing = new Set(all.map(e => e.name.toLowerCase()));
+      const fromDetails = (details || [])
+        .filter(d => !existing.has(d.name.toLowerCase()))
+        .map(d => ({ name: d.name, muscle: detectMuscle(d.name) }));
+      setExercises(fromDetails.length ? [...all, ...fromDetails] : all);
     });
   }, []);
 
