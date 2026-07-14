@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import ReorderableExercise from './workout/ReorderableExercise';
 import { Timer, CalendarDays, Clock } from 'lucide-react';
 import { AnimatePresence, motion, useMotionValue, useTransform, useMotionTemplate, animate as framerAnimate } from 'framer-motion';
@@ -433,6 +433,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     autoScrollRAFRef.current = requestAnimationFrame(dragAutoScroll);
   }, [handleDragPointerMove, dragAutoScroll]);
 
+  const pendingScrollTargetRef = useRef(null);
+
   const handleDragEnd = useCallback((result) => {
     scrollContainerRef.current?.classList.remove('drag-active');
     isDraggingRef.current = false;
@@ -442,16 +444,12 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     dragPointerYRef.current = null;
     if (autoScrollRAFRef.current) cancelAnimationFrame(autoScrollRAFRef.current);
     if (!result.destination || result.source.index === result.destination.index) return;
-    // Preserve scroll position across the re-render so the view stays
-    // at the drop location instead of snapping back to the top.
-    const savedScrollTop = scrollContainerRef.current?.scrollTop ?? 0;
     const reordered = Array.from(exercisesRef.current);
     const [moved] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, moved);
+    // Store the moved exercise name so we can scroll to it after re-render
+    pendingScrollTargetRef.current = moved.name;
     setExercises(reordered);
-    requestAnimationFrame(() => {
-      if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = savedScrollTop;
-    });
   }, [handleDragPointerMove]);
 
   useEffect(() => {
@@ -461,6 +459,22 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       if (autoScrollRAFRef.current) cancelAnimationFrame(autoScrollRAFRef.current);
     };
   }, [handleDragPointerMove]);
+
+  // After a drag reorder, scroll the dropped exercise into view so the
+  // viewport stays at the drop location instead of snapping elsewhere.
+  useLayoutEffect(() => {
+    const targetName = pendingScrollTargetRef.current;
+    if (!targetName || !scrollContainerRef.current) return;
+    pendingScrollTargetRef.current = null;
+    const container = scrollContainerRef.current;
+    const allDraggables = container.querySelectorAll('[data-rfd-draggable-id]');
+    const targetEl = Array.from(allDraggables).find(
+      el => el.getAttribute('data-rfd-draggable-id') === targetName
+    );
+    if (targetEl) {
+      targetEl.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+    }
+  }, [exercises]);
 
   // Persist the live workout session so it survives app kills
   const handleExerciseStateChange = useCallback((name, state) => {
