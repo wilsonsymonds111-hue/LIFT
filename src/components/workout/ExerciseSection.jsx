@@ -101,7 +101,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   return (
     <>
     <div
-      className={`mb-2 bg-white dark:bg-neutral-800 rounded-xl p-3 overflow-hidden transition-all duration-200 exercise-card ${
+      className={`mb-2 bg-white dark:bg-neutral-800 rounded-xl p-3 transition-all duration-200 exercise-card ${
         isDragging
           ? 'ring-2 ring-blue-500 shadow-2xl dragging'
           : 'bg-gray-50 dark:bg-neutral-800/60'
