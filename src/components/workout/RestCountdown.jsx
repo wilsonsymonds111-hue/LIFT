@@ -58,6 +58,7 @@ const RestCountdown = memo(function RestCountdown({ duration }) {
     startXRef.current = e.clientX;
     swipingRef.current = true;
     setAnimating(false);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
   };
 
   const onPointerMove = (e) => {
@@ -91,7 +92,6 @@ const RestCountdown = memo(function RestCountdown({ duration }) {
         ref={barRef}
         className="w-full bg-blue-500 text-white font-bold text-center py-1.5 rounded-xl text-base tracking-wider cursor-pointer select-none touch-none"
         style={{
-          transform: 'translateX(0px)',
           transition: animating ? 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease' : 'none',
           willChange: 'transform, opacity',
         }}
