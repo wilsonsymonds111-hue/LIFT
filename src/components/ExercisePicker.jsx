@@ -51,6 +51,8 @@ export default function ExercisePicker({ onClose, onAdd }) {
   }, []);
 
   // Load exercise detail images from cache (5-min TTL — warm from WorkoutSheet)
+  // Also merge library exercises (ExerciseDetail) into the picker list so they
+  // appear in search — the built-in list doesn't cover every library exercise.
   useEffect(() => {
     getExerciseDetailList().then((details) => {
       const map = {};
@@ -58,6 +60,14 @@ export default function ExercisePicker({ onClose, onAdd }) {
         if (d.image_url) map[d.name.toLowerCase()] = d.image_url;
       });
       setImageMap(map);
+
+      setExercises(prev => {
+        const existing = new Set(prev.map(e => e.name.toLowerCase()));
+        const fromDetails = (details || [])
+          .filter(d => !existing.has(d.name.toLowerCase()))
+          .map(d => ({ name: d.name, muscle: detectMuscle(d.name) }));
+        return fromDetails.length ? [...prev, ...fromDetails] : prev;
+      });
     });
   }, []);
 
