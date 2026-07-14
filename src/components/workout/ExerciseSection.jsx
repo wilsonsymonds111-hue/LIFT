@@ -105,7 +105,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
         isDragging
           ? 'ring-2 ring-blue-500 shadow-2xl dragging'
           : 'bg-gray-50 dark:bg-neutral-800/60'
-      }`}>
+      }`}
+      style={{ transform: 'scale(var(--card-scale, 1))', transformOrigin: 'top center' }}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
           <h3

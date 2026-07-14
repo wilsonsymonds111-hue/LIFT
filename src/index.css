@@ -186,12 +186,6 @@
   z-index: 1;
 }
 
-/* Shrink non-dragged exercise cards during drag reorder */
-.drag-active .exercise-card:not(.dragging) {
-  transform: scale(0.93);
-  opacity: 0.8;
-}
-
 /* ProgressGraph dot animation keyframes — defined once, not injected per render */
 @keyframes dotSnapIn {
   0%   { transform: scale(0); opacity: 0; }
