@@ -393,6 +393,63 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     setExercises(prev => prev.filter((_, i) => i !== idx));
   }, []);
 
+  // --- Drag auto-scroll: smooth scrolling while reordering exercises ---
+  const scrollContainerRef = useRef(null);
+  const dragPointerYRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const autoScrollRAFRef = useRef(null);
+
+  const handleDragPointerMove = useCallback((e) => {
+    dragPointerYRef.current = e.touches?.[0]?.clientY ?? e.clientY;
+  }, []);
+
+  const dragAutoScroll = useCallback(() => {
+    if (!isDraggingRef.current) return;
+    const container = scrollContainerRef.current;
+    if (container && dragPointerYRef.current != null) {
+      const rect = container.getBoundingClientRect();
+      const y = dragPointerYRef.current - rect.top;
+      const threshold = 130;
+      const maxSpeed = 20;
+      if (y < threshold) {
+        container.scrollTop -= maxSpeed * Math.min(1, 1 - y / threshold);
+      } else if (y > rect.height - threshold) {
+        container.scrollTop += maxSpeed * Math.min(1, 1 - (rect.height - y) / threshold);
+      }
+    }
+    autoScrollRAFRef.current = requestAnimationFrame(dragAutoScroll);
+  }, []);
+
+  const handleDragStart = useCallback(() => {
+    setExerciseDragActive(true);
+    isDraggingRef.current = true;
+    window.addEventListener('pointermove', handleDragPointerMove, { passive: true });
+    window.addEventListener('touchmove', handleDragPointerMove, { passive: true });
+    autoScrollRAFRef.current = requestAnimationFrame(dragAutoScroll);
+  }, [handleDragPointerMove, dragAutoScroll]);
+
+  const handleDragEnd = useCallback((result) => {
+    isDraggingRef.current = false;
+    setExerciseDragActive(false);
+    window.removeEventListener('pointermove', handleDragPointerMove);
+    window.removeEventListener('touchmove', handleDragPointerMove);
+    dragPointerYRef.current = null;
+    if (autoScrollRAFRef.current) cancelAnimationFrame(autoScrollRAFRef.current);
+    if (!result.destination || result.source.index === result.destination.index) return;
+    const reordered = Array.from(exercisesRef.current);
+    const [moved] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, moved);
+    setExercises(reordered);
+  }, [handleDragPointerMove]);
+
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('pointermove', handleDragPointerMove);
+      window.removeEventListener('touchmove', handleDragPointerMove);
+      if (autoScrollRAFRef.current) cancelAnimationFrame(autoScrollRAFRef.current);
+    };
+  }, [handleDragPointerMove]);
+
   // Persist the live workout session so it survives app kills
   const handleExerciseStateChange = useCallback((name, state) => {
     exerciseStateRef.current[name] = state;
@@ -675,7 +732,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 Finish
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-24" data-workout-scroll>
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 pt-2 pb-24" data-workout-scroll>
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-3xl font-bold text-gray-900">{template.name}</h1>
               </div>
@@ -701,15 +758,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
               />
 
               <DragDropContext
-                onDragStart={() => setExerciseDragActive(true)}
-                onDragEnd={(result) => {
-                  setExerciseDragActive(false);
-                  if (!result.destination || result.source.index === result.destination.index) return;
-                  const reordered = Array.from(exercises);
-                  const [moved] = reordered.splice(result.source.index, 1);
-                  reordered.splice(result.destination.index, 0, moved);
-                  setExercises(reordered);
-                }}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
               >
                 <Droppable droppableId="workout-exercises" direction="vertical">
                   {(provided) => (
