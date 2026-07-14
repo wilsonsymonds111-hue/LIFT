@@ -186,6 +186,17 @@
   z-index: 1;
 }
 
+/* During drag reorder: collapse all card content instantly so @hello-pangea/dnd
+   can measure stable dimensions and shuffle cards accurately.
+   Framer-motion's animate prop stays in sync (both set height:0/opacity:0),
+   so when the class is removed framer-motion animates the expand smoothly. */
+.drag-active .exercise-card-content {
+  height: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+  transition: none !important;
+}
+
 /* ProgressGraph dot animation keyframes — defined once, not injected per render */
 @keyframes dotSnapIn {
   0%   { transform: scale(0); opacity: 0; }
