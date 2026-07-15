@@ -85,7 +85,7 @@ export const ALL_EXERCISES = [
   { name: 'Russian Twist', muscle: 'Core' },
   { name: 'Seated Cable Fly', muscle: 'Chest' },
   { name: 'Seal Row', muscle: 'Back' },
-  { name: 'Seated Row (Machine)', muscle: 'Back' },
+  { name: 'Seated Cable Row', muscle: 'Back' },
   { name: 'Shrug (Barbell)', muscle: 'Shoulders' },
   { name: 'Shrug (Dumbbell)', muscle: 'Shoulders' },
   { name: 'Single Arm Dumbbell Row', muscle: 'Back' },

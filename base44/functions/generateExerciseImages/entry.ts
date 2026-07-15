@@ -18,7 +18,7 @@ const ALL_EXERCISES = [
   "Pallof Press", "Pec Deck (Machine)", "Pendlay Row", "Plank", "Preacher Curl",
   "Pull Up", "Pullover (Machine)", "Push Up", "Rear Delt Fly", "Reverse Curl",
   "Reverse Lunge", "Romanian Deadlift (Barbell)", "Romanian Deadlift (Dumbbell)", "Rope Pushdown", "Russian Twist",
-  "Seal Row", "Seated Row (Machine)",   "Shrug (Barbell)", "Shrug (Dumbbell)",
+  "Seal Row", "Seated Cable Row", "Shrug (Barbell)", "Shrug (Dumbbell)",
   "Single Arm Dumbbell Row", "Single Arm Overhead Cable Extension", "Sissy Squat", "Skull Crusher", "Sled Push",
   "Smith Machine Squat", "Spider Curl", "Squat (Barbell)", "Squat (Dumbbell)", "Standing Calf Raise (Machine)",
   "Standing Press", "Step Up", "Straight Arm Pulldown", "Sumo Deadlift", "Svend Press",
