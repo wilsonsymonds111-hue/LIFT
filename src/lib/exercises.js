@@ -33,6 +33,7 @@ export const ALL_EXERCISES = [
   { name: 'Front Raise', muscle: 'Shoulders' },
   { name: 'Front Squat', muscle: 'Legs' },
   { name: 'Glute Bridge', muscle: 'Legs' },
+  { name: 'Glute Kickback (Cable)', muscle: 'Legs' },
   { name: 'Goblet Squat', muscle: 'Legs' },
   { name: 'Good Morning', muscle: 'Back' },
   { name: 'Hack Squat', muscle: 'Legs' },
