@@ -129,7 +129,7 @@ export const EXAMPLE_SPLITS_DATA = {
         subtitle: 'Chest • Shoulders • Triceps',
         exercises: [
           { name: 'Flat Barbell Bench Press', muscle: 'Chest', sets: 2 },
-          { name: 'Incline Bench Press (Dumbbell)', muscle: 'Chest', sets: 2 },
+          { name: 'Incline Dumbbell Press', muscle: 'Chest', sets: 2 },
           { name: 'Dumbbell Fly', muscle: 'Chest', sets: 2 },
           { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 2 },
           { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 2 },
@@ -180,7 +180,7 @@ export const EXAMPLE_SPLITS_DATA = {
         subtitle: 'Chest + Triceps',
         exercises: [
           { name: 'Flat Barbell Bench Press', muscle: 'Chest', sets: 2 },
-          { name: 'Incline Bench Press (Dumbbell)', muscle: 'Chest', sets: 2 },
+          { name: 'Incline Dumbbell Press', muscle: 'Chest', sets: 2 },
           { name: 'Dumbbell Fly', muscle: 'Chest', sets: 2 },
           { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 2 },
           { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 2 },
