@@ -88,7 +88,6 @@ export const ALL_EXERCISES = [
   { name: 'Seated Row (Machine)', muscle: 'Back' },
   { name: 'Shrug (Barbell)', muscle: 'Shoulders' },
   { name: 'Shrug (Dumbbell)', muscle: 'Shoulders' },
-  { name: 'Side Lateral Raise', muscle: 'Shoulders' },
   { name: 'Single Arm Dumbbell Row', muscle: 'Back' },
   { name: 'Single Arm Overhead Cable Extension', muscle: 'Arms' },
   { name: 'Sissy Squat', muscle: 'Legs' },
