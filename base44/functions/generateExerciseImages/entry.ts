@@ -10,7 +10,7 @@ const ALL_EXERCISES = [
   "Deadlift (Barbell)", "Decline Bench Press", "Decline Crunch", "Dumbbell Fly", "Face Pull",
   "Farmer's Walk", "Front Raise", "Front Squat", "Glute Bridge", "Goblet Squat",
   "Good Morning", "Hack Squat", "Hammer Curl", "Hang Clean", "Hanging Leg Raise",
-  "Hip Thrust (Barbell)", "Hollow Body Hold", "Incline Bench Press (Barbell)", "Incline Bench Press (Dumbbell)", "Incline Curl",
+  "Hip Thrust (Barbell)", "Hollow Body Hold", "Incline Bench Press (Barbell)", "Incline Dumbbell Press", "Incline Curl",
   "Iso-Lateral Row (Machine)", "JM Press", "Jump Squat", "Kettlebell Swing", "L-Sit",
   "Lat Pulldown", "Lateral Raise (Dumbbell)", "Lateral Raise (Machine)", "Leg Curl (Machine)", "Leg Extension (Machine)",
   "Leg Press", "Leg Press Calf Raise", "Lunge (Barbell)", "Lunge (Dumbbell)", "Meadows Row",
