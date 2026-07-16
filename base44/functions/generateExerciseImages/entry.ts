@@ -21,7 +21,7 @@ const ALL_EXERCISES = [
   "Single Arm Dumbbell Row", "Single Arm Overhead Cable Extension",   "Sissy Squat", "Skull Crushers (Ezy Bar)", "Sled Push",
   "Smith Machine Squat", "Spider Curl", "Squat (Barbell)", "Squat (Dumbbell)", "Standing Calf Raise (Machine)",
   "Standing Press", "Step Up", "Straight Arm Pulldown", "Sumo Deadlift", "Svend Press",
-  "T-Bar Row", "Thruster", "Trap Bar Deadlift", "Tricep Dip", "Tricep Pushdown (Cable)",
+  "T-Bar Row", "Thruster", "Trap Bar Deadlift", "Tricep Pushdown (Cable)",
   "Tricep Single Arm Extension", "Turkish Get-Up", "Upright Row", "V-Up", "Wide Grip Pull Up",
   "Wrist Curl", "Zottman Curl"
 ];
