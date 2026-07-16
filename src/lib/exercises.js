@@ -36,7 +36,7 @@ export const ALL_EXERCISES = [
   { name: 'Row Machine', muscle: 'Back' },
 
   { name: 'Kettlebell Swing', muscle: 'Full Body' },
-  { name: 'L-Sit', muscle: 'Core' },
+
   { name: 'Lat Pulldown', muscle: 'Back' },
 
   { name: 'Lateral Raise (Machine)', muscle: 'Shoulders' },

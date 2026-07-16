@@ -10,7 +10,7 @@ const ALL_EXERCISES = [
    "Front Raise Isolateral (Dumbbell)", "Front Squat (Barbell)", "Goblet Squat",
   "Hack Squat",   "Hammer Curl", "Hanging Leg Raise",
   "Hip Thrust (Barbell)", "Incline Bench Press (Barbell)", "Incline Dumbbell Press", "Incline Curl",
-  "Row Machine",   "Kettlebell Swing", "L-Sit",
+  "Row Machine",   "Kettlebell Swing",
   "Lat Pulldown", "Lateral Raise (Machine)", "Leg Extension (Machine)",
   "Leg Press", "Leg Press Calf Raise", "Lunge (Barbell)", "Lunge (Dumbbell)", "Meadows Row",
   "Mountain Climber", "Nordic Curl", "Overhead Press (Barbell)", "Overhead Press (Dumbbell)", "Overhead Tricep Extension (Dumbbell)",
