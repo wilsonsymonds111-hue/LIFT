@@ -52,7 +52,6 @@ export const ALL_EXERCISES = [
   { name: 'Overhead Press (Barbell)', muscle: 'Shoulders' },
   { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders' },
   { name: 'Overhead Tricep Extension (Dumbbell)', muscle: 'Arms' },
-  { name: 'Pallof Press', muscle: 'Core' },
   { name: 'Pec Deck (Machine)', muscle: 'Chest' },
   { name: 'Pendlay Row', muscle: 'Back' },
   { name: 'Plank', muscle: 'Core' },
