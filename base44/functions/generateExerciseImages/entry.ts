@@ -14,7 +14,7 @@ const ALL_EXERCISES = [
   "Lat Pulldown", "Lateral Raise (Machine)", "Leg Extension (Machine)",
   "Leg Press",
   "Overhead Press (Barbell)", "Overhead Press (Dumbbell)", "Overhead Tricep Extension (Dumbbell)",
-  "Pec Deck (Machine)", "Pendlay Row", "Plank", "Preacher Curl",
+  "Pendlay Row", "Plank", "Preacher Curl",
   "Pull Up", "Pullover (Machine)", "Push Up", "Rear Delt Fly", "Reverse Curl",
   "Reverse Lunge", "Romanian Deadlift (Barbell)", "Romanian Deadlift (Dumbbell)", "Rope Pushdown", "Russian Twist",
   "Seal Row", "Seated Cable Row", "Shrug (Barbell)", "Shrug (Dumbbell)",
