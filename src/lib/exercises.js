@@ -28,7 +28,6 @@ export const ALL_EXERCISES = [
   { name: 'Goblet Squat', muscle: 'Legs' },
   { name: 'Hack Squat', muscle: 'Legs' },
   { name: 'Hammer Curl', muscle: 'Arms' },
-  { name: 'Hang Clean', muscle: 'Full Body' },
   { name: 'Hanging Leg Raise', muscle: 'Core' },
   { name: 'Hip Thrust (Barbell)', muscle: 'Legs' },
   { name: 'Hollow Body Hold', muscle: 'Core' },
