@@ -236,7 +236,7 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
         </div>
 
         {/* Body */}
-        <div ref={scrollContainerRef} className={`flex-1 overflow-y-auto px-4 pt-5 pb-28 ${exerciseDragActive ? 'drag-active' : ''}`}>
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 pt-5 pb-28">
           {/* Exercises — same ExerciseSection cards as live workout */}
           <DragDropContext
             onBeforeCapture={() => {
