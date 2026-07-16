@@ -23,6 +23,7 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, historyData, exerciseI
             src={imageUrl}
             alt={exercise.name}
             decoding="async"
+            loading="lazy"
             className="w-full h-full object-contain"
             onError={() => setImgFailed(true)}
           />

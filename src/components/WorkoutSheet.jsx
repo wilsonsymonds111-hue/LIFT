@@ -24,7 +24,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const [minimized, setMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [noteFocused, setNoteFocused] = useState(false);
-  const [exerciseDragActive, setExerciseDragActive] = useState(false);
   const yMotion = useMotionValue(0);
   const dragStartYRef = useRef(null);
   const draggingRef = useRef(false);
@@ -426,7 +425,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   }, []);
 
   const handleDragStart = useCallback(() => {
-    setExerciseDragActive(true);
     isDraggingRef.current = true;
     dragContainerRectRef.current = scrollContainerRef.current?.getBoundingClientRect() ?? null;
     window.addEventListener('pointermove', handleDragPointerMove, { passive: true });
@@ -440,7 +438,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     scrollContainerRef.current?.classList.remove('drag-active');
     scrollContainerRef.current?.querySelectorAll('.drag-preserve').forEach(el => el.classList.remove('drag-preserve'));
     isDraggingRef.current = false;
-    setExerciseDragActive(false);
     window.removeEventListener('pointermove', handleDragPointerMove);
     window.removeEventListener('touchmove', handleDragPointerMove);
     // Capture the pointer's Y position relative to the scroll container at
@@ -519,7 +516,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
         bestSets: bestSetsRef.current,
         exerciseState: exerciseStateRef.current,
       });
-    }, 1000);
+    }, 2500);
   }, []);
 
   useEffect(() => {
@@ -846,7 +843,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                           onDeleteExercise={() => handleDeleteExercise(idx)}
                           initialState={exerciseStateRef.current[exercise.name]}
                           onStateChange={(state) => handleExerciseStateChange(exercise.name, state)}
-                          dragActive={exerciseDragActive}
                         />
                       ))}
                       {provided.placeholder}

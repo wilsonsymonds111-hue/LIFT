@@ -9,7 +9,7 @@ import RestTimeModal from './RestTimeModal';
 import ExerciseShareButton from '../share/ExerciseShareButton';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
-const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange, isDragging, dragActive }) {
+const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange, isDragging }) {
   const pr = useMemo(() => {
     const history = exercise.history || [];
     if (history.length === 0) return null;

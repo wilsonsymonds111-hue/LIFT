@@ -1,7 +1,7 @@
 import { Draggable } from '@hello-pangea/dnd';
 import ExerciseSection from './ExerciseSection';
 
-export default function ReorderableExercise({ exercise, index, dragActive, ...props }) {
+export default function ReorderableExercise({ exercise, index, ...props }) {
   return (
     <Draggable draggableId={exercise.name} index={index}>
       {(provided, snapshot) => (
@@ -18,7 +18,6 @@ export default function ReorderableExercise({ exercise, index, dragActive, ...pr
             exercise={exercise}
             dragHandleProps={provided.dragHandleProps}
             isDragging={snapshot.isDragging}
-            dragActive={dragActive}
             {...props}
           />
         </div>

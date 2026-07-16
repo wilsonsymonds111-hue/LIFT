@@ -9,7 +9,7 @@ export function useWorkoutTemplates() {
     queryFn: () => base44.entities.WorkoutTemplate.list('sort_order', 500),
     staleTime: 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 }
 

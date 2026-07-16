@@ -28,8 +28,8 @@ const lazyRetry = (importFn, retries = 5) =>
   });
 
 import Home from './pages/Home';
-import Splits from './pages/Splits';
-import BodyStats from './pages/BodyStats';
+const Splits = lazy(() => lazyRetry(() => import('./pages/Splits')));
+const BodyStats = lazy(() => lazyRetry(() => import('./pages/BodyStats')));
 const NewTemplate = lazy(() => lazyRetry(() => import('./pages/NewTemplate')));
 const ActiveWorkout = lazy(() => lazyRetry(() => import('./pages/ActiveWorkout')));
 const TemplateDetail = lazy(() => lazyRetry(() => import('./pages/TemplateDetail')));
@@ -158,7 +158,7 @@ const SwipeableTabs = memo(() => {
         dragMomentum={false}
         onDragStart={() => { isDraggingRef.current = true; }}
         onDragEnd={handleDragEnd}
-        style={{ x, width: TABS.length * width, willChange: 'transform', transform: 'translateZ(0)' }}
+        style={{ x, width: TABS.length * width, transform: 'translateZ(0)' }}
         className="flex absolute top-0 bottom-0 overflow-hidden"
       >
         {TAB_CONTENT.map((Component, i) => (
@@ -182,7 +182,7 @@ const TabPanel = memo(function TabPanel({ width, visited, Component, scrollToTop
     <div
       ref={scrollRef}
       className="flex-shrink-0 overflow-y-auto"
-      style={{ width, contain: 'layout style paint' }}
+      style={{ width, contain: isActive ? 'layout style paint' : undefined }}
     >
       {visited ? <MemoTab Component={Component} /> : <div className="w-full h-full bg-background" />}
     </div>
@@ -193,6 +193,8 @@ const TabPanel = memo(function TabPanel({ width, visited, Component, scrollToTop
 const usePreloadSubPages = () => {
   useEffect(() => {
     const preload = () => {
+      import('./pages/Splits');
+      import('./pages/BodyStats');
       import('./pages/NewTemplate');
       import('./pages/ActiveWorkout');
       import('./pages/TemplateDetail');
