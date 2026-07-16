@@ -437,6 +437,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   const handleDragEnd = useCallback((result) => {
     scrollContainerRef.current?.classList.remove('drag-active');
+    scrollContainerRef.current?.querySelectorAll('.drag-preserve').forEach(el => el.classList.remove('drag-preserve'));
     isDraggingRef.current = false;
     setExerciseDragActive(false);
     window.removeEventListener('pointermove', handleDragPointerMove);
@@ -817,8 +818,11 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
               />
 
               <DragDropContext
-                onBeforeCapture={() => {
-                  scrollContainerRef.current?.classList.add('drag-active');
+                onBeforeCapture={(before) => {
+                  const container = scrollContainerRef.current;
+                  container?.classList.add('drag-active');
+                  const draggedEl = container?.querySelector(`[data-rfd-draggable-id="${before.draggableId}"]`);
+                  draggedEl?.classList.add('drag-preserve');
                 }}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}

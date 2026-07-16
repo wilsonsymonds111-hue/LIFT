@@ -241,6 +241,11 @@
   overflow: hidden !important;
   transition: none !important;
 }
+.drag-active .drag-preserve .exercise-card-content {
+  max-height: 5000px !important;
+  opacity: 1 !important;
+  transition: none !important;
+}
 
 /* WorkoutSheet graph fade-in */
 @keyframes graphFadeIn { from { opacity: 0.3; transform: scaleY(0.96); } to { opacity: 1; transform: scaleY(1); } }
