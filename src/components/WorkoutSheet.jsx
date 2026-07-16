@@ -437,7 +437,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
 
   const handleDragEnd = useCallback((result) => {
     scrollContainerRef.current?.classList.remove('drag-active');
-    scrollContainerRef.current?.querySelectorAll('.drag-preserve').forEach(el => el.classList.remove('drag-preserve'));
     isDraggingRef.current = false;
     setExerciseDragActive(false);
     window.removeEventListener('pointermove', handleDragPointerMove);
@@ -818,14 +817,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
               />
 
               <DragDropContext
-                onBeforeCapture={(result) => {
-                  const container = scrollContainerRef.current;
-                  if (!container) return;
-                  container.classList.add('drag-active');
-                  // Mark the dragged card so its content doesn't collapse —
-                  // dnd measures it at full height, keeping it glued to the finger
-                  const card = container.querySelector(`[data-rfd-draggable-id="${result.draggableId}"] .exercise-card`);
-                  card?.classList.add('drag-preserve');
+                onBeforeCapture={() => {
+                  scrollContainerRef.current?.classList.add('drag-active');
                 }}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}

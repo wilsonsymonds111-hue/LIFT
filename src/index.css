@@ -235,10 +235,7 @@
   overflow: hidden;
   transition: max-height 0.3s ease, opacity 0.22s ease;
 }
-.drag-active .exercise-card:not(.drag-preserve) .exercise-card-content {
-  max-height: 0 !important;
-  opacity: 0 !important;
-  overflow: hidden !important;
+.drag-active .exercise-card-content {
   transition: none !important;
 }
 
