@@ -441,14 +441,20 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     setExerciseDragActive(false);
     window.removeEventListener('pointermove', handleDragPointerMove);
     window.removeEventListener('touchmove', handleDragPointerMove);
+    // Capture the pointer's Y position relative to the scroll container at
+    // drop time, so we can scroll the dropped element back to that position
+    // after the card-content expansion transition finishes.
+    const dropY = (dragPointerYRef.current != null && dragContainerRectRef.current)
+      ? dragPointerYRef.current - dragContainerRectRef.current.top
+      : null;
     dragPointerYRef.current = null;
     if (autoScrollRAFRef.current) cancelAnimationFrame(autoScrollRAFRef.current);
     if (!result.destination || result.source.index === result.destination.index) return;
     const reordered = Array.from(exercisesRef.current);
     const [moved] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, moved);
-    // Store the moved exercise name so we can scroll to it after re-render
-    pendingScrollTargetRef.current = moved.name;
+    // Store the moved exercise name + drop Y so we can scroll to it after re-render
+    pendingScrollTargetRef.current = { name: moved.name, dropY };
     setExercises(reordered);
   }, [handleDragPointerMove]);
 
@@ -460,20 +466,38 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     };
   }, [handleDragPointerMove]);
 
-  // After a drag reorder, scroll the dropped exercise into view so the
-  // viewport stays at the drop location instead of snapping elsewhere.
+  // After a drag reorder, scroll the dropped exercise to the position where
+  // the user released it. We must wait for the card-content expansion
+  // transition (0.3s) to finish — otherwise the layout shift from
+  // collapsed→expanded cards moves the element after we scroll to it,
+  // causing the viewport to snap to the wrong spot.
   useLayoutEffect(() => {
-    const targetName = pendingScrollTargetRef.current;
-    if (!targetName || !scrollContainerRef.current) return;
+    const target = pendingScrollTargetRef.current;
+    if (!target || !scrollContainerRef.current) return;
     pendingScrollTargetRef.current = null;
     const container = scrollContainerRef.current;
-    const allDraggables = container.querySelectorAll('[data-rfd-draggable-id]');
-    const targetEl = Array.from(allDraggables).find(
-      el => el.getAttribute('data-rfd-draggable-id') === targetName
-    );
-    if (targetEl) {
-      targetEl.scrollIntoView({ block: 'nearest', behavior: 'auto' });
-    }
+    const findTargetEl = () => {
+      const allDraggables = container.querySelectorAll('[data-rfd-draggable-id]');
+      return Array.from(allDraggables).find(
+        el => el.getAttribute('data-rfd-draggable-id') === target.name
+      );
+    };
+    // Rough scroll while cards are still expanding — gets element into view ASAP
+    const targetEl = findTargetEl();
+    if (targetEl) targetEl.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+    // Precise scroll after the 0.3s expansion transition completes, so the
+    // dropped element sits at the exact Y where the user released it
+    const scrollTimer = setTimeout(() => {
+      const el = findTargetEl();
+      if (!el || !scrollContainerRef.current) return;
+      const c = scrollContainerRef.current;
+      const targetRect = el.getBoundingClientRect();
+      const containerRect = c.getBoundingClientRect();
+      const elementTopInContainer = targetRect.top - containerRect.top + c.scrollTop;
+      const y = target.dropY != null ? target.dropY : containerRect.height / 4;
+      c.scrollTop = Math.max(0, elementTopInContainer - y);
+    }, 330);
+    return () => clearTimeout(scrollTimer);
   }, [exercises]);
 
   // Persist the live workout session so it survives app kills
