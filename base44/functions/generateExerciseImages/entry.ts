@@ -4,7 +4,7 @@ const ALL_EXERCISES = [
   "Ab Wheel Rollouts", "Arnold Press (Dumbbell)", "Back Extension", 
   "Barbell Row",  "Flat Dumbbell Press", "Bicep Cable Curl",
   "Bent Over Rear Delt Raises", "Bicep Curl (Barbell)", "Bicep Curl Dumbbell Supinated", ,
-  "Bulgarian Split Squat (Dumbbell)", "Cable Crunch", "Cable Curl", "Cable Lateral Raise", "Cable Row", "Calf Raise (Machine)", "Chest Dip",
+  "Bulgarian Split Squat (Dumbbell)", "Cable Crunch", "Calf Raise (Machine)", "Chest Dip",
   "Chin Up", "Clean and Press", "Close Grip Smith Chest Press", "Crunch", "Dead Bug",
   "Deadlift (Barbell)", "Decline Bench Press", "Decline Crunch", "Dumbbell Fly", "Face Pull",
   "Farmer's Walk", "Front Raise", "Front Squat", "Glute Bridge", "Goblet Squat",
