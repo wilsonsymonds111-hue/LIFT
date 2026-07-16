@@ -213,30 +213,10 @@ const AnimatedRoutes = memo(() => {
   const isModalRoute = location.pathname.startsWith('/template/') || location.pathname.startsWith('/active-workout/');
   const tabDisplay = useMemo(() => ({ display: isTabRoute || isModalRoute ? 'flex' : 'none' }), [isTabRoute, isModalRoute]);
 
-  // Restore an in-progress workout if the app was killed and reopened
+  // Clear any stale workout session on load — do NOT auto-navigate to a workout
   useEffect(() => {
-    const session = loadWorkoutSession();
-    if (!session?.templateId) return;
-
-    if (isSessionStale(session)) {
-      handleStaleSession(session);
-      if (location.pathname.startsWith('/active-workout')) {
-        navigate('/', { replace: true });
-      }
-      return;
-    }
-
-    // Only restore if there's actual workout data to recover — prevents
-    // ghost workout restoration on preview reloads with empty sessions
-    if (!sessionHasData(session)) {
-      clearWorkoutSession();
-      return;
-    }
-
-    if (!location.pathname.startsWith('/active-workout')) {
-      navigate(`/active-workout/${session.templateId}`, { replace: true });
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    clearWorkoutSession();
+  }, []);
 
   return (
     <>
