@@ -2,9 +2,9 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 const ALL_EXERCISES = [
   "Ab Wheel Rollouts", "Arnold Press (Dumbbell)", "Back Extension", 
-  "Barbell Row", "Battle Ropes",  "Flat Dumbbell Press", "Bicep Cable Curl",
+  "Barbell Row",  "Flat Dumbbell Press", "Bicep Cable Curl",
   "Bent Over Rear Delt Raises", "Bicep Curl (Barbell)", "Bicep Curl Dumbbell Supinated", ,
-  "Bulgarian Split Squat", "Burpee", "Cable Crossover", "Cable Crunch", "Cable Curl",
+  "Bulgarian Split Squat", "Cable Crossover", "Cable Crunch", "Cable Curl",
   "Cable Fly", "Cable Lateral Raise", "Cable Row", "Calf Raise (Machine)", "Chest Dip",
   "Chin Up", "Clean and Press", "Close Grip Smith Chest Press", "Crunch", "Dead Bug",
   "Deadlift (Barbell)", "Decline Bench Press", "Decline Crunch", "Dumbbell Fly", "Face Pull",
