@@ -159,6 +159,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const bestSetsRef = useRef(initialWorkoutRef.current.migratedBestSets);
   const saveTimeoutRef = useRef(null);
   const cancelledRef = useRef(false);
+  const finishedRef = useRef(false);
   // Per-exercise state (sets, completedSets, note) for session persistence
   const exerciseStateRef = useRef(initialWorkoutRef.current.migratedState);
   // Refs for session saving inside stable callbacks
@@ -509,7 +510,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     // individual sets were completed, so mid-workout kills lost all set data)
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
-      if (cancelledRef.current || showSummary) return;
+      if (cancelledRef.current || finishedRef.current) return;
       saveWorkoutSession({
         templateId: templateRef.current?.id,
         templateName: templateRef.current?.name,
@@ -525,7 +526,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     if (showSummary || cancelledRef.current) return;
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
-      if (cancelledRef.current) return;
+      if (cancelledRef.current || finishedRef.current) return;
       saveWorkoutSession({
         templateId: template?.id,
         templateName: template?.name,
@@ -592,6 +593,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       console.error('Save failed:', e);
     }
     setIsRestDay(isRestDayToday(allTemplates));
+    finishedRef.current = true;
     setShowSummary(true);
     clearWorkoutSession();
     window.dispatchEvent(new CustomEvent('workoutSessionChanged'));
@@ -604,7 +606,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     const msUntilStale = startTimeRef.current + TWO_HOURS - Date.now();
     if (msUntilStale <= 0) return; // already stale — handled on mount
     const timer = setTimeout(async () => {
-      if (cancelledRef.current || showSummary) return;
+      if (cancelledRef.current || finishedRef.current) return;
       const allSets = {};
       for (const ex of exercisesRef.current) {
         const state = exerciseStateRef.current[ex.name];
@@ -861,7 +863,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                   Add Exercises
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); cancelledRef.current = true; clearWorkoutSession(); window.dispatchEvent(new CustomEvent('workoutSessionChanged')); onFinish(); }}
+                  onClick={(e) => { e.stopPropagation(); cancelledRef.current = true; finishedRef.current = true; clearWorkoutSession(); window.dispatchEvent(new CustomEvent('workoutSessionChanged')); onFinish(); }}
                   className="w-full py-3.5 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition relative z-20"
                   style={{ touchAction: 'manipulation' }}
                 >
