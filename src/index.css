@@ -217,6 +217,14 @@
   background: hsl(0 0% 14%);
 }
 
+/* Edit modal: visible grey exercise cards on white background */
+.edit-exercise-list .exercise-card:not(.dragging) {
+  background-color: hsl(0 0% 93%) !important;
+}
+.dark .edit-exercise-list .exercise-card:not(.dragging) {
+  background-color: hsl(0 0% 17%) !important;
+}
+
 /* During drag reorder: collapse all card content instantly BEFORE dnd captures
    dimensions (via onBeforeCapture → .drag-active class), so dnd measures the
    collapsed cards and moves them smoothly via transforms without glitching.
