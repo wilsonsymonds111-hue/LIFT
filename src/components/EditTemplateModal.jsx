@@ -118,6 +118,7 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
 
   const handleDragEnd = useCallback((result) => {
     scrollContainerRef.current?.classList.remove('drag-active');
+    scrollContainerRef.current?.querySelectorAll('.drag-preserve').forEach(el => el.classList.remove('drag-preserve'));
     isDraggingRef.current = false;
     setExerciseDragActive(false);
     window.removeEventListener('pointermove', handleDragPointerMove);
@@ -239,8 +240,14 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 pt-5 pb-28 edit-exercise-list">
           {/* Exercises — same ExerciseSection cards as live workout */}
           <DragDropContext
-            onBeforeCapture={() => {
-              scrollContainerRef.current?.classList.add('drag-active');
+            onBeforeCapture={(result) => {
+              const container = scrollContainerRef.current;
+              if (!container) return;
+              container.classList.add('drag-active');
+              // Mark the dragged card so its content doesn't collapse —
+              // dnd measures it at full height, keeping it glued to the finger
+              const card = container.querySelector(`[data-rfd-draggable-id="${result.draggableId}"] .exercise-card`);
+              card?.classList.add('drag-preserve');
             }}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}

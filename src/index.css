@@ -225,17 +225,17 @@
   background-color: hsl(0 0% 17%) !important;
 }
 
-/* During drag reorder: collapse all card content instantly BEFORE dnd captures
-   dimensions (via onBeforeCapture → .drag-active class), so dnd measures the
-   collapsed cards and moves them smoothly via transforms without glitching.
-   On drag end, the class is removed and max-height/opacity transition back smoothly. */
+/* During drag reorder: collapse NON-dragged card content so dnd measures
+   compact cards and moves them smoothly. The dragged card (marked with
+   .drag-preserve via onBeforeCapture → draggableId) keeps its full height
+   so the pointer offset stays correct and the card stays glued to the finger. */
 .exercise-card-content {
   max-height: 5000px;
   opacity: 1;
   overflow: hidden;
   transition: max-height 0.3s ease, opacity 0.22s ease;
 }
-.drag-active .exercise-card-content {
+.drag-active .exercise-card:not(.drag-preserve) .exercise-card-content {
   max-height: 0 !important;
   opacity: 0 !important;
   overflow: hidden !important;
