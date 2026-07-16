@@ -19,7 +19,6 @@ export const ALL_EXERCISES = [
   { name: 'Close Grip Smith Chest Press', muscle: 'Chest' },
   { name: 'Crunch', muscle: 'Core' },
   { name: 'Deadlift (Barbell)', muscle: 'Back' },
-  { name: 'Decline Bench Press', muscle: 'Chest' },
   { name: 'Decline Crunch', muscle: 'Core' },
   { name: 'Flat Dumbbell Chest Press', muscle: 'Chest' },
   { name: 'Dumbbell Chest Pullover', muscle: 'Chest' },
