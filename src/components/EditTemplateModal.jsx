@@ -1,12 +1,10 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
-import { X, CalendarDays } from 'lucide-react';
+import { X } from 'lucide-react';
 import ReorderableExercise from './workout/ReorderableExercise';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import ExercisePicker from './ExercisePicker';
 import { getExerciseDetailList, getCachedImageMap, saveCachedImageMap } from '../lib/exerciseCache';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
-
-const TODAY_STR = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
 const capitalize = (s) => s.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 
@@ -239,17 +237,6 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
 
         {/* Body */}
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 pt-5 pb-28">
-          {/* Template name */}
-          <input
-            value={name}
-            onChange={e => setName(e.target.value)}
-            className="text-2xl font-extrabold text-gray-900 dark:text-white bg-transparent focus:outline-none w-full mb-1 border-b border-transparent focus:border-gray-200 pb-1"
-          />
-          <div className="flex items-center gap-1.5 mt-2 mb-4">
-            <CalendarDays className="w-4 h-4 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
-            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 font-display">{TODAY_STR}</p>
-          </div>
-
           {/* Exercises — same ExerciseSection cards as live workout */}
           <DragDropContext
             onBeforeCapture={() => {
