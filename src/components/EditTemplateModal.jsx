@@ -1,31 +1,28 @@
-import { useState, useEffect, useCallback } from 'react';
-import { X, Trash2 } from 'lucide-react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import { X, CalendarDays } from 'lucide-react';
+import ReorderableExercise from './workout/ReorderableExercise';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import ExercisePicker from './ExercisePicker';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import ProgressGraph from './ProgressGraph';
 import { getExerciseDetailList, getCachedImageMap, saveCachedImageMap } from '../lib/exerciseCache';
 import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 
+const TODAY_STR = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const capitalize = (s) => s.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+
 export default function EditTemplateModal({ template, onClose, onSave }) {
   const [name, setName] = useState(template.name);
-  const [exerciseList, setExerciseList] = useState(
-    template.exerciseList.map(ex => ({
-      ...ex,
-      defaultSets: ex.defaultSets?.length
-        ? ex.defaultSets
-        : Array.from({ length: ex.sets || 1 }, () => {
-            const last = ex.history?.[ex.history.length - 1];
-            return {
-              kg: last ? (typeof last === 'object' ? (last.kg ?? '') : last) : '',
-              reps: last ? (typeof last === 'object' ? (last.reps ?? '') : 8) : '',
-            };
-          })
-    }))
+  const [exercises, setExercises] = useState(
+    (template.exerciseList || []).map(ex => ({ ...ex, name: capitalize(ex.name) }))
   );
   const [showPicker, setShowPicker] = useState(false);
   const [exerciseImages, setExerciseImages] = useState({});
+  const [exerciseDragActive, setExerciseDragActive] = useState(false);
+  const exerciseStateRef = useRef({});
+  const exercisesRef = useRef(exercises);
+  exercisesRef.current = exercises;
 
-  // Fetch exercise images — same pattern as WorkoutSheet
+  // --- Image fetching (same pattern as WorkoutSheet) ---
   const buildImageMap = useCallback((results, exerciseList) => {
     const detailByName = {};
     (results || []).forEach(d => {
@@ -82,64 +79,156 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
     });
   }, [template?.id, buildImageMap]);
 
-  const handleAddExercises = (exercises) => {
-    setExerciseList(prev => {
+  // --- Drag auto-scroll (mirrors WorkoutSheet) ---
+  const scrollContainerRef = useRef(null);
+  const dragPointerYRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const autoScrollRAFRef = useRef(null);
+  const dragContainerRectRef = useRef(null);
+
+  const handleDragPointerMove = useCallback((e) => {
+    dragPointerYRef.current = e.touches?.[0]?.clientY ?? e.clientY;
+  }, []);
+
+  const dragAutoScroll = useCallback(() => {
+    if (!isDraggingRef.current) return;
+    const container = scrollContainerRef.current;
+    const rect = dragContainerRectRef.current;
+    if (container && rect && dragPointerYRef.current != null) {
+      const y = dragPointerYRef.current - rect.top;
+      const threshold = 130;
+      const maxSpeed = 20;
+      if (y < threshold) {
+        container.scrollTop -= maxSpeed * Math.min(1, 1 - y / threshold);
+      } else if (y > rect.height - threshold) {
+        container.scrollTop += maxSpeed * Math.min(1, 1 - (rect.height - y) / threshold);
+      }
+    }
+    autoScrollRAFRef.current = requestAnimationFrame(dragAutoScroll);
+  }, []);
+
+  const handleDragStart = useCallback(() => {
+    setExerciseDragActive(true);
+    isDraggingRef.current = true;
+    dragContainerRectRef.current = scrollContainerRef.current?.getBoundingClientRect() ?? null;
+    window.addEventListener('pointermove', handleDragPointerMove, { passive: true });
+    window.addEventListener('touchmove', handleDragPointerMove, { passive: true });
+    autoScrollRAFRef.current = requestAnimationFrame(dragAutoScroll);
+  }, [handleDragPointerMove, dragAutoScroll]);
+
+  const pendingScrollTargetRef = useRef(null);
+
+  const handleDragEnd = useCallback((result) => {
+    scrollContainerRef.current?.classList.remove('drag-active');
+    isDraggingRef.current = false;
+    setExerciseDragActive(false);
+    window.removeEventListener('pointermove', handleDragPointerMove);
+    window.removeEventListener('touchmove', handleDragPointerMove);
+    const dropY = (dragPointerYRef.current != null && dragContainerRectRef.current)
+      ? dragPointerYRef.current - dragContainerRectRef.current.top
+      : null;
+    dragPointerYRef.current = null;
+    if (autoScrollRAFRef.current) cancelAnimationFrame(autoScrollRAFRef.current);
+    if (!result.destination || result.source.index === result.destination.index) return;
+    const reordered = Array.from(exercisesRef.current);
+    const [moved] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, moved);
+    pendingScrollTargetRef.current = { name: moved.name, dropY };
+    setExercises(reordered);
+  }, [handleDragPointerMove]);
+
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('pointermove', handleDragPointerMove);
+      window.removeEventListener('touchmove', handleDragPointerMove);
+      if (autoScrollRAFRef.current) cancelAnimationFrame(autoScrollRAFRef.current);
+    };
+  }, [handleDragPointerMove]);
+
+  useLayoutEffect(() => {
+    const target = pendingScrollTargetRef.current;
+    if (!target || !scrollContainerRef.current) return;
+    pendingScrollTargetRef.current = null;
+    const container = scrollContainerRef.current;
+    const findTargetEl = () => {
+      const allDraggables = container.querySelectorAll('[data-rfd-draggable-id]');
+      return Array.from(allDraggables).find(
+        el => el.getAttribute('data-rfd-draggable-id') === target.name
+      );
+    };
+    const targetEl = findTargetEl();
+    if (targetEl) targetEl.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+    const scrollTimer = setTimeout(() => {
+      const el = findTargetEl();
+      if (!el || !scrollContainerRef.current) return;
+      const c = scrollContainerRef.current;
+      const targetRect = el.getBoundingClientRect();
+      const containerRect = c.getBoundingClientRect();
+      const elementTopInContainer = targetRect.top - containerRect.top + c.scrollTop;
+      const y = target.dropY != null ? target.dropY : containerRect.height / 4;
+      c.scrollTop = Math.max(0, elementTopInContainer - y);
+    }, 330);
+    return () => clearTimeout(scrollTimer);
+  }, [exercises]);
+
+  // --- Per-exercise state tracking ---
+  const handleExerciseStateChange = useCallback((exerciseName, state) => {
+    exerciseStateRef.current[exerciseName] = state;
+  }, []);
+
+  const handleDeleteExercise = useCallback((idx) => {
+    setExercises(prev => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const handleAddExercises = (picked) => {
+    setExercises(prev => {
       const existing = new Set(prev.map(e => e.name));
-      const newOnes = exercises
+      const newOnes = picked
         .filter(e => !existing.has(e.name))
-        .map(e => ({ ...e, sets: 1, history: e.history || [], defaultSets: [{ kg: '', reps: '' }] }));
+        .map(e => ({ ...e, sets: 1, history: e.history || [] }));
       return [...prev, ...newOnes];
     });
     setShowPicker(false);
+    const newNames = picked.filter(e => !exerciseImages[e.name.toLowerCase()]).map(e => e.name);
+    if (newNames.length > 0) {
+      Promise.all(newNames.map(name => ensureExerciseDetail(name))).then(results => {
+        const generated = {};
+        newNames.forEach((name, i) => {
+          if (results[i]?.image_url) generated[name.toLowerCase()] = results[i].image_url;
+        });
+        setExerciseImages(prev => ({ ...prev, ...generated }));
+      });
+    }
   };
 
   const handleSave = () => {
     const updated = {
       ...template,
       name: name.trim() || template.name,
-      exercises: exerciseList.length > 0
-        ? exerciseList.map(e => e.name).join(', ') + '...'
+      exercises: exercises.length > 0
+        ? exercises.map(e => e.name).join(', ') + '...'
         : 'No exercises yet',
-      exerciseList: exerciseList.map(ex => ({ ...ex, sets: ex.defaultSets.length })),
+      exerciseList: exercises.map(ex => {
+        const state = exerciseStateRef.current[ex.name];
+        return {
+          ...ex,
+          sets: state?.sets?.length || ex.sets || 1,
+          note: state?.note ?? ex.note ?? '',
+        };
+      }),
     };
     onSave(updated);
-  };
-
-  const updateSet = (exIdx, setIdx, field, value) => {
-    setExerciseList(prev => prev.map((ex, i) => {
-      if (i !== exIdx) return ex;
-      return { ...ex, defaultSets: ex.defaultSets.map((s, j) => j === setIdx ? { ...s, [field]: value } : s) };
-    }));
-  };
-
-  const addSet = (exIdx) => {
-    setExerciseList(prev => prev.map((ex, i) => {
-      if (i !== exIdx) return ex;
-      const last = ex.defaultSets[ex.defaultSets.length - 1] || { kg: '', reps: '' };
-      return { ...ex, defaultSets: [...ex.defaultSets, { ...last }] };
-    }));
-  };
-
-  const removeSet = (exIdx, setIdx) => {
-    setExerciseList(prev => prev.map((ex, i) => {
-      if (i !== exIdx || ex.defaultSets.length <= 1) return ex;
-      return { ...ex, defaultSets: ex.defaultSets.filter((_, j) => j !== setIdx) };
-    }));
-  };
-
-  const removeExercise = (exIdx) => {
-    setExerciseList(prev => prev.filter((_, i) => i !== exIdx));
   };
 
   return (
     <>
       <div className="fixed inset-0 z-[60] flex flex-col bg-card pointer-events-auto">
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100">
-          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-200 hover:bg-gray-300 transition">
-            <X className="w-4 h-4 text-gray-700" />
+        {/* Top bar — X (left), title (center), Save (right) */}
+        <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100 dark:border-neutral-700">
+          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-200 dark:bg-neutral-700 hover:bg-gray-300 transition">
+            <X className="w-4 h-4 text-gray-700 dark:text-gray-300" />
           </button>
-          <span className="font-bold text-base text-gray-900">Edit Template</span>
+          <span className="font-bold text-base text-gray-900 dark:text-white">Edit Template</span>
           <button
             onClick={handleSave}
             className="px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl text-sm transition"
@@ -149,109 +238,42 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-4 pt-5 pb-28">
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 pt-5 pb-28">
           {/* Template name */}
           <input
             value={name}
             onChange={e => setName(e.target.value)}
-            className="text-2xl font-extrabold text-gray-900 bg-transparent focus:outline-none w-full mb-6 border-b border-transparent focus:border-gray-200 pb-1"
+            className="text-2xl font-extrabold text-gray-900 dark:text-white bg-transparent focus:outline-none w-full mb-1 border-b border-transparent focus:border-gray-200 pb-1"
           />
+          <div className="flex items-center gap-1.5 mt-2 mb-4">
+            <CalendarDays className="w-4 h-4 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 font-display">{TODAY_STR}</p>
+          </div>
 
-          {/* Exercises */}
-          <DragDropContext onDragEnd={({ source, destination }) => {
-            if (!destination) return;
-            const next = [...exerciseList];
-            const [moved] = next.splice(source.index, 1);
-            next.splice(destination.index, 0, moved);
-            setExerciseList(next);
-          }}>
-            <Droppable droppableId="edit-exercises">
+          {/* Exercises — same ExerciseSection cards as live workout */}
+          <DragDropContext
+            onBeforeCapture={() => {
+              scrollContainerRef.current?.classList.add('drag-active');
+            }}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <Droppable droppableId="edit-exercises" direction="vertical">
               {(provided) => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
-          {exerciseList.map((ex, exIdx) => (
-            <Draggable key={ex.name + exIdx} draggableId={ex.name + exIdx} index={exIdx}>
-              {(p) => (
-            <div ref={p.innerRef} {...p.draggableProps} className="mb-7">
-              <div className="flex items-center justify-between mb-2 gap-2">
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <h3 {...p.dragHandleProps} className="text-blue-500 font-semibold text-base cursor-grab active:cursor-grabbing select-none leading-snug">{ex.name}</h3>
-                </div>
-                {exerciseImages[ex.name.toLowerCase()] ? (
-                  <img
-                    src={exerciseImages[ex.name.toLowerCase()]}
-                    alt={ex.name}
-                    className="rounded-xl object-contain flex-shrink-0 w-24 h-16"
-                    decoding="async"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 w-24 h-16">
-                    <span className="text-sm font-bold text-gray-400">{ex.name[0]}</span>
-                  </div>
-                )}
-                <button onClick={() => removeExercise(exIdx)} className="p-1 rounded-lg hover:bg-red-50 transition flex-shrink-0">
-                  <Trash2 className="w-4 h-4 text-red-400" />
-                </button>
-              </div>
-
-              <ProgressGraph
-                history={ex.history || []}
-                animKey={0}
-                animDir="add"
-                isBodyweight={(ex.history || []).length > 0 && (ex.history || []).every(h => {
-                  const kg = typeof h === 'object' ? (h.kg ?? 0) : (h ?? 0);
-                  return kg === 0 || kg == null;
-                })}
-                compact
-                exerciseName={ex.name}
-              />
-
-              {/* Set headers */}
-              <div className="grid grid-cols-[32px_1fr_1fr_32px] gap-1 text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1">
-                <span className="text-center">Set</span>
-                <span className="text-center">kg</span>
-                <span className="text-center">Reps</span>
-                <span />
-              </div>
-
-              {ex.defaultSets.map((s, setIdx) => (
-                <div key={setIdx} className="grid grid-cols-[32px_1fr_1fr_32px] gap-1 items-center mb-1.5">
-                  <span className="text-sm font-semibold text-center text-gray-500">{setIdx + 1}</span>
-                  <input
-                    type="number"
-                    value={s.kg}
-                    onChange={e => updateSet(exIdx, setIdx, 'kg', e.target.value)}
-                    placeholder="—"
-                    className="rounded-lg text-center text-sm font-semibold py-1.5 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
-                  <input
-                    type="number"
-                    value={s.reps}
-                    onChange={e => updateSet(exIdx, setIdx, 'reps', e.target.value)}
-                    placeholder="—"
-                    className="rounded-lg text-center text-sm font-semibold py-1.5 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
-                  <button
-                    onClick={() => removeSet(exIdx, setIdx)}
-                    disabled={ex.defaultSets.length <= 1}
-                    className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-red-100 transition disabled:opacity-30"
-                  >
-                    <X className="w-3.5 h-3.5 text-gray-400" />
-                  </button>
-                </div>
-              ))}
-
-              <button
-                onClick={() => addSet(exIdx)}
-                className="mt-1.5 w-full py-1.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 transition"
-              >
-                + Add Set
-              </button>
-            </div>
-              )}
-            </Draggable>
-          ))}
-                {provided.placeholder}
+                  {exercises.map((exercise, idx) => (
+                    <ReorderableExercise
+                      key={exercise.name}
+                      exercise={exercise}
+                      index={idx}
+                      onDeleteExercise={() => handleDeleteExercise(idx)}
+                      exerciseImage={exerciseImages[exercise.name.toLowerCase()]}
+                      initialState={exerciseStateRef.current[exercise.name]}
+                      onStateChange={(state) => handleExerciseStateChange(exercise.name, state)}
+                      dragActive={exerciseDragActive}
+                    />
+                  ))}
+                  {provided.placeholder}
                 </div>
               )}
             </Droppable>
