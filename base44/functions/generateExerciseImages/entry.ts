@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 const ALL_EXERCISES = [
-  "Ab Wheel Rollouts", "Arnold Press (Dumbbell)", "Around the World", "Back Extension", "Back Extension (Machine)",
+  "Ab Wheel Rollouts", "Arnold Press (Dumbbell)", "Back Extension", "Back Extension (Machine)",
   "Ball Slams", "Barbell Row", "Battle Ropes", "Bench Press (Barbell)", "Bench Press (Dumbbell)", "Bicep Cable Curl",
   "Bent Over Lateral Raise", "Bicep Curl (Barbell)", "Bicep Curl Dumbbell Supinated", "Box Jump", "Bradford Press",
   "Bulgarian Split Squat", "Burpee", "Cable Crossover", "Cable Crunch", "Cable Curl",
