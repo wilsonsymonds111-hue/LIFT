@@ -7,7 +7,7 @@ const ALL_EXERCISES = [
   "Bulgarian Split Squat (Dumbbell)",  "Cable Crunch",  "Seated Calf Raise", "Chest Dip",
   "Chin Up", "Clean and Press", "Close Grip Smith Chest Press", "Crunch",
   "Deadlift (Barbell)", "Decline Crunch", "Dumbbell Fly", "Face Pull",
-   "Front Raise Isolateral (Dumbbell)", "Front Squat (Barbell)", "Glute Bridge", "Goblet Squat",
+   "Front Raise Isolateral (Dumbbell)", "Front Squat (Barbell)", "Goblet Squat",
   "Good Morning", "Hack Squat", "Hammer Curl", "Hang Clean", "Hanging Leg Raise",
   "Hip Thrust (Barbell)", "Hollow Body Hold", "Incline Bench Press (Barbell)", "Incline Dumbbell Press", "Incline Curl",
   "Iso-Lateral Row (Machine)", "JM Press", "Jump Squat", "Kettlebell Swing", "L-Sit",
