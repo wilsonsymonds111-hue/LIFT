@@ -27,6 +27,7 @@ function Star({ size = 24, delay = 0 }) {
 export default function SummaryScreen({ template, exercises, prs, bestSets, durationDisplay, onDone, isRestDay, allTemplates }) {
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
   const cardRef = useRef(null);
+  const listRef = useRef(null);
   const igStickerRef = useRef(null);
   const [sharing, setSharing] = useState(false);
   const [igSharing, setIgSharing] = useState(false);
@@ -62,7 +63,13 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
     setSharing(true);
     try {
       const { default: html2canvas } = await import('html2canvas');
+      // Temporarily expand the scrollable list so the screenshot captures all exercises
+      const list = listRef.current;
+      const prevOverflow = list?.style.overflow;
+      const prevMaxHeight = list?.style.maxHeight;
+      if (list) { list.style.overflow = 'visible'; list.style.maxHeight = 'none'; }
       const canvas = await html2canvas(cardRef.current, { scale: 3, useCORS: true, backgroundColor: null, logging: false });
+      if (list) { list.style.overflow = prevOverflow; list.style.maxHeight = prevMaxHeight; }
       canvas.toBlob(async (blob) => {
         const file = new File([blob], 'workout.png', { type: 'image/png' });
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
@@ -109,7 +116,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
       <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-auto">
         <div className="absolute inset-0 bg-black/60" />
 
-        <div className="relative bg-gray-50 rounded-3xl w-[92%] max-w-sm flex flex-col shadow-2xl overflow-hidden"
+        <div className="relative bg-gray-50 rounded-3xl w-[92%] max-w-sm max-h-[88vh] flex flex-col shadow-2xl overflow-hidden"
           style={{ animation: 'none' }}>
 
           <div className="flex items-center justify-between px-4 pt-4 pb-1 flex-shrink-0">
@@ -132,7 +139,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
           </div>
 
           <div ref={cardRef}
-            className={`mx-4 mb-4 bg-white rounded-2xl border-2 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`}
+            className={`mx-4 mb-4 bg-white rounded-2xl border-2 overflow-hidden relative flex-1 min-h-0 flex flex-col ${shimmer ? 'gold-shimmer' : ''}`}
             style={{ borderColor: '#FFD700', boxShadow: '0 0 20px rgba(255,215,0,0.3)' }}>
 
             <div className="px-4 pt-4 pb-2" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' }}>
@@ -157,7 +164,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
 
             <div className="border-t border-yellow-200" />
 
-            <div className="px-4 py-3 space-y-2">
+            <div ref={listRef} className="px-4 py-3 space-y-2 overflow-y-auto flex-1 min-h-0">
               {exercises.map((ex, i) => {
                 const best = bestSets[ex.name];
                 const isPR = prSet.has(ex.name);
