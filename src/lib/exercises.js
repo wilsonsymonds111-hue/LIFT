@@ -30,7 +30,6 @@ export const ALL_EXERCISES = [
   { name: 'Hammer Curl', muscle: 'Arms' },
   { name: 'Hanging Leg Raise', muscle: 'Core' },
   { name: 'Hip Thrust (Barbell)', muscle: 'Legs' },
-  { name: 'Hollow Body Hold', muscle: 'Core' },
   { name: 'Incline Barbell Press', muscle: 'Chest' },
   { name: 'Incline Smith Chest Press', muscle: 'Chest' },
   { name: 'Incline Curl', muscle: 'Arms' },
