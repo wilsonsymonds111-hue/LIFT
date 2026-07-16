@@ -55,7 +55,7 @@ export const ALL_EXERCISES = [
 
   { name: 'Preacher Curl (Machine)', muscle: 'Arms' },
   { name: 'Pull Up', muscle: 'Back' },
-  { name: 'Pullover (Machine)', muscle: 'Back' },
+
   { name: 'Push Up', muscle: 'Chest' },
   { name: 'Rear Delt Fly', muscle: 'Shoulders' },
   { name: 'Reverse Curl', muscle: 'Arms' },
