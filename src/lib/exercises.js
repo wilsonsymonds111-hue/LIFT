@@ -48,7 +48,7 @@ export const ALL_EXERCISES = [
   { name: 'Machine Chest Fly', muscle: 'Chest' },
 
 
-  { name: 'Nordic Curl', muscle: 'Legs' },
+
   { name: 'Overhead Press (Barbell)', muscle: 'Shoulders' },
   { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders' },
   { name: 'Overhead Tricep Extension (Dumbbell)', muscle: 'Arms' },
