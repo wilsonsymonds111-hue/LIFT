@@ -38,8 +38,8 @@ const SupportChat = lazy(() => lazyRetry(() => import('./pages/SupportChat')));
 const Terms = lazy(() => lazyRetry(() => import('./pages/Terms')));
 const Privacy = lazy(() => lazyRetry(() => import('./pages/Privacy')));
 import { usePrefetchData } from './hooks/usePrefetchData';
-import { loadWorkoutSession } from './lib/workoutSession';
-import { isSessionStale, handleStaleSession } from './lib/staleWorkoutCheck';
+import { loadWorkoutSession, clearWorkoutSession } from './lib/workoutSession';
+import { isSessionStale, handleStaleSession, sessionHasData } from './lib/staleWorkoutCheck';
 
 const TABS = ['/', '/splits', '/exercises'];
 
@@ -223,6 +223,13 @@ const AnimatedRoutes = memo(() => {
       if (location.pathname.startsWith('/active-workout')) {
         navigate('/', { replace: true });
       }
+      return;
+    }
+
+    // Only restore if there's actual workout data to recover — prevents
+    // ghost workout restoration on preview reloads with empty sessions
+    if (!sessionHasData(session)) {
+      clearWorkoutSession();
       return;
     }
 
