@@ -134,7 +134,7 @@ export const EXAMPLE_SPLITS_DATA = {
           { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 2 },
           { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 2 },
           { name: 'Tricep Pushdown (Cable)', muscle: 'Arms', sets: 2 },
-          { name: 'Skull Crusher', muscle: 'Arms', sets: 2 },
+          { name: 'Skull Crushers (Ezy Bar)', muscle: 'Arms', sets: 2 },
         ],
       },
       {
@@ -185,7 +185,7 @@ export const EXAMPLE_SPLITS_DATA = {
           { name: 'Overhead Press (Dumbbell)', muscle: 'Shoulders', sets: 2 },
           { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders', sets: 2 },
           { name: 'Tricep Pushdown (Cable)', muscle: 'Arms', sets: 2 },
-          { name: 'Skull Crusher', muscle: 'Arms', sets: 2 },
+          { name: 'Skull Crushers (Ezy Bar)', muscle: 'Arms', sets: 2 },
         ],
       },
       {

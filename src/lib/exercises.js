@@ -91,7 +91,7 @@ export const ALL_EXERCISES = [
   { name: 'Single Arm Dumbbell Row', muscle: 'Back' },
   { name: 'Single Arm Overhead Cable Extension', muscle: 'Arms' },
   { name: 'Sissy Squat', muscle: 'Legs' },
-  { name: 'Skull Crusher', muscle: 'Arms' },
+  { name: 'Skull Crushers (Ezy Bar)', muscle: 'Arms' },
   { name: 'Sled Push', muscle: 'Full Body' },
   { name: 'Smith Machine Squat', muscle: 'Legs' },
   { name: 'Spider Curl', muscle: 'Arms' },
