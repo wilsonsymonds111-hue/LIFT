@@ -21,7 +21,6 @@ export const ALL_EXERCISES = [
   { name: 'Deadlift (Barbell)', muscle: 'Back' },
   { name: 'Decline Crunch', muscle: 'Core' },
   { name: 'Flat Dumbbell Chest Press', muscle: 'Chest' },
-  { name: 'Dumbbell Chest Pullover', muscle: 'Chest' },
   { name: 'Dumbbell Fly', muscle: 'Chest' },
   { name: 'Face Pull', muscle: 'Shoulders' },
   { name: "Farmer's Walk", muscle: 'Full Body' },
