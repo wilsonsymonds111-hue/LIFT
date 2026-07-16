@@ -58,8 +58,6 @@ export const ALL_EXERCISES = [
 
   { name: 'Push Up', muscle: 'Chest' },
   { name: 'Rear Delt Fly Machine', muscle: 'Shoulders' },
-  { name: 'Reverse Curl', muscle: 'Arms' },
-  { name: 'Reverse Lunge', muscle: 'Legs' },
   { name: 'Romanian Deadlift (Barbell)', muscle: 'Legs' },
   { name: 'Romanian Deadlift (Dumbbell)', muscle: 'Legs' },
   { name: 'Rope Pushdown', muscle: 'Arms' },
