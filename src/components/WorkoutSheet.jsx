@@ -825,7 +825,6 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                   if (!draggedEl) return;
                   const screenYBefore = draggedEl.getBoundingClientRect().top;
                   container.classList.add('drag-active');
-                  draggedEl.classList.add('drag-preserve');
                   const screenYAfter = draggedEl.getBoundingClientRect().top;
                   container.scrollTop += screenYAfter - screenYBefore;
                 }}
