@@ -22,7 +22,7 @@ export const ALL_EXERCISES = [
   { name: 'Flat Dumbbell Chest Press', muscle: 'Chest' },
   { name: 'Dumbbell Fly', muscle: 'Chest' },
   { name: 'Face Pull', muscle: 'Shoulders' },
-  { name: 'Front Raise', muscle: 'Shoulders' },
+  { name: 'Front Raise Isolateral (Dumbbell)', muscle: 'Shoulders' },
   { name: 'Front Squat', muscle: 'Legs' },
   { name: 'Glute Bridge', muscle: 'Legs' },
   { name: 'Glute Cable Kickback', muscle: 'Legs' },
