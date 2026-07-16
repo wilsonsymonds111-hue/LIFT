@@ -174,7 +174,7 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
             <div ref={p.innerRef} {...p.draggableProps} className="mb-7">
               <div className="flex items-center justify-between mb-2 gap-2">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <h3 {...p.dragHandleProps} className="text-blue-500 font-semibold text-base truncate cursor-grab active:cursor-grabbing select-none">{ex.name}</h3>
+                  <h3 {...p.dragHandleProps} className="text-blue-500 font-semibold text-base cursor-grab active:cursor-grabbing select-none leading-snug">{ex.name}</h3>
                 </div>
                 {exerciseImages[ex.name.toLowerCase()] ? (
                   <img
