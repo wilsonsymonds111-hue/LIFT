@@ -2,12 +2,12 @@ import { base44 } from '@/api/base44Client';
 
 // Simple in-memory cache with TTL to avoid redundant API calls
 const cache = {};
-const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes — image data rarely changes
+const DEFAULT_TTL = 2 * 60 * 1000; // 2 minutes — short so updated images appear quickly
 
 // localStorage-backed image map — survives page reloads so workout images
 // appear instantly on repeat opens while the API refreshes in the background.
 const LS_KEY = 'exerciseImageMap';
-const LS_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const LS_TTL = 2 * 60 * 1000; // 2 minutes — must be short so image updates aren't hidden behind stale localStorage
 
 function now() { return Date.now(); }
 
