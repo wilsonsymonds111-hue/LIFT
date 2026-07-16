@@ -33,7 +33,7 @@ export const ALL_EXERCISES = [
   { name: 'Incline Barbell Press', muscle: 'Chest' },
   { name: 'Incline Smith Chest Press', muscle: 'Chest' },
   { name: 'Incline Curl', muscle: 'Arms' },
-  { name: 'Iso-Lateral Row (Machine)', muscle: 'Back' },
+  { name: 'Row Machine', muscle: 'Back' },
   { name: 'JM Press', muscle: 'Arms' },
   { name: 'Jump Squat', muscle: 'Legs' },
   { name: 'Kettlebell Swing', muscle: 'Full Body' },
