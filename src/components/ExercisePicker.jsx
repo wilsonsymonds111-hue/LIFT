@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { X, Search, Plus, Dumbbell } from 'lucide-react';
 import { getAllExercises, saveCustomExercise } from '../lib/customExercises';
-import { ALL_EXERCISES } from '../lib/exercises';
+import { ALL_EXERCISES, EXERCISE_ALIASES } from '../lib/exercises';
 import { getExerciseDetailList } from '../lib/exerciseCache';
 import ExerciseDetailModal from './ExerciseDetailModal';
 
@@ -70,7 +70,10 @@ export default function ExercisePicker({ onClose, onAdd }) {
 
   const filtered = useMemo(() => {
     return exercises.filter(ex => {
-      const matchesSearch = ex.name.toLowerCase().includes(search.toLowerCase());
+      const nameLower = ex.name.toLowerCase();
+      const alias = EXERCISE_ALIASES[nameLower]?.toLowerCase() || '';
+      const searchLower = search.toLowerCase();
+      const matchesSearch = nameLower.includes(searchLower) || alias.includes(searchLower);
       const matchesMuscle = muscleFilter === 'All' || ex.muscle === muscleFilter;
       return matchesSearch && matchesMuscle;
     });

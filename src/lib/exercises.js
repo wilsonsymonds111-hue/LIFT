@@ -101,6 +101,11 @@ export const ALL_EXERCISES = [
   { name: 'Zottman Curl', muscle: 'Arms' },
 ];
 
+// Alternate names users might search by → canonical exercise name (lowercase).
+export const EXERCISE_ALIASES = {
+  'military press': 'Overhead Press (Barbell)',
+};
+
 export const MUSCLES = ['All', 'Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders'];
 
 export const MUSCLE_COLORS = {

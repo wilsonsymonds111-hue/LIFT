@@ -2,6 +2,7 @@
  * Fuzzy exercise matching utilities.
  * Finds the closest exercise when an exact substring search returns nothing.
  */
+import { EXERCISE_ALIASES } from './exercises';
 
 function levenshtein(a, b) {
   const m = a.length, n = b.length;
@@ -50,6 +51,15 @@ export function tokenMatchesName(token, name) {
   // Correct common misspellings (e.g. "dumbell" → "dumbbell") before matching
   const qt = correctSpelling(token.toLowerCase());
   if (!qt) return false;
+
+  // 0. Check exercise aliases (e.g. "military" → "Overhead Press (Barbell)")
+  const aliasFor = EXERCISE_ALIASES[nameLower];
+  if (aliasFor) {
+    const aliasLower = aliasFor.toLowerCase();
+    if (aliasLower.includes(qt)) return true;
+    const aliasTokens = tokenize(aliasFor);
+    if (aliasTokens.some(et => et.includes(qt) || qt.includes(et))) return true;
+  }
 
   // 1. Exact substring match on full name (handles "curl" → "Bicep Curl (Dumbbell)")
   if (nameLower.includes(qt)) return true;
