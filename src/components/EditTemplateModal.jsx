@@ -242,9 +242,14 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
           <DragDropContext
             onBeforeCapture={(before) => {
               const container = scrollContainerRef.current;
-              container?.classList.add('drag-active');
-              const draggedEl = container?.querySelector(`[data-rfd-draggable-id="${before.draggableId}"]`);
-              draggedEl?.classList.add('drag-preserve');
+              if (!container) return;
+              const draggedEl = container.querySelector(`[data-rfd-draggable-id="${before.draggableId}"]`);
+              if (!draggedEl) return;
+              const screenYBefore = draggedEl.getBoundingClientRect().top;
+              container.classList.add('drag-active');
+              draggedEl.classList.add('drag-preserve');
+              const screenYAfter = draggedEl.getBoundingClientRect().top;
+              container.scrollTop += screenYAfter - screenYBefore;
             }}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
