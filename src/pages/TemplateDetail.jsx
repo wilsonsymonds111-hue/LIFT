@@ -25,7 +25,7 @@ function relativeTime(dateStr) {
 export default function TemplateDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [showEdit, setShowEdit] = useState(false);
+  const [showEdit, setShowEdit] = useState(true);
   const queryClient = useQueryClient();
 
   // Reuse React Query cache from Home page — data is already loaded, no refetch

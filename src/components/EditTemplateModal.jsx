@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, Trash2 } from 'lucide-react';
 import ExercisePicker from './ExercisePicker';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import ProgressGraph from './ProgressGraph';
+import { getExerciseDetailList, getCachedImageMap, saveCachedImageMap } from '../lib/exerciseCache';
+import { ensureExerciseDetail } from '../lib/ensureExerciseDetail';
 
 export default function EditTemplateModal({ template, onClose, onSave }) {
   const [name, setName] = useState(template.name);
@@ -20,6 +23,64 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
     }))
   );
   const [showPicker, setShowPicker] = useState(false);
+  const [exerciseImages, setExerciseImages] = useState({});
+
+  // Fetch exercise images — same pattern as WorkoutSheet
+  const buildImageMap = useCallback((results, exerciseList) => {
+    const detailByName = {};
+    (results || []).forEach(d => {
+      if (d.image_url) detailByName[d.name.toLowerCase()] = d.image_url;
+    });
+    const map = {};
+    const missing = [];
+    (exerciseList || []).forEach(ex => {
+      const key = ex.name.toLowerCase();
+      if (detailByName[key]) {
+        map[key] = detailByName[key];
+      } else {
+        const normalized = key.replace(/\s*\(.*?\)\s*/g, '').replace(/\bmachine\b/gi, ' ').replace(/\s+/g, ' ').replace(/es$/g, '').replace(/s$/g, '').trim();
+        const fuzzyKey = Object.keys(detailByName).find(k => {
+          const normK = k.replace(/\s*\(.*?\)\s*/g, '').replace(/\bmachine\b/gi, ' ').replace(/\s+/g, ' ').replace(/es$/g, '').replace(/s$/g, '').trim();
+          return normK === normalized || k.includes(normalized) || normalized.includes(normK);
+        });
+        if (fuzzyKey) {
+          map[key] = detailByName[fuzzyKey];
+        } else {
+          missing.push(ex.name);
+        }
+      }
+    });
+    return { map, missing };
+  }, []);
+
+  useEffect(() => {
+    const exerciseList = template?.exerciseList || [];
+    const cachedMap = getCachedImageMap();
+    if (cachedMap) {
+      const { map } = buildImageMap(
+        Object.entries(cachedMap).map(([name, url]) => ({ name, image_url: url })),
+        exerciseList
+      );
+      setExerciseImages(map);
+    }
+    getExerciseDetailList().then(async (results) => {
+      const { map, missing } = buildImageMap(results, exerciseList);
+      setExerciseImages(map);
+      const detailByName = {};
+      (results || []).forEach(d => {
+        if (d.image_url) detailByName[d.name.toLowerCase()] = d.image_url;
+      });
+      saveCachedImageMap(detailByName);
+      missing.forEach(async (name) => {
+        try {
+          const detail = await ensureExerciseDetail(name);
+          if (detail?.image_url) {
+            setExerciseImages(prev => ({ ...prev, [name.toLowerCase()]: detail.image_url }));
+          }
+        } catch {}
+      });
+    });
+  }, [template?.id, buildImageMap]);
 
   const handleAddExercises = (exercises) => {
     setExerciseList(prev => {
@@ -111,14 +172,39 @@ export default function EditTemplateModal({ template, onClose, onSave }) {
             <Draggable key={ex.name + exIdx} draggableId={ex.name + exIdx} index={exIdx}>
               {(p) => (
             <div ref={p.innerRef} {...p.draggableProps} className="mb-7">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-2 gap-2">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <h3 {...p.dragHandleProps} className="text-blue-500 font-semibold text-base truncate cursor-grab active:cursor-grabbing select-none">{ex.name}</h3>
                 </div>
+                {exerciseImages[ex.name.toLowerCase()] ? (
+                  <img
+                    src={exerciseImages[ex.name.toLowerCase()]}
+                    alt={ex.name}
+                    className="rounded-xl object-contain flex-shrink-0 w-24 h-16"
+                    decoding="async"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 w-24 h-16">
+                    <span className="text-sm font-bold text-gray-400">{ex.name[0]}</span>
+                  </div>
+                )}
                 <button onClick={() => removeExercise(exIdx)} className="p-1 rounded-lg hover:bg-red-50 transition flex-shrink-0">
                   <Trash2 className="w-4 h-4 text-red-400" />
                 </button>
               </div>
+
+              <ProgressGraph
+                history={ex.history || []}
+                animKey={0}
+                animDir="add"
+                isBodyweight={(ex.history || []).length > 0 && (ex.history || []).every(h => {
+                  const kg = typeof h === 'object' ? (h.kg ?? 0) : (h ?? 0);
+                  return kg === 0 || kg == null;
+                })}
+                compact
+                exerciseName={ex.name}
+              />
 
               {/* Set headers */}
               <div className="grid grid-cols-[32px_1fr_1fr_32px] gap-1 text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1">
