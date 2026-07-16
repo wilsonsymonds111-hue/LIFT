@@ -44,9 +44,7 @@ export const ALL_EXERCISES = [
   { name: 'Seated Hamstring Curl', muscle: 'Legs' },
   { name: 'Leg Extension (Machine)', muscle: 'Legs' },
   { name: 'Leg Press', muscle: 'Legs' },
-  { name: 'Leg Press Calf Raise', muscle: 'Legs' },
-  { name: 'Lunge (Barbell)', muscle: 'Legs' },
-  { name: 'Lunge (Dumbbell)', muscle: 'Legs' },
+
   { name: 'Machine Chest Fly', muscle: 'Chest' },
   { name: 'Meadows Row', muscle: 'Back' },
   { name: 'Mountain Climber', muscle: 'Core' },

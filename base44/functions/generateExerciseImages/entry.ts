@@ -12,7 +12,7 @@ const ALL_EXERCISES = [
   "Hip Thrust (Barbell)", "Incline Bench Press (Barbell)", "Incline Dumbbell Press", "Incline Curl",
   "Row Machine",   "Kettlebell Swing",
   "Lat Pulldown", "Lateral Raise (Machine)", "Leg Extension (Machine)",
-  "Leg Press", "Leg Press Calf Raise", "Lunge (Barbell)", "Lunge (Dumbbell)", "Meadows Row",
+  "Leg Press",   "Meadows Row",
   "Mountain Climber", "Nordic Curl", "Overhead Press (Barbell)", "Overhead Press (Dumbbell)", "Overhead Tricep Extension (Dumbbell)",
   "Pallof Press", "Pec Deck (Machine)", "Pendlay Row", "Plank", "Preacher Curl",
   "Pull Up", "Pullover (Machine)", "Push Up", "Rear Delt Fly", "Reverse Curl",
