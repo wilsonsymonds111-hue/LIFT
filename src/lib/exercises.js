@@ -12,7 +12,6 @@ export const ALL_EXERCISES = [
   { name: 'Bicep Cable Curl', muscle: 'Arms' },
   { name: 'Cable Chest Fly (Standing)', muscle: 'Chest' },
   { name: 'Side Cable Lateral Raise', muscle: 'Shoulders' },
-  { name: 'Cable Row', muscle: 'Back' },
 
   { name: 'Chest Dip', muscle: 'Chest' },
   { name: 'Chin Up', muscle: 'Back' },
