@@ -55,10 +55,12 @@ async function processWorkoutSave({ templateId, snapshot, exerciseList }) {
   // the template stays in sync with the Exercise entities after each workout.
   const exerciseListForSave = exerciseList.map(ex => {
     const entry = exerciseMap[ex.name.toLowerCase()];
-    // Merge history from ALL duplicates to avoid fragmentation
+    // Always use the Exercise entity as the source of truth for history.
+    // Falling back to ex.history (from the workout state) can propagate
+    // contaminated data between exercises. If no entity exists yet, start fresh.
     const mergedHistory = entry
       ? entry.all.flatMap(e => e.history || [])
-      : (ex.history || []);
+      : [];
     const sets = snapshot[ex.name];
     const newEntries = sets ? sets.map(s => ({ kg: s.kg, reps: s.reps, date: today })) : [];
     return {
