@@ -7,7 +7,7 @@ export const ALL_EXERCISES = [
   { name: 'Flat Dumbbell Press', muscle: 'Chest' },
   { name: 'Bicep Curl (Barbell)', muscle: 'Arms' },
   { name: 'Bicep Curl Dumbbell Supinated', muscle: 'Arms' },
-  { name: 'Dumbbell Bulgarian Split Squat', muscle: 'Legs' },
+  { name: 'Bulgarian Split Squat (Dumbbell)', muscle: 'Legs' },
   { name: 'Cable Crunch', muscle: 'Core' },
   { name: 'Bicep Cable Curl', muscle: 'Arms' },
   { name: 'Cable Chest Fly (Standing)', muscle: 'Chest' },
