@@ -26,7 +26,6 @@ export const ALL_EXERCISES = [
   { name: 'Front Squat (Barbell)', muscle: 'Legs' },
   { name: 'Glute Cable Kickback', muscle: 'Legs' },
   { name: 'Goblet Squat', muscle: 'Legs' },
-  { name: 'Good Morning', muscle: 'Back' },
   { name: 'Hack Squat', muscle: 'Legs' },
   { name: 'Hammer Curl', muscle: 'Arms' },
   { name: 'Hang Clean', muscle: 'Full Body' },
