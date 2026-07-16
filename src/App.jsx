@@ -182,7 +182,7 @@ const TabPanel = memo(function TabPanel({ width, visited, Component, scrollToTop
     <div
       ref={scrollRef}
       className="flex-shrink-0 overflow-y-auto"
-      style={{ width, contain: isActive ? 'layout style paint' : undefined }}
+      style={{ width, contain: 'layout style paint' }}
     >
       {visited ? <MemoTab Component={Component} /> : <div className="w-full h-full bg-background" />}
     </div>
