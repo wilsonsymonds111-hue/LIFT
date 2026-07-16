@@ -34,12 +34,11 @@ export const ALL_EXERCISES = [
   { name: 'Incline Smith Chest Press', muscle: 'Chest' },
   { name: 'Incline Curl', muscle: 'Arms' },
   { name: 'Row Machine', muscle: 'Back' },
-  { name: 'JM Press', muscle: 'Arms' },
-  { name: 'Jump Squat', muscle: 'Legs' },
+
   { name: 'Kettlebell Swing', muscle: 'Full Body' },
   { name: 'L-Sit', muscle: 'Core' },
   { name: 'Lat Pulldown', muscle: 'Back' },
-  { name: 'Lateral Raise (Dumbbell)', muscle: 'Shoulders' },
+
   { name: 'Lateral Raise (Machine)', muscle: 'Shoulders' },
   { name: 'Lying Hamstring Curl', muscle: 'Legs' },
   { name: 'Seated Hamstring Curl', muscle: 'Legs' },
