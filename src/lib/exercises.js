@@ -82,7 +82,7 @@ export const ALL_EXERCISES = [
   { name: 'Turkish Get-Up', muscle: 'Full Body' },
   { name: 'Upright Row', muscle: 'Shoulders' },
   { name: 'V-Up', muscle: 'Core' },
-  { name: 'Wide Grip Pull Up', muscle: 'Back' },
+
   { name: 'Wrist Curl', muscle: 'Arms' },
   { name: 'Zottman Curl', muscle: 'Arms' },
 ];
