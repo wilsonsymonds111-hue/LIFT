@@ -139,7 +139,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
           </div>
 
           <div ref={cardRef}
-            className={`mx-4 mb-4 bg-white rounded-2xl border-2 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`}
+            className={`mx-4 mb-4 bg-white rounded-2xl border-2 overflow-hidden relative flex-shrink-0 ${shimmer ? 'gold-shimmer' : ''}`}
             style={{ borderColor: '#FFD700', boxShadow: '0 0 20px rgba(255,215,0,0.3)' }}>
 
             <div className="px-4 pt-4 pb-2 flex-shrink-0" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' }}>
