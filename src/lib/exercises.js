@@ -91,6 +91,8 @@ export const ALL_EXERCISES = [
 export const EXERCISE_ALIASES = {
   'military press': 'Overhead Press (Barbell)',
   'rdl': 'Romanian Deadlift (Dumbbell)',
+  't bar row': 'T-Bar Row',
+  'tbar row': 'T-Bar Row',
 };
 
 export const MUSCLES = ['All', 'Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders'];
