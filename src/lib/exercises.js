@@ -60,7 +60,6 @@ export const ALL_EXERCISES = [
   { name: 'Rear Delt Fly Machine', muscle: 'Shoulders' },
   { name: 'Romanian Deadlift (Barbell)', muscle: 'Legs' },
   { name: 'Romanian Deadlift (Dumbbell)', muscle: 'Legs' },
-  { name: 'Seated Cable Fly', muscle: 'Chest' },
   { name: 'Seated Cable Row', muscle: 'Back' },
   { name: 'Shrug (Barbell)', muscle: 'Shoulders' },
   { name: 'Shrug (Dumbbell)', muscle: 'Shoulders' },
