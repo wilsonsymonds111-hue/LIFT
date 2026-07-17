@@ -20,7 +20,7 @@ const ALL_EXERCISES = [
   "Seated Cable Row", "Shrug (Dumbbell)",
   "Skull Crushers (Ezy Bar)",
   "Smith Machine Squat", "Spider Curl", "Squat (Barbell)", "Standing Calf Raise (Machine)",
-  "Sumo Deadlift", "Svend Press",
+  "Sumo Deadlift", 
   "T-Bar Row", "Thruster", "Trap Bar Deadlift", "Tricep Pushdown (Cable)",
   "Tricep Single Arm Extension", "Turkish Get-Up", "Upright Row", "V-Up", "Wide Grip Pull Up",
   "Wrist Curl", "Zottman Curl"
