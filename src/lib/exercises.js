@@ -83,7 +83,6 @@ export const ALL_EXERCISES = [
   { name: 'Upright Row', muscle: 'Shoulders' },
   { name: 'V-Up', muscle: 'Core' },
 
-  { name: 'Forearm Curl', muscle: 'Arms' },
   { name: 'Zottman Curl', muscle: 'Arms' },
 ];
 
