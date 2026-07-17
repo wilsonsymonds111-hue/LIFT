@@ -8,6 +8,7 @@ export const ALL_EXERCISES = [
   { name: 'Bicep Curl Dumbbell Supinated', muscle: 'Arms' },
   { name: 'Bulgarian Split Squat (Dumbbell)', muscle: 'Legs' },
   { name: 'Cable Crunch', muscle: 'Core' },
+  { name: 'Cable Lat Pullover', muscle: 'Back' },
   { name: 'Bicep Cable Curl', muscle: 'Arms' },
   { name: 'Cable Chest Fly (Standing)', muscle: 'Chest' },
   { name: 'Side Cable Lateral Raise', muscle: 'Shoulders' },
