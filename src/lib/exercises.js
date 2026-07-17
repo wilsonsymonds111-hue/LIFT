@@ -98,6 +98,7 @@ export const ALL_EXERCISES = [
 // Alternate names users might search by → canonical exercise name (lowercase).
 export const EXERCISE_ALIASES = {
   'military press': 'Overhead Press (Barbell)',
+  'rdl': 'Romanian Deadlift (Dumbbell)',
 };
 
 export const MUSCLES = ['All', 'Arms', 'Back', 'Chest', 'Core', 'Full Body', 'Legs', 'Shoulders'];
