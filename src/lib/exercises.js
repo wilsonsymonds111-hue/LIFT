@@ -70,7 +70,7 @@ export const ALL_EXERCISES = [
 
   { name: 'Standing Calf Raise (Machine)', muscle: 'Legs' },
   { name: 'Standing Chest Press', muscle: 'Chest' },
-  { name: 'Standing Press', muscle: 'Shoulders' },
+
   { name: 'Step Up', muscle: 'Legs' },
   { name: 'Straight Arm Pulldown', muscle: 'Back' },
   { name: 'Sumo Deadlift', muscle: 'Legs' },
