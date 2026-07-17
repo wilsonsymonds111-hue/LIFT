@@ -116,7 +116,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
       <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-auto">
         <div className="absolute inset-0 bg-black/60" />
 
-        <div className="relative bg-gray-50 rounded-3xl w-[92%] max-w-sm max-h-[88vh] flex flex-col shadow-2xl overflow-hidden"
+        <div className="relative bg-gray-50 rounded-3xl w-[92%] max-w-sm max-h-[88vh] flex flex-col shadow-2xl overflow-y-auto"
           style={{ animation: 'none' }}>
 
           <div className="flex items-center justify-between px-4 pt-4 pb-1 flex-shrink-0">
@@ -139,7 +139,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
           </div>
 
           <div ref={cardRef}
-            className={`mx-4 mb-4 bg-white rounded-2xl border-2 overflow-hidden relative flex-1 min-h-0 flex flex-col ${shimmer ? 'gold-shimmer' : ''}`}
+            className={`mx-4 mb-4 bg-white rounded-2xl border-2 overflow-hidden relative ${shimmer ? 'gold-shimmer' : ''}`}
             style={{ borderColor: '#FFD700', boxShadow: '0 0 20px rgba(255,215,0,0.3)' }}>
 
             <div className="px-4 pt-4 pb-2 flex-shrink-0" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' }}>
@@ -164,7 +164,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
 
             <div className="border-t border-yellow-200" />
 
-            <div ref={listRef} className="px-4 pt-3 pb-4 space-y-2 overflow-y-auto flex-1 min-h-0 overscroll-contain">
+            <div ref={listRef} className="px-4 pt-3 pb-4 space-y-2">
               {exercises.map((ex, i) => {
                 const best = bestSets[ex.name];
                 const isPR = prSet.has(ex.name);
