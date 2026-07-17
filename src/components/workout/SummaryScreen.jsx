@@ -142,7 +142,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
             className={`mx-4 mb-4 bg-white rounded-2xl border-2 overflow-hidden relative flex-1 min-h-0 flex flex-col ${shimmer ? 'gold-shimmer' : ''}`}
             style={{ borderColor: '#FFD700', boxShadow: '0 0 20px rgba(255,215,0,0.3)' }}>
 
-            <div className="px-4 pt-4 pb-2" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' }}>
+            <div className="px-4 pt-4 pb-2 flex-shrink-0" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' }}>
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="font-extrabold text-gray-900 text-lg tracking-wide">{template.name}</h2>
@@ -164,7 +164,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
 
             <div className="border-t border-yellow-200" />
 
-            <div ref={listRef} className="px-4 py-3 space-y-2 overflow-y-auto flex-1 min-h-0">
+            <div ref={listRef} className="px-4 pt-3 pb-4 space-y-2 overflow-y-auto flex-1 min-h-0 overscroll-contain">
               {exercises.map((ex, i) => {
                 const best = bestSets[ex.name];
                 const isPR = prSet.has(ex.name);
