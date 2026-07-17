@@ -16,7 +16,7 @@ const ALL_EXERCISES = [
   "Overhead Press (Barbell)", "Overhead Press (Dumbbell)", "Overhead Tricep Extension (Dumbbell)",
   "Preacher Curl (Machine)",
   "Pull Up", "Push Up", "Rear Delt Fly Machine",
-  "Romanian Deadlift (Barbell)", "Romanian Deadlift (Dumbbell)", "Rope Pushdown", "Russian Twist",
+  "Romanian Deadlift (Barbell)", "Romanian Deadlift (Dumbbell)",
   "Seal Row", "Seated Cable Row", "Shrug (Barbell)", "Shrug (Dumbbell)",
   "Single Arm Dumbbell Row", "Single Arm Overhead Cable Extension",   "Sissy Squat", "Skull Crushers (Ezy Bar)", "Sled Push",
   "Smith Machine Squat", "Spider Curl", "Squat (Barbell)", "Squat (Dumbbell)", "Standing Calf Raise (Machine)",
