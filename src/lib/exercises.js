@@ -79,7 +79,7 @@ export const ALL_EXERCISES = [
   { name: 'Trap Bar Deadlift', muscle: 'Legs' },
   { name: 'Tricep Pushdown (Cable)', muscle: 'Arms' },
   { name: 'Tricep Single Arm Extension', muscle: 'Arms' },
-  { name: 'Turkish Get-Up', muscle: 'Full Body' },
+
   { name: 'Upright Row', muscle: 'Shoulders' },
   { name: 'V-Up', muscle: 'Core' },
   { name: 'Wide Grip Pull Up', muscle: 'Back' },
