@@ -23,7 +23,7 @@ const ALL_EXERCISES = [
   "Sumo Deadlift", 
   "T-Bar Row", "Trap Bar Deadlift", "Tricep Pushdown (Cable)",
   "Tricep Single Arm Extension", "Turkish Get-Up", "Upright Row", "V-Up",
-  "Wrist Curl", "Zottman Curl"
+  "Forearm Curl", "Zottman Curl"
 ];
 
 const IMAGE_PROMPT = (name, muscles) => `Two side-by-side anatomical figures showing the "${name}" exercise: the left figure shows the starting position, the right figure shows the finishing position. Both figures are identical in size, proportions, camera angle, body composition, and anatomical detail. Clean white background. Grayscale anatomical style with visible musculature, no skin texture, like a fitness anatomy reference diagram. ONLY the following muscles must be highlighted in red: ${muscles}. No other muscles should be red. No text, labels, arrows, numbers, logos, watermarks, or annotations. Exercise equipment accurately represented for each phase. Professional museum-quality medical illustration style.`;
