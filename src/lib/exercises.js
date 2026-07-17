@@ -67,7 +67,7 @@ export const ALL_EXERCISES = [
   { name: 'Smith Machine Squat', muscle: 'Legs' },
   { name: 'Spider Curl', muscle: 'Arms' },
   { name: 'Squat (Barbell)', muscle: 'Legs' },
-  { name: 'Squat (Dumbbell)', muscle: 'Legs' },
+
   { name: 'Standing Calf Raise (Machine)', muscle: 'Legs' },
   { name: 'Standing Chest Press', muscle: 'Chest' },
   { name: 'Standing Press', muscle: 'Shoulders' },

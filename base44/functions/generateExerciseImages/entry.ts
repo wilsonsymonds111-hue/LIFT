@@ -19,7 +19,7 @@ const ALL_EXERCISES = [
   "Romanian Deadlift (Barbell)", "Romanian Deadlift (Dumbbell)",
   "Seated Cable Row", "Shrug (Dumbbell)",
   "Skull Crushers (Ezy Bar)",
-  "Smith Machine Squat", "Spider Curl", "Squat (Barbell)", "Squat (Dumbbell)", "Standing Calf Raise (Machine)",
+  "Smith Machine Squat", "Spider Curl", "Squat (Barbell)", "Standing Calf Raise (Machine)",
   "Standing Press", "Step Up", "Straight Arm Pulldown", "Sumo Deadlift", "Svend Press",
   "T-Bar Row", "Thruster", "Trap Bar Deadlift", "Tricep Pushdown (Cable)",
   "Tricep Single Arm Extension", "Turkish Get-Up", "Upright Row", "V-Up", "Wide Grip Pull Up",
