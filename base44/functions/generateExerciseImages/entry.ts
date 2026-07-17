@@ -18,7 +18,7 @@ const ALL_EXERCISES = [
   "Pull Up", "Push Up", "Rear Delt Fly Machine",
   "Romanian Deadlift (Barbell)", "Romanian Deadlift (Dumbbell)",
   "Seated Cable Row", "Shrug (Dumbbell)",
-  "Sissy Squat", "Skull Crushers (Ezy Bar)", "Sled Push",
+  "Skull Crushers (Ezy Bar)",
   "Smith Machine Squat", "Spider Curl", "Squat (Barbell)", "Squat (Dumbbell)", "Standing Calf Raise (Machine)",
   "Standing Press", "Step Up", "Straight Arm Pulldown", "Sumo Deadlift", "Svend Press",
   "T-Bar Row", "Thruster", "Trap Bar Deadlift", "Tricep Pushdown (Cable)",

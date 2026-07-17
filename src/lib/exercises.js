@@ -63,9 +63,7 @@ export const ALL_EXERCISES = [
   { name: 'Seated Cable Row', muscle: 'Back' },
   { name: 'Shrug (Dumbbell)', muscle: 'Shoulders' },
 
-  { name: 'Sissy Squat', muscle: 'Legs' },
   { name: 'Skull Crushers (Ezy Bar)', muscle: 'Arms' },
-  { name: 'Sled Push', muscle: 'Full Body' },
   { name: 'Smith Machine Squat', muscle: 'Legs' },
   { name: 'Spider Curl', muscle: 'Arms' },
   { name: 'Squat (Barbell)', muscle: 'Legs' },
