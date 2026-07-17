@@ -75,7 +75,7 @@ export const ALL_EXERCISES = [
 
   { name: 'Sumo Deadlift', muscle: 'Legs' },
   { name: 'T-Bar Row', muscle: 'Back' },
-  { name: 'Thruster', muscle: 'Full Body' },
+
   { name: 'Trap Bar Deadlift', muscle: 'Legs' },
   { name: 'Tricep Pushdown (Cable)', muscle: 'Arms' },
   { name: 'Tricep Single Arm Extension', muscle: 'Arms' },
