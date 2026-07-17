@@ -22,7 +22,7 @@ const ALL_EXERCISES = [
   "Smith Machine Squat", "Spider Curl", "Squat (Barbell)", "Standing Calf Raise (Machine)",
   "Sumo Deadlift", 
   "T-Bar Row", "Trap Bar Deadlift", "Tricep Pushdown (Cable)",
-  "Tricep Single Arm Extension", "Turkish Get-Up", "Upright Row", "V-Up",
+  "Tricep Single Arm Extension", "Upright Row", "V-Up",
   "Zottman Curl"
 ];
 
