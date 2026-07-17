@@ -62,7 +62,6 @@ export const ALL_EXERCISES = [
   { name: 'Romanian Deadlift (Dumbbell)', muscle: 'Legs' },
   { name: 'Seated Cable Row', muscle: 'Back' },
   { name: 'Shrug (Dumbbell)', muscle: 'Shoulders' },
-  { name: 'Single Arm Dumbbell Row', muscle: 'Back' },
   { name: 'Single Arm Overhead Cable Extension', muscle: 'Arms' },
   { name: 'Sissy Squat', muscle: 'Legs' },
   { name: 'Skull Crushers (Ezy Bar)', muscle: 'Arms' },
