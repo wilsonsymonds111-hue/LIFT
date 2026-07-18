@@ -87,8 +87,6 @@ const toReps = (v) => typeof v === 'object' ? (v.reps || 0) : (v || 0);
 export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessionResults, bodyweight, mode = 'transparent' }) {
   const isCard = mode === 'card';
   const isBodyweight = !weight || weight === 0;
-  const showMetrics = bodyweight && !isBodyweight && weight > 0;
-  const ratio = showMetrics ? weight / bodyweight : null;
   const sets = (sessionResults && sessionResults.length > 0)
     ? sessionResults
     : (weight || reps ? [{ kg: weight, reps }] : []);
@@ -145,7 +143,6 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   contentH += 12; // gap before weight
   contentH += 66; // weight + reps inline
   if (delta) contentH += 8 + 18; // gap + delta
-  if (showMetrics) contentH += 8 + 40; // gap + metrics row
   contentH += 14 + 1 + 14; // gap + divider + gap
   if (chartData) contentH += 20 + chartData.chartH + 24; // chart header + chart + axis labels
   contentH += 24 + 58; // bottom logo gap + logo
@@ -242,35 +239,6 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.fillText(deltaText, cx + dArrowSize + 7, y + 3);
     ctx.letterSpacing = '0px';
     y += 18;
-  }
-
-  // --- Bodyweight metrics row ---
-  if (showMetrics) {
-    y += 8;
-    const colW = drawW / 2;
-    const leftCx = cx + colW / 2;
-    const rightCx = cx + colW / 2 + colW;
-    ctx.textAlign = 'center';
-    ctx.font = `700 18px ${FONT}`;
-    ctx.fillStyle = WHITE;
-    ctx.fillText(`${Math.round(bodyweight)}KG`, leftCx, y);
-    ctx.font = `400 11px ${FONT}`;
-    ctx.fillStyle = LABEL;
-    ctx.fillText('BODYWEIGHT', leftCx, y + 20);
-    ctx.strokeStyle = DIVIDER;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cx + colW, y - 4);
-    ctx.lineTo(cx + colW, y + 26);
-    ctx.stroke();
-    ctx.font = `700 18px ${FONT}`;
-    ctx.fillStyle = WHITE;
-    ctx.fillText(`${ratio.toFixed(2)}x`, rightCx, y);
-    ctx.font = `400 11px ${FONT}`;
-    ctx.fillStyle = LABEL;
-    ctx.fillText('BODYWEIGHT', rightCx, y + 20);
-    ctx.textAlign = 'left';
-    y += 40;
   }
 
   // --- Divider ---
