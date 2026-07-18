@@ -106,7 +106,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
           </div>
 
           {/* Arrow showing before → after */}
-          <ArrowRight className="w-5 h-5 text-neutral-400 flex-shrink-0" />
+          <ArrowRight className="w-5 h-5 text-blue-500 flex-shrink-0" />
 
           {/* Example: the real overlay composited onto a gym story background */}
           <div className="flex flex-col items-center gap-1.5">
