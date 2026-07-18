@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { X, Copy, Check, ArrowRight } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
 
-const GYM_PHOTO = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80';
+const GYM_PHOTO = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/20118f077_image.png';
 
 export default function SharePreviewModal({ shareData, onClose }) {
   const [copied, setCopied] = useState(false);
