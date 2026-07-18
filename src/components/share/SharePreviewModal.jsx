@@ -80,20 +80,13 @@ export default function SharePreviewModal({ shareData, onClose }) {
           </button>
           <h2 className="text-white font-bold text-base px-6 text-center leading-tight flex items-center justify-center gap-1.5">
             <span>Share your PR on your Instagram Story!</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="flex-shrink-0">
-              <defs>
-                <linearGradient id="ig-title-grad" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#feda75"/>
-                  <stop offset="25%" stopColor="#fa7e1e"/>
-                  <stop offset="50%" stopColor="#d62976"/>
-                  <stop offset="75%" stopColor="#962fbf"/>
-                  <stop offset="100%" stopColor="#4f5bd5"/>
-                </linearGradient>
-              </defs>
-              <rect x="2" y="2" width="20" height="20" rx="5.5" stroke="url(#ig-title-grad)" strokeWidth="2" fill="none"/>
-              <circle cx="12" cy="12" r="4.5" stroke="url(#ig-title-grad)" strokeWidth="2" fill="none"/>
-              <circle cx="17.5" cy="6.5" r="1.2" fill="url(#ig-title-grad)"/>
-            </svg>
+            <img
+              src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/019005143_image.png"
+              width="18"
+              height="18"
+              className="flex-shrink-0 rounded-[4px]"
+              alt="Instagram"
+            />
           </h2>
           <div className="w-9" />
         </div>
