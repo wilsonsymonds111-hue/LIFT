@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { X, Copy, Check, ArrowRight } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
 
-const GYM_PHOTO = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/20118f077_image.png';
+const GYM_PHOTO = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9d6c4d095_image.png';
 
 export default function SharePreviewModal({ shareData, onClose }) {
   const [copied, setCopied] = useState(false);
@@ -111,11 +111,6 @@ export default function SharePreviewModal({ shareData, onClose }) {
                 className="absolute inset-0 w-full h-full object-cover"
                 alt="Example overlay on a gym story"
               />
-              <img
-                src={transparentUrl}
-                className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-                alt=""
-              />
             </button>
             <span className="text-[10px] text-neutral-500 font-medium">On a story</span>
           </div>
@@ -137,14 +132,13 @@ export default function SharePreviewModal({ shareData, onClose }) {
               <X className="w-5 h-5 text-white" />
             </button>
             {zoomed === 'example' ? (
-              <div
-                className="relative select-none"
-                style={{ height: '90vh', aspectRatio: '9 / 16' }}
+              <img
+                src={GYM_PHOTO}
+                className="select-none"
+                style={{ maxWidth: '95vw', maxHeight: '90vh' }}
+                alt="Example on a gym story"
                 onClick={(e) => e.stopPropagation()}
-              >
-                <img src={GYM_PHOTO} className="absolute inset-0 w-full h-full object-cover" alt="Gym story" />
-                <img src={transparentUrl} className="absolute inset-0 w-full h-full object-cover" alt="PR overlay" />
-              </div>
+              />
             ) : (
               <img
                 src={transparentUrl}
