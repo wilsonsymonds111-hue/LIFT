@@ -201,11 +201,12 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   y += 12;
   const numText = isBodyweight ? `${reps}` : `${Math.round(weight)}`;
   const unitText = isBodyweight ? '' : 'KG';
-  ctx.font = `700 64px ${FONT}`;
-  ctx.letterSpacing = '-1px';
+  const numFontSize = 58;
+  ctx.font = `700 ${numFontSize}px ${FONT}`;
+  ctx.letterSpacing = '1px';
   ctx.fillStyle = WHITE;
   ctx.textBaseline = 'alphabetic';
-  const numBaseline = y + 64 * 0.82;
+  const numBaseline = y + numFontSize * 0.82;
   ctx.fillText(numText, cx, numBaseline);
   const numW = ctx.measureText(numText).width;
   ctx.letterSpacing = '0px';
