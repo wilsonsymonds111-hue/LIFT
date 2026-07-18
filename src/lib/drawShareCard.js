@@ -1,4 +1,4 @@
-const BLUE = '#5B9AFE';
+const ORANGE = '#FC4C02';
 const YELLOW = '#F7E967';
 const WHITE = '#FFFFFF';
 const MUTED = 'rgba(255,255,255,0.7)';
@@ -130,8 +130,8 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   contentH += 32; // exercise name
   if (isPR) contentH += 10 + 24; // gap + badge
   contentH += 12; // gap before weight
-  contentH += 52; // weight (44px)
-  contentH += 38; // reps (28px, below weight)
+  contentH += 48; // weight (40px)
+  contentH += 48; // reps (40px, same size as weight)
   if (delta) contentH += 8 + 20; // gap + delta
   contentH += 10 + 1 + 14; // gap + divider + gap
   if (chartData) contentH += 18 + 6 + chartData.chartH + 24; // label + gap + chart + axis labels
@@ -210,19 +210,19 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   // --- Weight + Reps (consistent sizing) ---
   y += 12;
   const statText = isBodyweight ? `${reps}` : `${Math.round(weight)}KG`;
-  ctx.font = `800 44px ${FONT}`;
+  ctx.font = `800 40px ${FONT}`;
   ctx.fillStyle = WHITE;
   ctx.fillText(statText, cx, y);
-  y += 52;
+  y += 48;
 
-  ctx.font = `800 28px ${FONT}`;
+  ctx.font = `800 40px ${FONT}`;
   ctx.fillStyle = WHITE;
   if (!isBodyweight && reps) {
     ctx.fillText(`× ${reps} REPS`, cx, y);
   } else if (isBodyweight) {
     ctx.fillText('REPS', cx, y);
   }
-  y += 38;
+  y += 48;
 
   // --- Delta from last PR ---
   if (delta) {
@@ -300,13 +300,13 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       ctx.lineTo(cx + coords[0].x, y + chartH);
       ctx.closePath();
       const areaGrad = ctx.createLinearGradient(0, y, 0, y + chartH);
-      areaGrad.addColorStop(0, 'rgba(91,154,254,0.3)');
-      areaGrad.addColorStop(1, 'rgba(91,154,254,0)');
+      areaGrad.addColorStop(0, 'rgba(252,76,2,0.3)');
+      areaGrad.addColorStop(1, 'rgba(252,76,2,0)');
       ctx.fillStyle = areaGrad;
       ctx.fill();
 
       // Line
-      ctx.strokeStyle = BLUE;
+      ctx.strokeStyle = ORANGE;
       ctx.lineWidth = 2.5;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
@@ -318,7 +318,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       ctx.stroke();
     } else {
       // Single point — dashed reference line
-      ctx.strokeStyle = 'rgba(91,154,254,0.4)';
+      ctx.strokeStyle = 'rgba(252,76,2,0.4)';
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
       ctx.beginPath();
@@ -332,7 +332,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     coords.forEach((c, i) => {
       const isLast = i === coords.length - 1;
       if (isLast) {
-        ctx.fillStyle = BLUE;
+        ctx.fillStyle = ORANGE;
         ctx.beginPath();
         ctx.arc(cx + c.x, y + c.y, 5, 0, Math.PI * 2);
         ctx.fill();
@@ -342,7 +342,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
         ctx.fill();
       } else {
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.strokeStyle = BLUE;
+        ctx.strokeStyle = ORANGE;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(cx + c.x, y + c.y, 3.5, 0, Math.PI * 2);
