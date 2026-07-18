@@ -221,14 +221,16 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   ctx.font = `700 64px ${FONT}`;
   ctx.letterSpacing = '-1px';
   ctx.fillStyle = WHITE;
-  ctx.fillText(numText, cx, y);
+  ctx.textBaseline = 'alphabetic';
+  const numBaseline = y + 64 * 0.82;
+  ctx.fillText(numText, cx, numBaseline);
   const numW = ctx.measureText(numText).width;
   ctx.letterSpacing = '0px';
   let weightW = numW;
   if (unitText) {
     ctx.font = `700 34px ${FONT}`;
     ctx.fillStyle = WHITE;
-    ctx.fillText(unitText, cx + numW + 6, y + 15);
+    ctx.fillText(unitText, cx + numW + 6, numBaseline);
     weightW = numW + 6 + ctx.measureText(unitText).width;
   }
 
@@ -236,8 +238,9 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   ctx.letterSpacing = '1px';
   ctx.fillStyle = 'rgba(255,255,255,0.9)';
   const repsLabel = isBodyweight ? 'REPS' : `X ${reps} REPS`;
-  ctx.fillText(repsLabel, cx + weightW + 14, y + 34);
+  ctx.fillText(repsLabel, cx + weightW + 14, numBaseline);
   ctx.letterSpacing = '0px';
+  ctx.textBaseline = 'top';
   y += 66;
 
   // --- Delta from last PR ---
