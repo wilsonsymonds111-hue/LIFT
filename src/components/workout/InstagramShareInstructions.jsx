@@ -48,7 +48,7 @@ export default function InstagramShareInstructions({ imageUrl, onClose }) {
         <div className="px-4 pb-2 space-y-3 flex-shrink-0">
           {[
             'Tap "Copy Sticker" below to copy the transparent image',
-            'Open Instagram and add a background photo to your story',
+            'Open Instagram, add a background photo to your story, then tap the text icon at the top',
             'Paste the sticker on top, position it, and post!',
           ].map((text, i) => (
             <div key={i} className="flex gap-3 items-start">
