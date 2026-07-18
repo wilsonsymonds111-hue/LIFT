@@ -5,6 +5,7 @@ import { X, Copy, Check, ArrowRight } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
 
 const GYM_PHOTO = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/acb45489c_image.png';
+const JAKE_AVATAR = 'https://i.pravatar.cc/150?img=12';
 
 export default function SharePreviewModal({ shareData, onClose }) {
   const [copied, setCopied] = useState(false);
@@ -133,7 +134,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
               </div>
               {/* Profile + username (compact) */}
               <div className="absolute top-[14px] left-[6px] flex items-center gap-[4px]">
-                <div className="w-[12px] h-[12px] rounded-full bg-white/60 ring-[1px] ring-white/90 flex-shrink-0" />
+                <img src={JAKE_AVATAR} className="w-[12px] h-[12px] rounded-full object-cover ring-[1px] ring-white/90 flex-shrink-0" alt="" />
                 <span className="text-white text-[6px] font-semibold leading-none drop-shadow-sm">jake.deleon</span>
                 <span className="text-white/60 text-[6px] leading-none drop-shadow-sm">2h</span>
               </div>
@@ -185,7 +186,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
               </div>
               {/* Profile + username */}
               <div className="absolute top-[22px] left-3 flex items-center gap-[6px]">
-                <div className="w-[22px] h-[22px] rounded-full bg-white/60 ring-[1.5px] ring-white/90 flex-shrink-0" />
+                <img src={JAKE_AVATAR} className="w-[22px] h-[22px] rounded-full object-cover ring-[1.5px] ring-white/90 flex-shrink-0" alt="" />
                 <span className="text-white text-[11px] font-semibold leading-none drop-shadow-sm">jake.deleon</span>
                 <span className="text-white/60 text-[11px] leading-none drop-shadow-sm">2h</span>
               </div>
