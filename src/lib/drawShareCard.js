@@ -141,7 +141,6 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   // --- Calculate content height for dynamic card sizing ---
   const cardPad = 28;
   let contentH = cardPad; // top padding
-  contentH += 30 + 16; // logo square + gap
   contentH += 26; // title
   contentH += 12; // gap before weight
   contentH += 66; // weight + reps inline
@@ -149,6 +148,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   if (showMetrics) contentH += 8 + 40; // gap + metrics row
   contentH += 14 + 1 + 14; // gap + divider + gap
   if (chartData) contentH += 20 + chartData.chartH + 24; // chart header + chart + axis labels
+  contentH += 24 + 42; // bottom logo gap + logo
   contentH += cardPad; // bottom padding
 
   const cardW = 484;
@@ -182,23 +182,6 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
 
   const cx = cardX + cardPad;
   let y = cardY + cardPad;
-
-  // --- Header: LIFT. logo in black rounded square ---
-  const logoSize = 42;
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = '#000000';
-  roundRect(ctx, cx, y, logoSize, logoSize, 11);
-  ctx.fill();
-  ctx.fillStyle = WHITE;
-  ctx.font = `700 12px ${FONT}`;
-  ctx.letterSpacing = '0.5px';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('LIFT.', cx + logoSize / 2, y + logoSize / 2 + 1);
-  ctx.letterSpacing = '0px';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
-  y += logoSize + 16;
 
   // --- Title: exercise name + PR suffix ---
   ctx.font = `400 18px ${FONT}`;
@@ -398,6 +381,24 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.letterSpacing = '0px';
     ctx.textAlign = 'left';
   }
+
+  // --- Bottom center: LIFT. logo ---
+  const logoSize = 42;
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#000000';
+  const logoX = cx + drawW / 2 - logoSize / 2;
+  const logoY = y + 24;
+  roundRect(ctx, logoX, logoY, logoSize, logoSize, 11);
+  ctx.fill();
+  ctx.fillStyle = WHITE;
+  ctx.font = `700 12px ${FONT}`;
+  ctx.letterSpacing = '0.5px';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('LIFT.', logoX + logoSize / 2, logoY + logoSize / 2 + 1);
+  ctx.letterSpacing = '0px';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
 
   return canvas;
 }
