@@ -49,6 +49,19 @@ function drawSpacedText(ctx, text, x, y, spacing) {
   return cx;
 }
 
+function drawSpacedTextCentered(ctx, text, centerX, y, spacing) {
+  ctx.textAlign = 'left';
+  let totalW = 0;
+  for (const ch of text) totalW += ctx.measureText(ch).width + spacing;
+  totalW -= spacing;
+  let cx = centerX - totalW / 2;
+  for (const ch of text) {
+    ctx.fillText(ch, cx, y);
+    cx += ctx.measureText(ch).width + spacing;
+  }
+  return cx;
+}
+
 function drawUpArrow(ctx, cx, topY, size, color) {
   ctx.fillStyle = color;
   const headH = size * 0.55;
@@ -126,7 +139,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   // --- Calculate content height for dynamic card sizing ---
   const cardPad = 28;
   let contentH = cardPad; // top padding
-  contentH += 24 + 16; // header row + gap
+  contentH += 36 + 16; // app icon + gap
   contentH += 32; // exercise name
   contentH += 10 + 26; // gap + badge (always shown)
   contentH += 12; // gap before weight
@@ -174,11 +187,21 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   const cx = cardX + cardPad;
   let y = cardY + cardPad;
 
-  // --- Header: LIFT. branding only (no date) ---
-  ctx.font = `800 18px ${FONT}`;
+  // --- Header: LIFT. branding inside black rounded-square app icon ---
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = DARK_BG;
+  const iconSize = 36;
+  roundRect(ctx, cx, y, iconSize, iconSize, 9);
+  ctx.fill();
+  ctx.shadowBlur = 4;
+  ctx.font = `800 16px ${FONT}`;
   ctx.fillStyle = WHITE;
-  drawSpacedText(ctx, 'LIFT.', cx, y, 1.5);
-  y += 24 + 16;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  drawSpacedTextCentered(ctx, 'LIFT.', cx + iconSize / 2, y + iconSize / 2 - 1, 0.5);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  y += iconSize + 16;
 
   // --- Exercise name ---
   ctx.font = `800 24px ${FONT}`;
