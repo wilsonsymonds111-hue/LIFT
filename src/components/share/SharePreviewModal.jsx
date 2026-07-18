@@ -100,7 +100,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
               className="relative rounded-xl overflow-hidden shadow-xl active:scale-[0.98] transition"
               style={{ height: '38vh', aspectRatio: '9 / 16', ...checkerStyle }}
             >
-              <img src={transparentUrl} className="absolute inset-0 w-full h-full object-cover" alt="PR overlay" />
+              <img src={transparentUrl} className="absolute inset-0 w-full h-full object-contain scale-90" alt="PR overlay" />
             </button>
             <span className="text-[10px] text-neutral-600 font-medium">Your overlay</span>
           </div>
@@ -122,7 +122,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
               />
               <img
                 src={transparentUrl}
-                className="absolute inset-0 w-full h-full object-contain"
+                className="absolute inset-0 w-full h-full object-contain scale-90"
                 alt="Your overlay on a gym story"
               />
             </button>
