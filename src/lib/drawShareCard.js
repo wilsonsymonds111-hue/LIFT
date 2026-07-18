@@ -128,7 +128,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   let contentH = cardPad; // top padding
   contentH += 24 + 16; // header row + gap
   contentH += 32; // exercise name
-  if (isPR) contentH += 10 + 24; // gap + badge
+  contentH += 10 + 26; // gap + badge (always shown)
   contentH += 12; // gap before weight
   contentH += 48; // weight (40px)
   contentH += 48; // reps (40px, same size as weight)
@@ -191,21 +191,19 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   ctx.fillText(nameText, cx, y);
   y += 32;
 
-  // --- PR badge ---
-  if (isPR) {
-    y += 10;
-    ctx.font = `800 11px ${FONT}`;
-    const badgeText = 'NEW PR';
-    const badgeW = ctx.measureText(badgeText).width + 20;
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = YELLOW;
-    roundRect(ctx, cx, y, badgeW, 22, 11);
-    ctx.fill();
-    ctx.shadowBlur = 4;
-    ctx.fillStyle = DARK_BG;
-    drawSpacedText(ctx, badgeText, cx + 10, y + 5, 1);
-    y += 24;
-  }
+  // --- PR badge (always shown — this card is shared from the PR share button) ---
+  y += 10;
+  ctx.font = `800 12px ${FONT}`;
+  const badgeText = 'PR';
+  const badgeW = ctx.measureText(badgeText).width + 24;
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = YELLOW;
+  roundRect(ctx, cx, y, badgeW, 24, 12);
+  ctx.fill();
+  ctx.shadowBlur = 4;
+  ctx.fillStyle = DARK_BG;
+  drawSpacedText(ctx, badgeText, cx + 12, y + 6, 1.5);
+  y += 26;
 
   // --- Weight + Reps (consistent sizing) ---
   y += 12;
