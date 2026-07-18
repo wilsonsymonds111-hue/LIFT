@@ -12,7 +12,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import usePullToRefresh from '../hooks/usePullToRefresh';
 import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
-import StreakCounter from '../components/StreakCounter';
 import WeekTracker from '../components/WeekTracker';
 import TemplateCard from '../components/TemplateCard';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
@@ -463,11 +462,8 @@ export default function Home() {
 
       {/* Page Title */}
       <div className="px-4 pb-3 flex items-center justify-between" style={SAFE_AREA_PT}>
-        <div className="flex flex-col gap-2">
+        <div>
           <h1 className="text-4xl font-extrabold text-foreground leading-tight">Workouts</h1>
-          {!hasNoSplit && (
-            <StreakCounter onDays={onDays} offDays={offDays} startDayIndex={startDayIndex} />
-          )}
         </div>
         <div className="flex items-center gap-2">
           {currentSplit.length > 0 && (
