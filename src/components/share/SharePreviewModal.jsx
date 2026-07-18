@@ -94,7 +94,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pb-2 pt-3 flex-shrink-0">
+        <div className="flex items-center justify-between px-4 pb-4 pt-3 flex-shrink-0">
           <button onClick={handleClose} className="w-9 h-9 flex items-center justify-center -ml-2">
             <X className="w-6 h-6 text-white" />
           </button>
