@@ -154,7 +154,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   const cardW = 484;
   const cardH = contentH;
   const cardX = (W - cardW) / 2;
-  const cardY = isCard ? Math.round((H - cardH) / 2) : H - cardH - 10;
+  const cardY = isCard ? Math.round((H - cardH) / 2) : H - cardH;
   const drawW = cardW - cardPad * 2;
 
   // --- Create canvas ---
