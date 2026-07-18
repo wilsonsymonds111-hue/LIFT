@@ -190,7 +190,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   roundRect(ctx, cx, y, logoSize, logoSize, 8);
   ctx.fill();
   ctx.fillStyle = WHITE;
-  ctx.font = `700 14px ${FONT}`;
+  ctx.font = `700 11px ${FONT}`;
   ctx.letterSpacing = '0.5px';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
