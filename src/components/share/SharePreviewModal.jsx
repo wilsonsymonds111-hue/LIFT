@@ -78,13 +78,13 @@ export default function SharePreviewModal({ shareData, onClose }) {
           <button onClick={handleClose} className="w-9 h-9 flex items-center justify-center -ml-2">
             <X className="w-6 h-6 text-white" />
           </button>
-          <h2 className="text-white font-bold text-base px-6 text-center leading-tight flex items-center justify-center gap-1.5">
+          <h2 className="text-white font-bold text-base px-6 text-center leading-tight flex items-center justify-center gap-1">
             <span>Share your PR on your Instagram Story!</span>
             <img
               src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/019005143_image.png"
-              width="18"
-              height="18"
-              className="flex-shrink-0 rounded-[4px]"
+              width="28"
+              height="28"
+              className="flex-shrink-0 rounded-[6px] -ml-0.5"
               alt="Instagram"
             />
           </h2>
