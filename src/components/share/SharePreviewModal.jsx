@@ -113,7 +113,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
         <div className="px-6 pt-6 pb-2 flex-shrink-0">
           <div className="flex items-start gap-2.5">
             <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center mt-0.5">1</span>
-            <p className="text-[13px] text-neutral-300 leading-snug">Copy the transparent PNG below.</p>
+            <p className="text-[13px] text-neutral-300 leading-snug">Copy the transparent PNG overlay above.</p>
           </div>
           <div className="flex items-start gap-2.5 mt-2">
             <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center mt-0.5">2</span>
