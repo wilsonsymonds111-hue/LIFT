@@ -217,59 +217,19 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
         }}
       >
         <div>
-          {template.name.split(' ').map((word, wi) => (
-            <div key={wi} style={{
-              fontSize: '56px',
-              fontWeight: '900',
-              lineHeight: 1.05,
-              letterSpacing: '-1px',
-              color: wi % 2 === 1 ? '#FFD700' : '#ffffff',
-              textShadow: '0 2px 12px rgba(0,0,0,0.8)',
-              textTransform: 'uppercase',
-            }}>{word}</div>
-          ))}
-          <div style={{ fontSize: '18px', fontWeight: '700', color: '#aaaaaa', letterSpacing: '4px', textTransform: 'uppercase', marginTop: '6px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>WORKOUT</div>
+          <div style={{ fontSize: '48px', fontWeight: '800', lineHeight: 1.1, letterSpacing: '-1px', color: '#ffffff', textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>{template.name}</div>
+          <div style={{ fontSize: '15px', fontWeight: '600', color: '#ffffff', opacity: 0.6, letterSpacing: '2px', textTransform: 'uppercase', marginTop: '4px' }}>{durationDisplay}{prs.length > 0 ? `  ·  ${prs.length} PR${prs.length !== 1 ? 's' : ''}` : ''}</div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '20px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', padding: '6px 10px' }}>
-              <span style={{ fontSize: '13px', color: '#ccc' }}>📅</span>
-              <span style={{ fontSize: '13px', fontWeight: '600', color: '#fff' }}>{today}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', padding: '6px 10px' }}>
-              <span style={{ fontSize: '13px', color: '#ccc' }}>⏱</span>
-              <span style={{ fontSize: '13px', fontWeight: '600', color: '#fff' }}>{durationDisplay}</span>
-            </div>
-            {prs.length > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#FFD700', borderRadius: '10px', padding: '6px 10px' }}>
-                <span style={{ fontSize: '13px' }}>🏆</span>
-                <span style={{ fontSize: '13px', fontWeight: '800', color: '#000' }}>{prs.length} PR</span>
-              </div>
-            )}
-          </div>
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.2)', margin: '28px 0' }} />
 
-          <div style={{ height: '1px', background: 'rgba(255,255,255,0.15)', margin: '24px 0' }} />
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {exercises.map((ex, i) => {
               const best = bestSets[ex.name];
-              const isPR = prSet.has(ex.name);
               return (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <span style={{ fontSize: '16px' }}>💪</span>
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: '14px', fontWeight: '600', color: '#fff', lineHeight: 1.3, textShadow: '0 1px 6px rgba(0,0,0,0.8)' }}>{ex.sets} × {ex.name}</div>
-                    </div>
-                    {isPR && (
-                      <div style={{ background: '#FFD700', borderRadius: '6px', padding: '2px 7px', flexShrink: 0 }}>
-                        <span style={{ fontSize: '10px', fontWeight: '900', color: '#000' }}>PR</span>
-                      </div>
-                    )}
-                  </div>
-                  <span style={{ fontSize: '13px', color: '#aaa', fontWeight: '600', flexShrink: 0, marginLeft: '8px', textShadow: '0 1px 6px rgba(0,0,0,0.8)' }}>
-                    {best ? (best.kg ? `${best.kg} kg × ${best.reps}` : `${best.reps} reps`) : '—'}
+                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#fff', textShadow: '0 1px 6px rgba(0,0,0,0.8)' }}>{ex.sets} × {ex.name}</span>
+                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#fff', opacity: 0.7, flexShrink: 0, marginLeft: '12px', textShadow: '0 1px 6px rgba(0,0,0,0.8)' }}>
+                    {best ? (best.kg ? `${best.kg}kg × ${best.reps}` : `${best.reps} reps`) : '—'}
                   </span>
                 </div>
               );
@@ -277,20 +237,18 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
           </div>
         </div>
 
-        <div style={{ display: 'flex', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.15)', overflow: 'hidden', background: 'rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'flex' }}>
           {[
-            { label: 'DURATION', value: durationDisplay, emoji: '⏱' },
-            { label: "PR'S HIT", value: prs.length, emoji: '🏆' },
-            { label: 'EXERCISES', value: exercises.length, emoji: '🏋️' },
+            { label: 'DURATION', value: durationDisplay },
+            { label: "PR'S", value: prs.length },
+            { label: 'EXERCISES', value: exercises.length },
           ].map((stat, i) => (
             <div key={i} style={{
               flex: 1,
-              padding: '14px 8px',
-              textAlign: 'center',
-              borderRight: i < 2 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+              textAlign: i === 0 ? 'left' : i === 1 ? 'center' : 'right',
             }}>
-              <div style={{ fontSize: '10px', fontWeight: '700', color: '#888', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>{stat.label}</div>
-              <div style={{ fontSize: '22px', fontWeight: '900', color: '#FFD700', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>{stat.value}</div>
+              <div style={{ fontSize: '11px', fontWeight: '600', color: '#fff', opacity: 0.5, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>{stat.label}</div>
+              <div style={{ fontSize: '24px', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>{stat.value}</div>
             </div>
           ))}
         </div>
