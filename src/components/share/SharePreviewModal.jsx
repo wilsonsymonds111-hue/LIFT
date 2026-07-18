@@ -5,7 +5,6 @@ import { X, Copy, Check, ArrowRight } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
 
 const GYM_PHOTO = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/9d6c4d095_image.png';
-const OVERLAY_PHOTO = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/cb34b7ea5_image.png';
 
 export default function SharePreviewModal({ shareData, onClose }) {
   const [copied, setCopied] = useState(false);
@@ -92,7 +91,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
               className="relative rounded-xl overflow-hidden shadow-xl active:scale-[0.98] transition"
               style={{ height: '38vh', aspectRatio: '9 / 16' }}
             >
-              <img src={OVERLAY_PHOTO} className="absolute inset-0 w-full h-full object-cover" alt="PR overlay" />
+              <img src={transparentUrl} className="absolute inset-0 w-full h-full object-cover" alt="PR overlay" />
             </button>
             <span className="text-[10px] text-neutral-500 font-medium">Your overlay</span>
           </div>
@@ -142,7 +141,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
               />
             ) : (
               <img
-                src={OVERLAY_PHOTO}
+                src={transparentUrl}
                 className="max-w-none select-none"
                 style={{ maxWidth: '95vw', maxHeight: '90vh' }}
                 alt="PR preview zoomed"
