@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { X, Copy, Check, ArrowRight } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
 
+const GYM_PHOTO = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80';
+
 export default function SharePreviewModal({ shareData, onClose }) {
   const [copied, setCopied] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -87,9 +89,9 @@ export default function SharePreviewModal({ shareData, onClose }) {
             <button
               onClick={() => setZoomed('overlay')}
               className="relative rounded-xl overflow-hidden shadow-xl active:scale-[0.98] transition"
-              style={checkerStyle}
+              style={{ ...checkerStyle, height: '38vh', aspectRatio: '9 / 16' }}
             >
-              <img src={transparentUrl} className="block" alt="PR overlay" style={{ maxHeight: '38vh', maxWidth: '42vw' }} />
+              <img src={transparentUrl} className="absolute inset-0 w-full h-full object-cover" alt="PR overlay" />
             </button>
             <span className="text-[10px] text-neutral-500 font-medium">Your overlay</span>
           </div>
@@ -102,12 +104,17 @@ export default function SharePreviewModal({ shareData, onClose }) {
             <button
               onClick={() => setZoomed('example')}
               className="relative rounded-xl overflow-hidden shadow-xl active:scale-[0.98] transition"
+              style={{ height: '38vh', aspectRatio: '9 / 16' }}
             >
               <img
-                src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/c9cd0cc6f_image.png"
-                className="block"
+                src={GYM_PHOTO}
+                className="absolute inset-0 w-full h-full object-cover"
                 alt="Example overlay on a gym story"
-                style={{ maxHeight: '38vh', maxWidth: '42vw' }}
+              />
+              <img
+                src={transparentUrl}
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                alt=""
               />
             </button>
             <span className="text-[10px] text-neutral-500 font-medium">On a story</span>
@@ -129,15 +136,24 @@ export default function SharePreviewModal({ shareData, onClose }) {
             >
               <X className="w-5 h-5 text-white" />
             </button>
-            <img
-              src={zoomed === 'example'
-                ? 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/c9cd0cc6f_image.png'
-                : transparentUrl}
-              className="max-w-none select-none"
-              style={{ maxWidth: '95vw', maxHeight: '90vh' }}
-              alt="PR preview zoomed"
-              onClick={(e) => e.stopPropagation()}
-            />
+            {zoomed === 'example' ? (
+              <div
+                className="relative select-none"
+                style={{ height: '90vh', aspectRatio: '9 / 16' }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img src={GYM_PHOTO} className="absolute inset-0 w-full h-full object-cover" alt="Gym story" />
+                <img src={transparentUrl} className="absolute inset-0 w-full h-full object-cover" alt="PR overlay" />
+              </div>
+            ) : (
+              <img
+                src={transparentUrl}
+                className="max-w-none select-none"
+                style={{ maxWidth: '95vw', maxHeight: '90vh' }}
+                alt="PR preview zoomed"
+                onClick={(e) => e.stopPropagation()}
+              />
+            )}
           </motion.div>,
           document.body
         )}
