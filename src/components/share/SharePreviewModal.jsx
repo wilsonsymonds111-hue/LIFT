@@ -5,7 +5,7 @@ import { X, Copy, Check, ArrowRight } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
 
 const GYM_PHOTO = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/acb45489c_image.png';
-const JAKE_AVATAR = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/400bdf9ab_image.png';
+const JAKE_AVATAR = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6d1143193_generated_image.png';
 
 export default function SharePreviewModal({ shareData, onClose }) {
   const [copied, setCopied] = useState(false);
