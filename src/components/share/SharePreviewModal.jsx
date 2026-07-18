@@ -68,7 +68,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
       />
       {/* Full-screen sheet — extends to the very top, over the nav bar */}
       <motion.div
-        className="fixed inset-0 z-[101] bg-black flex flex-col justify-around py-4"
+        className="fixed inset-0 z-[101] bg-white flex flex-col justify-around py-4"
         initial={{ y: '100%' }}
         animate={{ y: closing ? '100%' : 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -76,9 +76,9 @@ export default function SharePreviewModal({ shareData, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-4 flex-shrink-0">
           <button onClick={handleClose} className="w-9 h-9 flex items-center justify-center -ml-2">
-            <X className="w-6 h-6 text-white" />
+            <X className="w-6 h-6 text-neutral-900" />
           </button>
-          <h2 className="text-white font-bold text-base px-6 text-center leading-tight flex items-center justify-center gap-1">
+          <h2 className="text-neutral-900 font-bold text-base px-6 text-center leading-tight flex items-center justify-center gap-1">
             <span>Share your PR on your Instagram Story!</span>
             <img
               src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/019005143_image.png"
@@ -102,11 +102,11 @@ export default function SharePreviewModal({ shareData, onClose }) {
             >
               <img src={transparentUrl} className="absolute inset-0 w-full h-full object-cover" alt="PR overlay" />
             </button>
-            <span className="text-[10px] text-neutral-500 font-medium">Your overlay</span>
+            <span className="text-[10px] text-neutral-600 font-medium">Your overlay</span>
           </div>
 
           {/* Arrow showing before → after */}
-          <ArrowRight className="w-5 h-5 text-neutral-600 flex-shrink-0" />
+          <ArrowRight className="w-5 h-5 text-neutral-400 flex-shrink-0" />
 
           {/* Example: the real overlay composited onto a gym story background */}
           <div className="flex flex-col items-center gap-1.5">
@@ -126,7 +126,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
                 alt="Your overlay on a gym story"
               />
             </button>
-            <span className="text-[10px] text-neutral-500 font-medium">On a story</span>
+            <span className="text-[10px] text-neutral-600 font-medium">On a story</span>
           </div>
         </div>
 
@@ -182,16 +182,16 @@ export default function SharePreviewModal({ shareData, onClose }) {
         {/* Instructions — Apple-quality step layout */}
         <div className="px-6 flex-shrink-0">
           <div className="flex items-center gap-2.5">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center">1</span>
-            <p className="text-[13px] text-neutral-300 leading-snug">Copy the transparent PNG overlay above.</p>
+            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-900 text-white text-[10px] font-bold flex items-center justify-center">1</span>
+            <p className="text-[13px] text-neutral-700 leading-snug">Copy the transparent PNG overlay above.</p>
           </div>
           <div className="flex items-center gap-2.5 mt-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center">2</span>
-            <p className="text-[13px] text-neutral-300 leading-snug">Open Instagram → add a photo to your story.</p>
+            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-900 text-white text-[10px] font-bold flex items-center justify-center">2</span>
+            <p className="text-[13px] text-neutral-700 leading-snug">Open Instagram → add a photo to your story.</p>
           </div>
           <div className="flex items-center gap-2.5 mt-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center">3</span>
-            <p className="text-[13px] text-neutral-300 leading-snug">Tap the text icon, then paste!</p>
+            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-900 text-white text-[10px] font-bold flex items-center justify-center">3</span>
+            <p className="text-[13px] text-neutral-700 leading-snug">Tap the text icon, then paste!</p>
           </div>
         </div>
 
