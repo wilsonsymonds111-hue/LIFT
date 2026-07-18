@@ -111,7 +111,6 @@ export default function SharePreviewModal({ shareData, onClose }) {
                 className="absolute inset-0 w-full h-full object-cover"
                 alt="Example overlay on a gym story"
               />
-              <img src={transparentUrl} className="absolute inset-0 w-full h-full object-cover" alt="Overlay on story" />
             </button>
             <span className="text-[10px] text-neutral-500 font-medium">On a story</span>
           </div>
