@@ -71,7 +71,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pb-4 pt-3 flex-shrink-0">
+        <div className="flex items-center justify-between px-4 pt-3 pb-3 flex-shrink-0">
           <button onClick={handleClose} className="w-9 h-9 flex items-center justify-center -ml-2">
             <X className="w-6 h-6 text-white" />
           </button>
@@ -80,14 +80,14 @@ export default function SharePreviewModal({ shareData, onClose }) {
         </div>
 
         {/* Preview — transparent PNG on checkered background */}
-        <div className="flex-1 flex items-center justify-center px-6 py-1 min-h-0">
+        <div className="flex-1 flex items-center justify-center px-6 min-h-0">
           <div className="relative rounded-2xl overflow-hidden shadow-2xl" style={checkerStyle}>
             <img src={transparentUrl} className="block max-h-full max-w-full" alt="PR share preview" style={{ maxHeight: '45vh' }} />
           </div>
         </div>
 
         {/* Instructions — Apple-quality step layout */}
-        <div className="px-6 pt-6 pb-2 flex-shrink-0">
+        <div className="px-6 py-3 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center">1</span>
             <p className="text-[13px] text-neutral-300 leading-snug">Copy the transparent PNG overlay above.</p>
@@ -104,7 +104,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
 
         {/* Actions */}
         <div
-          className="px-6 pt-2 pb-5 space-y-2 flex-shrink-0"
+          className="px-6 pt-3 pb-5 space-y-2 flex-shrink-0"
           style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)' }}
         >
           <button
