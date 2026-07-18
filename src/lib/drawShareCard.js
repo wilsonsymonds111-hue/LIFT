@@ -226,7 +226,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   ctx.font = `400 26px ${FONT}`;
   ctx.letterSpacing = '1px';
   ctx.fillStyle = WHITE;
-  const repsLabel = isBodyweight ? 'REPS' : `× ${reps} REPS`;
+  const repsLabel = isBodyweight ? 'REPS' : `X ${reps} REPS`;
   ctx.fillText(repsLabel, cx + weightW + 14, y + 40);
   ctx.letterSpacing = '0px';
   y += 76;
@@ -259,7 +259,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.fillStyle = WHITE;
     ctx.fillText(`${Math.round(bodyweight)}KG`, leftCx, y);
     ctx.font = `400 11px ${FONT}`;
-    ctx.fillStyle = MUTED;
+    ctx.fillStyle = WHITE;
     ctx.fillText('BODYWEIGHT', leftCx, y + 20);
     ctx.strokeStyle = DIVIDER;
     ctx.lineWidth = 1;
@@ -271,7 +271,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.fillStyle = WHITE;
     ctx.fillText(`${ratio.toFixed(2)}x`, rightCx, y);
     ctx.font = `400 11px ${FONT}`;
-    ctx.fillStyle = MUTED;
+    ctx.fillStyle = WHITE;
     ctx.fillText('BODYWEIGHT', rightCx, y + 20);
     ctx.textAlign = 'left';
     y += 40;
@@ -296,7 +296,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.shadowBlur = 4;
     ctx.font = `400 14px ${FONT}`;
     ctx.letterSpacing = '2px';
-    ctx.fillStyle = GOLD;
+    ctx.fillStyle = WHITE;
     ctx.fillText('PROGRESS OVER TIME', cx, y);
     ctx.letterSpacing = '0px';
     y += 20;
@@ -419,7 +419,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.shadowBlur = 4;
     ctx.font = `400 13px ${FONT}`;
     ctx.letterSpacing = '1px';
-    ctx.fillStyle = MUTED;
+    ctx.fillStyle = WHITE;
     ctx.textAlign = 'left';
     ctx.fillText(`${startVal}${isBodyweight ? '' : 'kg'} ${startDate}`, chartX, y + 8);
     if (!singlePoint) {
