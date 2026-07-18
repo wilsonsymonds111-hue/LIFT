@@ -7,7 +7,7 @@ const DIVIDER = 'rgba(255,255,255,0.15)';
 const DARK_BG = '#0a0a0a';
 const CARD_BG = 'rgba(18,18,18,0.55)';
 const BORDER = '#C84637';
-const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Rounded", "SF Pro Display", "SF Pro Text", system-ui, sans-serif';
 const SCALE = 2;
 const W = 540;
 const H = 960;
@@ -138,7 +138,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   // --- Calculate content height for dynamic card sizing ---
   const cardPad = 28;
   let contentH = cardPad; // top padding
-  contentH += 14 + 16; // arrow header + gap
+  contentH += 30 + 16; // logo square + gap
   contentH += 24; // title
   contentH += 12; // gap before weight
   contentH += 56; // weight + reps inline
@@ -191,13 +191,20 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   const cx = cardX + cardPad;
   let y = cardY + cardPad;
 
-  // --- Header: up arrow + LIFT branding in gold ---
-  const arrowSize = 14;
-  drawUpArrow(ctx, cx + arrowSize / 2, y, arrowSize, GOLD);
-  ctx.font = `800 15px ${FONT}`;
-  ctx.fillStyle = GOLD;
-  drawSpacedText(ctx, 'LIFT', cx + arrowSize + 6, y + 1, 1.2);
-  y += arrowSize + 16;
+  // --- Header: LIFT. logo in black rounded square ---
+  const logoSize = 30;
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#000000';
+  roundRect(ctx, cx, y, logoSize, logoSize, 8);
+  ctx.fill();
+  ctx.fillStyle = WHITE;
+  ctx.font = `800 14px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('LIFT.', cx + logoSize / 2, y + logoSize / 2 + 1);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  y += logoSize + 16;
 
   // --- Title: exercise name + PR suffix ---
   ctx.font = `700 16px ${FONT}`;
