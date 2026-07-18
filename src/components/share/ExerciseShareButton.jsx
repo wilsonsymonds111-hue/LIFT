@@ -1,6 +1,15 @@
 import { useState } from 'react';
-import { Share2 } from 'lucide-react';
 import SharePreviewModal from './SharePreviewModal';
+
+function InstagramIcon({ size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="2" width="20" height="20" rx="5.5" stroke="#3b82f6" strokeWidth="2" fill="none"/>
+      <circle cx="12" cy="12" r="4.5" stroke="#3b82f6" strokeWidth="2" fill="none"/>
+      <circle cx="17.5" cy="6.5" r="1.2" fill="#3b82f6"/>
+    </svg>
+  );
+}
 
 const toKg = (v) => typeof v === 'object' ? (v.kg || 0) : (v || 0);
 const toReps = (v) => typeof v === 'object' ? (v.reps || 0) : (v || 0);
@@ -51,7 +60,7 @@ export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
         className="w-7 h-7 flex items-center justify-center rounded-lg transition flex-shrink-0 hover:opacity-80"
         aria-label="Share PR"
       >
-        <Share2 className="w-[18px] h-[18px] text-blue-500" />
+        <InstagramIcon size={18} />
       </button>
       {showModal && (
         <SharePreviewModal shareData={shareData} onClose={() => setShowModal(false)} />
