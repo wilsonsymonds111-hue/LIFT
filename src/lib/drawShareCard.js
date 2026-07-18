@@ -321,44 +321,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       y: chartH - chartPad - ((p.val - min) / range) * (chartH - chartPad * 2),
     }));
 
-    // Grid — horizontal lines
-    ctx.shadowBlur = 0;
-    for (let g = 1; g < 3; g++) {
-      const gy = y + (chartH / 3) * g;
-      ctx.strokeStyle = GRID;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(chartX, gy);
-      ctx.lineTo(chartX + chartDrawW, gy);
-      ctx.stroke();
-    }
-    // Grid — vertical lines
-    for (let g = 1; g < 4; g++) {
-      const gx = chartX + (chartDrawW / 4) * g;
-      ctx.strokeStyle = GRID;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(gx, y);
-      ctx.lineTo(gx, y + chartH);
-      ctx.stroke();
-    }
-
     if (!singlePoint) {
-      // Area fill under line
-      ctx.beginPath();
-      coords.forEach((c, i) => {
-        if (i === 0) ctx.moveTo(chartX + c.x, y + c.y);
-        else ctx.lineTo(chartX + c.x, y + c.y);
-      });
-      ctx.lineTo(chartX + coords[coords.length - 1].x, y + chartH);
-      ctx.lineTo(chartX + coords[0].x, y + chartH);
-      ctx.closePath();
-      const areaGrad = ctx.createLinearGradient(0, y, 0, y + chartH);
-      areaGrad.addColorStop(0, 'rgba(212,193,152,0.25)');
-      areaGrad.addColorStop(1, 'rgba(212,193,152,0)');
-      ctx.fillStyle = areaGrad;
-      ctx.fill();
-
       // Line
       ctx.strokeStyle = GOLD;
       ctx.lineWidth = 2.5;
