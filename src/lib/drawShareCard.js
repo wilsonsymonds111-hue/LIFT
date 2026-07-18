@@ -1,10 +1,9 @@
-const ORANGE = '#FC4C02';
-const YELLOW = '#F7E967';
+const GOLD = '#D4C198';
 const WHITE = '#FFFFFF';
 const MUTED = 'rgba(255,255,255,0.7)';
 const FAINT = 'rgba(255,255,255,0.55)';
-const GRID = 'rgba(255,255,255,0.2)';
-const DIVIDER = 'rgba(255,255,255,0.3)';
+const GRID = '#4A4A4A';
+const DIVIDER = 'rgba(255,255,255,0.15)';
 const DARK_BG = '#0a0a0a';
 const CARD_BG = 'rgba(20,20,20,0.92)';
 const BORDER = '#C84637';
@@ -139,7 +138,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   // --- Calculate content height for dynamic card sizing ---
   const cardPad = 28;
   let contentH = cardPad; // top padding
-  contentH += 36 + 16; // app icon + gap
+  contentH += 14 + 16; // arrow header + gap
   contentH += 32; // exercise name
   contentH += 10 + 26; // gap + badge (always shown)
   contentH += 12; // gap before weight
@@ -174,12 +173,11 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.fillRect(0, 0, W, H);
   }
 
-  // --- Transparent background: no card fill, no border ---
-  // Subtle text shadow for visibility on any background
-  ctx.shadowColor = 'rgba(0,0,0,0.6)';
-  ctx.shadowBlur = 4;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 1;
+  // --- Semi-transparent dark card background (readable on any photo) ---
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = CARD_BG;
+  roundRect(ctx, cardX, cardY, cardW, cardH, 22);
+  ctx.fill();
 
   ctx.textBaseline = 'top';
   ctx.textAlign = 'left';
@@ -187,21 +185,13 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   const cx = cardX + cardPad;
   let y = cardY + cardPad;
 
-  // --- Header: LIFT. branding inside black rounded-square app icon ---
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = DARK_BG;
-  const iconSize = 36;
-  roundRect(ctx, cx, y, iconSize, iconSize, 9);
-  ctx.fill();
-  ctx.shadowBlur = 4;
-  ctx.font = `800 13px ${FONT}`;
-  ctx.fillStyle = WHITE;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  drawSpacedTextCentered(ctx, 'LIFT.', cx + iconSize / 2, y + iconSize / 2 - 1, 0.8);
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
-  y += iconSize + 16;
+  // --- Header: up arrow + LIFT branding in gold ---
+  const arrowSize = 14;
+  drawUpArrow(ctx, cx + arrowSize / 2, y, arrowSize, GOLD);
+  ctx.font = `800 15px ${FONT}`;
+  ctx.fillStyle = GOLD;
+  drawSpacedText(ctx, 'LIFT', cx + arrowSize + 6, y + 1, 1.2);
+  y += arrowSize + 16;
 
   // --- Exercise name ---
   ctx.font = `800 24px ${FONT}`;
@@ -220,10 +210,9 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   const badgeText = 'PR';
   const badgeW = ctx.measureText(badgeText).width + 24;
   ctx.shadowBlur = 0;
-  ctx.fillStyle = YELLOW;
+  ctx.fillStyle = GOLD;
   roundRect(ctx, cx, y, badgeW, 24, 12);
   ctx.fill();
-  ctx.shadowBlur = 4;
   ctx.fillStyle = DARK_BG;
   drawSpacedText(ctx, badgeText, cx + 12, y + 6, 1.5);
   y += 26;
@@ -319,13 +308,13 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       ctx.lineTo(chartX + coords[0].x, y + chartH);
       ctx.closePath();
       const areaGrad = ctx.createLinearGradient(0, y, 0, y + chartH);
-      areaGrad.addColorStop(0, 'rgba(252,76,2,0.3)');
-      areaGrad.addColorStop(1, 'rgba(252,76,2,0)');
+      areaGrad.addColorStop(0, 'rgba(212,193,152,0.25)');
+      areaGrad.addColorStop(1, 'rgba(212,193,152,0)');
       ctx.fillStyle = areaGrad;
       ctx.fill();
 
       // Line
-      ctx.strokeStyle = ORANGE;
+      ctx.strokeStyle = GOLD;
       ctx.lineWidth = 2.5;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
@@ -337,7 +326,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       ctx.stroke();
     } else {
       // Single point — dashed reference line
-      ctx.strokeStyle = 'rgba(252,76,2,0.4)';
+      ctx.strokeStyle = 'rgba(212,193,152,0.5)';
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
       ctx.beginPath();
@@ -351,7 +340,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     coords.forEach((c, i) => {
       const isLast = i === coords.length - 1;
       if (isLast) {
-        ctx.fillStyle = ORANGE;
+        ctx.fillStyle = GOLD;
         ctx.beginPath();
         ctx.arc(chartX + c.x, y + c.y, 5, 0, Math.PI * 2);
         ctx.fill();
@@ -361,7 +350,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
         ctx.fill();
       } else {
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.strokeStyle = ORANGE;
+        ctx.strokeStyle = GOLD;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(chartX + c.x, y + c.y, 3.5, 0, Math.PI * 2);
