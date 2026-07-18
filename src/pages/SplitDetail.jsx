@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { EXAMPLE_SPLITS_DATA } from '../lib/splitData';
+import SplitDetailSkeleton from '../components/skeletons/SplitDetailSkeleton';
 
 function relativeTime(dateStr) {
   if (!dateStr) return null;
@@ -56,11 +57,7 @@ export default function SplitDetail() {
   const split = exampleSplit || customSplit;
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
-      </div>
-    );
+    return <SplitDetailSkeleton />;
   }
 
   const handleBack = () => {

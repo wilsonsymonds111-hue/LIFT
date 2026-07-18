@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import BodyStatsCard from '../components/BodyStatsCard';
+import BodyStatsSkeleton from '../components/skeletons/BodyStatsSkeleton';
 
 const SAFE_AREA_PT = { paddingTop: 'calc(0.5rem + env(safe-area-inset-top))' };
 
@@ -48,11 +49,7 @@ export default function BodyStats() {
   }, [templates]);
 
   if (isLoading) {
-    return (
-      <div className="health-gradient min-h-screen flex items-center justify-center pb-28">
-        <div className="w-8 h-8 border-4 border-muted border-t-foreground rounded-full animate-spin" />
-      </div>
-    );
+    return <BodyStatsSkeleton />;
   }
 
   return (

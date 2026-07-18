@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import SplitCard from '../components/SplitCard';
 import RestFrequencyConfirmModal from '../components/RestFrequencyConfirmModal';
 import RenameSplitModal from '../components/RenameSplitModal';
+import SplitsSkeleton from '../components/skeletons/SplitsSkeleton';
 
 const SplitBuilder = lazy(() => import('../components/SplitBuilder'));
 const SplitModal = lazy(() => import('../components/SplitModal'));
@@ -300,11 +301,7 @@ export default function Splits() {
   }, [queryClient]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#000' }}>
-        <div className="w-8 h-8 border-4 border-gray-700 border-t-white rounded-full animate-spin" />
-      </div>
-    );
+    return <SplitsSkeleton />;
   }
 
   return (

@@ -4,6 +4,7 @@ import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { saveWorkout, syncOfflineQueue } from '../lib/offlineQueue';
 import { loadWorkoutSession } from '../lib/workoutSession';
 import WorkoutSheet from '../components/WorkoutSheet';
+import ActiveWorkoutSkeleton from '../components/skeletons/ActiveWorkoutSkeleton';
 
 export default function ActiveWorkout() {
   const { id } = useParams();
@@ -30,11 +31,7 @@ export default function ActiveWorkout() {
   }, []);
 
   if (!template) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-muted border-t-blue-500 rounded-full animate-spin" />
-      </div>
-    );
+    return <ActiveWorkoutSkeleton />;
   }
 
   return (

@@ -14,6 +14,7 @@ import PullToRefreshIndicator from '../components/PullToRefreshIndicator';
 import ProfileButton from '../components/ProfileButton';
 import WeekTracker from '../components/WeekTracker';
 import TemplateCard from '../components/TemplateCard';
+import HomeSkeleton from '../components/skeletons/HomeSkeleton';
 import { useWorkoutTemplates, invalidateWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import { generateWorkoutICS } from '../lib/icsGenerator';
 import { TouchHold } from '../lib/useTouchHold';
@@ -449,11 +450,7 @@ export default function Home() {
   }, [splitDetection, hasNoSplit]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-muted border-t-foreground rounded-full animate-spin" />
-      </div>
-    );
+    return <HomeSkeleton />;
   }
 
   return (
