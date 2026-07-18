@@ -136,7 +136,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                       onClick={() => { setShowMenu(false); setShowRestTimeModal(true); }}
                       className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-neutral-700 transition"
                     >
-                      Change Default Rest Time
+                      Change Default Rest Time ({restDuration >= 60 ? `${Math.floor(restDuration / 60)}m${restDuration % 60 ? ` ${restDuration % 60}s` : ''}` : `${restDuration}s`})
                     </button>
                     <button
                       onClick={() => { setShowMenu(false); onDeleteExercise?.(); }}
