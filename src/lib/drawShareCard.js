@@ -1,7 +1,8 @@
-const GOLD = '#D4C198';
+const GOLD = '#D4AF37';
 const WHITE = '#FFFFFF';
 const MUTED = 'rgba(255,255,255,0.7)';
 const FAINT = 'rgba(255,255,255,0.55)';
+const LABEL = '#A0A0A0';
 const GRID = '#4A4A4A';
 const DIVIDER = 'rgba(255,255,255,0.15)';
 const DARK_BG = '#0a0a0a';
@@ -215,19 +216,27 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
 
   // --- Main stat: weight (large) + reps (inline right) ---
   y += 12;
-  const weightText = isBodyweight ? `${reps}` : `${Math.round(weight)}KG`;
-  ctx.font = `400 56px ${FONT}`;
+  const numText = isBodyweight ? `${reps}` : `${Math.round(weight)}`;
+  const unitText = isBodyweight ? '' : 'KG';
+  ctx.font = `700 64px ${FONT}`;
   ctx.letterSpacing = '-1px';
   ctx.fillStyle = WHITE;
-  ctx.fillText(weightText, cx, y);
-  const weightW = ctx.measureText(weightText).width;
+  ctx.fillText(numText, cx, y);
+  const numW = ctx.measureText(numText).width;
   ctx.letterSpacing = '0px';
+  let weightW = numW;
+  if (unitText) {
+    ctx.font = `700 34px ${FONT}`;
+    ctx.fillStyle = WHITE;
+    ctx.fillText(unitText, cx + numW + 6, y + (64 - 34));
+    weightW = numW + 6 + ctx.measureText(unitText).width;
+  }
 
-  ctx.font = `400 24px ${FONT}`;
+  ctx.font = `400 22px ${FONT}`;
   ctx.letterSpacing = '1px';
-  ctx.fillStyle = WHITE;
+  ctx.fillStyle = LABEL;
   const repsLabel = isBodyweight ? 'REPS' : `X ${reps} REPS`;
-  ctx.fillText(repsLabel, cx + weightW + 14, y + 32);
+  ctx.fillText(repsLabel, cx + weightW + 14, y + 34);
   ctx.letterSpacing = '0px';
   y += 66;
 
@@ -259,7 +268,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.fillStyle = WHITE;
     ctx.fillText(`${Math.round(bodyweight)}KG`, leftCx, y);
     ctx.font = `400 11px ${FONT}`;
-    ctx.fillStyle = WHITE;
+    ctx.fillStyle = LABEL;
     ctx.fillText('BODYWEIGHT', leftCx, y + 20);
     ctx.strokeStyle = DIVIDER;
     ctx.lineWidth = 1;
@@ -271,7 +280,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.fillStyle = WHITE;
     ctx.fillText(`${ratio.toFixed(2)}x`, rightCx, y);
     ctx.font = `400 11px ${FONT}`;
-    ctx.fillStyle = WHITE;
+    ctx.fillStyle = LABEL;
     ctx.fillText('BODYWEIGHT', rightCx, y + 20);
     ctx.textAlign = 'left';
     y += 40;
@@ -296,7 +305,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.shadowBlur = 4;
     ctx.font = `400 14px ${FONT}`;
     ctx.letterSpacing = '2px';
-    ctx.fillStyle = WHITE;
+    ctx.fillStyle = LABEL;
     ctx.fillText('PROGRESS OVER TIME', cx, y);
     ctx.letterSpacing = '0px';
     y += 20;
@@ -399,32 +408,26 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       }
     });
 
-    // Weight interval labels on the left side
-    ctx.shadowBlur = 6;
+    // Weight interval labels on the left side — min & max only
     ctx.font = `500 14px ${FONT}`;
-    ctx.fillStyle = WHITE;
+    ctx.fillStyle = LABEL;
     ctx.textAlign = 'right';
     const unit = isBodyweight ? '' : 'kg';
-    const maxLabel = Math.round(max);
-    const minLabel = Math.round(min);
-    const midLabel = Math.round((max + min) / 2);
-    ctx.fillText(`${maxLabel}${unit}`, chartX - 8, y + 5);
-    ctx.fillText(`${midLabel}${unit}`, chartX - 8, y + chartH / 2 + 5);
-    ctx.fillText(`${minLabel}${unit}`, chartX - 8, y + chartH - 3);
+    ctx.fillText(`${Math.round(max)}${unit}`, chartX - 8, y + 5);
+    ctx.fillText(`${Math.round(min)}${unit}`, chartX - 8, y + chartH - 3);
     ctx.textAlign = 'left';
 
     y += chartH;
 
-    // Combined axis labels: "60KG JUN 2025" left, "70KG JUL 2026" right
-    ctx.shadowBlur = 4;
+    // Clean separate date labels only
     ctx.font = `400 13px ${FONT}`;
     ctx.letterSpacing = '1px';
-    ctx.fillStyle = WHITE;
+    ctx.fillStyle = LABEL;
     ctx.textAlign = 'left';
-    ctx.fillText(`${startVal}${isBodyweight ? '' : 'kg'} ${startDate}`, chartX, y + 8);
+    ctx.fillText(startDate, chartX, y + 8);
     if (!singlePoint) {
       ctx.textAlign = 'right';
-      ctx.fillText(`${endVal}${isBodyweight ? '' : 'kg'} ${endDate}`, chartX + chartDrawW, y + 8);
+      ctx.fillText(endDate, chartX + chartDrawW, y + 8);
     }
     ctx.letterSpacing = '0px';
     ctx.textAlign = 'left';
