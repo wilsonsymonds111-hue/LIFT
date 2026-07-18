@@ -348,17 +348,17 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     });
 
     // Weight interval labels on the left side
-    ctx.shadowBlur = 4;
-    ctx.font = `700 11px ${FONT}`;
-    ctx.fillStyle = FAINT;
+    ctx.shadowBlur = 6;
+    ctx.font = `800 16px ${FONT}`;
+    ctx.fillStyle = WHITE;
     ctx.textAlign = 'right';
     const unit = isBodyweight ? '' : 'kg';
     const maxLabel = Math.round(max);
     const minLabel = Math.round(min);
     const midLabel = Math.round((max + min) / 2);
-    ctx.fillText(`${maxLabel}${unit}`, chartX - 6, y + 3);
-    ctx.fillText(`${midLabel}${unit}`, chartX - 6, y + chartH / 2 + 3);
-    ctx.fillText(`${minLabel}${unit}`, chartX - 6, y + chartH - 3);
+    ctx.fillText(`${maxLabel}${unit}`, chartX - 8, y + 5);
+    ctx.fillText(`${midLabel}${unit}`, chartX - 8, y + chartH / 2 + 5);
+    ctx.fillText(`${minLabel}${unit}`, chartX - 8, y + chartH - 3);
     ctx.textAlign = 'left';
 
     y += chartH;
