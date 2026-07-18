@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Trophy, Clock, Share, X } from 'lucide-react';
 import { playCompleteChime } from '../../lib/workoutSounds';
 import RestDayPromptModal from '../RestDayPromptModal';
+import InstagramShareInstructions from './InstagramShareInstructions';
 import { makeTodayWorkoutDay } from '../../lib/restDayCheck';
 
 function InstagramIcon({ size = 20 }) {
@@ -31,6 +32,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
   const igStickerRef = useRef(null);
   const [sharing, setSharing] = useState(false);
   const [igSharing, setIgSharing] = useState(false);
+  const [igImageUrl, setIgImageUrl] = useState(null);
   const [shimmer, setShimmer] = useState(false);
   const [showRestDayPrompt, setShowRestDayPrompt] = useState(false);
 
@@ -97,17 +99,9 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
         width: 390,
         height: 844,
       });
-      canvas.toBlob(async (blob) => {
-        const file = new File([blob], 'workout-story.png', { type: 'image/png' });
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${template.name} Workout` });
-        } else {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = 'workout-story.png'; a.click();
-          URL.revokeObjectURL(url);
-        }
-        setIgSharing(false);
-      }, 'image/png');
+      const url = canvas.toDataURL('image/png');
+      setIgImageUrl(url);
+      setIgSharing(false);
     } catch { setIgSharing(false); }
   };
 
@@ -213,7 +207,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
           top: 0,
           width: '390px',
           height: '844px',
-          background: 'rgba(0,0,0,0.82)',
+          background: 'transparent',
           fontFamily: 'system-ui, -apple-system, sans-serif',
           display: 'flex',
           flexDirection: 'column',
@@ -230,10 +224,11 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
               lineHeight: 1.05,
               letterSpacing: '-1px',
               color: wi % 2 === 1 ? '#FFD700' : '#ffffff',
+              textShadow: '0 2px 12px rgba(0,0,0,0.8)',
               textTransform: 'uppercase',
             }}>{word}</div>
           ))}
-          <div style={{ fontSize: '18px', fontWeight: '700', color: '#aaaaaa', letterSpacing: '4px', textTransform: 'uppercase', marginTop: '6px' }}>WORKOUT</div>
+          <div style={{ fontSize: '18px', fontWeight: '700', color: '#aaaaaa', letterSpacing: '4px', textTransform: 'uppercase', marginTop: '6px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>WORKOUT</div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '20px', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', padding: '6px 10px' }}>
@@ -265,7 +260,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
                       <span style={{ fontSize: '16px' }}>💪</span>
                     </div>
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: '14px', fontWeight: '600', color: '#fff', lineHeight: 1.3 }}>{ex.sets} × {ex.name}</div>
+                      <div style={{ fontSize: '14px', fontWeight: '600', color: '#fff', lineHeight: 1.3, textShadow: '0 1px 6px rgba(0,0,0,0.8)' }}>{ex.sets} × {ex.name}</div>
                     </div>
                     {isPR && (
                       <div style={{ background: '#FFD700', borderRadius: '6px', padding: '2px 7px', flexShrink: 0 }}>
@@ -273,7 +268,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
                       </div>
                     )}
                   </div>
-                  <span style={{ fontSize: '13px', color: '#aaa', fontWeight: '600', flexShrink: 0, marginLeft: '8px' }}>
+                  <span style={{ fontSize: '13px', color: '#aaa', fontWeight: '600', flexShrink: 0, marginLeft: '8px', textShadow: '0 1px 6px rgba(0,0,0,0.8)' }}>
                     {best ? (best.kg ? `${best.kg} kg × ${best.reps}` : `${best.reps} reps`) : '—'}
                   </span>
                 </div>
@@ -295,11 +290,18 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
               borderRight: i < 2 ? '1px solid rgba(255,255,255,0.1)' : 'none',
             }}>
               <div style={{ fontSize: '10px', fontWeight: '700', color: '#888', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>{stat.label}</div>
-              <div style={{ fontSize: '22px', fontWeight: '900', color: '#FFD700' }}>{stat.value}</div>
+              <div style={{ fontSize: '22px', fontWeight: '900', color: '#FFD700', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>{stat.value}</div>
             </div>
           ))}
         </div>
       </div>
+
+      {igImageUrl && (
+        <InstagramShareInstructions
+          imageUrl={igImageUrl}
+          onClose={() => setIgImageUrl(null)}
+        />
+      )}
 
       {showRestDayPrompt && (
         <RestDayPromptModal
