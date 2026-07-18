@@ -44,12 +44,12 @@ export default function SharePreviewModal({ shareData, onClose }) {
   };
 
   const checkerStyle = {
-    backgroundColor: '#2a2a2a',
+    backgroundColor: '#cccccc',
     backgroundImage:
-      'linear-gradient(45deg, #333 25%, transparent 25%), ' +
-      'linear-gradient(-45deg, #333 25%, transparent 25%), ' +
-      'linear-gradient(45deg, transparent 75%, #333 75%), ' +
-      'linear-gradient(-45deg, transparent 75%, #333 75%)',
+      'linear-gradient(45deg, #e8e8e8 25%, transparent 25%), ' +
+      'linear-gradient(-45deg, #e8e8e8 25%, transparent 25%), ' +
+      'linear-gradient(45deg, transparent 75%, #e8e8e8 75%), ' +
+      'linear-gradient(-45deg, transparent 75%, #e8e8e8 75%)',
     backgroundSize: '24px 24px',
     backgroundPosition: '0 0, 0 12px, 12px -12px, -12px 0px',
   };

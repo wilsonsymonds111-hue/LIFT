@@ -5,7 +5,7 @@ const FAINT = 'rgba(255,255,255,0.55)';
 const GRID = '#4A4A4A';
 const DIVIDER = 'rgba(255,255,255,0.15)';
 const DARK_BG = '#0a0a0a';
-const CARD_BG = 'rgba(20,20,20,0.92)';
+const CARD_BG = 'rgba(18,18,18,0.55)';
 const BORDER = '#C84637';
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif';
 const SCALE = 2;
@@ -173,11 +173,19 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.fillRect(0, 0, W, H);
   }
 
-  // --- Semi-transparent dark card background (readable on any photo) ---
-  ctx.shadowBlur = 0;
+  // --- Semi-transparent dark card with soft glow (overlay quality) ---
+  ctx.shadowColor = 'rgba(0,0,0,0.45)';
+  ctx.shadowBlur = 24;
+  ctx.shadowOffsetY = 6;
   ctx.fillStyle = CARD_BG;
   roundRect(ctx, cardX, cardY, cardW, cardH, 22);
   ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+  // Subtle gold-tinted border for a glowy edge
+  ctx.strokeStyle = 'rgba(212,193,152,0.18)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
 
   ctx.textBaseline = 'top';
   ctx.textAlign = 'left';
