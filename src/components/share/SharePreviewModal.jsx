@@ -1,10 +1,18 @@
 import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { X, Copy, Share2, Check, Download } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
 
 export default function SharePreviewModal({ shareData, onClose }) {
   const [copied, setCopied] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [closing, setClosing] = useState(false);
+
+  const handleClose = () => {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(onClose, 300);
+  };
 
   const { transparentUrl, transparentCanvas } = useMemo(() => {
     const canvas = drawShareCard({ ...shareData, mode: 'transparent' });
@@ -17,18 +25,20 @@ export default function SharePreviewModal({ shareData, onClose }) {
       if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
         await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
         setCopied(true);
-        setTimeout(() => setCopied(false), 2500);
+        setTimeout(() => handleClose(), 800);
       } else {
         const link = document.createElement('a');
         link.href = transparentUrl;
         link.download = 'lift-pr.png';
         link.click();
+        setTimeout(() => handleClose(), 800);
       }
     } catch (e) {
       const link = document.createElement('a');
       link.href = transparentUrl;
       link.download = 'lift-pr.png';
       link.click();
+      setTimeout(() => handleClose(), 800);
     }
   };
 
@@ -50,6 +60,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
       if (e.name === 'AbortError') return;
     } finally {
       setSharing(false);
+      setTimeout(() => handleClose(), 600);
     }
   };
 
@@ -65,13 +76,18 @@ export default function SharePreviewModal({ shareData, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col">
+    <motion.div
+      className="fixed inset-0 z-50 bg-black flex flex-col"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: closing ? 0 : 1, y: closing ? 30 : 0 }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+    >
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 pb-2 relative z-10"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
-        <button onClick={onClose} className="w-10 h-10 flex items-center justify-center -ml-2">
+        <button onClick={handleClose} className="w-10 h-10 flex items-center justify-center -ml-2">
           <X className="w-6 h-6 text-white" />
         </button>
         <h2 className="text-white font-bold text-lg">Share PR</h2>
@@ -111,6 +127,6 @@ export default function SharePreviewModal({ shareData, onClose }) {
             : <><Share2 className="w-5 h-5" /> Share as Card</>}
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
