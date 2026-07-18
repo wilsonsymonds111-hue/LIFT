@@ -68,7 +68,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
       {/* Header */}
       <div
-        className="flex items-center justify-between px-4 pb-2"
+        className="flex items-center justify-between px-4 pb-2 relative z-10"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
         <button onClick={onClose} className="w-10 h-10 flex items-center justify-center -ml-2">
