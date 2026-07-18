@@ -194,11 +194,11 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   roundRect(ctx, cx, y, iconSize, iconSize, 9);
   ctx.fill();
   ctx.shadowBlur = 4;
-  ctx.font = `800 16px ${FONT}`;
+  ctx.font = `800 13px ${FONT}`;
   ctx.fillStyle = WHITE;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  drawSpacedTextCentered(ctx, 'LIFT.', cx + iconSize / 2, y + iconSize / 2 - 1, 0.5);
+  drawSpacedTextCentered(ctx, 'LIFT.', cx + iconSize / 2, y + iconSize / 2 - 1, 0.8);
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
   y += iconSize + 16;
