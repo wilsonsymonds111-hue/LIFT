@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { X, Copy, Check, ZoomIn, ArrowRight } from 'lucide-react';
+import { X, Copy, Check, ArrowRight } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
 
 export default function SharePreviewModal({ shareData, onClose }) {
@@ -90,9 +90,6 @@ export default function SharePreviewModal({ shareData, onClose }) {
               style={checkerStyle}
             >
               <img src={transparentUrl} className="block" alt="PR overlay" style={{ maxHeight: '38vh', maxWidth: '42vw' }} />
-              <div className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-80">
-                <ZoomIn className="w-3.5 h-3.5 text-white" />
-              </div>
             </button>
             <span className="text-[10px] text-neutral-500 font-medium">Your overlay</span>
           </div>
@@ -112,9 +109,6 @@ export default function SharePreviewModal({ shareData, onClose }) {
                 alt="Example overlay on a gym story"
                 style={{ maxHeight: '38vh', maxWidth: '42vw' }}
               />
-              <div className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-80">
-                <ZoomIn className="w-3.5 h-3.5 text-white" />
-              </div>
             </button>
             <span className="text-[10px] text-neutral-500 font-medium">On a story</span>
           </div>
