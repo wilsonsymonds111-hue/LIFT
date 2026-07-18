@@ -46,7 +46,7 @@ export function usePrefetchData() {
         staleTime: 5 * 60 * 1000,
       });
     };
-    const ric = window.requestIdleCallback || ((cb) => setTimeout(cb, 300));
+    const ric = window.requestIdleCallback || ((cb) => setTimeout(cb, 2000));
     const id = ric(prefetch);
     return () => (window.cancelIdleCallback ? window.cancelIdleCallback(id) : clearTimeout(id));
   }, [queryClient]);

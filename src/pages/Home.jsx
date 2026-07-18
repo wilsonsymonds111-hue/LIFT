@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { MoreHorizontal, CalendarPlus, Plus, Moon, Layers, Pencil } from 'lucide-react';
 import { motion, useAnimationControls } from 'framer-motion';
-import CalendarSyncModal from '../components/CalendarSyncModal';
-import SplitModal from '../components/SplitModal';
-import RenameSplitModal from '../components/RenameSplitModal';
+
+const CalendarSyncModal = lazy(() => import('../components/CalendarSyncModal'));
+const SplitModal = lazy(() => import('../components/SplitModal'));
+const RenameSplitModal = lazy(() => import('../components/RenameSplitModal'));
 import { useNavigate, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -605,31 +606,37 @@ export default function Home() {
       </div>
 
       {showCalendarSync && (
-        <CalendarSyncModal
-          onClose={() => setShowCalendarSync(false)}
-          onSync={handleCalendarSyncConfirm}
-        />
+        <Suspense fallback={null}>
+          <CalendarSyncModal
+            onClose={() => setShowCalendarSync(false)}
+            onSync={handleCalendarSyncConfirm}
+          />
+        </Suspense>
       )}
 
       {showSplitEditor && groupId && (
-        <SplitModal
-          splitKey={groupId}
-          isActiveSplit
-          onClose={() => setShowSplitEditor(false)}
-          onCycleSaved={() => { setCycleVersion(v => v + 1); invalidateWorkoutTemplates(queryClient); }}
-          onMakeCurrent={async () => {
-            setShowSplitEditor(false);
-            invalidateWorkoutTemplates(queryClient);
-          }}
-        />
+        <Suspense fallback={null}>
+          <SplitModal
+            splitKey={groupId}
+            isActiveSplit
+            onClose={() => setShowSplitEditor(false)}
+            onCycleSaved={() => { setCycleVersion(v => v + 1); invalidateWorkoutTemplates(queryClient); }}
+            onMakeCurrent={async () => {
+              setShowSplitEditor(false);
+              invalidateWorkoutTemplates(queryClient);
+            }}
+          />
+        </Suspense>
       )}
 
       {showRenameSplit && (
-        <RenameSplitModal
-          initialName={currentSplit[0]?.splitName || currentSplitName || ''}
-          onClose={() => setShowRenameSplit(false)}
-          onConfirm={handleRenameSplit}
-        />
+        <Suspense fallback={null}>
+          <RenameSplitModal
+            initialName={currentSplit[0]?.splitName || currentSplitName || ''}
+            onClose={() => setShowRenameSplit(false)}
+            onConfirm={handleRenameSplit}
+          />
+        </Suspense>
       )}
 
     </div>

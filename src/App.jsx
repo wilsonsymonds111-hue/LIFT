@@ -27,7 +27,7 @@ const lazyRetry = (importFn, retries = 5) =>
     attempt(retries);
   });
 
-import Home from './pages/Home';
+const Home = lazy(() => lazyRetry(() => import('./pages/Home')));
 const Splits = lazy(() => lazyRetry(() => import('./pages/Splits')));
 const BodyStats = lazy(() => lazyRetry(() => import('./pages/BodyStats')));
 const NewTemplate = lazy(() => lazyRetry(() => import('./pages/NewTemplate')));
@@ -200,7 +200,7 @@ const usePreloadSubPages = () => {
       import('./pages/TemplateDetail');
       import('./pages/SplitDetail');
     };
-    const ric = window.requestIdleCallback || ((cb) => setTimeout(cb, 500));
+    const ric = window.requestIdleCallback || ((cb) => setTimeout(cb, 3000));
     const id = ric(preload);
     return () => (window.cancelIdleCallback ? window.cancelIdleCallback(id) : clearTimeout(id));
   }, []);
