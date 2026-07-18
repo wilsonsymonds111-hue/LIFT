@@ -69,7 +69,8 @@ export default function SharePreviewModal({ shareData, onClose }) {
       />
       {/* Full-screen sheet — extends to the very top, over the nav bar */}
       <motion.div
-        className="fixed inset-0 z-[101] bg-white flex flex-col justify-around py-4"
+        className="fixed bottom-0 left-0 right-0 z-[101] bg-white flex flex-col justify-around py-4 rounded-t-3xl"
+        style={{ height: '80vh' }}
         initial={{ y: '100%' }}
         animate={{ y: closing ? '100%' : 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
