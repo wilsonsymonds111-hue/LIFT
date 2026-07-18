@@ -111,7 +111,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           <h3
             {...dragHandleProps}
             style={{ touchAction: 'none' }}
-            className="text-blue-500 font-semibold text-base select-none cursor-grab active:cursor-grabbing leading-snug"
+            className="text-blue-500 font-semibold text-lg select-none cursor-grab active:cursor-grabbing leading-snug"
             onClick={() => { setExerciseDetailInitialTab('About'); setShowExerciseDetail(true); }}
           >
             {exercise.name}
@@ -119,8 +119,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           {(
             <div className="relative -ml-1 mt-0.5 flex items-center gap-0.5">
               <ExerciseShareButton exercise={exercise} sessionResults={sessionResults} pr={pr} exerciseImage={exerciseImage} />
-              <button onClick={() => setShowMenu(m => !m)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition">
-                <MoreHorizontal className="w-4 h-4 text-gray-700 dark:text-gray-200" />
+              <button onClick={() => setShowMenu(m => !m)} className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition">
+                <MoreHorizontal className="w-5 h-5 text-gray-700 dark:text-gray-200" />
               </button>
               {showMenu && (
                 <>
@@ -243,7 +243,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                 }
                 setSets(p => [...p, { id: Date.now(), suggestedKg, suggestedReps }]);
               }}
-              className="mt-2 w-full py-1.5 bg-white dark:bg-neutral-700 hover:bg-gray-100 dark:hover:bg-neutral-600 border border-gray-200 dark:border-neutral-600 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 transition"
+              className="mt-2 w-full py-2.5 bg-white dark:bg-neutral-700 hover:bg-gray-100 dark:hover:bg-neutral-600 border border-gray-200 dark:border-neutral-600 rounded-xl text-base font-medium text-gray-600 dark:text-gray-300 transition"
             >
               + Add Set
             </button>
