@@ -46,8 +46,9 @@ export function usePrefetchData() {
         staleTime: 5 * 60 * 1000,
       });
     };
-    const ric = window.requestIdleCallback || ((cb) => setTimeout(cb, 2000));
-    const id = ric(prefetch);
-    return () => (window.cancelIdleCallback ? window.cancelIdleCallback(id) : clearTimeout(id));
+    // Start image map fetch immediately — it's a single lightweight API call
+    // and the actual image preloading (new Image()) is non-blocking.
+    prefetch();
+    return;
   }, [queryClient]);
 }
