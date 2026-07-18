@@ -143,7 +143,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   contentH += 30 + 16; // logo square + gap
   contentH += 26; // title
   contentH += 12; // gap before weight
-  contentH += 76; // weight (68px) + reps inline
+  contentH += 66; // weight + reps inline
   if (delta) contentH += 8 + 18; // gap + delta
   if (showMetrics) contentH += 8 + 40; // gap + metrics row
   contentH += 14 + 1 + 14; // gap + divider + gap
@@ -216,20 +216,20 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   // --- Main stat: weight (large) + reps (inline right) ---
   y += 12;
   const weightText = isBodyweight ? `${reps}` : `${Math.round(weight)}KG`;
-  ctx.font = `700 68px ${FONT}`;
-  ctx.letterSpacing = '-2px';
+  ctx.font = `400 56px ${FONT}`;
+  ctx.letterSpacing = '-1px';
   ctx.fillStyle = WHITE;
   ctx.fillText(weightText, cx, y);
   const weightW = ctx.measureText(weightText).width;
   ctx.letterSpacing = '0px';
 
-  ctx.font = `400 26px ${FONT}`;
+  ctx.font = `400 24px ${FONT}`;
   ctx.letterSpacing = '1px';
   ctx.fillStyle = WHITE;
   const repsLabel = isBodyweight ? 'REPS' : `X ${reps} REPS`;
-  ctx.fillText(repsLabel, cx + weightW + 14, y + 40);
+  ctx.fillText(repsLabel, cx + weightW + 14, y + 32);
   ctx.letterSpacing = '0px';
-  y += 76;
+  y += 66;
 
   // --- Delta from last PR ---
   if (delta) {
