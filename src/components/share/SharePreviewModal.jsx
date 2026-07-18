@@ -123,7 +123,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
               />
               <img
                 src={transparentUrl}
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[60%] w-auto object-contain scale-y-[0.85]"
+                className="absolute inset-0 w-full h-full object-contain scale-90"
                 alt="Your overlay on a gym story"
               />
               {/* Instagram Story chrome — progress bars (thin, high) */}
@@ -175,7 +175,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
               />
               <img
                 src={transparentUrl}
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[60%] w-auto object-contain scale-y-[0.85]"
+                className="absolute inset-0 w-full h-full object-contain scale-90"
                 alt="Your overlay on a gym story"
               />
               {/* Instagram Story chrome — progress bars */}
