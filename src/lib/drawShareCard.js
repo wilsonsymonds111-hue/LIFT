@@ -148,7 +148,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   if (showMetrics) contentH += 8 + 40; // gap + metrics row
   contentH += 14 + 1 + 14; // gap + divider + gap
   if (chartData) contentH += 20 + chartData.chartH + 24; // chart header + chart + axis labels
-  contentH += 24 + 42; // bottom logo gap + logo
+  contentH += 24 + 58; // bottom logo gap + logo
   contentH += cardPad; // bottom padding
 
   const cardW = 484;
@@ -383,15 +383,15 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   }
 
   // --- Bottom center: LIFT. logo ---
-  const logoSize = 42;
+  const logoSize = 58;
   ctx.shadowBlur = 0;
   ctx.fillStyle = '#000000';
   const logoX = cx + drawW / 2 - logoSize / 2;
   const logoY = y + 24;
-  roundRect(ctx, logoX, logoY, logoSize, logoSize, 11);
+  roundRect(ctx, logoX, logoY, logoSize, logoSize, 15);
   ctx.fill();
   ctx.fillStyle = WHITE;
-  ctx.font = `700 12px ${FONT}`;
+  ctx.font = `700 16px ${FONT}`;
   ctx.letterSpacing = '0.5px';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
