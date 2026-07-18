@@ -125,23 +125,21 @@ export default function SharePreviewModal({ shareData, onClose }) {
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[72%] w-auto object-contain"
                 alt="Your overlay on a gym story"
               />
-              {/* Instagram Story chrome — progress bars */}
-              <div className="absolute top-0 left-0 right-0 flex gap-[3px] px-2 pt-[6px]">
+              {/* Instagram Story chrome — progress bars (thin, high) */}
+              <div className="absolute top-0 left-0 right-0 flex gap-[2px] px-[6px] pt-[5px]">
                 {[0, 1, 2, 3].map(i => (
-                  <div key={i} className="flex-1 h-[2.5px] rounded-full bg-white/35 overflow-hidden">
-                    {i === 0 && <div className="h-full w-2/3 bg-white" />}
-                  </div>
+                  <div key={i} className={`flex-1 h-[1.5px] rounded-full overflow-hidden ${i < 3 ? 'bg-white' : 'bg-white/30'}`} />
                 ))}
               </div>
-              {/* Profile + username */}
-              <div className="absolute top-[14px] left-2 flex items-center gap-1.5">
-                <div className="w-[18px] h-[18px] rounded-full bg-white/70 ring-[1.5px] ring-white flex-shrink-0" />
-                <span className="text-white text-[8px] font-semibold leading-none drop-shadow-sm">jake.deleon</span>
-                <span className="text-white/70 text-[8px] leading-none drop-shadow-sm">2h</span>
+              {/* Profile + username (compact) */}
+              <div className="absolute top-[14px] left-[6px] flex items-center gap-[4px]">
+                <div className="w-[12px] h-[12px] rounded-full bg-white/60 ring-[1px] ring-white/90 flex-shrink-0" />
+                <span className="text-white text-[6px] font-semibold leading-none drop-shadow-sm">jake.deleon</span>
+                <span className="text-white/60 text-[6px] leading-none drop-shadow-sm">2h</span>
               </div>
               {/* Close (X) */}
-              <div className="absolute top-[12px] right-2 w-[16px] h-[16px] flex items-center justify-center">
-                <X className="w-3 h-3 text-white" strokeWidth={2.5} />
+              <div className="absolute top-[12px] right-[5px] w-[10px] h-[10px] flex items-center justify-center">
+                <X className="w-[9px] h-[9px] text-white" strokeWidth={2.5} />
               </div>
             </button>
             <span className="text-[10px] text-neutral-600 font-medium">On a story</span>
@@ -164,22 +162,38 @@ export default function SharePreviewModal({ shareData, onClose }) {
               <X className="w-5 h-5 text-white" />
             </button>
             {zoomed === 'example' ? (
-              <div
-                className="relative select-none"
-                style={{ height: '85vh', aspectRatio: '9 / 16' }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <img
-                  src={GYM_PHOTO}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  alt="Gym story background"
-                />
-                <img
-                  src={transparentUrl}
-                  className="absolute inset-0 w-full h-full object-contain"
-                  alt="Your overlay on a gym story"
-                />
+            <div
+              className="relative select-none rounded-xl overflow-hidden"
+              style={{ height: '85vh', aspectRatio: '9 / 16' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={GYM_PHOTO}
+                className="absolute inset-0 w-full h-full object-cover"
+                alt="Gym story background"
+              />
+              <img
+                src={transparentUrl}
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[72%] w-auto object-contain"
+                alt="Your overlay on a gym story"
+              />
+              {/* Instagram Story chrome — progress bars */}
+              <div className="absolute top-0 left-0 right-0 flex gap-[3px] px-3 pt-[8px]">
+                {[0, 1, 2, 3].map(i => (
+                  <div key={i} className={`flex-1 h-[2.5px] rounded-full overflow-hidden ${i < 3 ? 'bg-white' : 'bg-white/30'}`} />
+                ))}
               </div>
+              {/* Profile + username */}
+              <div className="absolute top-[22px] left-3 flex items-center gap-[6px]">
+                <div className="w-[22px] h-[22px] rounded-full bg-white/60 ring-[1.5px] ring-white/90 flex-shrink-0" />
+                <span className="text-white text-[11px] font-semibold leading-none drop-shadow-sm">jake.deleon</span>
+                <span className="text-white/60 text-[11px] leading-none drop-shadow-sm">2h</span>
+              </div>
+              {/* Close (X) */}
+              <div className="absolute top-[20px] right-3 w-[18px] h-[18px] flex items-center justify-center">
+                <X className="w-[15px] h-[15px] text-white" strokeWidth={2.5} />
+              </div>
+            </div>
             ) : (
               <div
                 className="relative select-none overflow-hidden rounded-xl"
