@@ -74,10 +74,10 @@ export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
     <>
       <button
         onClick={() => setShowModal(true)}
-        className="w-9 h-9 flex items-center justify-center rounded-lg transition flex-shrink-0 hover:opacity-80"
+        className="w-11 h-11 flex items-center justify-center rounded-lg transition flex-shrink-0 hover:opacity-80"
         aria-label="Share PR"
       >
-        <InstagramIcon size={22} />
+        <InstagramIcon size={26} />
       </button>
       {showModal && (
         <SharePreviewModal shareData={shareData} onClose={() => setShowModal(false)} />

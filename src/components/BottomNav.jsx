@@ -22,7 +22,7 @@ const BottomNav = memo(function BottomNav() {
       style={{ bottom: '16px' }}
     >
       <nav
-        className="relative flex items-center justify-around gap-1 h-[64px] px-1.5 rounded-full overflow-hidden border border-white/40 dark:border-white/10 bg-white/40 dark:bg-neutral-900/80"
+        className="relative flex items-center justify-around gap-1 h-[70px] px-1.5 rounded-full overflow-hidden border border-white/40 dark:border-white/10 bg-white/40 dark:bg-neutral-900/80"
         style={{
           backdropFilter: 'blur(40px) saturate(180%)',
           WebkitBackdropFilter: 'blur(40px) saturate(180%)',
@@ -52,7 +52,7 @@ const BottomNav = memo(function BottomNav() {
                 />
               )}
               <Icon
-                className="relative z-10 w-[23px] h-[23px] transition-colors duration-200 text-foreground"
+                className="relative z-10 w-[27px] h-[27px] transition-colors duration-200 text-foreground"
                 strokeWidth={active ? 2.2 : 1.8}
               />
             </Link>

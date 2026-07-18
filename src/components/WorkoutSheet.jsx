@@ -712,8 +712,8 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                   onClick={() => setRestMinimized(false)}
                 />
               ) : (
-                <button onClick={() => setShowRestTimerPicker(true)} className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-xl transition">
-                  <Timer className="w-4 h-4" strokeWidth={1.5} />
+                <button onClick={() => setShowRestTimerPicker(true)} className="flex items-center gap-2 px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white text-base font-semibold rounded-xl transition">
+                  <Timer className="w-5 h-5" strokeWidth={1.5} />
                   Rest Timer
                 </button>
               )}
@@ -787,7 +787,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                 onPointerUp={onGrabPointerUp}
                 onPointerCancel={onGrabPointerUp}
               />
-              <button onClick={handleFinish} className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition">
+              <button onClick={handleFinish} className="px-6 py-2.5 bg-green-500 hover:bg-green-600 text-white text-base font-semibold rounded-xl transition">
                 Finish
               </button>
             </div>
