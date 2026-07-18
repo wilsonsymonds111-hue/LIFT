@@ -25,9 +25,9 @@ export default function InstagramShareInstructions({ imageUrl, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className="relative bg-gray-50 rounded-3xl w-[92%] max-w-sm max-h-[88vh] flex flex-col shadow-2xl overflow-y-auto">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/70" />
+      <div className="relative bg-gray-50 rounded-3xl w-[92%] max-w-sm max-h-[88vh] flex flex-col shadow-2xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
 
         <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
           <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition">
