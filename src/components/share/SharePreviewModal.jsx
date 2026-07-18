@@ -93,13 +93,13 @@ export default function SharePreviewModal({ shareData, onClose }) {
         </div>
 
         {/* Previews — overlay (left) + example on a story (right) */}
-        <div className="flex items-center justify-center gap-3 px-6 flex-shrink-0">
+        <div className="flex items-center justify-center gap-2 px-4 flex-shrink-0">
           {/* Overlay PNG on checkered background */}
           <div className="flex flex-col items-center gap-1.5">
             <button
               onClick={() => setZoomed('overlay')}
               className="relative rounded-xl overflow-hidden shadow-xl active:scale-[0.98] transition"
-              style={{ height: '38vh', aspectRatio: '9 / 16', ...checkerStyle }}
+              style={{ height: '32vh', aspectRatio: '9 / 16', ...checkerStyle }}
             >
               <img src={transparentUrl} className="absolute inset-0 w-full h-full object-contain object-bottom scale-90 origin-bottom" alt="PR overlay" />
             </button>
@@ -114,7 +114,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
             <button
               onClick={() => setZoomed('example')}
               className="relative rounded-xl overflow-hidden shadow-xl active:scale-[0.98] transition"
-              style={{ height: '38vh', aspectRatio: '9 / 16' }}
+              style={{ height: '32vh', aspectRatio: '9 / 16' }}
             >
               <img
                 src={GYM_PHOTO}
