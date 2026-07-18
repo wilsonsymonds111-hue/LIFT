@@ -98,7 +98,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
           <button onClick={handleClose} className="w-9 h-9 flex items-center justify-center -ml-2">
             <X className="w-6 h-6 text-white" />
           </button>
-          <h2 className="text-white font-bold text-lg">Share Your PR!</h2>
+          <h2 className="text-white font-bold text-lg">Share your PR on your Instagram Story!</h2>
           <div className="w-9" />
         </div>
 
