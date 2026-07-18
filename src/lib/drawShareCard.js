@@ -139,14 +139,12 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   const cardPad = 28;
   let contentH = cardPad; // top padding
   contentH += 14 + 16; // arrow header + gap
-  contentH += 32; // exercise name
-  contentH += 10 + 26; // gap + badge (always shown)
+  contentH += 24; // title
   contentH += 12; // gap before weight
-  contentH += 48; // weight (40px)
-  contentH += 48; // reps (40px, same size as weight)
+  contentH += 56; // weight + reps inline
   if (delta) contentH += 8 + 20; // gap + delta
-  contentH += 10 + 1 + 14; // gap + divider + gap
-  if (chartData) contentH += chartData.chartH + 24; // chart + axis labels
+  contentH += 14 + 1 + 14; // gap + divider + gap
+  if (chartData) contentH += 18 + chartData.chartH + 24; // chart header + chart + axis labels
   contentH += cardPad; // bottom padding
 
   const cardW = 484;
@@ -201,46 +199,31 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   drawSpacedText(ctx, 'LIFT', cx + arrowSize + 6, y + 1, 1.2);
   y += arrowSize + 16;
 
-  // --- Exercise name ---
-  ctx.font = `800 24px ${FONT}`;
+  // --- Title: exercise name + PR suffix ---
+  ctx.font = `700 16px ${FONT}`;
   ctx.fillStyle = WHITE;
-  let nameText = exerciseName.toUpperCase();
-  while (ctx.measureText(nameText).width > drawW && nameText.length > 0) {
-    nameText = nameText.slice(0, -1);
+  const fullTitle = (exerciseName + (isPR ? ' PR' : '')).toUpperCase();
+  let titleText = fullTitle;
+  while (ctx.measureText(titleText).width > drawW && titleText.length > 0) {
+    titleText = titleText.slice(0, -1);
   }
-  if (nameText !== exerciseName.toUpperCase()) nameText = nameText.slice(0, -2) + '…';
-  ctx.fillText(nameText, cx, y);
-  y += 32;
+  if (titleText !== fullTitle) titleText = titleText.slice(0, -2) + '…';
+  ctx.fillText(titleText, cx, y);
+  y += 24;
 
-  // --- PR badge (always shown — this card is shared from the PR share button) ---
-  y += 10;
-  ctx.font = `800 12px ${FONT}`;
-  const badgeText = 'PR';
-  const badgeW = ctx.measureText(badgeText).width + 24;
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = GOLD;
-  roundRect(ctx, cx, y, badgeW, 24, 12);
-  ctx.fill();
-  ctx.fillStyle = DARK_BG;
-  drawSpacedText(ctx, badgeText, cx + 12, y + 6, 1.5);
-  y += 26;
-
-  // --- Weight + Reps (consistent sizing) ---
+  // --- Main stat: weight (large) + reps (inline right) ---
   y += 12;
-  const statText = isBodyweight ? `${reps}` : `${Math.round(weight)}KG`;
-  ctx.font = `800 40px ${FONT}`;
+  const weightText = isBodyweight ? `${reps}` : `${Math.round(weight)}KG`;
+  ctx.font = `800 48px ${FONT}`;
   ctx.fillStyle = WHITE;
-  ctx.fillText(statText, cx, y);
-  y += 48;
+  ctx.fillText(weightText, cx, y);
+  const weightW = ctx.measureText(weightText).width;
 
-  ctx.font = `800 40px ${FONT}`;
-  ctx.fillStyle = WHITE;
-  if (!isBodyweight && reps) {
-    ctx.fillText(`× ${reps} REPS`, cx, y);
-  } else if (isBodyweight) {
-    ctx.fillText('REPS', cx, y);
-  }
-  y += 48;
+  ctx.font = `700 22px ${FONT}`;
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  const repsLabel = isBodyweight ? 'REPS' : `× ${reps} REPS`;
+  ctx.fillText(repsLabel, cx + weightW + 12, y + 24);
+  y += 56;
 
   // --- Delta from last PR ---
   if (delta) {
@@ -258,7 +241,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   }
 
   // --- Divider ---
-  y += 10;
+  y += 14;
   ctx.shadowBlur = 0;
   ctx.strokeStyle = DIVIDER;
   ctx.lineWidth = 1;
@@ -271,6 +254,13 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   // --- Progress chart ---
   if (chartData) {
     const { points, min, max, range, chartH, chartPad, singlePoint, startVal, endVal, startDate, endDate } = chartData;
+
+    // Chart section header
+    ctx.shadowBlur = 4;
+    ctx.font = `700 11px ${FONT}`;
+    ctx.fillStyle = GOLD;
+    drawSpacedText(ctx, 'PROGRESS OVER TIME', cx, y, 1.5);
+    y += 18;
 
     // Left padding for weight interval labels
     const labelW = 38;
@@ -326,12 +316,15 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       ctx.lineWidth = 2.5;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
+      ctx.shadowColor = 'rgba(212,193,152,0.45)';
+      ctx.shadowBlur = 6;
       ctx.beginPath();
       coords.forEach((c, i) => {
         if (i === 0) ctx.moveTo(chartX + c.x, y + c.y);
         else ctx.lineTo(chartX + c.x, y + c.y);
       });
       ctx.stroke();
+      ctx.shadowBlur = 0;
     } else {
       // Single point — dashed reference line
       ctx.strokeStyle = 'rgba(212,193,152,0.5)';
