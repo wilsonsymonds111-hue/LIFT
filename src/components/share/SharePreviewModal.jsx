@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { X, Copy, Check } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
@@ -52,11 +53,11 @@ export default function SharePreviewModal({ shareData, onClose }) {
     backgroundPosition: '0 0, 0 12px, 12px -12px, -12px 0px',
   };
 
-  return (
+  return createPortal(
     <>
       {/* Dimmed backdrop */}
       <motion.div
-        className="fixed inset-0 z-[60] bg-black/60"
+        className="fixed inset-0 z-[100] bg-black/60"
         initial={{ opacity: 0 }}
         animate={{ opacity: closing ? 0 : 1 }}
         transition={{ duration: 0.3 }}
@@ -64,7 +65,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
       />
       {/* Full-screen sheet — extends to the very top, over the nav bar */}
       <motion.div
-        className="fixed inset-0 z-[80] bg-black flex flex-col"
+        className="fixed inset-0 z-[101] bg-black flex flex-col"
         initial={{ y: '100%' }}
         animate={{ y: closing ? '100%' : 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -81,7 +82,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
         {/* Preview — transparent PNG on checkered background */}
         <div className="flex-1 flex items-center justify-center px-6 py-1 min-h-0">
           <div className="relative rounded-2xl overflow-hidden shadow-2xl" style={checkerStyle}>
-            <img src={transparentUrl} className="block max-h-full max-w-full" alt="PR share preview" style={{ maxHeight: '30vh' }} />
+            <img src={transparentUrl} className="block max-h-full max-w-full" alt="PR share preview" style={{ maxHeight: '45vh' }} />
           </div>
         </div>
 
@@ -116,6 +117,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
           </button>
         </div>
       </motion.div>
-    </>
+    </>,
+    document.body
   );
 }
