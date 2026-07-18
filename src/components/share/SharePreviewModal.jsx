@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { X, Copy, Check, ZoomIn } from 'lucide-react';
+import { X, Copy, Check, ZoomIn, ArrowRight } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
 
 export default function SharePreviewModal({ shareData, onClose }) {
@@ -96,6 +96,9 @@ export default function SharePreviewModal({ shareData, onClose }) {
             </button>
             <span className="text-[10px] text-neutral-500 font-medium">Your overlay</span>
           </div>
+
+          {/* Arrow showing before → after */}
+          <ArrowRight className="w-5 h-5 text-neutral-600 flex-shrink-0" />
 
           {/* Example on a gym story */}
           <div className="flex flex-col items-center gap-1.5">
