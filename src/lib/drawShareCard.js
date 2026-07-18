@@ -228,13 +228,13 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   if (unitText) {
     ctx.font = `700 34px ${FONT}`;
     ctx.fillStyle = WHITE;
-    ctx.fillText(unitText, cx + numW + 6, y + (64 - 34));
+    ctx.fillText(unitText, cx + numW + 6, y + 15);
     weightW = numW + 6 + ctx.measureText(unitText).width;
   }
 
   ctx.font = `400 22px ${FONT}`;
   ctx.letterSpacing = '1px';
-  ctx.fillStyle = LABEL;
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
   const repsLabel = isBodyweight ? 'REPS' : `X ${reps} REPS`;
   ctx.fillText(repsLabel, cx + weightW + 14, y + 34);
   ctx.letterSpacing = '0px';
