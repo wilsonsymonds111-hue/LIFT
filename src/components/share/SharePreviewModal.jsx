@@ -7,7 +7,7 @@ import { drawShareCard } from '@/lib/drawShareCard';
 export default function SharePreviewModal({ shareData, onClose }) {
   const [copied, setCopied] = useState(false);
   const [closing, setClosing] = useState(false);
-  const [zoomed, setZoomed] = useState(false);
+  const [zoomed, setZoomed] = useState(null); // null | 'overlay' | 'example'
 
   const handleClose = () => {
     if (closing) return;
@@ -80,18 +80,41 @@ export default function SharePreviewModal({ shareData, onClose }) {
           <div className="w-9" />
         </div>
 
-        {/* Preview — transparent PNG on checkered background */}
-        <div className="flex items-center justify-center px-6 flex-shrink-0">
-          <button
-            onClick={() => setZoomed(true)}
-            className="relative rounded-2xl overflow-hidden shadow-2xl group active:scale-[0.98] transition"
-            style={checkerStyle}
-          >
-            <img src={transparentUrl} className="block max-w-full" alt="PR share preview" style={{ maxHeight: '40vh' }} />
-            <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-80">
-              <ZoomIn className="w-4 h-4 text-white" />
-            </div>
-          </button>
+        {/* Previews — overlay (left) + example on a story (right) */}
+        <div className="flex items-center justify-center gap-3 px-6 flex-shrink-0">
+          {/* Overlay PNG on checkered background */}
+          <div className="flex flex-col items-center gap-1.5">
+            <button
+              onClick={() => setZoomed('overlay')}
+              className="relative rounded-xl overflow-hidden shadow-xl active:scale-[0.98] transition"
+              style={checkerStyle}
+            >
+              <img src={transparentUrl} className="block" alt="PR overlay" style={{ maxHeight: '38vh', maxWidth: '42vw' }} />
+              <div className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-80">
+                <ZoomIn className="w-3.5 h-3.5 text-white" />
+              </div>
+            </button>
+            <span className="text-[10px] text-neutral-500 font-medium">Your overlay</span>
+          </div>
+
+          {/* Example on a gym story */}
+          <div className="flex flex-col items-center gap-1.5">
+            <button
+              onClick={() => setZoomed('example')}
+              className="relative rounded-xl overflow-hidden shadow-xl active:scale-[0.98] transition"
+            >
+              <img
+                src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/c9cd0cc6f_image.png"
+                className="block"
+                alt="Example overlay on a gym story"
+                style={{ maxHeight: '38vh', maxWidth: '42vw' }}
+              />
+              <div className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-80">
+                <ZoomIn className="w-3.5 h-3.5 text-white" />
+              </div>
+            </button>
+            <span className="text-[10px] text-neutral-500 font-medium">On a story</span>
+          </div>
         </div>
 
         {/* Fullscreen zoom view */}
@@ -101,19 +124,21 @@ export default function SharePreviewModal({ shareData, onClose }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
-            onClick={() => setZoomed(false)}
+            onClick={() => setZoomed(null)}
           >
             <button
-              onClick={() => setZoomed(false)}
+              onClick={() => setZoomed(null)}
               className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center"
             >
               <X className="w-5 h-5 text-white" />
             </button>
             <img
-              src={transparentUrl}
+              src={zoomed === 'example'
+                ? 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/c9cd0cc6f_image.png'
+                : transparentUrl}
               className="max-w-none select-none"
-              style={{ maxHeight: 'none', maxWidth: '95vw', maxHeight: '90vh' }}
-              alt="PR share preview zoomed"
+              style={{ maxWidth: '95vw', maxHeight: '90vh' }}
+              alt="PR preview zoomed"
               onClick={(e) => e.stopPropagation()}
             />
           </motion.div>,
