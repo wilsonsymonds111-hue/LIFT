@@ -103,25 +103,34 @@ export default function SharePreviewModal({ shareData, onClose }) {
         </div>
 
         {/* Preview — transparent PNG on checkered background */}
-        <div className="flex-1 flex items-center justify-center px-6 py-2 min-h-0">
+        <div className="flex-1 flex items-center justify-center px-6 py-1 min-h-0">
           <div className="relative rounded-2xl overflow-hidden shadow-2xl" style={checkerStyle}>
-            <img src={transparentUrl} className="block max-h-full max-w-full" alt="PR share preview" style={{ maxHeight: '38vh' }} />
+            <img src={transparentUrl} className="block max-h-full max-w-full" alt="PR share preview" style={{ maxHeight: '30vh' }} />
             <div className="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded tracking-widest">
               TRANSPARENT
             </div>
           </div>
         </div>
 
-        {/* Instagram instructions */}
-        <div className="px-6 py-2 flex-shrink-0">
-          <p className="text-xs text-neutral-400 leading-relaxed text-center">
-            Copy the transparent PNG, then open Instagram → add a photo to your story → paste the sticker on top.
-          </p>
+        {/* Instructions — Apple-quality step layout */}
+        <div className="px-6 pt-3 pb-2 flex-shrink-0">
+          <div className="flex items-start gap-2.5">
+            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center mt-0.5">1</span>
+            <p className="text-[13px] text-neutral-300 leading-snug">Copy the transparent PNG below.</p>
+          </div>
+          <div className="flex items-start gap-2.5 mt-2">
+            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center mt-0.5">2</span>
+            <p className="text-[13px] text-neutral-300 leading-snug">Open Instagram → add a photo to your story.</p>
+          </div>
+          <div className="flex items-start gap-2.5 mt-2">
+            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center mt-0.5">3</span>
+            <p className="text-[13px] text-neutral-300 leading-snug">Paste the sticker on top.</p>
+          </div>
         </div>
 
         {/* Actions */}
         <div
-          className="px-6 pt-1 pb-5 space-y-2.5 flex-shrink-0"
+          className="px-6 pt-2 pb-5 space-y-2 flex-shrink-0"
           style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)' }}
         >
           <button
@@ -129,7 +138,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
             className="w-full py-3.5 bg-white text-black rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition"
           >
             {copied
-              ? <><Check className="w-5 h-5" /> Copied to Clipboard!</>
+              ? <><Check className="w-5 h-5" /> Copied!</>
               : <><Copy className="w-5 h-5" /> Copy Transparent PNG</>}
           </button>
           <button
@@ -139,7 +148,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
           >
             {sharing
               ? <><Download className="w-5 h-5 animate-pulse" /> Preparing…</>
-              : <><MessageCircle className="w-5 h-5" /> Share via Text</>}
+              : <><MessageCircle className="w-5 h-5" /> Share as Text Card</>}
           </button>
         </div>
       </motion.div>
