@@ -98,7 +98,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
           <button onClick={handleClose} className="w-9 h-9 flex items-center justify-center -ml-2">
             <X className="w-6 h-6 text-white" />
           </button>
-          <h2 className="text-white font-bold text-lg">Share your PR on your Instagram Story!</h2>
+          <h2 className="text-white font-bold text-sm px-6 text-center leading-tight">Share your PR on your Instagram Story!</h2>
           <div className="w-9" />
         </div>
 
@@ -110,7 +110,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
         </div>
 
         {/* Instructions — Apple-quality step layout */}
-        <div className="px-6 pt-3 pb-2 flex-shrink-0">
+        <div className="px-6 pt-6 pb-2 flex-shrink-0">
           <div className="flex items-start gap-2.5">
             <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center mt-0.5">1</span>
             <p className="text-[13px] text-neutral-300 leading-snug">Copy the transparent PNG below.</p>
