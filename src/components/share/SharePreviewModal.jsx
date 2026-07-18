@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { X, Copy, Check, ArrowRight } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
+import ZoomOverlay from './ZoomOverlay';
 
 const GYM_PHOTO = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/acb45489c_image.png';
 const JAKE_AVATAR = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6d1143193_generated_image.png';
@@ -148,68 +149,14 @@ export default function SharePreviewModal({ shareData, onClose }) {
           </div>
         </div>
 
-        {/* Fullscreen zoom view */}
+        {/* Fullscreen zoom view — drag down to dismiss */}
         {zoomed && createPortal(
-          <motion.div
-            className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center overflow-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => setZoomed(null)}
-          >
-            <button
-              onClick={() => setZoomed(null)}
-              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center"
-            >
-              <X className="w-5 h-5 text-white" />
-            </button>
-            {zoomed === 'example' ? (
-            <div
-              className="relative select-none rounded-xl overflow-hidden"
-              style={{ height: '85vh', aspectRatio: '9 / 16' }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img
-                src={GYM_PHOTO}
-                className="absolute inset-0 w-full h-full object-cover"
-                alt="Gym story background"
-              />
-              <img
-                src={transparentUrl}
-                className="absolute inset-0 w-full h-full object-contain object-bottom scale-90 origin-bottom"
-                alt="Your overlay on a gym story"
-              />
-              {/* Instagram Story chrome — progress bars */}
-              <div className="absolute top-0 left-0 right-0 flex gap-[3px] px-3 pt-[8px]">
-                {[0, 1, 2, 3].map(i => (
-                  <div key={i} className={`flex-1 h-[2.5px] rounded-full overflow-hidden ${i < 3 ? 'bg-white' : 'bg-white/30'}`} />
-                ))}
-              </div>
-              {/* Profile + username */}
-              <div className="absolute top-[22px] left-3 flex items-center gap-[6px]">
-                <img src={JAKE_AVATAR} className="w-[22px] h-[22px] rounded-full object-cover ring-[1.5px] ring-white/90 flex-shrink-0" alt="" />
-                <span className="text-white text-[11px] font-semibold leading-none drop-shadow-sm">jake.deleon</span>
-                <span className="text-white/60 text-[11px] leading-none drop-shadow-sm">2h</span>
-              </div>
-              {/* Close (X) */}
-              <div className="absolute top-[20px] right-3 w-[18px] h-[18px] flex items-center justify-center">
-                <X className="w-[15px] h-[15px] text-white" strokeWidth={2.5} />
-              </div>
-            </div>
-            ) : (
-              <div
-                className="relative select-none overflow-hidden rounded-xl"
-                style={{ ...checkerStyle, maxHeight: '90vh', aspectRatio: '9 / 16', height: '85vh' }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <img
-                  src={transparentUrl}
-                  className="absolute inset-0 w-full h-full object-contain"
-                  alt="PR preview zoomed"
-                />
-              </div>
-            )}
-          </motion.div>,
+          <ZoomOverlay
+            zoomed={zoomed}
+            transparentUrl={transparentUrl}
+            checkerStyle={checkerStyle}
+            onClose={() => setZoomed(null)}
+          />,
           document.body
         )}
 
