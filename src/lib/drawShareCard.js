@@ -83,9 +83,11 @@ const toReps = (v) => typeof v === 'object' ? (v.reps || 0) : (v || 0);
  * mode: 'transparent' (card floats over any background, positioned in bottom third)
  *       'card' (dark canvas background, card centered — for text message sharing)
  */
-export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessionResults, mode = 'transparent' }) {
+export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessionResults, bodyweight, mode = 'transparent' }) {
   const isCard = mode === 'card';
   const isBodyweight = !weight || weight === 0;
+  const showMetrics = bodyweight && !isBodyweight && weight > 0;
+  const ratio = showMetrics ? weight / bodyweight : null;
   const sets = (sessionResults && sessionResults.length > 0)
     ? sessionResults
     : (weight || reps ? [{ kg: weight, reps }] : []);
@@ -143,6 +145,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   contentH += 12; // gap before weight
   contentH += 76; // weight (68px) + reps inline
   if (delta) contentH += 8 + 18; // gap + delta
+  if (showMetrics) contentH += 8 + 40; // gap + metrics row
   contentH += 14 + 1 + 14; // gap + divider + gap
   if (chartData) contentH += 20 + chartData.chartH + 24; // chart header + chart + axis labels
   contentH += cardPad; // bottom padding
@@ -171,19 +174,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.fillRect(0, 0, W, H);
   }
 
-  // --- Semi-transparent dark card with soft glow (overlay quality) ---
-  ctx.shadowColor = 'rgba(0,0,0,0.45)';
-  ctx.shadowBlur = 24;
-  ctx.shadowOffsetY = 6;
-  ctx.fillStyle = CARD_BG;
-  roundRect(ctx, cardX, cardY, cardW, cardH, 22);
-  ctx.fill();
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetY = 0;
-  // Subtle gold-tinted border for a glowy edge
-  ctx.strokeStyle = 'rgba(212,193,152,0.18)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
+  // Transparent background — content floats on a transparent PNG
 
   ctx.textBaseline = 'top';
   ctx.textAlign = 'left';
@@ -255,6 +246,35 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.fillText(deltaText, cx + dArrowSize + 7, y + 3);
     ctx.letterSpacing = '0px';
     y += 18;
+  }
+
+  // --- Bodyweight metrics row ---
+  if (showMetrics) {
+    y += 8;
+    const colW = drawW / 2;
+    const leftCx = cx + colW / 2;
+    const rightCx = cx + colW / 2 + colW;
+    ctx.textAlign = 'center';
+    ctx.font = `700 18px ${FONT}`;
+    ctx.fillStyle = WHITE;
+    ctx.fillText(`${Math.round(bodyweight)}KG`, leftCx, y);
+    ctx.font = `400 11px ${FONT}`;
+    ctx.fillStyle = MUTED;
+    ctx.fillText('BODYWEIGHT', leftCx, y + 20);
+    ctx.strokeStyle = DIVIDER;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx + colW, y - 4);
+    ctx.lineTo(cx + colW, y + 26);
+    ctx.stroke();
+    ctx.font = `700 18px ${FONT}`;
+    ctx.fillStyle = WHITE;
+    ctx.fillText(`${ratio.toFixed(2)}x`, rightCx, y);
+    ctx.font = `400 11px ${FONT}`;
+    ctx.fillStyle = MUTED;
+    ctx.fillText('BODYWEIGHT', rightCx, y + 20);
+    ctx.textAlign = 'left';
+    y += 40;
   }
 
   // --- Divider ---

@@ -89,7 +89,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
             <button
               onClick={() => setZoomed('overlay')}
               className="relative rounded-xl overflow-hidden shadow-xl active:scale-[0.98] transition"
-              style={{ height: '38vh', aspectRatio: '9 / 16' }}
+              style={{ height: '38vh', aspectRatio: '9 / 16', ...checkerStyle }}
             >
               <img src={transparentUrl} className="absolute inset-0 w-full h-full object-cover" alt="PR overlay" />
             </button>

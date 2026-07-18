@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
 import SharePreviewModal from './SharePreviewModal';
 
 function InstagramIcon({ size = 18 }) {
@@ -25,6 +26,13 @@ const toReps = (v) => typeof v === 'object' ? (v.reps || 0) : (v || 0);
 
 export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
   const [showModal, setShowModal] = useState(false);
+  const [bodyweight, setBodyweight] = useState(null);
+
+  useEffect(() => {
+    base44.entities.BodyWeight.list('-date', 1).then(entries => {
+      if (entries.length > 0) setBodyweight(entries[0].weight);
+    }).catch(() => {});
+  }, []);
 
   const shareData = (() => {
     const history = exercise.history || [];
@@ -57,7 +65,7 @@ export default function ExerciseShareButton({ exercise, sessionResults, pr }) {
       isPR = true;
     }
 
-    return { exerciseName: exercise.name, weight, reps, history, isPR, sessionResults: sets };
+    return { exerciseName: exercise.name, weight, reps, history, isPR, sessionResults: sets, bodyweight };
   })();
 
   if (!shareData) return null;
