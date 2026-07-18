@@ -122,9 +122,27 @@ export default function SharePreviewModal({ shareData, onClose }) {
               />
               <img
                 src={transparentUrl}
-                className="absolute inset-0 w-full h-full object-contain scale-90"
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[72%] w-auto object-contain"
                 alt="Your overlay on a gym story"
               />
+              {/* Instagram Story chrome — progress bars */}
+              <div className="absolute top-0 left-0 right-0 flex gap-[3px] px-2 pt-[6px]">
+                {[0, 1, 2, 3].map(i => (
+                  <div key={i} className="flex-1 h-[2.5px] rounded-full bg-white/35 overflow-hidden">
+                    {i === 0 && <div className="h-full w-2/3 bg-white" />}
+                  </div>
+                ))}
+              </div>
+              {/* Profile + username */}
+              <div className="absolute top-[14px] left-2 flex items-center gap-1.5">
+                <div className="w-[18px] h-[18px] rounded-full bg-white/70 ring-[1.5px] ring-white flex-shrink-0" />
+                <span className="text-white text-[8px] font-semibold leading-none drop-shadow-sm">jake.deleon</span>
+                <span className="text-white/70 text-[8px] leading-none drop-shadow-sm">2h</span>
+              </div>
+              {/* Close (X) */}
+              <div className="absolute top-[12px] right-2 w-[16px] h-[16px] flex items-center justify-center">
+                <X className="w-3 h-3 text-white" strokeWidth={2.5} />
+              </div>
             </button>
             <span className="text-[10px] text-neutral-600 font-medium">On a story</span>
           </div>
