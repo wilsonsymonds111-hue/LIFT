@@ -170,13 +170,17 @@ export default function SharePreviewModal({ shareData, onClose }) {
                 />
               </div>
             ) : (
-              <img
-                src={transparentUrl}
-                className="max-w-none select-none"
-                style={{ maxWidth: '95vw', maxHeight: '90vh' }}
-                alt="PR preview zoomed"
+              <div
+                className="relative select-none overflow-hidden rounded-xl"
+                style={{ ...checkerStyle, maxHeight: '90vh', aspectRatio: '9 / 16', height: '85vh' }}
                 onClick={(e) => e.stopPropagation()}
-              />
+              >
+                <img
+                  src={transparentUrl}
+                  className="absolute inset-0 w-full h-full object-contain"
+                  alt="PR preview zoomed"
+                />
+              </div>
             )}
           </motion.div>,
           document.body
