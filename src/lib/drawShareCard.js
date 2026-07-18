@@ -7,7 +7,7 @@ const DIVIDER = 'rgba(255,255,255,0.15)';
 const DARK_BG = '#0a0a0a';
 const CARD_BG = 'rgba(18,18,18,0.55)';
 const BORDER = '#C84637';
-const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Rounded", "SF Pro Display", "SF Pro Text", system-ui, sans-serif';
+const FONT = '"SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", sans-serif';
 const SCALE = 2;
 const W = 540;
 const H = 960;
@@ -139,12 +139,12 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   const cardPad = 28;
   let contentH = cardPad; // top padding
   contentH += 30 + 16; // logo square + gap
-  contentH += 24; // title
+  contentH += 26; // title
   contentH += 12; // gap before weight
-  contentH += 56; // weight + reps inline
-  if (delta) contentH += 8 + 20; // gap + delta
+  contentH += 76; // weight (68px) + reps inline
+  if (delta) contentH += 8 + 18; // gap + delta
   contentH += 14 + 1 + 14; // gap + divider + gap
-  if (chartData) contentH += 18 + chartData.chartH + 24; // chart header + chart + axis labels
+  if (chartData) contentH += 20 + chartData.chartH + 24; // chart header + chart + axis labels
   contentH += cardPad; // bottom padding
 
   const cardW = 484;
@@ -198,16 +198,19 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   roundRect(ctx, cx, y, logoSize, logoSize, 8);
   ctx.fill();
   ctx.fillStyle = WHITE;
-  ctx.font = `800 14px ${FONT}`;
+  ctx.font = `700 14px ${FONT}`;
+  ctx.letterSpacing = '0.5px';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('LIFT.', cx + logoSize / 2, y + logoSize / 2 + 1);
+  ctx.letterSpacing = '0px';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
   y += logoSize + 16;
 
   // --- Title: exercise name + PR suffix ---
-  ctx.font = `700 16px ${FONT}`;
+  ctx.font = `400 18px ${FONT}`;
+  ctx.letterSpacing = '2px';
   ctx.fillStyle = WHITE;
   const fullTitle = (exerciseName + (isPR ? ' PR' : '')).toUpperCase();
   let titleText = fullTitle;
@@ -216,21 +219,26 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
   }
   if (titleText !== fullTitle) titleText = titleText.slice(0, -2) + '…';
   ctx.fillText(titleText, cx, y);
-  y += 24;
+  ctx.letterSpacing = '0px';
+  y += 26;
 
   // --- Main stat: weight (large) + reps (inline right) ---
   y += 12;
   const weightText = isBodyweight ? `${reps}` : `${Math.round(weight)}KG`;
-  ctx.font = `800 48px ${FONT}`;
+  ctx.font = `700 68px ${FONT}`;
+  ctx.letterSpacing = '-2px';
   ctx.fillStyle = WHITE;
   ctx.fillText(weightText, cx, y);
   const weightW = ctx.measureText(weightText).width;
+  ctx.letterSpacing = '0px';
 
-  ctx.font = `700 22px ${FONT}`;
-  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.font = `400 26px ${FONT}`;
+  ctx.letterSpacing = '1px';
+  ctx.fillStyle = WHITE;
   const repsLabel = isBodyweight ? 'REPS' : `× ${reps} REPS`;
-  ctx.fillText(repsLabel, cx + weightW + 12, y + 24);
-  y += 56;
+  ctx.fillText(repsLabel, cx + weightW + 14, y + 40);
+  ctx.letterSpacing = '0px';
+  y += 76;
 
   // --- Delta from last PR ---
   if (delta) {
@@ -241,10 +249,12 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
     ctx.shadowBlur = 0;
     drawUpArrow(ctx, cx + dArrowSize / 2, y + 3, dArrowSize, WHITE);
     ctx.shadowBlur = 4;
-    ctx.font = `800 12px ${FONT}`;
+    ctx.font = `400 13px ${FONT}`;
+    ctx.letterSpacing = '1.5px';
     ctx.fillStyle = WHITE;
-    drawSpacedText(ctx, deltaText, cx + dArrowSize + 7, y + 3, 0.8);
-    y += 20;
+    ctx.fillText(deltaText, cx + dArrowSize + 7, y + 3);
+    ctx.letterSpacing = '0px';
+    y += 18;
   }
 
   // --- Divider ---
@@ -264,10 +274,12 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
 
     // Chart section header
     ctx.shadowBlur = 4;
-    ctx.font = `700 11px ${FONT}`;
+    ctx.font = `400 14px ${FONT}`;
+    ctx.letterSpacing = '2px';
     ctx.fillStyle = GOLD;
-    drawSpacedText(ctx, 'PROGRESS OVER TIME', cx, y, 1.5);
-    y += 18;
+    ctx.fillText('PROGRESS OVER TIME', cx, y);
+    ctx.letterSpacing = '0px';
+    y += 20;
 
     // Left padding for weight interval labels
     const labelW = 38;
@@ -369,7 +381,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
 
     // Weight interval labels on the left side
     ctx.shadowBlur = 6;
-    ctx.font = `800 16px ${FONT}`;
+    ctx.font = `500 14px ${FONT}`;
     ctx.fillStyle = WHITE;
     ctx.textAlign = 'right';
     const unit = isBodyweight ? '' : 'kg';
@@ -385,7 +397,8 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
 
     // Combined axis labels: "60KG JUN 2025" left, "70KG JUL 2026" right
     ctx.shadowBlur = 4;
-    ctx.font = `700 12px ${FONT}`;
+    ctx.font = `400 13px ${FONT}`;
+    ctx.letterSpacing = '1px';
     ctx.fillStyle = MUTED;
     ctx.textAlign = 'left';
     ctx.fillText(`${startVal}${isBodyweight ? '' : 'kg'} ${startDate}`, chartX, y + 8);
@@ -393,6 +406,7 @@ export function drawShareCard({ exerciseName, weight, reps, history, isPR, sessi
       ctx.textAlign = 'right';
       ctx.fillText(`${endVal}${isBodyweight ? '' : 'kg'} ${endDate}`, chartX + chartDrawW, y + 8);
     }
+    ctx.letterSpacing = '0px';
     ctx.textAlign = 'left';
   }
 
