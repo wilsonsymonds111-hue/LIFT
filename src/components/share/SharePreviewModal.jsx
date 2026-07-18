@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { X, Copy, Check, Download, MessageCircle } from 'lucide-react';
+import { X, Copy, Check, Download, MessageCircle, Instagram, ClipboardPaste } from 'lucide-react';
 import { drawShareCard } from '@/lib/drawShareCard';
 
 export default function SharePreviewModal({ shareData, onClose }) {
@@ -64,15 +64,8 @@ export default function SharePreviewModal({ shareData, onClose }) {
     }
   };
 
-  const checkerStyle = {
-    backgroundColor: '#2a2a2a',
-    backgroundImage:
-      'linear-gradient(45deg, #333 25%, transparent 25%), ' +
-      'linear-gradient(-45deg, #333 25%, transparent 25%), ' +
-      'linear-gradient(45deg, transparent 75%, #333 75%), ' +
-      'linear-gradient(-45deg, transparent 75%, #333 75%)',
-    backgroundSize: '24px 24px',
-    backgroundPosition: '0 0, 0 12px, 12px -12px, -12px 0px',
+  const previewBgStyle = {
+    background: 'radial-gradient(ellipse at center, #1e1e1e 0%, #0a0a0a 100%)',
   };
 
   return (
@@ -102,26 +95,26 @@ export default function SharePreviewModal({ shareData, onClose }) {
           <div className="w-9" />
         </div>
 
-        {/* Preview — transparent PNG on checkered background */}
+        {/* Preview — transparent PNG on soft gradient backdrop with glow ring */}
         <div className="flex-1 flex items-center justify-center px-6 py-1 min-h-0">
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl" style={checkerStyle}>
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10" style={{ ...previewBgStyle, boxShadow: '0 0 40px rgba(220, 39, 67, 0.15), 0 8px 32px rgba(0,0,0,0.5)' }}>
             <img src={transparentUrl} className="block max-h-full max-w-full" alt="PR share preview" style={{ maxHeight: '30vh' }} />
           </div>
         </div>
 
-        {/* Instructions — Apple-quality step layout */}
+        {/* Instructions — compact inline icon steps */}
         <div className="px-6 pt-6 pb-2 flex-shrink-0">
-          <div className="flex items-start gap-2.5">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center mt-0.5">1</span>
-            <p className="text-[13px] text-neutral-300 leading-snug">Copy the transparent PNG below.</p>
+          <div className="flex items-center gap-2">
+            <Copy className="flex-shrink-0 w-3.5 h-3.5 text-neutral-500" />
+            <p className="text-[13px] text-neutral-300 leading-snug">Copy the overlay below</p>
           </div>
-          <div className="flex items-start gap-2.5 mt-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center mt-0.5">2</span>
-            <p className="text-[13px] text-neutral-300 leading-snug">Open Instagram → add a photo to your story.</p>
+          <div className="flex items-center gap-2 mt-2">
+            <Instagram className="flex-shrink-0 w-3.5 h-3.5 text-neutral-500" />
+            <p className="text-[13px] text-neutral-300 leading-snug">Open Instagram → add a photo to your story</p>
           </div>
-          <div className="flex items-start gap-2.5 mt-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-700 text-white text-[10px] font-bold flex items-center justify-center mt-0.5">3</span>
-            <p className="text-[13px] text-neutral-300 leading-snug">Paste the sticker on top.</p>
+          <div className="flex items-center gap-2 mt-2">
+            <ClipboardPaste className="flex-shrink-0 w-3.5 h-3.5 text-neutral-500" />
+            <p className="text-[13px] text-neutral-300 leading-snug">Paste the sticker on top</p>
           </div>
         </div>
 
@@ -132,7 +125,8 @@ export default function SharePreviewModal({ shareData, onClose }) {
         >
           <button
             onClick={handleCopyTransparent}
-            className="mx-auto py-2 px-5 bg-blue-500 text-white rounded-full font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition"
+            className="mx-auto py-2.5 px-7 text-white rounded-full font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition shadow-lg"
+            style={{ background: 'linear-gradient(90deg, #feda75 0%, #fa7e1e 25%, #d62976 50%, #962fbf 75%, #4f5bd5 100%)' }}
           >
             {copied
               ? <><Check className="w-4 h-4" /> Copied!</>
