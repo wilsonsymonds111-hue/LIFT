@@ -132,7 +132,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
         >
           <button
             onClick={handleCopyTransparent}
-            className="w-full py-3.5 bg-white text-black rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition"
+            className="w-full py-2.5 bg-blue-500 text-white rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition"
           >
             {copied
               ? <><Check className="w-5 h-5" /> Copied!</>
