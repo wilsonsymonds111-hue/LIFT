@@ -106,9 +106,6 @@ export default function SharePreviewModal({ shareData, onClose }) {
         <div className="flex-1 flex items-center justify-center px-6 py-1 min-h-0">
           <div className="relative rounded-2xl overflow-hidden shadow-2xl" style={checkerStyle}>
             <img src={transparentUrl} className="block max-h-full max-w-full" alt="PR share preview" style={{ maxHeight: '30vh' }} />
-            <div className="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded tracking-widest">
-              TRANSPARENT
-            </div>
           </div>
         </div>
 
