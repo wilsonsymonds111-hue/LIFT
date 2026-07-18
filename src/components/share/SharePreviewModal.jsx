@@ -99,7 +99,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
           {/* Arrow showing before → after */}
           <ArrowRight className="w-5 h-5 text-neutral-600 flex-shrink-0" />
 
-          {/* Example on a gym story */}
+          {/* Example: the real overlay composited onto a gym story background */}
           <div className="flex flex-col items-center gap-1.5">
             <button
               onClick={() => setZoomed('example')}
@@ -109,7 +109,12 @@ export default function SharePreviewModal({ shareData, onClose }) {
               <img
                 src={GYM_PHOTO}
                 className="absolute inset-0 w-full h-full object-cover"
-                alt="Example overlay on a gym story"
+                alt="Gym story background"
+              />
+              <img
+                src={transparentUrl}
+                className="absolute inset-0 w-full h-full object-contain"
+                alt="Your overlay on a gym story"
               />
             </button>
             <span className="text-[10px] text-neutral-500 font-medium">On a story</span>
@@ -132,13 +137,22 @@ export default function SharePreviewModal({ shareData, onClose }) {
               <X className="w-5 h-5 text-white" />
             </button>
             {zoomed === 'example' ? (
-              <img
-                src={GYM_PHOTO}
-                className="select-none"
-                style={{ maxWidth: '95vw', maxHeight: '90vh' }}
-                alt="Example on a gym story"
+              <div
+                className="relative select-none"
+                style={{ height: '85vh', aspectRatio: '9 / 16' }}
                 onClick={(e) => e.stopPropagation()}
-              />
+              >
+                <img
+                  src={GYM_PHOTO}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  alt="Gym story background"
+                />
+                <img
+                  src={transparentUrl}
+                  className="absolute inset-0 w-full h-full object-contain"
+                  alt="Your overlay on a gym story"
+                />
+              </div>
             ) : (
               <img
                 src={transparentUrl}
