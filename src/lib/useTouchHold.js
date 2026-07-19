@@ -1,27 +1,23 @@
-import { useRef, useCallback } from 'react';
-
 /**
  * Returns spreadable props for an element that fires `onHold` after
- * the user presses and holds for ~500ms. Works with touch and mouse.
+ * the user presses and holds for ~300ms. Works with touch and mouse.
+ * Not a hook — safe to call inside loops/map callbacks.
  */
 export function TouchHold(onHold, duration = 300) {
-  const timerRef = useRef(null);
-
-  const start = useCallback(() => {
-    timerRef.current = setTimeout(() => {
+  let timer = null;
+  const start = () => {
+    timer = setTimeout(() => {
       if (navigator.vibrate) navigator.vibrate(8);
       onHold();
-      timerRef.current = null;
+      timer = null;
     }, duration);
-  }, [onHold, duration]);
-
-  const cancel = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
+  };
+  const cancel = () => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
     }
-  }, []);
-
+  };
   return {
     onTouchStart: start,
     onTouchEnd: cancel,
