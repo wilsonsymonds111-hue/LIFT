@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/AuthContext';
 import WeightEntryKeypad from './WeightEntryKeypad';
 import TargetArrowIcon from './TargetArrowIcon';
 import EditEntryModal from './EditEntryModal';
-import FatBurnedCard from './FatBurnedCard';
+
 
 const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -654,13 +654,6 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             </div>
           </div>,
           document.body
-        )}
-
-        {/* Fat Burned card — only in cutting mode */}
-        {goalMode === 'cutting' && (
-          <div className="pb-3">
-            <FatBurnedCard cutStartDate={cutStartDate} />
-          </div>
         )}
 
         {/* History list */}

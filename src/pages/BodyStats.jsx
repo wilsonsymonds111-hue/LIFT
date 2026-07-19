@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { useWorkoutTemplates } from '../hooks/useWorkoutTemplates';
 import BodyStatsCard from '../components/BodyStatsCard';
+import FatBurnedCard from '../components/FatBurnedCard';
 import BodyStatsSkeleton from '../components/skeletons/BodyStatsSkeleton';
 
 const SAFE_AREA_PT = { paddingTop: 'calc(0.5rem + env(safe-area-inset-top))' };
@@ -14,6 +15,7 @@ const SPLIT_CYCLES = {
 };
 
 export default function BodyStats() {
+  const { user } = useAuth();
   const { data: templates = [], isLoading } = useWorkoutTemplates();
 
   const { currentSplit, targetSessionsPerWeek } = useMemo(() => {
@@ -58,11 +60,14 @@ export default function BodyStats() {
         <h1 className="text-4xl font-extrabold text-foreground leading-tight">Body Stats</h1>
       </div>
 
-      <div className="px-4 py-2">
+      <div className="px-4 py-2 space-y-3">
         <BodyStatsCard
           templates={currentSplit}
           targetSessionsPerWeek={targetSessionsPerWeek}
         />
+        {user?.goalMode === 'cutting' && (
+          <FatBurnedCard cutStartDate={user?.cutStartDate} />
+        )}
       </div>
     </div>
   );
