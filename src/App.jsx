@@ -218,6 +218,9 @@ const AnimatedRoutes = memo(() => {
   // Clear any stale workout session on load — do NOT auto-navigate to a workout
   useEffect(() => {
     clearWorkoutSession();
+    if (location.pathname.startsWith('/active-workout')) {
+      navigate('/', { replace: true });
+    }
   }, []);
 
   return (
