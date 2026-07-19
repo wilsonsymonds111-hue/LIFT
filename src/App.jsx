@@ -38,6 +38,7 @@ const SupportChat = lazy(() => lazyRetry(() => import('./pages/SupportChat')));
 const Terms = lazy(() => lazyRetry(() => import('./pages/Terms')));
 const Privacy = lazy(() => lazyRetry(() => import('./pages/Privacy')));
 import { usePrefetchData } from './hooks/usePrefetchData';
+import { unlockAudio } from './lib/workoutSounds';
 import { loadWorkoutSession, clearWorkoutSession } from './lib/workoutSession';
 import { isSessionStale, handleStaleSession, sessionHasData } from './lib/staleWorkoutCheck';
 
@@ -305,8 +306,9 @@ function App() {
     const handler = (e) => {
       if (e.pointerType === 'mouse') return;
       const interactive = e.target.closest?.('button, a, [role="button"]');
-      if (interactive && typeof navigator.vibrate === 'function') {
-        navigator.vibrate(10);
+      if (interactive) {
+        if (typeof navigator.vibrate === 'function') navigator.vibrate(10);
+        unlockAudio();
       }
     };
     document.addEventListener('pointerdown', handler, { passive: true });
