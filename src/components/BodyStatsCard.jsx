@@ -23,7 +23,7 @@ export default function BodyStatsCard({ templates, targetSessionsPerWeek }) {
   const [prediction, setPrediction] = useState(null);
   const [muscleLoading, setMuscleLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [showWeightModal, setShowWeightModal] = useState(false);
+  const [showWeightModal, setShowWeightModal] = useState(true);
   const [showMuscleModal, setShowMuscleModal] = useState(false);
   const [goalMode, setGoalMode] = useState(() => user?.goalMode || null);
 
