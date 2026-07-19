@@ -297,6 +297,19 @@ function App() {
     document.documentElement.classList.toggle('dark', stored === 'true');
   }, []);
 
+  // Global haptic feedback on button/link taps (touch devices only)
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.pointerType === 'mouse') return;
+      const interactive = e.target.closest?.('button, a, [role="button"]');
+      if (interactive && typeof navigator.vibrate === 'function') {
+        navigator.vibrate(10);
+      }
+    };
+    document.addEventListener('pointerdown', handler, { passive: true });
+    return () => document.removeEventListener('pointerdown', handler);
+  }, []);
+
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
