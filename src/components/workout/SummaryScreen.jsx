@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Trophy, Clock, Share, X } from 'lucide-react';
 import { playCompleteChime } from '../../lib/workoutSounds';
 import RestDayPromptModal from '../RestDayPromptModal';
-import InstagramShareInstructions from './InstagramShareInstructions';
+import SharePreviewModal from '../share/SharePreviewModal';
+import { drawWorkoutShareCard } from '../../lib/drawWorkoutShareCard';
 import { makeTodayWorkoutDay } from '../../lib/restDayCheck';
 
 function InstagramIcon({ size = 20 }) {
@@ -29,11 +30,9 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
   const cardRef = useRef(null);
   const listRef = useRef(null);
-  const igStickerRef = useRef(null);
   const [sharing, setSharing] = useState(false);
-  const [igSharing, setIgSharing] = useState(false);
-  const [igImageUrl, setIgImageUrl] = useState(null);
   const [shimmer, setShimmer] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [showRestDayPrompt, setShowRestDayPrompt] = useState(false);
 
   const prSet = new Set(prs.map(p => p.name));
@@ -86,23 +85,8 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
     } catch { setSharing(false); }
   };
 
-  const handleInstagramShare = async () => {
-    if (!igStickerRef.current) return;
-    setIgSharing(true);
-    try {
-      const { default: html2canvas } = await import('html2canvas');
-      const canvas = await html2canvas(igStickerRef.current, {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: null,
-        logging: false,
-        width: 390,
-        height: 844,
-      });
-      const url = canvas.toDataURL('image/png');
-      setIgImageUrl(url);
-      setIgSharing(false);
-    } catch { setIgSharing(false); }
+  const handleInstagramShare = () => {
+    setShowShareModal(true);
   };
 
   return (
@@ -182,12 +166,11 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
           <div className="px-4 pb-5 flex flex-col gap-2 flex-shrink-0">
             <button
               onClick={handleInstagramShare}
-              disabled={igSharing}
               className="w-full flex items-center justify-center gap-2 text-white font-bold py-3.5 rounded-2xl text-sm transition active:scale-95 shadow-md"
               style={{ background: 'linear-gradient(90deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}
             >
               <InstagramIcon size={20} />
-              {igSharing ? 'Preparing…' : 'Share to Instagram Story'}
+              Share to Instagram Story
             </button>
             <button
               onClick={handleDone}
@@ -199,65 +182,19 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
         </div>
       </div>
 
-      <div
-        ref={igStickerRef}
-        style={{
-          position: 'fixed',
-          left: '-9999px',
-          top: 0,
-          width: '390px',
-          height: '844px',
-          background: 'transparent',
-          fontFamily: 'system-ui, -apple-system, sans-serif',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: '60px 28px 50px',
-          boxSizing: 'border-box',
-        }}
-      >
-        <div>
-          <div style={{ fontSize: '48px', fontWeight: '800', lineHeight: 1.1, letterSpacing: '-1px', color: '#ffffff', textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>{template.name}</div>
-          <div style={{ fontSize: '15px', fontWeight: '600', color: '#ffffff', opacity: 0.6, letterSpacing: '2px', textTransform: 'uppercase', marginTop: '4px' }}>{durationDisplay}{prs.length > 0 ? `  ·  ${prs.length} PR${prs.length !== 1 ? 's' : ''}` : ''}</div>
-
-          <div style={{ height: '1px', background: 'rgba(255,255,255,0.2)', margin: '28px 0' }} />
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {exercises.map((ex, i) => {
-              const best = bestSets[ex.name];
-              return (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#fff', textShadow: '0 1px 6px rgba(0,0,0,0.8)' }}>{ex.sets} × {ex.name}</span>
-                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#fff', opacity: 0.7, flexShrink: 0, marginLeft: '12px', textShadow: '0 1px 6px rgba(0,0,0,0.8)' }}>
-                    {best ? (best.kg ? `${best.kg}kg × ${best.reps}` : `${best.reps} reps`) : '—'}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div style={{ display: 'flex' }}>
-          {[
-            { label: 'DURATION', value: durationDisplay },
-            { label: "PR'S", value: prs.length },
-            { label: 'EXERCISES', value: exercises.length },
-          ].map((stat, i) => (
-            <div key={i} style={{
-              flex: 1,
-              textAlign: i === 0 ? 'left' : i === 1 ? 'center' : 'right',
-            }}>
-              <div style={{ fontSize: '11px', fontWeight: '600', color: '#fff', opacity: 0.5, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>{stat.label}</div>
-              <div style={{ fontSize: '24px', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>{stat.value}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {igImageUrl && (
-        <InstagramShareInstructions
-          imageUrl={igImageUrl}
-          onClose={() => setIgImageUrl(null)}
+      {showShareModal && (
+        <SharePreviewModal
+          shareData={{
+            templateName: template.name,
+            exercises,
+            bestSets,
+            prs,
+            durationDisplay,
+            dateStr: today,
+          }}
+          drawFunction={drawWorkoutShareCard}
+          title="Share your workout on your Instagram Story!"
+          onClose={() => setShowShareModal(false)}
         />
       )}
 

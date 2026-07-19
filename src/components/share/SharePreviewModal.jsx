@@ -8,7 +8,7 @@ import ZoomOverlay from './ZoomOverlay';
 const GYM_PHOTO = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/acb45489c_image.png';
 const JAKE_AVATAR = 'https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/6d1143193_generated_image.png';
 
-export default function SharePreviewModal({ shareData, onClose }) {
+export default function SharePreviewModal({ shareData, onClose, drawFunction = drawShareCard, title }) {
   const [copied, setCopied] = useState(false);
   const [closing, setClosing] = useState(false);
   const [zoomed, setZoomed] = useState(null); // null | 'overlay' | 'example'
@@ -20,9 +20,9 @@ export default function SharePreviewModal({ shareData, onClose }) {
   };
 
   const { transparentUrl, transparentCanvas } = useMemo(() => {
-    const canvas = drawShareCard({ ...shareData, mode: 'transparent' });
+    const canvas = drawFunction({ ...shareData, mode: 'transparent' });
     return { transparentCanvas: canvas, transparentUrl: canvas.toDataURL('image/png') };
-  }, [shareData]);
+  }, [shareData, drawFunction]);
 
   const handleCopyTransparent = async () => {
     try {
@@ -82,7 +82,7 @@ export default function SharePreviewModal({ shareData, onClose }) {
             <X className="w-6 h-6 text-neutral-900" />
           </button>
           <h2 className="text-neutral-900 font-bold text-base px-6 text-center leading-tight flex items-center justify-center gap-1 flex-wrap">
-            <span>Share your PR on your Instagram Story!</span>
+            <span>{title || 'Share your PR on your Instagram Story!'}</span>
             <img
               src="https://media.base44.com/images/public/6a16b583ab0ebad6332038a3/019005143_image.png"
               width="28"
