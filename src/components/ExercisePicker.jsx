@@ -99,7 +99,7 @@ export default function ExercisePicker({ onClose, onAdd }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center pointer-events-auto">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-card rounded-t-3xl w-full flex flex-col shadow-2xl" style={{ maxHeight: `${viewportHeight * 0.9}px`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {/* Header */}
