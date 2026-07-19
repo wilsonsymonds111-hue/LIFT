@@ -44,6 +44,11 @@
       ],
       "description": "Whether the user is cutting or bulking"
     },
+    "cutStartDate": {
+      "type": "string",
+      "format": "date",
+      "description": "The start date of the user's current cut, used for fat loss calculations"
+    },
     "darkMode": {
       "type": "boolean",
       "description": "Whether dark mode is enabled"

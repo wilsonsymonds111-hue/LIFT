@@ -168,3 +168,76 @@ export function generateSummary(result) {
 
   return summary;
 }
+
+// ── Cut-specific fat loss calculation ──
+// Partitions weight lost during a cut into fat vs muscle using strength trends.
+// If strength holds/improves → weight loss is primarily fat (recomp).
+// If strength drops → a portion is attributed to muscle loss based on
+// lean mass loss research during caloric deficits.
+export function calculateCutResults(params) {
+  const {
+    startingWeight, currentWeight,
+    weeksCut, exercises,
+  } = params;
+
+  const totalWeightChange = (currentWeight || 0) - (startingWeight || 0);
+  const totalWeightLost = Math.max(0, -totalWeightChange);
+
+  if (totalWeightLost < 0.1) {
+    return {
+      fatLostG: 0,
+      muscleLostG: 0,
+      totalWeightLostG: 0,
+      strengthChange: 0,
+      weeksCut,
+      summary: 'Not enough weight loss data yet. Keep weighing in weekly!',
+    };
+  }
+
+  // Strength analysis — prefer compound lifts
+  const compounds = exercises.filter(e => e.isCompound);
+  const relevant = compounds.length > 0 ? compounds : exercises;
+  const avgStrengthChange = relevant.length > 0
+    ? relevant.reduce((sum, e) => sum + (e.percentIncrease || 0), 0) / relevant.length
+    : 0;
+
+  let muscleLostKg;
+  let fatLostKg;
+
+  if (avgStrengthChange < -0.02) {
+    // Strength decreased — partition some weight loss to muscle.
+    // During caloric deficits, 10–30% of weight lost can be lean mass
+    // (Weinheimer et al. 2010; Chaston et al. 2007).
+    // Greater strength loss → proportionally more muscle loss.
+    const bw = currentWeight || startingWeight || 70;
+    muscleLostKg = Math.min(
+      totalWeightLost * 0.4,
+      bw * Math.abs(avgStrengthChange) * 2
+    );
+    fatLostKg = totalWeightLost - muscleLostKg;
+  } else {
+    // Strength maintained or improved — minimal muscle loss.
+    // Even optimal cuts lose ~5% lean mass (Helms et al. 2014).
+    muscleLostKg = totalWeightLost * 0.05;
+    fatLostKg = totalWeightLost - muscleLostKg;
+  }
+
+  const strengthPct = Math.round(avgStrengthChange * 100);
+  let statusText;
+  if (avgStrengthChange < -0.02) {
+    statusText = `Strength dropped ${Math.abs(strengthPct)}% — an estimated ${Math.round(muscleLostKg * 1000)}g of that was muscle, not fat.`;
+  } else if (avgStrengthChange > 0.02) {
+    statusText = `Strength increased ${strengthPct}% — muscle was preserved, so nearly all weight lost is fat.`;
+  } else {
+    statusText = 'Strength held steady — muscle was preserved, so weight lost is primarily fat.';
+  }
+
+  return {
+    fatLostG: Math.round(fatLostKg * 1000),
+    muscleLostG: Math.round(muscleLostKg * 1000),
+    totalWeightLostG: Math.round(totalWeightLost * 1000),
+    strengthChange: avgStrengthChange,
+    weeksCut,
+    summary: `You've lost ${(Math.round(totalWeightLost * 10) / 10).toFixed(1)}kg since your cut started. ${statusText}`,
+  };
+}

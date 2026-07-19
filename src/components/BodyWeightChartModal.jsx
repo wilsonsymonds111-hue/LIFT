@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/AuthContext';
 import WeightEntryKeypad from './WeightEntryKeypad';
 import TargetArrowIcon from './TargetArrowIcon';
 import EditEntryModal from './EditEntryModal';
+import FatBurnedCard from './FatBurnedCard';
 
 const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -54,17 +55,25 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
   const { user } = useAuth();
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [goalMode, setGoalMode] = useState(() => user?.goalMode || null);
+  const [cutStartDate, setCutStartDate] = useState(() => user?.cutStartDate || null);
 
-  // Sync goalMode + goalData from the cloud user entity
+  // Sync goalMode + goalData + cutStartDate from the cloud user entity
   useEffect(() => {
     if (user?.goalMode) setGoalMode(user.goalMode);
     if (user?.bodyWeightGoal) setGoalData(user.bodyWeightGoal);
+    if (user?.cutStartDate) setCutStartDate(user.cutStartDate);
   }, [user]);
 
   const changeGoalMode = (mode) => {
     setGoalMode(mode);
     base44.auth.updateMe({ goalMode: mode }).catch(() => {});
     onGoalModeChange?.(mode);
+  };
+
+  const handleDotClick = (payload) => {
+    if (goalMode !== 'cutting' || !payload?.date) return;
+    setCutStartDate(payload.date);
+    base44.auth.updateMe({ cutStartDate: payload.date }).catch(() => {});
   };
   const [goalWeight, setGoalWeight] = useState('');
   const [goalRate, setGoalRate] = useState('0.5');
@@ -428,11 +437,28 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
                 <XAxis dataKey="dateLabel" tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} interval="equidistantPreserveStartEnd" minTickGap={25} padding={{ left: 0, right: 10 }} />
                 <YAxis orientation="right" domain={yDomain?.domain || [0, 100]} ticks={yDomain?.ticks} allowDecimals={false} tick={{ fontSize: 10, fill: '#8E8E93' }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip
-                  contentStyle={{ background: 'white', border: '1px solid #E5E5EA', borderRadius: '12px', fontSize: '12px' }}
-                  labelStyle={{ color: '#8E8E93' }}
-                  formatter={(value, name) => name === 'weightProjection' ? [`${value} ${unit}`, 'Next Goal'] : [`${value} ${unit}`, 'Weight']}
+                  content={({ active, payload }) => {
+                    if (!active || !payload || !payload.length) return null;
+                    const data = payload[0]?.payload;
+                    if (!data || data.isContext) return null;
+                    const dateStr = data.date ? fmtDate(data.date) : '';
+                    return (
+                      <div className="bg-white dark:bg-card border border-gray-200 dark:border-border rounded-xl px-3 py-2 shadow-lg" style={{ fontSize: '12px' }}>
+                        {dateStr && <p className="text-gray-500 dark:text-muted-foreground text-[11px] font-medium mb-0.5">{dateStr}</p>}
+                        {payload.map((entry, i) => {
+                          if (entry.value == null) return null;
+                          const isProj = entry.dataKey === 'weightProjection';
+                          return (
+                            <p key={i} className={`font-semibold ${isProj ? 'text-blue-400' : 'text-[#F59E0B]'}`}>
+                              {isProj ? 'Next Goal' : 'Weight'}: {entry.value} {unit}
+                            </p>
+                          );
+                        })}
+                      </div>
+                    );
+                  }}
                 />
-                <Line type="monotone" dataKey="weight" stroke={goalMode === 'bulking' ? '#3b82f6' : '#F59E0B'} strokeWidth={2} dot={(props) => { if (props.payload.weight == null || props.payload.isContext) return false; const c = goalMode === 'bulking' ? '#3b82f6' : '#F59E0B'; return <circle cx={props.cx} cy={props.cy} r={props.payload.isLatest ? 5 : 4} fill="#fff" stroke={c} strokeWidth={2} />; }} activeDot={(props) => { if (props.payload?.isContext) return false; const c = goalMode === 'bulking' ? '#3b82f6' : '#F59E0B'; return <circle cx={props.cx} cy={props.cy} r={6} fill="#fff" stroke={c} strokeWidth={2} />; }} animationDuration={200} animationEasing="ease-out" />
+                <Line type="monotone" dataKey="weight" stroke={goalMode === 'bulking' ? '#3b82f6' : '#F59E0B'} strokeWidth={2} dot={(props) => { if (props.payload.weight == null || props.payload.isContext) return false; const c = goalMode === 'bulking' ? '#3b82f6' : '#F59E0B'; const isCutStart = goalMode === 'cutting' && cutStartDate && props.payload.date === cutStartDate; return <circle cx={props.cx} cy={props.cy} r={isCutStart ? 7 : props.payload.isLatest ? 5 : 4} fill={isCutStart ? c : '#fff'} stroke={c} strokeWidth={2} style={{ cursor: goalMode === 'cutting' ? 'pointer' : 'default' }} onClick={() => handleDotClick(props.payload)} />; }} activeDot={(props) => { if (props.payload?.isContext) return false; const c = goalMode === 'bulking' ? '#3b82f6' : '#F59E0B'; return <circle cx={props.cx} cy={props.cy} r={6} fill="#fff" stroke={c} strokeWidth={2} style={{ cursor: goalMode === 'cutting' ? 'pointer' : 'default' }} onClick={() => handleDotClick(props.payload)} />; }} animationDuration={200} animationEasing="ease-out" />
                 {goalData && <Line type="linear" dataKey="weightProjection" stroke="#bfdbfe" strokeWidth={1.5} strokeDasharray="4 3" opacity={0.6} dot={(props) => { if (props.payload.weight != null) return false; return <circle cx={props.cx} cy={props.cy} r={5} fill="#fff" fillOpacity={0.6} stroke="#bfdbfe" strokeWidth={1.5} strokeDasharray="3 2" />; }} activeDot={{ r: 5, fill: '#93c5fd', stroke: '#fff', strokeWidth: 2 }} connectNulls={true} isAnimationActive={false} />}
               </LineChart>
             </ResponsiveContainer>
@@ -628,6 +654,13 @@ export default function BodyWeightChartModal({ entries, onClose, onChanged, pred
             </div>
           </div>,
           document.body
+        )}
+
+        {/* Fat Burned card — only in cutting mode */}
+        {goalMode === 'cutting' && (
+          <div className="pb-3">
+            <FatBurnedCard cutStartDate={cutStartDate} />
+          </div>
         )}
 
         {/* History list */}
