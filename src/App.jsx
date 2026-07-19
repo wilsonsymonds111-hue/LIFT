@@ -49,7 +49,7 @@ const pageVariants = {
   exit: { x: '-25%', opacity: 0 },
 };
 
-const PAGE_TRANSITION = { duration: 0.28, ease: [0.22, 1, 0.36, 1] };
+const PAGE_TRANSITION = { duration: 0.18, ease: [0.22, 1, 0.36, 1] };
 const SUSPENSE_FALLBACK = <div className="w-full h-screen bg-background" />;
 
 // Memo wrapper prevents inactive tab pages from re-rendering on every navigation
@@ -135,9 +135,9 @@ const SwipeableTabs = memo(() => {
     if (isDraggingRef.current || !width) return;
     const controls = framerAnimate(x, targetX, {
       type: 'spring',
-      stiffness: 550,
-      damping: 44,
-      mass: 0.22,
+      stiffness: 750,
+      damping: 50,
+      mass: 0.2,
       restSpeed: 0.01,
       restDelta: 0.5,
     });
