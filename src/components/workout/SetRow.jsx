@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, memo } from 'react';
 import { Check, Trash2 } from 'lucide-react';
 import { playTick } from '../../lib/workoutSounds';
+import { triggerHaptic } from '../../lib/haptics';
 import RestCountdown from './RestCountdown';
 
 const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, initialDone, onComplete, onDelete, restDuration = 120, showHeader = false }) {
@@ -70,7 +71,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
     const wasPast = currentXRef.current < -DELETE_THRESHOLD;
     applyTransform(clamped);
     if (clamped < -DELETE_THRESHOLD && !wasPast) {
-      if (navigator.vibrate) navigator.vibrate(10);
+      triggerHaptic('medium');
     }
   };
 
@@ -80,7 +81,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
     if (currentXRef.current < -DELETE_THRESHOLD) {
       setAnimating(true);
       applyTransform(-300);
-      if (navigator.vibrate) navigator.vibrate(20);
+      triggerHaptic('heavy');
       setTimeout(() => onDelete?.(), 250);
     } else {
       setAnimating(true);

@@ -39,6 +39,7 @@ const Terms = lazy(() => lazyRetry(() => import('./pages/Terms')));
 const Privacy = lazy(() => lazyRetry(() => import('./pages/Privacy')));
 import { usePrefetchData } from './hooks/usePrefetchData';
 import { unlockAudio } from './lib/workoutSounds';
+import { triggerHaptic } from './lib/haptics';
 import { loadWorkoutSession, clearWorkoutSession } from './lib/workoutSession';
 import { isSessionStale, handleStaleSession, sessionHasData } from './lib/staleWorkoutCheck';
 
@@ -307,7 +308,7 @@ function App() {
       if (e.pointerType === 'mouse') return;
       const interactive = e.target.closest?.('button, a, [role="button"]');
       if (interactive) {
-        if (typeof navigator.vibrate === 'function') navigator.vibrate(10);
+        triggerHaptic('light');
         unlockAudio();
       }
     };

@@ -2,6 +2,8 @@
 // Uses Web Audio API (decoded buffer) for instant playback once loaded,
 // with an HTML5 Audio fallback so it always plays even before the buffer is ready.
 
+import { triggerHaptic, triggerHapticPattern } from './haptics';
+
 const TICK_URL = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/ee0d3ce4e_ScreenRecording_06-16-202607-45-53_12.mp3';
 const COMPLETE_URL = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/5571535bc_universfield-game-level-complete-143022.mp3';
 
@@ -78,22 +80,16 @@ function playSound(url) {
 }
 
 export function playTick() {
-  if (navigator.vibrate) {
-    try { navigator.vibrate(15); } catch (_) {}
-  }
+  triggerHaptic('light');
   playSound(TICK_URL);
 }
 
 export function playCompleteChime() {
-  if (navigator.vibrate) {
-    try { navigator.vibrate([100, 50, 100, 50, 200]); } catch (_) {}
-  }
+  triggerHapticPattern([100, 50, 100, 50, 200]);
   playSound(COMPLETE_URL);
 }
 
 export function notifyRestComplete(silent = false) {
-  if (navigator.vibrate) {
-    try { navigator.vibrate([200, 100, 200]); } catch (_) {}
-  }
+  triggerHapticPattern([200, 100, 200]);
   if (!silent) playSound(TICK_URL);
 }
