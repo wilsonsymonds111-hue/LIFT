@@ -117,7 +117,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
   return (
     <div>
       {showHeader && (
-        <div className="grid grid-cols-[40px_1fr_80px_80px_44px] gap-1.5 px-2 mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
+        <div className="grid grid-cols-[36px_minmax(0,1fr)_72px_72px_40px] gap-1 px-2 mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
           <span className="text-center">Set</span>
           <span className="text-center">Previous</span>
           <span className="text-center">kg</span>
@@ -137,7 +137,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
         </div>
         <div
           ref={rowRef}
-          className={`grid grid-cols-[40px_1fr_80px_80px_44px] items-center gap-1.5 py-2 px-3 rounded-lg transition-colors ${done ? 'bg-green-200 dark:bg-green-900/50' : 'bg-white dark:bg-neutral-700'}`}
+          className={`grid grid-cols-[36px_minmax(0,1fr)_72px_72px_40px] items-center gap-1 py-2 px-3 rounded-lg transition-colors ${done ? 'bg-green-200 dark:bg-green-900/50' : 'bg-white dark:bg-neutral-700'}`}
           style={{
             transform: 'translateX(0px)',
             transition: animating ? 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none',
@@ -182,7 +182,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
           />
           <button
             onClick={handleToggle}
-            className={`w-11 h-11 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-400 text-white dark:bg-green-600' : 'bg-gray-200 dark:bg-neutral-600 text-gray-400 dark:text-gray-300'}`}
+            className={`w-10 h-10 flex items-center justify-center rounded-lg transition ${done ? 'bg-green-400 text-white dark:bg-green-600' : 'bg-gray-200 dark:bg-neutral-600 text-gray-400 dark:text-gray-300'}`}
           >
             <Check className="w-6 h-6" />
           </button>
