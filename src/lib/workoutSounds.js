@@ -1,7 +1,7 @@
 // Haptic + audio feedback for workout events.
 // Uses the user-provided sound clip for set completion.
 
-const SOUND_URL = 'https://media.base44.com/videos/public/6a16b583ab0ebad6332038a3/fff9d0ef8_ScreenRecording_07-03-202607-42-00_1.MP4';
+const SOUND_URL = 'https://media.base44.com/files/public/6a16b583ab0ebad6332038a3/ee0d3ce4e_ScreenRecording_06-16-202607-45-53_12.mp3';
 
 let _audio = null;
 function getAudio() {
