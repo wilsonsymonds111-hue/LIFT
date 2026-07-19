@@ -125,7 +125,7 @@ export default function FatBurnedCard({ cutStartDate }) {
 
   if (!cutStartDate) {
     return (
-      <div className="bg-white dark:bg-card rounded-2xl p-4 border border-gray-200 dark:border-border shadow-sm">
+      <div className="rounded-2xl p-6 border border-white dark:border-border shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] bg-white dark:bg-card">
         <div className="flex items-center gap-2.5">
           <Flame className="w-5 h-5 text-orange-500" />
           <span className="text-lg font-semibold text-gray-900 dark:text-foreground">Fat Burned</span>
@@ -140,7 +140,7 @@ export default function FatBurnedCard({ cutStartDate }) {
   const fatLostKg = result ? (result.fatLostG / 1000).toFixed(1) : '0.0';
 
   return (
-    <div className="bg-white dark:bg-card rounded-2xl p-4 border border-gray-200 dark:border-border shadow-sm">
+    <div className="rounded-2xl p-6 border border-white dark:border-border shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] bg-white dark:bg-card">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <Flame className="w-5 h-5 text-orange-500" />

@@ -66,7 +66,9 @@ export default function BodyStats() {
           targetSessionsPerWeek={targetSessionsPerWeek}
         />
         {user?.goalMode === 'cutting' && (
-          <FatBurnedCard cutStartDate={user?.cutStartDate} />
+          <div className="px-1">
+            <FatBurnedCard cutStartDate={user?.cutStartDate} />
+          </div>
         )}
       </div>
     </div>
