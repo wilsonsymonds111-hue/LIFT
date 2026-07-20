@@ -74,7 +74,7 @@ export default function SummaryScreen({ template, exercises, prs, bestSets, dura
       canvas.toBlob(async (blob) => {
         const file = new File([blob], 'workout.png', { type: 'image/png' });
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `${template.name} Workout` });
+          await navigator.share({ files: [file] });
         } else {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a'); a.href = url; a.download = 'workout.png'; a.click();

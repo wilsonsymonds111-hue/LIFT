@@ -3,7 +3,7 @@ const WHITE = '#FFFFFF';
 const MUTED = '#A0A0A0';
 const LABEL = '#A0A0A0';
 const DIVIDER = '#444444';
-const CARD_BG = 'rgba(26, 26, 26, 0.85)';
+const CARD_BG = 'rgba(20, 20, 20, 0.45)';
 const CARD_BORDER = '#333333';
 const FONT = '"SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", sans-serif';
 const SCALE = 2;
@@ -221,7 +221,7 @@ export function drawWorkoutShareCard({ templateName, exercises, bestSets, prs, d
 
   // --- LIFT logo: pill-shaped badge with white border, separate from card ---
   const logoX = cx + drawW / 2 - logoW / 2;
-  ctx.fillStyle = 'rgba(20, 20, 20, 0.9)';
+  ctx.fillStyle = 'rgba(20, 20, 20, 0.45)';
   ctx.strokeStyle = WHITE;
   ctx.lineWidth = 1;
   roundRect(ctx, logoX, logoY, logoW, logoH, logoH / 2);
