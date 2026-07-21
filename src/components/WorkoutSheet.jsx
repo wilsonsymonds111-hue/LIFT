@@ -101,6 +101,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const [prs, setPrs] = useState([]);
   const [bestSets, setBestSets] = useState({});
   const [showSummary, setShowSummary] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [finishTimer, setFinishTimer] = useState('00:00');
   const [isRestDay, setIsRestDay] = useState(false);
   const { data: allTemplates = [] } = useWorkoutTemplates();
@@ -536,6 +537,18 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     return () => { if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current); };
   }, [exercises, showSummary, template?.id, template?.name]);
 
+  const handleCancel = useCallback(() => {
+    if (cancelling) return;
+    setCancelling(true);
+    setTimeout(() => {
+      cancelledRef.current = true;
+      finishedRef.current = true;
+      clearWorkoutSession();
+      window.dispatchEvent(new CustomEvent('workoutSessionChanged'));
+      onFinish();
+    }, 350);
+  }, [cancelling, onFinish]);
+
   const handleFinish = useCallback(async () => {
     const snapshot = { ...bestSetsRef.current };
     const toKg = (h) => typeof h === 'object' ? h.kg : h;
@@ -652,12 +665,16 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     {/* Dimmed background — covers full screen so no gap shows above during transitions */}
     <motion.div
       className="fixed pointer-events-none"
+      animate={cancelling ? { opacity: 0 } : {}}
+      transition={{ duration: 0.35, ease: 'easeInOut' }}
       style={{ zIndex: 35, top: 0, bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', opacity: bgDimOpacity }}
     />
 
     <motion.div
       className="fixed z-40 flex flex-col overflow-hidden pointer-events-auto"
-      style={{ 
+      animate={cancelling ? { y: '100%', opacity: 0 } : {}}
+      transition={{ duration: 0.35, ease: 'easeInOut' }}
+      style={{
         height,
         top,
         left: sideMargin,
@@ -859,8 +876,9 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
                   Add Exercises
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); cancelledRef.current = true; finishedRef.current = true; clearWorkoutSession(); window.dispatchEvent(new CustomEvent('workoutSessionChanged')); onFinish(); }}
-                  className="w-full py-3.5 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition relative z-20"
+                  onClick={handleCancel}
+                  disabled={cancelling}
+                  className="w-full py-3.5 bg-red-50 hover:bg-red-100 text-red-400 font-semibold rounded-xl text-base transition relative z-20 disabled:opacity-50"
                   style={{ touchAction: 'manipulation' }}
                 >
                   Cancel Workout
