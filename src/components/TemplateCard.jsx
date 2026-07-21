@@ -39,7 +39,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
       {...(isReorderMode ? dragHandleProps : holdProps)}
     >
       <div
-        className={`relative w-full rounded-2xl p-5 transition-all duration-150 border bg-white dark:bg-card overflow-hidden ${
+        className={`relative w-full rounded-2xl p-5 transition-all duration-150 border bg-white/70 dark:bg-card/70 backdrop-blur-md backdrop-saturate-150 overflow-hidden ${
           isReorderMode
             ? 'border-blue-400 dark:border-blue-500 shadow-[0_12px_40px_rgba(59,130,246,0.18)] scale-[1.02] cursor-grab active:cursor-grabbing'
             : `active:scale-[0.99] ${
