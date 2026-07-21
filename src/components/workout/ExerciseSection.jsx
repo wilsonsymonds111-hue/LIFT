@@ -189,7 +189,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       className={`mb-2 bg-white dark:bg-neutral-800 rounded-xl p-3 transition-all duration-200 exercise-card ${
         isDragging
           ? 'ring-2 ring-blue-500 shadow-2xl dragging'
-          : 'bg-blue-50/40 dark:bg-blue-950/20'
+          : 'bg-blue-50 dark:bg-blue-950/30'
       }`}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
