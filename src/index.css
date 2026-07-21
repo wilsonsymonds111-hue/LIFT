@@ -173,13 +173,13 @@
    (bright top-left & bottom-right, dim top-right & bottom-left) */
 .frosted-pill {
   position: relative;
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(10px) saturate(160%);
-  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  background: rgba(180, 180, 185, 0.28);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
   border-radius: 0.5rem;
 }
 .dark .frosted-pill {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(120, 120, 125, 0.18);
 }
 .frosted-pill::before {
   content: '';
