@@ -7,6 +7,7 @@ import SetRow from './SetRow';
 
 import RestTimeModal from './RestTimeModal';
 import ExerciseShareButton from '../share/ExerciseShareButton';
+import PRBadge from './PRBadge';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
 const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange, isDragging }) {
@@ -115,6 +116,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     return null;
   }, [sets, completedSets, lastSessionSets, prev, displayBodyweight]);
 
+  const isSetPR = (setId) => {
+    const result = completedSets[setId];
+    if (!result || !pr) return false;
+    if (pr.bodyweight) return result.reps > pr.reps;
+    return result.kg > pr.kg;
+  };
+
   const handleShareCard = async () => {
     setShowMenu(false);
     if (!cardRef.current || sharing) return;
@@ -222,7 +230,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden exercise-card-content"
+            className="exercise-card-content"
+            style={{ overflow: 'visible' }}
           >
             {showNote && (
               <div
@@ -242,8 +251,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
               const suggestedKg = isDone ? completedResult.kg : (s.suggestedKg ?? prevSet?.kg ?? (i === 0 && prev ? prev.kg : null));
               const suggestedReps = isDone ? completedResult.reps : (s.suggestedReps ?? (prevSet ? prevSet.reps + 1 : (i === 0 && prev ? prev.reps + 1 : null)));
               return (
-              <div key={s.id} className={i > 0 ? 'mt-2' : ''}>
-              <SetRow setNum={i + 1} previous={i === 0 ? (pr ?? prevSet ?? prev) : null} initialKg={suggestedKg} initialReps={suggestedReps} initialDone={isDone} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
+              <div key={s.id} className={`relative ${i > 0 ? 'mt-2' : ''}`}>
+                {isSetPR(s.id) && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10" style={{ marginLeft: '-7px' }}>
+                    <PRBadge />
+                  </div>
+                )}
+                <SetRow setNum={i + 1} previous={i === 0 ? (pr ?? prevSet ?? prev) : null} initialKg={suggestedKg} initialReps={suggestedReps} initialDone={isDone} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
                 onComplete={(result) => {
                   const setIndex = sets.findIndex(r => r.id === s.id);
                   const wasCompleted = !!completedSets[s.id];
