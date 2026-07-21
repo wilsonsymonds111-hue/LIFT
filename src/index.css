@@ -169,6 +169,32 @@
   background: rgba(23, 23, 23, 0.75);
 }
 
+/* Frosted-glass exercise pills — blurry fill + diagonal shimmer border
+   (bright top-left & bottom-right, dim top-right & bottom-left) */
+.frosted-pill {
+  position: relative;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  border-radius: 0.5rem;
+}
+.dark .frosted-pill {
+  background: rgba(255, 255, 255, 0.08);
+}
+.frosted-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.12) 42%, rgba(255,255,255,0.12) 58%, rgba(255,255,255,0.75) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 /* Exercise detail shimmer – defined once, not injected per render */
 @keyframes goldShimmer {
   0% { transform: translateX(-100%) skewX(-15deg); }
