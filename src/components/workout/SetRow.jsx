@@ -4,7 +4,7 @@ import { playTick } from '../../lib/workoutSounds';
 import { triggerHaptic } from '../../lib/haptics';
 import RestCountdown from './RestCountdown';
 
-const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, initialDone, onComplete, onDelete, restDuration = 120, showHeader = false }) {
+const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, initialDone, isPR = false, onComplete, onDelete, restDuration = 120, showHeader = false }) {
   const [kg, setKg] = useState(initialKg ?? previous?.kg ?? '');
   const [reps, setReps] = useState(initialReps ?? previous?.reps ?? '');
   const [done, setDone] = useState(initialDone || false);
@@ -138,10 +138,10 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
         </div>
         <div
           ref={rowRef}
-          className={`grid grid-cols-[36px_minmax(0,1fr)_72px_72px_40px] items-center gap-1 py-2 px-3 rounded-lg transition-colors ${done ? 'bg-green-200 dark:bg-green-900/50' : 'bg-white dark:bg-neutral-700'}`}
+          className={`grid grid-cols-[36px_minmax(0,1fr)_72px_72px_40px] items-center gap-1 py-2 px-3 rounded-lg relative transition-colors ${done ? 'bg-green-200 dark:bg-green-900/50' : 'bg-white dark:bg-neutral-700'} ${isPR ? 'ring-2 ring-amber-400 gold-shimmer shadow-[0_0_14px_rgba(251,191,36,0.3)]' : ''}`}
           style={{
             transform: 'translateX(0px)',
-            transition: animating ? 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none',
+            transition: animating ? 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'box-shadow 0.3s ease',
             willChange: 'transform',
           }}
           onPointerDown={onPointerDown}
