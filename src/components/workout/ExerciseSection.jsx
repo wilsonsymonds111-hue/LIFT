@@ -120,7 +120,11 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     const result = completedSets[setId];
     if (!result || !pr) return false;
     if (pr.bodyweight) return result.reps > pr.reps;
-    return result.kg > pr.kg;
+    // Weight PR: lifted heavier than ever before
+    if (result.kg > pr.kg) return true;
+    // Reps PR at max weight: same weight, more reps than the previous best
+    if (result.kg === pr.kg && result.reps > pr.reps) return true;
+    return false;
   };
 
   const handleShareCard = async () => {
