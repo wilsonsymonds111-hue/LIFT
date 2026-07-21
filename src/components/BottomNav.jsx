@@ -14,7 +14,7 @@ const BottomNav = memo(function BottomNav() {
   const location = useLocation();
   const { hideNav, triggerScrollToTop } = useNavVisibility();
 
-  if (hideNav || location.pathname.startsWith('/support-chat')) return null;
+  if (hideNav || location.pathname.startsWith('/support-chat') || location.pathname.startsWith('/active-workout')) return null;
 
   return (
     <div
