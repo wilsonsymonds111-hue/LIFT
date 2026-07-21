@@ -706,15 +706,17 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
       </div>
       )}
 
-      {/* Minimized bar — fades in as it minimizes, anchored to the bottom of the sheet */}
+      {/* Minimized bar — only rendered when minimized to prevent ghost overlay when expanded */}
+      {minimized && (
       <div
         className="flex items-center justify-between px-5 absolute inset-x-0 bottom-0"
-        style={{ height: 72, opacity: barOpacity, pointerEvents: minimized ? 'auto' : 'none' }}
-        onClick={minimized ? handleBarClick : undefined}
+        style={{ height: 72, opacity: barOpacity, pointerEvents: 'auto' }}
+        onClick={handleBarClick}
       >
         <p className="font-bold text-foreground text-base truncate">{template.name}</p>
         <TimerDisplay startTimestamp={startTimeRef.current} className="text-base text-muted-foreground font-display" />
       </div>
+      )}
 
       {/* Full content — fades out as it minimizes */}
       <motion.div
