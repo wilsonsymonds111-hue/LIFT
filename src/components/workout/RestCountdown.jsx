@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, memo } from 'react';
+import { motion } from 'framer-motion';
 import { notifyRestComplete } from '../../lib/workoutSounds';
 
 const SWIPE_THRESHOLD = 60;
@@ -7,10 +8,12 @@ const SWIPE_THRESHOLD = 60;
 const RestCountdown = memo(function RestCountdown({ duration }) {
   const [seconds, setSeconds] = useState(duration);
   const [visible, setVisible] = useState(true);
+  const [phase, setPhase] = useState('counting'); // 'counting' | 'done'
   const [animating, setAnimating] = useState(false);
   const restEndRef = useRef(Date.now() + duration * 1000);
   const notifiedRef = useRef(false);
   const intervalRef = useRef(null);
+  const doneTimeoutRef = useRef(null);
   const startXRef = useRef(null);
   const swipingRef = useRef(false);
   const currentXRef = useRef(0);
@@ -18,6 +21,7 @@ const RestCountdown = memo(function RestCountdown({ duration }) {
 
   const dismiss = () => {
     clearInterval(intervalRef.current);
+    clearTimeout(doneTimeoutRef.current);
     setVisible(false);
   };
 
@@ -27,11 +31,12 @@ const RestCountdown = memo(function RestCountdown({ duration }) {
       if (remaining <= 0) {
         clearInterval(intervalRef.current);
         setSeconds(0);
-        setVisible(false);
+        setPhase('done');
         if (!notifiedRef.current) {
           notifiedRef.current = true;
           notifyRestComplete(silent);
         }
+        doneTimeoutRef.current = setTimeout(() => dismiss(), 2500);
       } else {
         setSeconds(remaining);
       }
@@ -44,6 +49,7 @@ const RestCountdown = memo(function RestCountdown({ duration }) {
 
     return () => {
       clearInterval(intervalRef.current);
+      clearTimeout(doneTimeoutRef.current);
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);
@@ -82,15 +88,15 @@ const RestCountdown = memo(function RestCountdown({ duration }) {
     startXRef.current = null;
   };
 
-  if (!visible || seconds <= 0) return null;
+  if (!visible) return null;
+
+  const progress = duration > 0 ? seconds / duration : 0;
 
   return (
-    <div
-      className="w-full mt-2 overflow-hidden rounded-xl"
-    >
+    <div className="w-full mt-2 overflow-hidden rounded-xl">
       <div
         ref={barRef}
-        className="w-full bg-blue-500 text-white font-bold text-center py-1.5 rounded-xl text-base tracking-wider cursor-pointer select-none touch-none"
+        className="relative w-full bg-blue-500/25 text-white font-bold text-center py-1.5 rounded-xl text-base tracking-wider cursor-pointer select-none touch-none overflow-hidden"
         style={{
           transition: animating ? 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease' : 'none',
           willChange: 'transform, opacity',
@@ -101,7 +107,30 @@ const RestCountdown = memo(function RestCountdown({ duration }) {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-        {String(Math.floor(seconds / 60)).padStart(2, '0')}:{String(seconds % 60).padStart(2, '0')}
+        {/* Depleting blue fill — shrinks left as time runs out */}
+        <div
+          className="absolute inset-y-0 left-0 right-0 bg-blue-500"
+          style={{
+            transform: `scaleX(${progress})`,
+            transformOrigin: 'left',
+            transition: 'transform 1s linear',
+          }}
+        />
+        {/* Text overlay */}
+        <span className="relative z-10" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+          {phase === 'done' ? (
+            <motion.span
+              initial={{ scale: 0.4, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 12 }}
+              className="inline-block uppercase"
+            >
+              Back to work!
+            </motion.span>
+          ) : (
+            `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`
+          )}
+        </span>
       </div>
     </div>
   );
