@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { MoreHorizontal, Plus } from 'lucide-react';
+import { MoreHorizontal, Plus, Share } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
 import ProgressGraph from '../ProgressGraph';
 import SetRow from './SetRow';
@@ -69,6 +69,8 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const [showRestTimeModal, setShowRestTimeModal] = useState(false);
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [exerciseDetailInitialTab, setExerciseDetailInitialTab] = useState('Charts');
+  const cardRef = useRef(null);
+  const [sharing, setSharing] = useState(false);
 
 
   const lastEntry = useMemo(() => exercise.history?.[exercise.history.length - 1], [exercise.history]);
@@ -113,9 +115,34 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     return null;
   }, [sets, completedSets, lastSessionSets, prev, displayBodyweight]);
 
+  const handleShareCard = async () => {
+    setShowMenu(false);
+    if (!cardRef.current || sharing) return;
+    setSharing(true);
+    try {
+      const { default: html2canvas } = await import('html2canvas');
+      const content = cardRef.current.querySelector('.exercise-card-content');
+      if (content) content.style.overflow = 'visible';
+      const canvas = await html2canvas(cardRef.current, { scale: 3, useCORS: true, backgroundColor: null, logging: false });
+      if (content) content.style.overflow = '';
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], `${exercise.name}-pr.png`, { type: 'image/png' });
+        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file] });
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a'); a.href = url; a.download = `${exercise.name}-pr.png`; a.click();
+          URL.revokeObjectURL(url);
+        }
+        setSharing(false);
+      }, 'image/png');
+    } catch { setSharing(false); }
+  };
+
   return (
     <>
     <div
+      ref={cardRef}
       className={`mb-2 bg-white dark:bg-neutral-800 rounded-xl p-3 transition-all duration-200 exercise-card ${
         isDragging
           ? 'ring-2 ring-blue-500 shadow-2xl dragging'
@@ -146,6 +173,14 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                       className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-neutral-700 transition"
                     >
                       {showNote ? 'Hide Note' : 'Add a Note'}
+                    </button>
+                    <button
+                      onClick={handleShareCard}
+                      disabled={sharing}
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-neutral-700 transition flex items-center gap-2"
+                    >
+                      <Share className="w-4 h-4" />
+                      {sharing ? 'Preparing…' : 'Share via Text Message'}
                     </button>
                     <button
                       onClick={() => { setShowMenu(false); setShowRestTimeModal(true); }}
