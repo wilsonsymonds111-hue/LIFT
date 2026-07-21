@@ -131,7 +131,27 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
       const { default: html2canvas } = await import('html2canvas');
       const content = cardRef.current.querySelector('.exercise-card-content');
       if (content) content.style.overflow = 'visible';
-      const canvas = await html2canvas(cardRef.current, { scale: 3, useCORS: true, backgroundColor: null, logging: false });
+      // Capture input values before cloning — html2canvas may not copy the .value property
+      const inputData = Array.from(cardRef.current.querySelectorAll('input')).map(inp => ({
+        value: inp.value,
+        className: inp.className,
+      }));
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 3, useCORS: true, backgroundColor: null, logging: false,
+        onclone: (doc) => {
+          // Replace <input> elements with flex-centered <div>s so text sits
+          // cleanly centered in the captured image (html2canvas misaligns input text).
+          doc.querySelectorAll('input').forEach((input, i) => {
+            const div = doc.createElement('div');
+            div.textContent = inputData[i]?.value || '';
+            div.className = inputData[i]?.className || input.className;
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.justifyContent = 'center';
+            input.parentNode.replaceChild(div, input);
+          });
+        },
+      });
       if (content) content.style.overflow = '';
       canvas.toBlob(async (blob) => {
         const file = new File([blob], `${exercise.name}-pr.png`, { type: 'image/png' });
