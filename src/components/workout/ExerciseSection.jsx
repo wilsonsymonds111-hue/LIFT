@@ -7,7 +7,6 @@ import SetRow from './SetRow';
 
 import RestTimeModal from './RestTimeModal';
 import ExerciseShareButton from '../share/ExerciseShareButton';
-import PRBadge from './PRBadge';
 const ExerciseDetailModal = lazy(() => import('../ExerciseDetailModal'));
 
 const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dragHandleProps, onDeleteExercise, exerciseImage, initialState, onStateChange, isDragging }) {
@@ -54,6 +53,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     }));
   });
   const [completedSets, setCompletedSets] = useState(() => initialState?.completedSets || {});
+  const [hasPR, setHasPR] = useState(() => {
+    const completed = initialState?.completedSets || {};
+    if (!pr) return false;
+    return Object.values(completed).some(r => r && (
+      pr.bodyweight ? r.reps > pr.reps : r.kg > pr.kg || (r.kg === pr.kg && r.reps > pr.reps)
+    ));
+  });
   const [showMenu, setShowMenu] = useState(false);
   const [note, setNote] = useState(() => initialState?.note || exercise.note || '');
   const [showNote, setShowNote] = useState(() => !!(initialState?.note || exercise.note));
@@ -175,10 +181,12 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
     <>
     <div
       ref={cardRef}
-      className={`mb-2 bg-white dark:bg-neutral-800 rounded-xl p-3 transition-all duration-200 exercise-card ${
+      className={`mb-2 bg-white dark:bg-neutral-800 rounded-xl p-3 transition-all duration-300 exercise-card relative ${
         isDragging
           ? 'ring-2 ring-blue-500 shadow-2xl dragging'
-          : 'bg-gray-50 dark:bg-neutral-800/60'
+          : hasPR
+            ? 'ring-2 ring-amber-400 gold-shimmer shadow-[0_0_18px_rgba(251,191,36,0.3)]'
+            : 'bg-gray-50 dark:bg-neutral-800/60'
       }`}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
@@ -276,11 +284,6 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
               const suggestedReps = isDone ? completedResult.reps : (s.suggestedReps ?? (prevSet ? prevSet.reps + 1 : (i === 0 && prev ? prev.reps + 1 : null)));
               return (
               <div key={s.id} className={`relative ${i > 0 ? 'mt-2' : ''}`}>
-                {isSetPR(s.id) && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10" style={{ marginLeft: '-7px' }}>
-                    <PRBadge />
-                  </div>
-                )}
                 <SetRow setNum={i + 1} previous={i === 0 ? (pr ?? prevSet ?? prev) : null} initialKg={suggestedKg} initialReps={suggestedReps} initialDone={isDone} restDuration={restEnabled ? restDuration : 0} showHeader={i === 0}
                 onComplete={(result) => {
                   const setIndex = sets.findIndex(r => r.id === s.id);
@@ -288,6 +291,13 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                   setCompletedSets(prev => { const next = {...prev}; if (result) next[s.id] = result; else delete next[s.id]; return next; });
                   if (result) {
                     onBestSet?.(exercise.name, result.kg, result.reps);
+
+                    if (pr && !hasPR) {
+                      const isPR = pr.bodyweight
+                        ? result.reps > pr.reps
+                        : result.kg > pr.kg || (result.kg === pr.kg && result.reps > pr.reps);
+                      if (isPR) setHasPR(true);
+                    }
 
                     if (!wasCompleted && setIndex < sets.length - 1) {
                       setSets(prev => prev.map((r, i) => {
