@@ -68,7 +68,7 @@ const StaticDot = (props) => {
   return <circle cx={cx} cy={cy} r={3} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
 };
 
-const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact, exerciseName }) {
+const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, isBodyweight, hideLabel, labelOverride, compact, exerciseName, goal }) {
   const [freshAnim, setFreshAnim] = useState(false);
   const prevAnimKeyRef = useRef(animKey);
   const chartHeight = compact ? 140 : 230;
@@ -118,13 +118,32 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
       }
     });
 
+    // Append a single goal point (next progressive overload target) if provided
+    if (goal) {
+      const goalVal = isBodyweight ? (goal.reps ?? 0) : (goal.kg ?? 0);
+      if (goalVal > 0 && d.length > 0) {
+        const lastIdx = d.length - 1;
+        d[lastIdx] = { ...d[lastIdx], valGoal: d[lastIdx].valNew ?? d[lastIdx].valStatic };
+        d.push({
+          date: null,
+          dateShort: '',
+          valStatic: null,
+          valNew: null,
+          valGoal: goalVal,
+          kg: goal.kg,
+          reps: goal.reps,
+          isGoal: true,
+        });
+      }
+    }
+
     return { data: d, lastRealIdx: idx };
-  }, [history, isBodyweight]);
+  }, [history, isBodyweight, goal]);
 
   // Y-axis domain — ticks always in increments of 5 or 10 kg for clean, even spacing
   const { domain: yDomain, ticks: yTicks } = useMemo(() => {
     if (!result.data || result.data.length === 0) return { domain: [0, 100], ticks: [] };
-    const vals = result.data.map(x => x.valStatic ?? x.valNew).filter(v => v != null);
+    const vals = result.data.map(x => x.valStatic ?? x.valNew ?? x.valGoal).filter(v => v != null);
     if (vals.length === 0) return { domain: [0, 100], ticks: [] };
     const min = Math.min(...vals);
     const max = Math.max(...vals);
@@ -165,9 +184,24 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
     return <circle cx={cx} cy={cy} r={3} fill="#fff" stroke="#3b82f6" strokeWidth={2} />;
   }, [freshAnim, animDir, animKey, lastRealIdx]);
 
+  const renderGoalDot = useCallback((props) => {
+    const { cx, cy, value, payload } = props;
+    if (value == null || !payload?.isGoal) return <g />;
+    return <circle cx={cx} cy={cy} r={5} fill="none" stroke="#9ca3af" strokeWidth={1.5} strokeDasharray="2.5 2.5" />;
+  }, []);
+
   const renderTooltip = useCallback(({ active, payload }) => {
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload;
+    if (d?.isGoal) {
+      const label = isBodyweight ? `${d.reps} reps` : `${d.kg} kg × ${d.reps} reps`;
+      return (
+        <div className="bg-white text-gray-800 px-3 py-1.5 rounded-md shadow-md text-xs font-semibold whitespace-nowrap text-center">
+          <div>🎯 {label}</div>
+          <div className="text-[10px] font-normal text-gray-500 mt-0.5">Next goal</div>
+        </div>
+      );
+    }
     const val = d?.valNew ?? d?.valStatic;
     if (val == null) return null;
     const label = isBodyweight
@@ -197,6 +231,7 @@ const ProgressGraph = memo(function ProgressGraph({ history, animKey, animDir, i
           <Tooltip content={renderTooltip} />
           <Line type="monotone" dataKey="valStatic" stroke="#3b82f6" strokeWidth={2} dot={StaticDot} activeDot={false} connectNulls={false} isAnimationActive={false} />
           <Line key={animKey} type="monotone" dataKey="valNew" stroke="#3b82f6" strokeWidth={2} dot={renderNewDot} activeDot={{ r: 6, fill: '#fff', stroke: '#3b82f6', strokeWidth: 2 }} connectNulls={true} isAnimationActive={true} animationDuration={300} animationEasing="ease-out" />
+          <Line type="monotone" dataKey="valGoal" stroke="#9ca3af" strokeWidth={1.5} strokeDasharray="3 3" dot={renderGoalDot} activeDot={false} connectNulls={false} isAnimationActive={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>

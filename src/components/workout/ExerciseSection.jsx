@@ -98,6 +98,21 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
   const displayHistory = graphHistory;
   const displayBodyweight = isBodyweight;
 
+  const nextGoal = useMemo(() => {
+    for (let i = 0; i < sets.length; i++) {
+      const s = sets[i];
+      if (completedSets[s.id]) continue;
+      const prevSet = i < lastSessionSets.length ? lastSessionSets[i] : null;
+      const suggestedKg = s.suggestedKg ?? prevSet?.kg ?? (i === 0 && prev ? prev.kg : null);
+      const suggestedReps = s.suggestedReps ?? (prevSet ? prevSet.reps + 1 : (i === 0 && prev ? prev.reps + 1 : null));
+      const goalVal = displayBodyweight ? suggestedReps : suggestedKg;
+      if (goalVal != null && goalVal > 0) {
+        return { kg: suggestedKg ?? 0, reps: suggestedReps ?? 0 };
+      }
+    }
+    return null;
+  }, [sets, completedSets, lastSessionSets, prev, displayBodyweight]);
+
   return (
     <>
     <div
@@ -184,7 +199,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                 className="w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-1.5 empty:bg-transparent empty:border-transparent empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold transition-colors"
               />
             )}
-            <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} />
+            <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} goal={nextGoal} />
             {sets.map((s, i) => {
               const prevSet = i < lastSessionSets.length ? lastSessionSets[i] : null;
               const completedResult = completedSets[s.id];
