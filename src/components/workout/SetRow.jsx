@@ -138,7 +138,7 @@ const SetRow = memo(function SetRow({ setNum, previous, initialKg, initialReps, 
         </div>
         <div
           ref={rowRef}
-          className={`grid grid-cols-[36px_minmax(0,1fr)_72px_72px_40px] items-center gap-1 py-2 px-3 rounded-lg relative transition-colors ${done ? 'bg-green-200 dark:bg-green-900/50' : 'bg-white dark:bg-neutral-700'} ${isPR ? 'ring-2 ring-amber-400 gold-shimmer shadow-[0_0_14px_rgba(251,191,36,0.3)]' : ''}`}
+          className={`grid grid-cols-[36px_minmax(0,1fr)_72px_72px_40px] items-center gap-1 py-2 px-3 rounded-lg relative transition-colors ${done ? 'bg-green-200 dark:bg-green-900/50' : 'bg-white dark:bg-neutral-700'} ${isPR ? 'ring-2 ring-amber-400 gold-shimmer shadow-[0_0_16px_rgba(251,191,36,0.45)]' : ''}`}
           style={{
             transform: 'translateX(0px)',
             transition: animating ? 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'box-shadow 0.3s ease',
