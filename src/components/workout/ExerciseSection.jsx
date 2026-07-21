@@ -186,7 +186,7 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
           ? 'ring-2 ring-blue-500 shadow-2xl dragging'
           : hasPR
             ? 'ring-2 ring-amber-400 gold-shimmer shadow-[0_0_18px_rgba(251,191,36,0.3)]'
-            : 'bg-gray-50 dark:bg-neutral-800/60'
+            : 'bg-blue-50/40 dark:bg-blue-950/20'
       }`}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0 flex flex-col">
