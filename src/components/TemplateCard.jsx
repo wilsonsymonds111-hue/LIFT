@@ -94,7 +94,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
             {exercises.map((ex, i) => (
               <span
                 key={i}
-                className="text-[13px] font-semibold px-3 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300"
+                className="text-[13px] font-semibold px-3 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-foreground/80 dark:text-foreground/70"
               >
                 {ex.name}
               </span>
