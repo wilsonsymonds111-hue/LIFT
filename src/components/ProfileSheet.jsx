@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { X, Moon, Sun, Trash2, AlertTriangle, Camera, MessageSquare, LogIn, UserPlus, LogOut, FileText, CalendarPlus } from 'lucide-react';
+import { X, Trash2, AlertTriangle, MessageSquare, LogIn, UserPlus, LogOut, FileText, CalendarPlus, ArrowRightLeft, Copy, Check } from 'lucide-react';
 import CalendarSyncModal from './CalendarSyncModal';
 import { generateWorkoutICS } from '../lib/icsGenerator';
 import { base44 } from '@/api/base44Client';
@@ -10,13 +10,84 @@ import CreateAccountModal from './CreateAccountModal';
 import ImageCropper from './ImageCropper';
 import { useNavVisibility } from '@/lib/NavContext';
 import { useAuth } from '@/lib/AuthContext';
-
 import { memo } from 'react';
+
+function finiteTransferNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function cleanTransferHistory(history) {
+  if (!Array.isArray(history)) return [];
+
+  return history.flatMap((entry) => {
+    const kg = finiteTransferNumber(entry?.kg);
+    const reps = finiteTransferNumber(entry?.reps);
+    const date = typeof entry?.date === 'string' ? entry.date.trim() : '';
+    if (kg === null || reps === null || !date) return [];
+    return [{ kg, reps, date }];
+  });
+}
+
+async function createNativeTransferCode() {
+  const [exercises, bodyWeights] = await Promise.all([
+    base44.entities.Exercise.list('name', 500),
+    base44.entities.BodyWeight.list('-date', 1000),
+  ]);
+
+  return JSON.stringify({
+    kind: 'lift-base44-transfer',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    exercises: (Array.isArray(exercises) ? exercises : []).flatMap((exercise, index) => {
+      const name = typeof exercise?.name === 'string' ? exercise.name.trim() : '';
+      const history = cleanTransferHistory(exercise?.history);
+      if (!name || history.length === 0) return [];
+
+      return [{
+        sourceId: String(exercise?.id ?? `exercise-${index}`),
+        name,
+        muscle: typeof exercise?.muscle === 'string' ? exercise.muscle : '',
+        history,
+      }];
+    }),
+    bodyWeights: (Array.isArray(bodyWeights) ? bodyWeights : []).flatMap((entry, index) => {
+      const weight = finiteTransferNumber(entry?.weight);
+      const date = typeof entry?.date === 'string' ? entry.date.trim() : '';
+      if (weight === null || !date) return [];
+
+      return [{
+        sourceId: String(entry?.id ?? `body-weight-${index}`),
+        weight,
+        date,
+      }];
+    }),
+  });
+}
+
+async function copyNativeTransferCode(code, textarea) {
+  try {
+    await navigator.clipboard.writeText(code);
+    return true;
+  } catch {
+    try {
+      textarea?.focus();
+      textarea?.select();
+      return document.execCommand('copy');
+    } catch {
+      return false;
+    }
+  }
+}
 
 const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDark, profilePhoto, onPhotoChange, bodyStatsProps }) {
   const [showFeedback, setShowFeedback] = useState(false);
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [showCalendarSync, setShowCalendarSync] = useState(false);
+  const [showNativeTransfer, setShowNativeTransfer] = useState(false);
+  const [transferCode, setTransferCode] = useState('');
+  const [buildingTransfer, setBuildingTransfer] = useState(false);
+  const [transferCopied, setTransferCopied] = useState(false);
   const { setHideNav } = useNavVisibility();
   const { isAuthenticated, isGuest, logout } = useAuth();
 
@@ -65,6 +136,25 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
   const [pendingCropFile, setPendingCropFile] = useState(null);
   const [loggingOut, setLoggingOut] = useState(false);
   const fileInputRef = useRef(null);
+  const transferTextareaRef = useRef(null);
+
+  const handleOpenNativeTransfer = async () => {
+    setShowNativeTransfer(true);
+    setBuildingTransfer(true);
+    setTransferCopied(false);
+    try {
+      setTransferCode(await createNativeTransferCode());
+    } catch {
+      setTransferCode('');
+    } finally {
+      setBuildingTransfer(false);
+    }
+  };
+
+  const handleCopyNativeTransfer = async () => {
+    const copied = await copyNativeTransferCode(transferCode, transferTextareaRef.current);
+    setTransferCopied(copied);
+  };
 
   const handleDeleteAccount = async () => {
     if (confirmText.trim().toLowerCase() !== 'delete') return;
@@ -228,6 +318,20 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
           </button>
         </div>
 
+        {/* One-time Base44 to native data transfer */}
+        <button
+          onClick={handleOpenNativeTransfer}
+          className="relative z-10 flex items-center gap-3 bg-white dark:bg-zinc-800 rounded-2xl px-4 py-3.5 transition active:opacity-70 shadow-sm"
+        >
+          <div className="w-8 h-8 bg-violet-100 dark:bg-violet-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+            <ArrowRightLeft className="w-4 h-4 text-violet-600" />
+          </div>
+          <div className="text-left">
+            <p className="font-semibold text-foreground text-sm">Transfer Data to Native LIFT</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Copy your logged weights, reps and body weight</p>
+          </div>
+        </button>
+
         {/* Feedback & Support */}
         <button
           onClick={() => setShowFeedback(true)}
@@ -367,6 +471,63 @@ const ProfileSheet = memo(function ProfileSheet({ onClose, darkMode, onToggleDar
             onCancel={() => setPendingCropFile(null)}
             onCrop={handleCropComplete}
           />
+        )}
+
+        {showNativeTransfer && createPortal(
+          <div className="fixed inset-0 z-[70] flex items-center justify-center px-5">
+            <div
+              className="absolute inset-0 bg-black/70"
+              onClick={() => setShowNativeTransfer(false)}
+            />
+            <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-zinc-900 p-5 shadow-2xl">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-xl font-extrabold text-foreground">Transfer to Native LIFT</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    This makes a copy. Nothing is removed from Base44.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowNativeTransfer(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-muted"
+                >
+                  <X className="w-4 h-4 text-foreground" />
+                </button>
+              </div>
+
+              {buildingTransfer ? (
+                <div className="my-8 flex items-center justify-center gap-3">
+                  <div className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm font-semibold text-muted-foreground">Preparing your history…</span>
+                </div>
+              ) : transferCode ? (
+                <>
+                  <textarea
+                    ref={transferTextareaRef}
+                    readOnly
+                    value={transferCode}
+                    aria-label="Native LIFT transfer code"
+                    className="mt-4 h-28 w-full resize-none rounded-2xl border border-border bg-muted p-3 text-[10px] text-muted-foreground focus:outline-none"
+                  />
+                  <button
+                    onClick={handleCopyNativeTransfer}
+                    className="mt-3 w-full h-12 rounded-2xl bg-violet-600 text-white font-bold flex items-center justify-center gap-2 active:scale-[0.99]"
+                  >
+                    {transferCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {transferCopied ? 'Copied — open Native LIFT' : 'Copy Transfer Code'}
+                  </button>
+                  <p className="mt-3 text-center text-xs text-muted-foreground">
+                    In Native LIFT, open Profile → Import Base44 Data and paste this code.
+                  </p>
+                </>
+              ) : (
+                <div className="mt-4 rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-600">
+                  LIFT could not read the old history. Keep this window open and try again.
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body
         )}
       </div>
 
