@@ -11,6 +11,7 @@ import BottomNav from './components/BottomNav';
 import PersistentWorkoutBar from './components/PersistentWorkoutBar';
 import { NavProvider, useNavVisibility } from '@/lib/NavContext';
 import ImportErrorBoundary from './components/ImportErrorBoundary';
+import ActiveWorkout from './pages/ActiveWorkout';
 
 // Retry wrapper for lazy imports — recovers from transient Vite HMR
 // "Failed to fetch dynamically imported module" errors after recompiles.
@@ -31,7 +32,6 @@ const Home = lazy(() => lazyRetry(() => import('./pages/Home')));
 const Splits = lazy(() => lazyRetry(() => import('./pages/Splits')));
 const BodyStats = lazy(() => lazyRetry(() => import('./pages/BodyStats')));
 const NewTemplate = lazy(() => lazyRetry(() => import('./pages/NewTemplate')));
-const ActiveWorkout = lazy(() => lazyRetry(() => import('./pages/ActiveWorkout')));
 const TemplateDetail = lazy(() => lazyRetry(() => import('./pages/TemplateDetail')));
 const SplitDetail = lazy(() => lazyRetry(() => import('./pages/SplitDetail')));
 const SupportChat = lazy(() => lazyRetry(() => import('./pages/SupportChat')));
@@ -196,9 +196,6 @@ const TabPanel = memo(function TabPanel({ width, visited, Component, scrollToTop
 // Preload sub-pages after tab content settles
 const usePreloadSubPages = () => {
   useEffect(() => {
-    // The active-workout flow is the most latency-sensitive — start its chunk
-    // download immediately so it's already cached when the user taps a card.
-    import('./pages/ActiveWorkout');
     const preload = () => {
       import('./pages/Splits');
       import('./pages/BodyStats');
