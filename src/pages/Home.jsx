@@ -218,10 +218,9 @@ export default function Home() {
     if (!cardEl) { navigate(`/active-workout/${template.id}`); return; }
     const rect = cardEl.getBoundingClientRect();
     setExpand({ rect });
-    window.setTimeout(() => {
-      navigate(`/active-workout/${template.id}`);
-      window.setTimeout(() => setExpand(null), 360);
-    }, 320);
+    // Mount the live view behind the zoom panel so it's ready when revealed
+    window.setTimeout(() => navigate(`/active-workout/${template.id}`), 290);
+    window.setTimeout(() => setExpand(null), 480);
   }, [navigate]);
 
   // --- Split categorization (computed fresh every render — no stale memo) ---
@@ -649,12 +648,23 @@ export default function Home() {
       )}
 
       {expand && createPortal(
-        <motion.div
-          initial={{ left: expand.rect.left, top: expand.rect.top, width: expand.rect.width, height: expand.rect.height, borderRadius: 16, opacity: 1 }}
-          animate={{ left: 0, top: 0, width: window.innerWidth, height: window.innerHeight, borderRadius: 24, opacity: 1 }}
-          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed z-30 bg-background border border-border shadow-xl pointer-events-none"
-        />,
+        (() => {
+          const W = window.innerWidth, H = window.innerHeight;
+          const sx = expand.rect.width / W;
+          const sy = expand.rect.height / H;
+          // Origin that makes the fullscreen panel exactly cover the card at the start
+          const ox = sx >= 1 ? expand.rect.left : expand.rect.left / (1 - sx);
+          const oy = sy >= 1 ? expand.rect.top : expand.rect.top / (1 - sy);
+          return (
+            <motion.div
+              className="fixed inset-0 bg-background shadow-2xl pointer-events-none"
+              style={{ zIndex: 60, transformOrigin: `${ox}px ${oy}px` }}
+              initial={{ scaleX: sx, scaleY: sy, borderRadius: 28 }}
+              animate={{ scaleX: 1, scaleY: 1, borderRadius: 0 }}
+              transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
+            />
+          );
+        })(),
         document.body
       )}
 
