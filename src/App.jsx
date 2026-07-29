@@ -69,7 +69,7 @@ const LOADING_SPINNER = (
 // For modal routes (template detail) — dim background instead of solid black
 const MODAL_FALLBACK = <div className="fixed inset-0 bg-black/40" />;
 
-const fadeVariants = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } };
+const fadeVariants = { initial: { opacity: 1 }, animate: { opacity: 1 }, exit: { opacity: 0 } };
 
 const SlideIn = memo(({ children, transparent, fade }) => (
   <motion.div
@@ -78,7 +78,7 @@ const SlideIn = memo(({ children, transparent, fade }) => (
     initial="initial"
     animate="animate"
     exit="exit"
-    transition={fade ? { duration: 0.22, ease: 'easeInOut' } : PAGE_TRANSITION}
+    transition={fade ? { duration: 0.2, ease: 'easeInOut' } : PAGE_TRANSITION}
   >
     {children}
   </motion.div>

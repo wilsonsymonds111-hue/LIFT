@@ -220,8 +220,8 @@ export default function Home() {
     setExpand({ rect });
     window.setTimeout(() => {
       navigate(`/active-workout/${template.id}`);
-      window.setTimeout(() => setExpand(null), 320);
-    }, 280);
+      window.setTimeout(() => setExpand(null), 280);
+    }, 200);
   }, [navigate]);
 
   // --- Split categorization (computed fresh every render — no stale memo) ---
@@ -652,7 +652,7 @@ export default function Home() {
         <motion.div
           initial={{ left: expand.rect.left, top: expand.rect.top, width: expand.rect.width, height: expand.rect.height, borderRadius: 16, opacity: 1 }}
           animate={{ left: 0, top: 0, width: window.innerWidth, height: window.innerHeight, borderRadius: 24, opacity: 1 }}
-          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="fixed z-30 bg-background border border-border shadow-xl pointer-events-none"
         />,
         document.body
