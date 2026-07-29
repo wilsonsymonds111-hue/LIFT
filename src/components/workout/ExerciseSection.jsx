@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, memo, lazy, Suspense } from 'reac
 import { AnimatePresence, motion } from 'framer-motion';
 import { MoreHorizontal, Plus, Share } from 'lucide-react';
 import { getDefaultRestDuration } from '../../lib/exerciseDefaults';
-import ProgressGraph from '../ProgressGraph';
+const ProgressGraph = lazy(() => import('../ProgressGraph'));
 import SetRow from './SetRow';
 
 import RestTimeModal from './RestTimeModal';
@@ -278,7 +278,9 @@ const ExerciseSection = memo(function ExerciseSection({ exercise, onBestSet, dra
                 className="w-fit max-w-full text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2 focus:outline-none bg-blue-50 dark:bg-blue-950/40 border border-white rounded-full px-4 py-1.5 empty:bg-transparent empty:border-transparent empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 dark:empty:before:text-gray-500 empty:before:font-semibold transition-colors"
               />
             )}
-            <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} goal={nextGoal} />
+            <Suspense fallback={<div className="h-16 rounded-lg bg-gray-100 dark:bg-neutral-700/40 animate-pulse" />}>
+              <ProgressGraph history={displayHistory} animKey={graphAnimKey} animDir={animDir} isBodyweight={displayBodyweight} compact exerciseName={exercise.name} goal={nextGoal} />
+            </Suspense>
             {sets.map((s, i) => {
               const prevSet = i < lastSessionSets.length ? lastSessionSets[i] : null;
               const completedResult = completedSets[s.id];

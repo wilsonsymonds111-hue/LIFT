@@ -226,10 +226,11 @@ export default function Home() {
     // bounded by CAP so we never hang if something fails.
     window.setTimeout(() => navigate(`/active-workout/${template.id}`), 280);
     const reveal = () => {
-      const ready = !!document.querySelector('[data-active-workout="1"]');
+      const ready = !!window.__workoutPainted;
       const elapsed = Date.now() - t0;
       if ((ready && elapsed >= MIN_COVER) || elapsed >= CAP) {
         setExpand(null);
+        window.__workoutPainted = false;
       } else {
         window.requestAnimationFrame(reveal);
       }

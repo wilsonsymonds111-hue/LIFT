@@ -104,6 +104,16 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
   const [cancelling, setCancelling] = useState(false);
   const [finishTimer, setFinishTimer] = useState('00:00');
   const [isRestDay, setIsRestDay] = useState(false);
+  // Signal the opener that the sheet's first paint is done so the zoom panel
+  // lifts to painted content instead of a blank frame.
+  useEffect(() => {
+    window.__workoutPainted = false;
+    let raf2;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => { window.__workoutPainted = true; });
+    });
+    return () => { cancelAnimationFrame(raf1); if (raf2) cancelAnimationFrame(raf2); };
+  }, []);
   const { data: allTemplates = [] } = useWorkoutTemplates();
   // Compute initial exercises + migrated state once.
   // When restoring a saved session, exercise names are refreshed from the
