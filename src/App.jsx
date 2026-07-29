@@ -196,11 +196,13 @@ const TabPanel = memo(function TabPanel({ width, visited, Component, scrollToTop
 // Preload sub-pages after tab content settles
 const usePreloadSubPages = () => {
   useEffect(() => {
+    // The active-workout flow is the most latency-sensitive — start its chunk
+    // download immediately so it's already cached when the user taps a card.
+    import('./pages/ActiveWorkout');
     const preload = () => {
       import('./pages/Splits');
       import('./pages/BodyStats');
       import('./pages/NewTemplate');
-      import('./pages/ActiveWorkout');
       import('./pages/TemplateDetail');
       import('./pages/SplitDetail');
     };

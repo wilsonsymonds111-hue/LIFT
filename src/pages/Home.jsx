@@ -218,9 +218,23 @@ export default function Home() {
     if (!cardEl) { navigate(`/active-workout/${template.id}`); return; }
     const rect = cardEl.getBoundingClientRect();
     setExpand({ rect });
-    // Mount the live view behind the zoom panel so it's ready when revealed
-    window.setTimeout(() => navigate(`/active-workout/${template.id}`), 290);
-    window.setTimeout(() => setExpand(null), 480);
+    const t0 = Date.now();
+    const MIN_COVER = 430; // let the zoom animation finish
+    const CAP = 2500;      // never cover longer than this
+    // Mount the live view behind the zoom panel so it loads while covered.
+    // Keep the panel up until the workout sheet has actually rendered (no blank),
+    // bounded by CAP so we never hang if something fails.
+    window.setTimeout(() => navigate(`/active-workout/${template.id}`), 280);
+    const reveal = () => {
+      const ready = !!document.querySelector('[data-active-workout="1"]');
+      const elapsed = Date.now() - t0;
+      if ((ready && elapsed >= MIN_COVER) || elapsed >= CAP) {
+        setExpand(null);
+      } else {
+        window.requestAnimationFrame(reveal);
+      }
+    };
+    window.requestAnimationFrame(reveal);
   }, [navigate]);
 
   // --- Split categorization (computed fresh every render — no stale memo) ---

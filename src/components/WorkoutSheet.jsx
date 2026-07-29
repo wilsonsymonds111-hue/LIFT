@@ -671,6 +671,7 @@ export default function WorkoutSheet({ template, onFinish, onSaveHistory, savedS
     />
 
     <motion.div
+      data-active-workout="1"
       className="fixed z-40 flex flex-col overflow-hidden pointer-events-auto"
       animate={cancelling ? { y: '100%', opacity: 0 } : {}}
       transition={{ duration: 0.35, ease: 'easeInOut' }}
