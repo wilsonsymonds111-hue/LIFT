@@ -22,9 +22,10 @@ const relativeTime = (dateStr) => {
   return `${Math.floor(diffDays / 7)}w ago`;
 };
 
-const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent, dotColor, isMenuOpen, onToggleMenu, menuRef, onRemove, isReorderMode, dragHandleProps, onLongPress }) {
+const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent, dotColor, isMenuOpen, onToggleMenu, menuRef, onRemove, isReorderMode, dragHandleProps, onLongPress, onOpen }) {
   const navigate = useNavigate();
   const btnRef = useRef(null);
+  const cardRef = useRef(null);
 
   const setBtnRef = (el) => {
     btnRef.current = el;
@@ -39,6 +40,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
       {...(isReorderMode ? dragHandleProps : holdProps)}
     >
       <div
+        ref={cardRef}
         className={`relative w-full rounded-2xl p-5 transition-all duration-150 border bg-white/40 dark:bg-card/40 backdrop-blur-xl backdrop-saturate-150 overflow-hidden ${
           isReorderMode
             ? 'border-blue-400 dark:border-blue-500 shadow-[0_12px_40px_rgba(59,130,246,0.18)] scale-[1.02] cursor-grab active:cursor-grabbing'
@@ -67,7 +69,7 @@ const TemplateCard = memo(function TemplateCard({ template, isTodayCard, accent,
         </div>
       )}
 
-      <div onClick={isReorderMode ? undefined : () => navigate(`/active-workout/${template.id}`)} className={`${isReorderMode ? '' : 'cursor-pointer'} ${isTodayCard && !isReorderMode ? 'pl-1.5' : ''}`}>
+      <div onClick={isReorderMode ? undefined : () => onOpen?.(template, cardRef.current)} className={`${isReorderMode ? '' : 'cursor-pointer'} ${isTodayCard && !isReorderMode ? 'pl-1.5' : ''}`}>
         {/* Title row */}
         <div className="flex items-center gap-2 pr-10">
           <h4 className="text-lg font-extrabold text-foreground tracking-tight">{template.name}</h4>

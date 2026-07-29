@@ -69,14 +69,16 @@ const LOADING_SPINNER = (
 // For modal routes (template detail) — dim background instead of solid black
 const MODAL_FALLBACK = <div className="fixed inset-0 bg-black/40" />;
 
-const SlideIn = memo(({ children, transparent }) => (
+const fadeVariants = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } };
+
+const SlideIn = memo(({ children, transparent, fade }) => (
   <motion.div
     className={`w-full min-h-screen ${transparent ? '' : 'bg-background'}`}
-    variants={pageVariants}
+    variants={fade ? fadeVariants : pageVariants}
     initial="initial"
     animate="animate"
     exit="exit"
-    transition={PAGE_TRANSITION}
+    transition={fade ? { duration: 0.22, ease: 'easeInOut' } : PAGE_TRANSITION}
   >
     {children}
   </motion.div>
@@ -248,7 +250,7 @@ const AnimatedRoutes = memo(() => {
                 <Route path="/template/new" element={<SlideIn><NewTemplate /></SlideIn>} />
                 <Route path="/template/:id" element={<SlideIn transparent><TemplateDetail /></SlideIn>} />
                 <Route path="/split/:key" element={<SlideIn><SplitDetail /></SlideIn>} />
-                <Route path="/active-workout/:id" element={<SlideIn transparent><ActiveWorkout /></SlideIn>} />
+                <Route path="/active-workout/:id" element={<SlideIn transparent fade><ActiveWorkout /></SlideIn>} />
                 <Route path="/support-chat/:id" element={<SlideIn><SupportChat /></SlideIn>} />
                 <Route path="/terms" element={<SlideIn><Terms /></SlideIn>} />
                 <Route path="/privacy" element={<SlideIn><Privacy /></SlideIn>} />

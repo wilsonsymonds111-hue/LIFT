@@ -156,6 +156,7 @@ export default function Home() {
   const [showRenameSplit, setShowRenameSplit] = useState(false);
   const [cycleVersion, setCycleVersion] = useState(0);
   const [isReorderMode, setIsReorderMode] = useState(false);
+  const [expand, setExpand] = useState(null);
   const punchControls = useAnimationControls();
   const menuRef = useRef({});
   const splitMenuBtnRef = useRef(null);
@@ -212,6 +213,16 @@ export default function Home() {
     setSplitMenuOpen(false);
     setShowCalendarSync(true);
   }, []);
+
+  const handleOpenWorkout = useCallback((template, cardEl) => {
+    if (!cardEl) { navigate(`/active-workout/${template.id}`); return; }
+    const rect = cardEl.getBoundingClientRect();
+    setExpand({ rect });
+    window.setTimeout(() => {
+      navigate(`/active-workout/${template.id}`);
+      window.setTimeout(() => setExpand(null), 320);
+    }, 280);
+  }, [navigate]);
 
   // --- Split categorization (computed fresh every render — no stale memo) ---
 
@@ -522,6 +533,7 @@ export default function Home() {
                   <div ref={dragProvided.innerRef} {...dragProvided.draggableProps} style={dragProvided.draggableProps.style}>
                     <TemplateCard
                       template={template}
+                      onOpen={handleOpenWorkout}
                       isTodayCard={idx === todayWorkoutIndex}
                       accent={accent}
                       dotColor={WORKOUT_COLORS[idx % WORKOUT_COLORS.length]}
@@ -634,6 +646,16 @@ export default function Home() {
             onConfirm={handleRenameSplit}
           />
         </Suspense>
+      )}
+
+      {expand && createPortal(
+        <motion.div
+          initial={{ left: expand.rect.left, top: expand.rect.top, width: expand.rect.width, height: expand.rect.height, borderRadius: 16, opacity: 1 }}
+          animate={{ left: 0, top: 0, width: window.innerWidth, height: window.innerHeight, borderRadius: 24, opacity: 1 }}
+          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed z-30 bg-background border border-border shadow-xl pointer-events-none"
+        />,
+        document.body
       )}
 
     </div>
